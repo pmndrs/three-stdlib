@@ -5,6 +5,7 @@ import json from 'rollup-plugin-json'
 import glslify from 'rollup-plugin-glslify'
 import multiInput from 'rollup-plugin-multi-input'
 import { sizeSnapshot } from 'rollup-plugin-size-snapshot'
+import typescript from '@rollup/plugin-typescript'
 
 const root = process.platform === 'win32' ? path.resolve('/') : '/'
 const external = (id) => !id.startsWith('.') && !id.startsWith(root)
@@ -35,7 +36,7 @@ export default [
     preserveModules: true,
   },
   {
-    input: ['src/**/*.js', '!src/index.js'],
+    input: ['src/**/*.js', 'src/**/*.ts', '!src/index.js'],
     output: { dir: `dist`, format: 'esm' },
     external,
     plugins: [
@@ -43,10 +44,11 @@ export default [
       json(),
       babel(getBabelOptions({ useESModules: true }, '>1%, not dead, not ie 11, not op_mini all')),
       resolve({ extensions }),
+      typescript(),
     ],
   },
   {
-    input: ['src/**/*.js', '!src/index.js'],
+    input: ['src/**/*.js', 'src/**/*.ts', '!src/index.js'],
     output: { dir: `dist`, format: 'cjs' },
     external,
     plugins: [
