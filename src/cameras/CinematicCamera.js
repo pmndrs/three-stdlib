@@ -25,7 +25,7 @@ class CinematicCamera extends PerspectiveCamera {
       samples: 4,
     }
 
-    var depthShader = BokehDepthShader
+    const depthShader = BokehDepthShader
 
     this.materialDepth = new ShaderMaterial({
       uniforms: depthShader.uniforms,
@@ -65,13 +65,13 @@ class CinematicCamera extends PerspectiveCamera {
   }
 
   linearize(depth) {
-    var zfar = this.far
-    var znear = this.near
+    const zfar = this.far
+    const znear = this.near
     return (-zfar * znear) / (depth * (zfar - znear) - zfar)
   }
 
   smoothstep(near, far, depth) {
-    var x = this.saturate((depth - near) / (far - near))
+    const x = this.saturate((depth - near) / (far - near))
     return x * x * (3 - 2 * x)
   }
 
@@ -83,7 +83,7 @@ class CinematicCamera extends PerspectiveCamera {
   focusAt(focusDistance) {
     if (focusDistance === undefined) focusDistance = 20
 
-    var focalLength = this.getFocalLength()
+    const focalLength = this.getFocalLength()
 
     // distance from the camera (normal to frustrum) to focus on
     this.focus = focusDistance
@@ -122,7 +122,7 @@ class CinematicCamera extends PerspectiveCamera {
 
       this.postprocessing.scene.add(this.postprocessing.camera)
 
-      var pars = {
+      const pars = {
         minFilter: LinearFilter,
         magFilter: LinearFilter,
         format: RGBFormat,
@@ -130,7 +130,7 @@ class CinematicCamera extends PerspectiveCamera {
       this.postprocessing.rtTextureDepth = new WebGLRenderTarget(window.innerWidth, window.innerHeight, pars)
       this.postprocessing.rtTextureColor = new WebGLRenderTarget(window.innerWidth, window.innerHeight, pars)
 
-      var bokeh_shader = BokehShader
+      const bokeh_shader = BokehShader
 
       this.postprocessing.bokeh_uniforms = UniformsUtils.clone(bokeh_shader.uniforms)
 
@@ -177,7 +177,7 @@ class CinematicCamera extends PerspectiveCamera {
 
   renderCinematic(scene, renderer) {
     if (this.postprocessing.enabled) {
-      var currentRenderTarget = renderer.getRenderTarget()
+      const currentRenderTarget = renderer.getRenderTarget()
 
       renderer.clear()
 

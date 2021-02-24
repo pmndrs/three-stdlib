@@ -85,7 +85,7 @@ export default class Frustum {
   }
 
   toSpace(cameraMatrix, target) {
-    for (var i = 0; i < 4; i++) {
+    for (let i = 0; i < 4; i++) {
       target.vertices.near[i].copy(this.vertices.near[i]).applyMatrix4(cameraMatrix)
 
       target.vertices.far[i].copy(this.vertices.far[i]).applyMatrix4(cameraMatrix)

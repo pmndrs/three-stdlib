@@ -2,22 +2,22 @@ import { EventDispatcher, Matrix4, Plane, Raycaster, Vector2, Vector3 } from '..
 
 class DragControls extends EventDispatcher {
   constructor(_objects, _camera, _domElement) {
-    var _plane = new Plane()
-    var _raycaster = new Raycaster()
+    const _plane = new Plane()
+    const _raycaster = new Raycaster()
 
-    var _mouse = new Vector2()
-    var _offset = new Vector3()
-    var _intersection = new Vector3()
-    var _worldPosition = new Vector3()
-    var _inverseMatrix = new Matrix4()
-    var _intersections = []
+    const _mouse = new Vector2()
+    const _offset = new Vector3()
+    const _intersection = new Vector3()
+    const _worldPosition = new Vector3()
+    const _inverseMatrix = new Matrix4()
+    const _intersections = []
 
-    var _selected = null,
+    let _selected = null,
       _hovered = null
 
     //
 
-    var scope = this
+    const scope = this
 
     function activate() {
       _domElement.addEventListener('pointermove', onPointerMove)
@@ -63,7 +63,7 @@ class DragControls extends EventDispatcher {
     }
 
     function onMouseMove(event) {
-      var rect = _domElement.getBoundingClientRect()
+      const rect = _domElement.getBoundingClientRect()
 
       _mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1
       _mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1
@@ -86,7 +86,7 @@ class DragControls extends EventDispatcher {
       _raycaster.intersectObjects(_objects, true, _intersections)
 
       if (_intersections.length > 0) {
-        var object = _intersections[0].object
+        const object = _intersections[0].object
 
         _plane.setFromNormalAndCoplanarPoint(
           _camera.getWorldDirection(_plane.normal),
@@ -173,7 +173,7 @@ class DragControls extends EventDispatcher {
       event.preventDefault()
       event = event.changedTouches[0]
 
-      var rect = _domElement.getBoundingClientRect()
+      const rect = _domElement.getBoundingClientRect()
 
       _mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1
       _mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1
@@ -195,7 +195,7 @@ class DragControls extends EventDispatcher {
       event.preventDefault()
       event = event.changedTouches[0]
 
-      var rect = _domElement.getBoundingClientRect()
+      const rect = _domElement.getBoundingClientRect()
 
       _mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1
       _mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1

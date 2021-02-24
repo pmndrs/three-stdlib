@@ -1,6 +1,6 @@
 import { Vector2 } from '../../../build/three.module.js'
 
-var SelectionHelper = (() => {
+const SelectionHelper = (() => {
   class SelectionHelper {
     constructor(selectionBox, renderer, cssClassName) {
       this.element = document.createElement('div')

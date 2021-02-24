@@ -15,7 +15,7 @@ import { MMDPhysics } from '../animation/MMDPhysics.js'
  *  - more precise grant skinning support.
  */
 
-var MMDAnimationHelper = (() => {
+const MMDAnimationHelper = (() => {
   /**
    * @param {Object} params - (optional)
    * @param {boolean} params.sync - Whether animation durations of added objects are synched. Default is true.
@@ -137,7 +137,7 @@ var MMDAnimationHelper = (() => {
     update: function (delta) {
       if (this.audioManager !== null) this.audioManager.control(delta)
 
-      for (var i = 0; i < this.meshes.length; i++) {
+      for (let i = 0; i < this.meshes.length; i++) {
         this._animateMesh(this.meshes[i], delta)
       }
 
@@ -164,25 +164,25 @@ var MMDAnimationHelper = (() => {
 
       if (params.resetPose !== false) mesh.pose()
 
-      var bones = mesh.skeleton.bones
-      var boneParams = vpd.bones
+      const bones = mesh.skeleton.bones
+      const boneParams = vpd.bones
 
-      var boneNameDictionary = {}
+      const boneNameDictionary = {}
 
       for (var i = 0, il = bones.length; i < il; i++) {
         boneNameDictionary[bones[i].name] = i
       }
 
-      var vector = new Vector3()
-      var quaternion = new Quaternion()
+      const vector = new Vector3()
+      const quaternion = new Quaternion()
 
       for (var i = 0, il = boneParams.length; i < il; i++) {
-        var boneParam = boneParams[i]
-        var boneIndex = boneNameDictionary[boneParam.name]
+        const boneParam = boneParams[i]
+        const boneIndex = boneNameDictionary[boneParam.name]
 
         if (boneIndex === undefined) continue
 
-        var bone = bones[boneIndex]
+        const bone = bones[boneIndex]
         bone.position.add(vector.fromArray(boneParam.translation))
         bone.quaternion.multiply(quaternion.fromArray(boneParam.quaternion))
       }
@@ -215,7 +215,7 @@ var MMDAnimationHelper = (() => {
       this.enabled[key] = enabled
 
       if (key === 'physics') {
-        for (var i = 0, il = this.meshes.length; i < il; i++) {
+        for (let i = 0, il = this.meshes.length; i < il; i++) {
           this._optimizeIK(this.meshes[i], enabled)
         }
       }
@@ -290,10 +290,10 @@ var MMDAnimationHelper = (() => {
     },
 
     _removeMesh: function (mesh) {
-      var found = false
-      var writeIndex = 0
+      let found = false
+      let writeIndex = 0
 
-      for (var i = 0, il = this.meshes.length; i < il; i++) {
+      for (let i = 0, il = this.meshes.length; i < il; i++) {
         if (this.meshes[i] === mesh) {
           this.objects.delete(mesh)
           found = true
@@ -340,20 +340,20 @@ var MMDAnimationHelper = (() => {
     },
 
     _setupMeshAnimation: function (mesh, animation) {
-      var objects = this.objects.get(mesh)
+      const objects = this.objects.get(mesh)
 
       if (animation !== undefined) {
-        var animations = Array.isArray(animation) ? animation : [animation]
+        const animations = Array.isArray(animation) ? animation : [animation]
 
         objects.mixer = new AnimationMixer(mesh)
 
-        for (var i = 0, il = animations.length; i < il; i++) {
+        for (let i = 0, il = animations.length; i < il; i++) {
           objects.mixer.clipAction(animations[i]).play()
         }
 
         // TODO: find a workaround not to access ._clip looking like a private property
         objects.mixer.addEventListener('loop', (event) => {
-          var tracks = event.action._clip.tracks
+          const tracks = event.action._clip.tracks
 
           if (tracks.length > 0 && tracks[0].name.slice(0, 6) !== '.bones') return
 
@@ -368,24 +368,24 @@ var MMDAnimationHelper = (() => {
     },
 
     _setupCameraAnimation: function (camera, animation) {
-      var animations = Array.isArray(animation) ? animation : [animation]
+      const animations = Array.isArray(animation) ? animation : [animation]
 
-      var objects = this.objects.get(camera)
+      const objects = this.objects.get(camera)
 
       objects.mixer = new AnimationMixer(camera)
 
-      for (var i = 0, il = animations.length; i < il; i++) {
+      for (let i = 0, il = animations.length; i < il; i++) {
         objects.mixer.clipAction(animations[i]).play()
       }
     },
 
     _setupMeshPhysics: function (mesh, params) {
-      var objects = this.objects.get(mesh)
+      const objects = this.objects.get(mesh)
 
       // shared physics is experimental
 
       if (params.world === undefined && this.sharedPhysics) {
-        var masterPhysics = this._getMasterPhysics()
+        const masterPhysics = this._getMasterPhysics()
 
         if (masterPhysics !== null) world = masterPhysics.world // eslint-disable-line no-undef
       }
@@ -403,13 +403,13 @@ var MMDAnimationHelper = (() => {
     },
 
     _animateMesh: function (mesh, delta) {
-      var objects = this.objects.get(mesh)
+      const objects = this.objects.get(mesh)
 
-      var mixer = objects.mixer
-      var ikSolver = objects.ikSolver
-      var grantSolver = objects.grantSolver
-      var physics = objects.physics
-      var looped = objects.looped
+      const mixer = objects.mixer
+      const ikSolver = objects.ikSolver
+      const grantSolver = objects.grantSolver
+      const physics = objects.physics
+      const looped = objects.looped
 
       // alternate solution to save/restore bones but less performant?
       //mesh.pose();
@@ -445,7 +445,7 @@ var MMDAnimationHelper = (() => {
     },
 
     _animateCamera: function (camera, delta) {
-      var mixer = this.objects.get(camera).mixer
+      const mixer = this.objects.get(camera).mixer
 
       if (mixer && this.enabled.cameraAnimation) {
         mixer.update(delta)
@@ -459,15 +459,15 @@ var MMDAnimationHelper = (() => {
     },
 
     _optimizeIK: function (mesh, physicsEnabled) {
-      var iks = mesh.geometry.userData.MMD.iks
-      var bones = mesh.geometry.userData.MMD.bones
+      const iks = mesh.geometry.userData.MMD.iks
+      const bones = mesh.geometry.userData.MMD.bones
 
-      for (var i = 0, il = iks.length; i < il; i++) {
-        var ik = iks[i]
-        var links = ik.links
+      for (let i = 0, il = iks.length; i < il; i++) {
+        const ik = iks[i]
+        const links = ik.links
 
-        for (var j = 0, jl = links.length; j < jl; j++) {
-          var link = links[j]
+        for (let j = 0, jl = links.length; j < jl; j++) {
+          const link = links[j]
 
           if (physicsEnabled === true) {
             // disable IK of the bone the corresponding rigidBody type of which is 1 or 2
@@ -506,12 +506,12 @@ var MMDAnimationHelper = (() => {
      * TODO: Not to access private properties ( ._actions and ._clip )
      */
     _syncDuration: function () {
-      var max = 0.0
+      let max = 0.0
 
-      var objects = this.objects
-      var meshes = this.meshes
-      var camera = this.camera
-      var audioManager = this.audioManager
+      const objects = this.objects
+      const meshes = this.meshes
+      const camera = this.camera
+      const audioManager = this.audioManager
 
       // get the longest duration
 
@@ -564,7 +564,7 @@ var MMDAnimationHelper = (() => {
 
         if (mixer === undefined) continue
 
-        for (var j = 0, jl = mixer._actions.length; j < jl; j++) {
+        for (const j = 0, jl = mixer._actions.length; j < jl; j++) {
           mixer._actions[j]._clip.duration = max
         }
       }
@@ -587,16 +587,16 @@ var MMDAnimationHelper = (() => {
     // workaround
 
     _updatePropertyMixersBuffer: function (mesh) {
-      var mixer = this.objects.get(mesh).mixer
+      const mixer = this.objects.get(mesh).mixer
 
-      var propertyMixers = mixer._bindings
-      var accuIndex = mixer._accuIndex
+      const propertyMixers = mixer._bindings
+      const accuIndex = mixer._accuIndex
 
-      for (var i = 0, il = propertyMixers.length; i < il; i++) {
-        var propertyMixer = propertyMixers[i]
-        var buffer = propertyMixer.buffer
-        var stride = propertyMixer.valueSize
-        var offset = (accuIndex + 1) * stride
+      for (let i = 0, il = propertyMixers.length; i < il; i++) {
+        const propertyMixer = propertyMixers[i]
+        const buffer = propertyMixer.buffer
+        const stride = propertyMixer.valueSize
+        const offset = (accuIndex + 1) * stride
 
         propertyMixer.binding.getValue(buffer, offset)
       }
@@ -612,35 +612,35 @@ var MMDAnimationHelper = (() => {
      * 2. Applying Grant two or more times without reset the posing breaks model.
      */
     _saveBones: function (mesh) {
-      var objects = this.objects.get(mesh)
+      const objects = this.objects.get(mesh)
 
-      var bones = mesh.skeleton.bones
+      const bones = mesh.skeleton.bones
 
-      var backupBones = objects.backupBones
+      let backupBones = objects.backupBones
 
       if (backupBones === undefined) {
         backupBones = new Float32Array(bones.length * 7)
         objects.backupBones = backupBones
       }
 
-      for (var i = 0, il = bones.length; i < il; i++) {
-        var bone = bones[i]
+      for (let i = 0, il = bones.length; i < il; i++) {
+        const bone = bones[i]
         bone.position.toArray(backupBones, i * 7)
         bone.quaternion.toArray(backupBones, i * 7 + 3)
       }
     },
 
     _restoreBones: function (mesh) {
-      var objects = this.objects.get(mesh)
+      const objects = this.objects.get(mesh)
 
-      var backupBones = objects.backupBones
+      const backupBones = objects.backupBones
 
       if (backupBones === undefined) return
 
-      var bones = mesh.skeleton.bones
+      const bones = mesh.skeleton.bones
 
-      for (var i = 0, il = bones.length; i < il; i++) {
-        var bone = bones[i]
+      for (let i = 0, il = bones.length; i < il; i++) {
+        const bone = bones[i]
         bone.position.fromArray(backupBones, i * 7)
         bone.quaternion.fromArray(backupBones, i * 7 + 3)
       }
@@ -651,8 +651,8 @@ var MMDAnimationHelper = (() => {
     _getMasterPhysics: function () {
       if (this.masterPhysics !== null) return this.masterPhysics
 
-      for (var i = 0, il = this.meshes.length; i < il; i++) {
-        var physics = this.meshes[i].physics
+      for (let i = 0, il = this.meshes.length; i < il; i++) {
+        const physics = this.meshes[i].physics
 
         if (physics !== undefined && physics !== null) {
           this.masterPhysics = physics
@@ -666,7 +666,7 @@ var MMDAnimationHelper = (() => {
     _updateSharedPhysics: function (delta) {
       if (this.meshes.length === 0 || !this.enabled.physics || !this.sharedPhysics) return
 
-      var physics = this._getMasterPhysics()
+      const physics = this._getMasterPhysics()
 
       if (physics === null) return
 
@@ -765,16 +765,16 @@ var MMDAnimationHelper = (() => {
      * @return {GrantSolver}
      */
     update: (() => {
-      var quaternion = new Quaternion()
+      const quaternion = new Quaternion()
 
       return function () {
-        var bones = this.mesh.skeleton.bones
-        var grants = this.grants
+        const bones = this.mesh.skeleton.bones
+        const grants = this.grants
 
-        for (var i = 0, il = grants.length; i < il; i++) {
-          var grant = grants[i]
-          var bone = bones[grant.index]
-          var parentBone = bones[grant.parentIndex]
+        for (let i = 0, il = grants.length; i < il; i++) {
+          const grant = grants[i]
+          const bone = bones[grant.index]
+          const parentBone = bones[grant.parentIndex]
 
           if (grant.isLocal) {
             // TODO: implement

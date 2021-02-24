@@ -6,9 +6,9 @@ import { Euler, EventDispatcher, MathUtils, Quaternion, Vector3 } from '../../..
 
 class DeviceOrientationControls extends EventDispatcher {
   constructor(object) {
-    var scope = this
-    var changeEvent = { type: 'change' }
-    var EPS = 0.000001
+    const scope = this
+    const changeEvent = { type: 'change' }
+    const EPS = 0.000001
 
     this.object = object
     this.object.rotation.reorder('YXZ')
@@ -20,24 +20,24 @@ class DeviceOrientationControls extends EventDispatcher {
 
     this.alphaOffset = 0 // radians
 
-    var onDeviceOrientationChangeEvent = (event) => {
+    const onDeviceOrientationChangeEvent = (event) => {
       scope.deviceOrientation = event
     }
 
-    var onScreenOrientationChangeEvent = () => {
+    const onScreenOrientationChangeEvent = () => {
       scope.screenOrientation = window.orientation || 0
     }
 
     // The angles alpha, beta and gamma form a set of intrinsic Tait-Bryan angles of type Z-X'-Y''
 
-    var setObjectQuaternion = (() => {
-      var zee = new Vector3(0, 0, 1)
+    const setObjectQuaternion = (() => {
+      const zee = new Vector3(0, 0, 1)
 
-      var euler = new Euler()
+      const euler = new Euler()
 
-      var q0 = new Quaternion()
+      const q0 = new Quaternion()
 
-      var q1 = new Quaternion(-Math.sqrt(0.5), 0, 0, Math.sqrt(0.5)) // - PI/2 around the x-axis
+      const q1 = new Quaternion(-Math.sqrt(0.5), 0, 0, Math.sqrt(0.5)) // - PI/2 around the x-axis
 
       return (quaternion, alpha, beta, gamma, orient) => {
         euler.set(beta, alpha, -gamma, 'YXZ') // 'ZXY' for the device, but 'YXZ' for us
@@ -85,21 +85,21 @@ class DeviceOrientationControls extends EventDispatcher {
     }
 
     this.update = (() => {
-      var lastQuaternion = new Quaternion()
+      const lastQuaternion = new Quaternion()
 
       return () => {
         if (scope.enabled === false) return
 
-        var device = scope.deviceOrientation
+        const device = scope.deviceOrientation
 
         if (device) {
-          var alpha = device.alpha ? MathUtils.degToRad(device.alpha) + scope.alphaOffset : 0 // Z
+          const alpha = device.alpha ? MathUtils.degToRad(device.alpha) + scope.alphaOffset : 0 // Z
 
-          var beta = device.beta ? MathUtils.degToRad(device.beta) : 0 // X'
+          const beta = device.beta ? MathUtils.degToRad(device.beta) : 0 // X'
 
-          var gamma = device.gamma ? MathUtils.degToRad(device.gamma) : 0 // Y''
+          const gamma = device.gamma ? MathUtils.degToRad(device.gamma) : 0 // Y''
 
-          var orient = scope.screenOrientation ? MathUtils.degToRad(scope.screenOrientation) : 0 // O
+          const orient = scope.screenOrientation ? MathUtils.degToRad(scope.screenOrientation) : 0 // O
 
           setObjectQuaternion(scope.object.quaternion, alpha, beta, gamma, orient)
 

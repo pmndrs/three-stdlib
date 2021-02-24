@@ -19,23 +19,23 @@ class PointerLockControls extends EventDispatcher {
     // internals
     //
 
-    var scope = this
+    const scope = this
 
-    var changeEvent = { type: 'change' }
-    var lockEvent = { type: 'lock' }
-    var unlockEvent = { type: 'unlock' }
+    const changeEvent = { type: 'change' }
+    const lockEvent = { type: 'lock' }
+    const unlockEvent = { type: 'unlock' }
 
-    var euler = new Euler(0, 0, 0, 'YXZ')
+    const euler = new Euler(0, 0, 0, 'YXZ')
 
-    var PI_2 = Math.PI / 2
+    const PI_2 = Math.PI / 2
 
-    var vec = new Vector3()
+    const vec = new Vector3()
 
     function onMouseMove(event) {
       if (scope.isLocked === false) return
 
-      var movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0
-      var movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0
+      const movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0
+      const movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0
 
       euler.setFromQuaternion(camera.quaternion)
 
@@ -87,7 +87,7 @@ class PointerLockControls extends EventDispatcher {
       camera
 
     this.getDirection = (() => {
-      var direction = new Vector3(0, 0, -1)
+      const direction = new Vector3(0, 0, -1)
 
       return (v) => v.copy(direction).applyQuaternion(camera.quaternion)
     })()

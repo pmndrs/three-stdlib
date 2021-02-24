@@ -56,43 +56,45 @@ import { BackSide, Color, ShaderMaterial, UniformsLib, UniformsUtils } from '../
  * };
  */
 
-var OutlineEffect = function (renderer, parameters) {
+const OutlineEffect = function (renderer, parameters) {
   parameters = parameters || {}
 
   this.enabled = true
 
-  var defaultThickness = parameters.defaultThickness !== undefined ? parameters.defaultThickness : 0.003
-  var defaultColor = new Color().fromArray(parameters.defaultColor !== undefined ? parameters.defaultColor : [0, 0, 0])
-  var defaultAlpha = parameters.defaultAlpha !== undefined ? parameters.defaultAlpha : 1.0
-  var defaultKeepAlive = parameters.defaultKeepAlive !== undefined ? parameters.defaultKeepAlive : false
+  const defaultThickness = parameters.defaultThickness !== undefined ? parameters.defaultThickness : 0.003
+  const defaultColor = new Color().fromArray(
+    parameters.defaultColor !== undefined ? parameters.defaultColor : [0, 0, 0],
+  )
+  const defaultAlpha = parameters.defaultAlpha !== undefined ? parameters.defaultAlpha : 1.0
+  const defaultKeepAlive = parameters.defaultKeepAlive !== undefined ? parameters.defaultKeepAlive : false
 
   // object.material.uuid -> outlineMaterial or
   // object.material[ n ].uuid -> outlineMaterial
   // save at the outline material creation and release
   // if it's unused removeThresholdCount frames
   // unless keepAlive is true.
-  var cache = {}
+  const cache = {}
 
-  var removeThresholdCount = 60
+  const removeThresholdCount = 60
 
   // outlineMaterial.uuid -> object.material or
   // outlineMaterial.uuid -> object.material[ n ]
   // save before render and release after render.
-  var originalMaterials = {}
+  const originalMaterials = {}
 
   // object.uuid -> originalOnBeforeRender
   // save before render and release after render.
-  var originalOnBeforeRenders = {}
+  const originalOnBeforeRenders = {}
 
   //this.cache = cache;  // for debug
 
-  var uniformsOutline = {
+  const uniformsOutline = {
     outlineThickness: { value: defaultThickness },
     outlineColor: { value: defaultColor },
     outlineAlpha: { value: defaultAlpha },
   }
 
-  var vertexShader = [
+  const vertexShader = [
     '#include <common>',
     '#include <uv_pars_vertex>',
     '#include <displacementmap_pars_vertex>',
@@ -139,7 +141,7 @@ var OutlineEffect = function (renderer, parameters) {
     '}',
   ].join('\n')
 
-  var fragmentShader = [
+  const fragmentShader = [
     '#include <common>',
     '#include <fog_pars_fragment>',
     '#include <logdepthbuf_pars_fragment>',
@@ -174,7 +176,7 @@ var OutlineEffect = function (renderer, parameters) {
   }
 
   function getOutlineMaterialFromCache(originalMaterial) {
-    var data = cache[originalMaterial.uuid]
+    let data = cache[originalMaterial.uuid]
 
     if (data === undefined) {
       data = {
@@ -193,7 +195,7 @@ var OutlineEffect = function (renderer, parameters) {
   }
 
   function getOutlineMaterial(originalMaterial) {
-    var outlineMaterial = getOutlineMaterialFromCache(originalMaterial)
+    const outlineMaterial = getOutlineMaterialFromCache(originalMaterial)
 
     originalMaterials[outlineMaterial.uuid] = originalMaterial
 
@@ -203,8 +205,8 @@ var OutlineEffect = function (renderer, parameters) {
   }
 
   function isCompatible(object) {
-    var geometry = object.geometry
-    var hasNormals = false
+    const geometry = object.geometry
+    let hasNormals = false
 
     if (object.geometry !== undefined) {
       if (geometry.isBufferGeometry) {
@@ -221,7 +223,7 @@ var OutlineEffect = function (renderer, parameters) {
     if (isCompatible(object) === false) return
 
     if (Array.isArray(object.material)) {
-      for (var i = 0, il = object.material.length; i < il; i++) {
+      for (let i = 0, il = object.material.length; i < il; i++) {
         object.material[i] = getOutlineMaterial(object.material[i])
       }
     } else {
@@ -236,7 +238,7 @@ var OutlineEffect = function (renderer, parameters) {
     if (isCompatible(object) === false) return
 
     if (Array.isArray(object.material)) {
-      for (var i = 0, il = object.material.length; i < il; i++) {
+      for (let i = 0, il = object.material.length; i < il; i++) {
         object.material[i] = originalMaterials[object.material[i].uuid]
       }
     } else {
@@ -247,7 +249,7 @@ var OutlineEffect = function (renderer, parameters) {
   }
 
   function onBeforeRender(renderer, scene, camera, geometry, material) {
-    var originalMaterial = originalMaterials[material.uuid]
+    const originalMaterial = originalMaterials[material.uuid]
 
     // just in case
     if (originalMaterial === undefined) return
@@ -256,7 +258,7 @@ var OutlineEffect = function (renderer, parameters) {
   }
 
   function updateUniforms(material, originalMaterial) {
-    var outlineParameters = originalMaterial.userData.outlineParameters
+    const outlineParameters = originalMaterial.userData.outlineParameters
 
     material.uniforms.outlineAlpha.value = originalMaterial.opacity
 
@@ -277,7 +279,7 @@ var OutlineEffect = function (renderer, parameters) {
   function updateOutlineMaterial(material, originalMaterial) {
     if (material.name === 'invisible') return
 
-    var outlineParameters = originalMaterial.userData.outlineParameters
+    const outlineParameters = originalMaterial.userData.outlineParameters
 
     material.skinning = originalMaterial.skinning
     material.morphTargets = originalMaterial.morphTargets
@@ -318,7 +320,7 @@ var OutlineEffect = function (renderer, parameters) {
   }
 
   function cleanupCache() {
-    var keys
+    let keys
 
     // clear originialMaterials
     keys = Object.keys(originalMaterials)
@@ -338,7 +340,7 @@ var OutlineEffect = function (renderer, parameters) {
     keys = Object.keys(cache)
 
     for (var i = 0, il = keys.length; i < il; i++) {
-      var key = keys[i]
+      const key = keys[i]
 
       if (cache[key].used === false) {
         cache[key].count++
@@ -354,8 +356,8 @@ var OutlineEffect = function (renderer, parameters) {
   }
 
   this.render = function (scene, camera) {
-    var renderTarget
-    var forceClear = false
+    let renderTarget
+    let forceClear = false
 
     if (arguments[2] !== undefined) {
       console.warn(
@@ -378,7 +380,7 @@ var OutlineEffect = function (renderer, parameters) {
       return
     }
 
-    var currentAutoClear = renderer.autoClear
+    const currentAutoClear = renderer.autoClear
     renderer.autoClear = this.autoClear
 
     renderer.render(scene, camera)
@@ -389,10 +391,10 @@ var OutlineEffect = function (renderer, parameters) {
   }
 
   this.renderOutline = (scene, camera) => {
-    var currentAutoClear = renderer.autoClear
-    var currentSceneAutoUpdate = scene.autoUpdate
-    var currentSceneBackground = scene.background
-    var currentShadowMapEnabled = renderer.shadowMap.enabled
+    const currentAutoClear = renderer.autoClear
+    const currentSceneAutoUpdate = scene.autoUpdate
+    const currentSceneBackground = scene.background
+    const currentShadowMapEnabled = renderer.shadowMap.enabled
 
     scene.autoUpdate = false
     scene.background = null

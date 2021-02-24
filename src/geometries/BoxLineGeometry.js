@@ -12,17 +12,17 @@ class BoxLineGeometry extends BufferGeometry {
     heightSegments = Math.floor(heightSegments) || 1
     depthSegments = Math.floor(depthSegments) || 1
 
-    var widthHalf = width / 2
-    var heightHalf = height / 2
-    var depthHalf = depth / 2
+    const widthHalf = width / 2
+    const heightHalf = height / 2
+    const depthHalf = depth / 2
 
-    var segmentWidth = width / widthSegments
-    var segmentHeight = height / heightSegments
-    var segmentDepth = depth / depthSegments
+    const segmentWidth = width / widthSegments
+    const segmentHeight = height / heightSegments
+    const segmentDepth = depth / depthSegments
 
-    var vertices = []
+    const vertices = []
 
-    var x = -widthHalf,
+    let x = -widthHalf,
       y = -heightHalf,
       z = -depthHalf
 

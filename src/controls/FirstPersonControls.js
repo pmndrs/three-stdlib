@@ -1,6 +1,6 @@
 import { MathUtils, Spherical, Vector3 } from '../../../build/three.module.js'
 
-var FirstPersonControls = function (object, domElement) {
+const FirstPersonControls = function (object, domElement) {
   if (domElement === undefined) {
     console.warn('THREE.FirstPersonControls: The second parameter "domElement" is now mandatory.')
     domElement = document
@@ -49,12 +49,12 @@ var FirstPersonControls = function (object, domElement) {
 
   // private variables
 
-  var lat = 0
-  var lon = 0
+  let lat = 0
+  let lon = 0
 
-  var lookDirection = new Vector3()
-  var spherical = new Spherical()
-  var target = new Vector3()
+  const lookDirection = new Vector3()
+  const spherical = new Spherical()
+  const target = new Vector3()
 
   //
 
@@ -203,21 +203,21 @@ var FirstPersonControls = function (object, domElement) {
   }
 
   this.update = (() => {
-    var targetPosition = new Vector3()
+    const targetPosition = new Vector3()
 
     return function update(delta) {
       if (this.enabled === false) return
 
       if (this.heightSpeed) {
-        var y = MathUtils.clamp(this.object.position.y, this.heightMin, this.heightMax)
-        var heightDelta = y - this.heightMin
+        const y = MathUtils.clamp(this.object.position.y, this.heightMin, this.heightMax)
+        const heightDelta = y - this.heightMin
 
         this.autoSpeedFactor = delta * (heightDelta * this.heightCoef)
       } else {
         this.autoSpeedFactor = 0.0
       }
 
-      var actualMoveSpeed = delta * this.movementSpeed
+      const actualMoveSpeed = delta * this.movementSpeed
 
       if (this.moveForward || (this.autoForward && !this.moveBackward))
         this.object.translateZ(-(actualMoveSpeed + this.autoSpeedFactor))
@@ -229,13 +229,13 @@ var FirstPersonControls = function (object, domElement) {
       if (this.moveUp) this.object.translateY(actualMoveSpeed)
       if (this.moveDown) this.object.translateY(-actualMoveSpeed)
 
-      var actualLookSpeed = delta * this.lookSpeed
+      let actualLookSpeed = delta * this.lookSpeed
 
       if (!this.activeLook) {
         actualLookSpeed = 0
       }
 
-      var verticalLookRatio = 1
+      let verticalLookRatio = 1
 
       if (this.constrainVertical) {
         verticalLookRatio = Math.PI / (this.verticalMax - this.verticalMin)
@@ -246,14 +246,14 @@ var FirstPersonControls = function (object, domElement) {
 
       lat = Math.max(-85, Math.min(85, lat))
 
-      var phi = MathUtils.degToRad(90 - lat)
-      var theta = MathUtils.degToRad(lon)
+      let phi = MathUtils.degToRad(90 - lat)
+      const theta = MathUtils.degToRad(lon)
 
       if (this.constrainVertical) {
         phi = MathUtils.mapLinear(phi, 0, Math.PI, this.verticalMin, this.verticalMax)
       }
 
-      var position = this.object.position
+      const position = this.object.position
 
       targetPosition.setFromSphericalCoords(1, phi, theta).add(position)
 
@@ -296,7 +296,7 @@ var FirstPersonControls = function (object, domElement) {
   }
 
   function setOrientation(controls) {
-    var quaternion = controls.object.quaternion
+    const quaternion = controls.object.quaternion
 
     lookDirection.set(0, 0, -1).applyQuaternion(quaternion)
     spherical.setFromVector3(lookDirection)

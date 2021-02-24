@@ -10,7 +10,7 @@ import { Vector3, Vector4 } from '../../../build/three.module.js'
  *	NURBS Utils
  **************************************************************/
 
-var NURBSUtils = {
+const NURBSUtils = {
   /*
 	Finds knot vector span.
 
@@ -21,7 +21,7 @@ var NURBSUtils = {
 	returns the span
 	*/
   findSpan: function (p, u, U) {
-    var n = U.length - p - 1
+    const n = U.length - p - 1
 
     if (u >= U[n]) {
       return n - 1
@@ -31,9 +31,9 @@ var NURBSUtils = {
       return p
     }
 
-    var low = p
-    var high = n
-    var mid = Math.floor((low + high) / 2)
+    let low = p
+    let high = n
+    let mid = Math.floor((low + high) / 2)
 
     while (u < U[mid] || u >= U[mid + 1]) {
       if (u < U[mid]) {
@@ -59,21 +59,21 @@ var NURBSUtils = {
 	returns array[p+1] with basis functions values.
 	*/
   calcBasisFunctions: function (span, u, p, U) {
-    var N = []
-    var left = []
-    var right = []
+    const N = []
+    const left = []
+    const right = []
     N[0] = 1.0
 
-    for (var j = 1; j <= p; ++j) {
+    for (let j = 1; j <= p; ++j) {
       left[j] = u - U[span + 1 - j]
       right[j] = U[span + j] - u
 
-      var saved = 0.0
+      let saved = 0.0
 
-      for (var r = 0; r < j; ++r) {
-        var rv = right[r + 1]
-        var lv = left[j - r]
-        var temp = N[r] / (rv + lv)
+      for (let r = 0; r < j; ++r) {
+        const rv = right[r + 1]
+        const lv = left[j - r]
+        const temp = N[r] / (rv + lv)
         N[r] = saved + rv * temp
         saved = lv * temp
       }
@@ -95,14 +95,14 @@ var NURBSUtils = {
 	returns point for given u
 	*/
   calcBSplinePoint: function (p, U, P, u) {
-    var span = this.findSpan(p, u, U)
-    var N = this.calcBasisFunctions(span, u, p, U)
-    var C = new Vector4(0, 0, 0, 0)
+    const span = this.findSpan(p, u, U)
+    const N = this.calcBasisFunctions(span, u, p, U)
+    const C = new Vector4(0, 0, 0, 0)
 
-    for (var j = 0; j <= p; ++j) {
-      var point = P[span - p + j]
-      var Nj = N[j]
-      var wNj = point.w * Nj
+    for (let j = 0; j <= p; ++j) {
+      const point = P[span - p + j]
+      const Nj = N[j]
+      const wNj = point.w * Nj
       C.x += point.x * wNj
       C.y += point.y * wNj
       C.z += point.z * wNj
@@ -124,32 +124,32 @@ var NURBSUtils = {
 	returns array[n+1][p+1] with basis functions derivatives
 	*/
   calcBasisFunctionDerivatives: function (span, u, p, n, U) {
-    var zeroArr = []
+    const zeroArr = []
     for (var i = 0; i <= p; ++i) zeroArr[i] = 0.0
 
-    var ders = []
+    const ders = []
     for (var i = 0; i <= n; ++i) ders[i] = zeroArr.slice(0)
 
-    var ndu = []
+    const ndu = []
     for (var i = 0; i <= p; ++i) ndu[i] = zeroArr.slice(0)
 
     ndu[0][0] = 1.0
 
-    var left = zeroArr.slice(0)
-    var right = zeroArr.slice(0)
+    const left = zeroArr.slice(0)
+    const right = zeroArr.slice(0)
 
     for (var j = 1; j <= p; ++j) {
       left[j] = u - U[span + 1 - j]
       right[j] = U[span + j] - u
 
-      var saved = 0.0
+      let saved = 0.0
 
       for (var r = 0; r < j; ++r) {
-        var rv = right[r + 1]
-        var lv = left[j - r]
+        const rv = right[r + 1]
+        const lv = left[j - r]
         ndu[j][r] = rv + lv
 
-        var temp = ndu[r][j - 1] / ndu[j][r]
+        const temp = ndu[r][j - 1] / ndu[j][r]
         ndu[r][j] = saved + rv * temp
         saved = lv * temp
       }
@@ -162,10 +162,10 @@ var NURBSUtils = {
     }
 
     for (var r = 0; r <= p; ++r) {
-      var s1 = 0
-      var s2 = 1
+      let s1 = 0
+      let s2 = 1
 
-      var a = []
+      const a = []
       for (var i = 0; i <= p; ++i) {
         a[i] = zeroArr.slice(0)
       }
@@ -173,17 +173,17 @@ var NURBSUtils = {
       a[0][0] = 1.0
 
       for (var k = 1; k <= n; ++k) {
-        var d = 0.0
-        var rk = r - k
-        var pk = p - k
+        let d = 0.0
+        const rk = r - k
+        const pk = p - k
 
         if (r >= k) {
           a[s2][0] = a[s1][0] / ndu[pk + 1][rk]
           d = a[s2][0] * ndu[rk][pk]
         }
 
-        var j1 = rk >= -1 ? 1 : -rk
-        var j2 = r - 1 <= pk ? k - 1 : p - r
+        const j1 = rk >= -1 ? 1 : -rk
+        const j2 = r - 1 <= pk ? k - 1 : p - r
 
         for (var j = j1; j <= j2; ++j) {
           a[s2][j] = (a[s1][j] - a[s1][j - 1]) / ndu[pk + 1][rk + j]
@@ -228,15 +228,15 @@ var NURBSUtils = {
 		returns array[d+1] with derivatives
 		*/
   calcBSplineDerivatives: function (p, U, P, u, nd) {
-    var du = nd < p ? nd : p
-    var CK = []
-    var span = this.findSpan(p, u, U)
-    var nders = this.calcBasisFunctionDerivatives(span, u, p, du, U)
-    var Pw = []
+    const du = nd < p ? nd : p
+    const CK = []
+    const span = this.findSpan(p, u, U)
+    const nders = this.calcBasisFunctionDerivatives(span, u, p, du, U)
+    const Pw = []
 
-    for (var i = 0; i < P.length; ++i) {
+    for (let i = 0; i < P.length; ++i) {
       var point = P[i].clone()
-      var w = point.w
+      const w = point.w
 
       point.x *= w
       point.y *= w
@@ -248,7 +248,7 @@ var NURBSUtils = {
     for (var k = 0; k <= du; ++k) {
       var point = Pw[span - p].clone().multiplyScalar(nders[k][0])
 
-      for (var j = 1; j <= p; ++j) {
+      for (let j = 1; j <= p; ++j) {
         point.add(Pw[span - p + j].clone().multiplyScalar(nders[k][j]))
       }
 
@@ -268,13 +268,13 @@ var NURBSUtils = {
 	returns k!/(i!(k-i)!)
 	*/
   calcKoverI: function (k, i) {
-    var nom = 1
+    let nom = 1
 
     for (var j = 2; j <= k; ++j) {
       nom *= j
     }
 
-    var denom = 1
+    let denom = 1
 
     for (var j = 2; j <= i; ++j) {
       denom *= j
@@ -295,20 +295,20 @@ var NURBSUtils = {
 	returns array with derivatives for rational curve.
 	*/
   calcRationalCurveDerivatives: function (Pders) {
-    var nd = Pders.length
-    var Aders = []
-    var wders = []
+    const nd = Pders.length
+    const Aders = []
+    const wders = []
 
     for (var i = 0; i < nd; ++i) {
-      var point = Pders[i]
+      const point = Pders[i]
       Aders[i] = new Vector3(point.x, point.y, point.z)
       wders[i] = point.w
     }
 
-    var CK = []
+    const CK = []
 
-    for (var k = 0; k < nd; ++k) {
-      var v = Aders[k].clone()
+    for (let k = 0; k < nd; ++k) {
+      const v = Aders[k].clone()
 
       for (var i = 1; i <= k; ++i) {
         v.sub(CK[k - i].clone().multiplyScalar(this.calcKoverI(k, i) * wders[i]))
@@ -332,7 +332,7 @@ var NURBSUtils = {
 	returns array with derivatives.
 	*/
   calcNURBSDerivatives: function (p, U, P, u, nd) {
-    var Pders = this.calcBSplineDerivatives(p, U, P, u, nd)
+    const Pders = this.calcBSplineDerivatives(p, U, P, u, nd)
     return this.calcRationalCurveDerivatives(Pders)
   },
 
@@ -347,17 +347,17 @@ var NURBSUtils = {
 	returns point for given (u, v)
 	*/
   calcSurfacePoint: function (p, q, U, V, P, u, v, target) {
-    var uspan = this.findSpan(p, u, U)
-    var vspan = this.findSpan(q, v, V)
-    var Nu = this.calcBasisFunctions(uspan, u, p, U)
-    var Nv = this.calcBasisFunctions(vspan, v, q, V)
-    var temp = []
+    const uspan = this.findSpan(p, u, U)
+    const vspan = this.findSpan(q, v, V)
+    const Nu = this.calcBasisFunctions(uspan, u, p, U)
+    const Nv = this.calcBasisFunctions(vspan, v, q, V)
+    const temp = []
 
     for (var l = 0; l <= q; ++l) {
       temp[l] = new Vector4(0, 0, 0, 0)
-      for (var k = 0; k <= p; ++k) {
-        var point = P[uspan - p + k][vspan - q + l].clone()
-        var w = point.w
+      for (let k = 0; k <= p; ++k) {
+        const point = P[uspan - p + k][vspan - q + l].clone()
+        const w = point.w
         point.x *= w
         point.y *= w
         point.z *= w
@@ -365,7 +365,7 @@ var NURBSUtils = {
       }
     }
 
-    var Sw = new Vector4(0, 0, 0, 0)
+    const Sw = new Vector4(0, 0, 0, 0)
     for (var l = 0; l <= q; ++l) {
       Sw.add(temp[l].multiplyScalar(Nv[l]))
     }

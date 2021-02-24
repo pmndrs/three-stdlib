@@ -4,23 +4,23 @@ import { PerspectiveCamera, Quaternion, Vector3 } from '../../../build/three.mod
  * peppers ghost effect based on http://www.instructables.com/id/Reflective-Prism/?ALLSTEPS
  */
 
-var PeppersGhostEffect = function (renderer) {
-  var scope = this
+const PeppersGhostEffect = function (renderer) {
+  const scope = this
 
   scope.cameraDistance = 15
   scope.reflectFromAbove = false
 
   // Internals
-  var _halfWidth, _width, _height
+  let _halfWidth, _width, _height
 
-  var _cameraF = new PerspectiveCamera() //front
-  var _cameraB = new PerspectiveCamera() //back
-  var _cameraL = new PerspectiveCamera() //left
-  var _cameraR = new PerspectiveCamera() //right
+  const _cameraF = new PerspectiveCamera() //front
+  const _cameraB = new PerspectiveCamera() //back
+  const _cameraL = new PerspectiveCamera() //left
+  const _cameraR = new PerspectiveCamera() //right
 
-  var _position = new Vector3()
-  var _quaternion = new Quaternion()
-  var _scale = new Vector3()
+  const _position = new Vector3()
+  const _quaternion = new Quaternion()
+  const _scale = new Vector3()
 
   // Initialization
   renderer.autoClear = false

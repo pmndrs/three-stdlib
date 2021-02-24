@@ -258,10 +258,10 @@ class LightningStrike extends BufferGeometry {
   }
 
   createMesh() {
-    var maxDrawableSegmentsPerSubRay = 1 << this.maxIterations
+    const maxDrawableSegmentsPerSubRay = 1 << this.maxIterations
 
-    var maxVerts = 3 * (maxDrawableSegmentsPerSubRay + 1) * this.maxSubrays
-    var maxIndices = 18 * maxDrawableSegmentsPerSubRay * this.maxSubrays
+    const maxVerts = 3 * (maxDrawableSegmentsPerSubRay + 1) * this.maxSubrays
+    const maxIndices = 18 * maxDrawableSegmentsPerSubRay * this.maxSubrays
 
     this.vertices = new Float32Array(maxVerts * 3)
     this.indices = new Uint32Array(maxIndices)
@@ -313,7 +313,7 @@ class LightningStrike extends BufferGeometry {
   }
 
   fillMesh(time) {
-    var scope = this
+    const scope = this
 
     this.currentVertex = 0
     this.currentIndex = 0
@@ -321,7 +321,7 @@ class LightningStrike extends BufferGeometry {
     this.currentUVCoordinate = 0
 
     this.fractalRay(time, function fillVertices(segment) {
-      var subray = scope.currentSubray
+      const subray = scope.currentSubray
 
       if (time < subray.birthTime) {
         //&& ( ! this.rayParameters.isEternal || scope.currentSubray.recursion > 0 ) ) {
@@ -392,8 +392,8 @@ class LightningStrike extends BufferGeometry {
     this.initSubray(this.addNewSubray(), this.rayParameters)
 
     // Process all subrays that are being generated until consuming all of them
-    for (var subrayIndex = 0; subrayIndex < this.numSubrays; subrayIndex++) {
-      var subray = this.subrays[subrayIndex]
+    for (let subrayIndex = 0; subrayIndex < this.numSubrays; subrayIndex++) {
+      const subray = this.subrays[subrayIndex]
       this.currentSubray = subray
 
       this.randomGenerator.setSeed(subray.seed)
@@ -401,7 +401,7 @@ class LightningStrike extends BufferGeometry {
       subray.endPropagationTime = MathUtils.lerp(subray.birthTime, subray.deathTime, subray.propagationTimeFactor)
       subray.beginVanishingTime = MathUtils.lerp(subray.deathTime, subray.birthTime, 1 - subray.vanishingTimeFactor)
 
-      var random1 = this.randomGenerator.random
+      const random1 = this.randomGenerator.random
       subray.linPos0.set(random1(), random1(), random1()).multiplyScalar(1000)
       subray.linPos1.set(random1(), random1(), random1()).multiplyScalar(1000)
 
@@ -410,7 +410,7 @@ class LightningStrike extends BufferGeometry {
       this.currentSegmentIndex = 0
       this.isInitialSegment = true
 
-      var segment = this.getNewSegment()
+      const segment = this.getNewSegment()
       segment.iteration = 0
       segment.pos0.copy(subray.pos0)
       segment.pos1.copy(subray.pos1)
@@ -444,21 +444,21 @@ class LightningStrike extends BufferGeometry {
 
     // Interpolation
     this.forwards.subVectors(segment.pos1, segment.pos0)
-    var lForwards = this.forwards.length()
+    let lForwards = this.forwards.length()
 
     if (lForwards < 0.000001) {
       this.forwards.set(0, 0, 0.01)
       lForwards = this.forwards.length()
     }
 
-    var middleRadius = (segment.radius0 + segment.radius1) * 0.5
-    var middleFraction = (segment.fraction0 + segment.fraction1) * 0.5
+    const middleRadius = (segment.radius0 + segment.radius1) * 0.5
+    const middleFraction = (segment.fraction0 + segment.fraction1) * 0.5
 
-    var timeDimension = this.time * this.currentSubray.timeScale * Math.pow(2, segment.iteration)
+    const timeDimension = this.time * this.currentSubray.timeScale * Math.pow(2, segment.iteration)
 
     this.middlePos.lerpVectors(segment.pos0, segment.pos1, 0.5)
     this.middleLinPos.lerpVectors(segment.linPos0, segment.linPos1, 0.5)
-    var p = this.middleLinPos
+    const p = this.middleLinPos
 
     // Noise
     this.newPos.set(
@@ -472,7 +472,7 @@ class LightningStrike extends BufferGeometry {
 
     // Recursion
 
-    var newSegment1 = this.getNewSegment()
+    const newSegment1 = this.getNewSegment()
     newSegment1.pos0.copy(segment.pos0)
     newSegment1.pos1.copy(this.newPos)
     newSegment1.linPos0.copy(segment.linPos0)
@@ -486,7 +486,7 @@ class LightningStrike extends BufferGeometry {
     newSegment1.positionVariationFactor = segment.positionVariationFactor * this.currentSubray.roughness
     newSegment1.iteration = segment.iteration + 1
 
-    var newSegment2 = this.getNewSegment()
+    const newSegment2 = this.getNewSegment()
     newSegment2.pos0.copy(this.newPos)
     newSegment2.pos1.copy(segment.pos1)
     newSegment2.linPos0.copy(this.middleLinPos)
@@ -528,8 +528,8 @@ class LightningStrike extends BufferGeometry {
     this.side.crossVectors(up, forwards).multiplyScalar(radius * LightningStrike.COS30DEG)
     this.down.copy(up).multiplyScalar(-radius * LightningStrike.SIN30DEG)
 
-    var p = this.vPos
-    var v = this.vertices
+    const p = this.vPos
+    const v = this.vertices
 
     p.copy(pos).sub(this.side).add(this.down)
 
@@ -558,9 +558,9 @@ class LightningStrike extends BufferGeometry {
     this.side.crossVectors(up, forwards).multiplyScalar(radius * LightningStrike.COS30DEG)
     this.down.copy(up).multiplyScalar(-radius * LightningStrike.SIN30DEG)
 
-    var p = this.vPos
-    var v = this.vertices
-    var uv = this.uvs
+    const p = this.vPos
+    const v = this.vertices
+    const uv = this.uvs
 
     p.copy(pos).sub(this.side).add(this.down)
 
@@ -593,7 +593,7 @@ class LightningStrike extends BufferGeometry {
   }
 
   createPrismFaces(vertex /*, index*/) {
-    var indices = this.indices
+    const indices = this.indices
     var vertex = this.currentVertex - 6
 
     indices[this.currentIndex++] = vertex + 1
@@ -617,29 +617,29 @@ class LightningStrike extends BufferGeometry {
   }
 
   createDefaultSubrayCreationCallbacks() {
-    var random1 = this.randomGenerator.random
+    const random1 = this.randomGenerator.random
 
     this.onDecideSubrayCreation = (segment, lightningStrike) => {
       // Decide subrays creation at parent (sub)ray segment
 
-      var subray = lightningStrike.currentSubray
+      const subray = lightningStrike.currentSubray
 
-      var period = lightningStrike.rayParameters.subrayPeriod
-      var dutyCycle = lightningStrike.rayParameters.subrayDutyCycle
+      const period = lightningStrike.rayParameters.subrayPeriod
+      const dutyCycle = lightningStrike.rayParameters.subrayDutyCycle
 
-      var phase0 =
+      const phase0 =
         lightningStrike.rayParameters.isEternal && subray.recursion == 0
           ? -random1() * period
           : MathUtils.lerp(subray.birthTime, subray.endPropagationTime, segment.fraction0) - random1() * period
 
-      var phase = lightningStrike.time - phase0
-      var currentCycle = Math.floor(phase / period)
+      const phase = lightningStrike.time - phase0
+      const currentCycle = Math.floor(phase / period)
 
-      var childSubraySeed = random1() * (currentCycle + 1)
+      const childSubraySeed = random1() * (currentCycle + 1)
 
-      var isActive = phase % period <= dutyCycle * period
+      const isActive = phase % period <= dutyCycle * period
 
-      var probability = 0
+      let probability = 0
 
       if (isActive) {
         probability = lightningStrike.subrayProbability
@@ -651,9 +651,9 @@ class LightningStrike extends BufferGeometry {
         lightningStrike.numSubrays < lightningStrike.maxSubrays &&
         random1() < probability
       ) {
-        var childSubray = lightningStrike.addNewSubray()
+        const childSubray = lightningStrike.addNewSubray()
 
-        var parentSeed = lightningStrike.randomGenerator.getSeed()
+        const parentSeed = lightningStrike.randomGenerator.getSeed()
         childSubray.seed = childSubraySeed
         lightningStrike.randomGenerator.setSeed(childSubraySeed)
 
@@ -690,10 +690,10 @@ class LightningStrike extends BufferGeometry {
       }
     }
 
-    var vec1Pos = new Vector3()
-    var vec2Forward = new Vector3()
-    var vec3Side = new Vector3()
-    var vec4Up = new Vector3()
+    const vec1Pos = new Vector3()
+    const vec2Forward = new Vector3()
+    const vec3Side = new Vector3()
+    const vec4Up = new Vector3()
 
     this.onSubrayCreation = (segment, parentSubray, childSubray, lightningStrike) => {
       // Decide childSubray origin and destination positions (pos0 and pos1) and possibly other properties of childSubray
@@ -717,9 +717,9 @@ class LightningStrike extends BufferGeometry {
       vec1Pos.subVectors(parentSubray.pos1, parentSubray.pos0)
       vec2Forward.copy(vec1Pos).normalize()
       vec1Pos.multiplyScalar(segment.fraction0 + (1 - segment.fraction0) * (random1() * heightFactor))
-      var length = vec1Pos.length()
+      const length = vec1Pos.length()
       vec3Side.crossVectors(parentSubray.up0, vec2Forward)
-      var angle = 2 * Math.PI * random1()
+      const angle = 2 * Math.PI * random1()
       vec3Side.multiplyScalar(Math.cos(angle))
       vec4Up.copy(parentSubray.up0).multiplyScalar(Math.sin(angle))
 
@@ -746,9 +746,9 @@ class LightningStrike extends BufferGeometry {
       vec1Pos.subVectors(parentSubray.pos1, parentSubray.pos0)
       vec2Forward.copy(vec1Pos).normalize()
       vec1Pos.multiplyScalar(segment.fraction0 + (1 - segment.fraction0) * ((2 * random1() - 1) * heightFactor))
-      var length = vec1Pos.length()
+      const length = vec1Pos.length()
       vec3Side.crossVectors(parentSubray.up0, vec2Forward)
-      var angle = 2 * Math.PI * random1()
+      const angle = 2 * Math.PI * random1()
       vec3Side.multiplyScalar(Math.cos(angle))
       vec4Up.copy(parentSubray.up0).multiplyScalar(Math.sin(angle))
 
@@ -834,18 +834,18 @@ LightningStrike.COS30DEG = Math.cos((30 * Math.PI) / 180)
 LightningStrike.SIN30DEG = Math.sin((30 * Math.PI) / 180)
 
 LightningStrike.createRandomGenerator = () => {
-  var numSeeds = 2053
-  var seeds = []
+  const numSeeds = 2053
+  const seeds = []
 
-  for (var i = 0; i < numSeeds; i++) {
+  for (let i = 0; i < numSeeds; i++) {
     seeds.push(Math.random())
   }
 
-  var generator = {
+  const generator = {
     currentSeed: 0,
 
     random: function () {
-      var value = seeds[generator.currentSeed]
+      const value = seeds[generator.currentSeed]
 
       generator.currentSeed = (generator.currentSeed + 1) % numSeeds
 
@@ -868,14 +868,13 @@ LightningStrike.copyParameters = (dest, source) => {
   source = source || {}
   dest = dest || {}
 
-  var vecCopy = (v) => {
+  const vecCopy = (v) => {
     if (source === dest) {
       return v
     } else {
       return v.clone()
     }
   }
-
   ;(dest.sourceOffset = source.sourceOffset !== undefined ? vecCopy(source.sourceOffset) : new Vector3(0, 100, 0)),
     (dest.destOffset = source.destOffset !== undefined ? vecCopy(source.destOffset) : new Vector3(0, 0, 0)),
     (dest.timeScale = source.timeScale !== undefined ? source.timeScale : 1),

@@ -24,9 +24,9 @@ class FlyControls extends EventDispatcher {
 
     // internals
 
-    var scope = this
-    var changeEvent = { type: 'change' }
-    var EPS = 0.000001
+    const scope = this
+    const changeEvent = { type: 'change' }
+    const EPS = 0.000001
 
     this.tmpQuaternion = new Quaternion()
 
@@ -189,9 +189,9 @@ class FlyControls extends EventDispatcher {
 
     this.mousemove = function (event) {
       if (!this.dragToLook || this.mouseStatus > 0) {
-        var container = this.getContainerDimensions()
-        var halfWidth = container.size[0] / 2
-        var halfHeight = container.size[1] / 2
+        const container = this.getContainerDimensions()
+        const halfWidth = container.size[0] / 2
+        const halfHeight = container.size[1] / 2
 
         this.moveState.yawLeft = -(event.pageX - container.offset[0] - halfWidth) / halfWidth
         this.moveState.pitchDown = (event.pageY - container.offset[1] - halfHeight) / halfHeight
@@ -225,12 +225,12 @@ class FlyControls extends EventDispatcher {
     }
 
     this.update = (() => {
-      var lastQuaternion = new Quaternion()
-      var lastPosition = new Vector3()
+      const lastQuaternion = new Quaternion()
+      const lastPosition = new Vector3()
 
       return (delta) => {
-        var moveMult = delta * scope.movementSpeed
-        var rotMult = delta * scope.rollSpeed
+        const moveMult = delta * scope.movementSpeed
+        const rotMult = delta * scope.rollSpeed
 
         scope.object.translateX(scope.moveVector.x * moveMult)
         scope.object.translateY(scope.moveVector.y * moveMult)
@@ -253,7 +253,7 @@ class FlyControls extends EventDispatcher {
     })()
 
     this.updateMovementVector = function () {
-      var forward = this.moveState.forward || (this.autoForward && !this.moveState.back) ? 1 : 0
+      const forward = this.moveState.forward || (this.autoForward && !this.moveState.back) ? 1 : 0
 
       this.moveVector.x = -this.moveState.left + this.moveState.right
       this.moveVector.y = -this.moveState.down + this.moveState.up

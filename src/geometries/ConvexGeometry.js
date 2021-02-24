@@ -9,27 +9,27 @@ class ConvexGeometry extends BufferGeometry {
 
     // buffers
 
-    var vertices = []
-    var normals = []
+    const vertices = []
+    const normals = []
 
     if (ConvexHull === undefined) {
       console.error('THREE.ConvexBufferGeometry: ConvexBufferGeometry relies on ConvexHull')
     }
 
-    var convexHull = new ConvexHull().setFromPoints(points)
+    const convexHull = new ConvexHull().setFromPoints(points)
 
     // generate vertices and normals
 
-    var faces = convexHull.faces
+    const faces = convexHull.faces
 
-    for (var i = 0; i < faces.length; i++) {
-      var face = faces[i]
-      var edge = face.edge
+    for (let i = 0; i < faces.length; i++) {
+      const face = faces[i]
+      let edge = face.edge
 
       // we move along a doubly-connected edge list to access all face points (see HalfEdge docs)
 
       do {
-        var point = edge.head().point
+        const point = edge.head().point
 
         vertices.push(point.x, point.y, point.z)
         normals.push(face.normal.x, face.normal.y, face.normal.z)

@@ -26,20 +26,20 @@ class NURBSCurve extends Curve {
     // Used by periodic NURBS to remove hidden spans
     this.startKnot = startKnot || 0
     this.endKnot = endKnot || this.knots.length - 1
-    for (var i = 0; i < controlPoints.length; ++i) {
+    for (let i = 0; i < controlPoints.length; ++i) {
       // ensure Vector4 for control points
-      var point = controlPoints[i]
+      const point = controlPoints[i]
       this.controlPoints[i] = new Vector4(point.x, point.y, point.z, point.w)
     }
   }
 
   getPoint(t, optionalTarget) {
-    var point = optionalTarget || new Vector3()
+    const point = optionalTarget || new Vector3()
 
-    var u = this.knots[this.startKnot] + t * (this.knots[this.endKnot] - this.knots[this.startKnot]) // linear mapping t->u
+    const u = this.knots[this.startKnot] + t * (this.knots[this.endKnot] - this.knots[this.startKnot]) // linear mapping t->u
 
     // following results in (wx, wy, wz, w) homogeneous point
-    var hpoint = NURBSUtils.calcBSplinePoint(this.degree, this.knots, this.controlPoints, u)
+    const hpoint = NURBSUtils.calcBSplinePoint(this.degree, this.knots, this.controlPoints, u)
 
     if (hpoint.w != 1.0) {
       // project to 3D space: (wx, wy, wz, w) -> (x, y, z, 1)
@@ -50,10 +50,10 @@ class NURBSCurve extends Curve {
   }
 
   getTangent(t, optionalTarget) {
-    var tangent = optionalTarget || new Vector3()
+    const tangent = optionalTarget || new Vector3()
 
-    var u = this.knots[0] + t * (this.knots[this.knots.length - 1] - this.knots[0])
-    var ders = NURBSUtils.calcNURBSDerivatives(this.degree, this.knots, this.controlPoints, u, 1)
+    const u = this.knots[0] + t * (this.knots[this.knots.length - 1] - this.knots[0])
+    const ders = NURBSUtils.calcNURBSDerivatives(this.degree, this.knots, this.controlPoints, u, 1)
     tangent.copy(ders[1]).normalize()
 
     return tangent

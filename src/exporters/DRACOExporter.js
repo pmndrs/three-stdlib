@@ -14,7 +14,7 @@
 
 /* global DracoEncoderModule */
 
-var DRACOExporter = () => {}
+const DRACOExporter = () => {}
 
 DRACOExporter.prototype = {
   constructor: DRACOExporter,
@@ -40,12 +40,12 @@ DRACOExporter.prototype = {
       }
     }
 
-    var geometry = object.geometry
+    const geometry = object.geometry
 
-    var dracoEncoder = DracoEncoderModule()
-    var encoder = new dracoEncoder.Encoder()
-    var builder
-    var dracoObject
+    const dracoEncoder = DracoEncoderModule()
+    const encoder = new dracoEncoder.Encoder()
+    let builder
+    let dracoObject
 
     if (geometry.isBufferGeometry !== true) {
       throw new Error('THREE.DRACOExporter.parse(geometry, options): geometry is not a THREE.BufferGeometry instance.')
@@ -79,7 +79,7 @@ DRACOExporter.prototype = {
       }
 
       if (options.exportNormals === true) {
-        var normals = geometry.getAttribute('normal')
+        const normals = geometry.getAttribute('normal')
 
         if (normals !== undefined) {
           builder.AddFloatAttributeToMesh(
@@ -93,7 +93,7 @@ DRACOExporter.prototype = {
       }
 
       if (options.exportUvs === true) {
-        var uvs = geometry.getAttribute('uv')
+        const uvs = geometry.getAttribute('uv')
 
         if (uvs !== undefined) {
           builder.AddFloatAttributeToMesh(dracoObject, dracoEncoder.TEX_COORD, uvs.count, uvs.itemSize, uvs.array)
@@ -127,12 +127,12 @@ DRACOExporter.prototype = {
 
     //Compress using draco encoder
 
-    var encodedData = new dracoEncoder.DracoInt8Array()
+    const encodedData = new dracoEncoder.DracoInt8Array()
 
     //Sets the desired encoding and decoding speed for the given options from 0 (slowest speed, but the best compression) to 10 (fastest, but the worst compression).
 
-    var encodeSpeed = options.encodeSpeed !== undefined ? options.encodeSpeed : 5
-    var decodeSpeed = options.decodeSpeed !== undefined ? options.decodeSpeed : 5
+    const encodeSpeed = options.encodeSpeed !== undefined ? options.encodeSpeed : 5
+    const decodeSpeed = options.decodeSpeed !== undefined ? options.decodeSpeed : 5
 
     encoder.SetSpeedOptions(encodeSpeed, decodeSpeed)
 
@@ -152,7 +152,7 @@ DRACOExporter.prototype = {
       }
     }
 
-    var length
+    let length
 
     if (object.isMesh === true) {
       length = encoder.EncodeMeshToDracoBuffer(dracoObject, encodedData)
@@ -167,7 +167,7 @@ DRACOExporter.prototype = {
     }
 
     //Copy encoded data to buffer.
-    var outputData = new Int8Array(new ArrayBuffer(length))
+    const outputData = new Int8Array(new ArrayBuffer(length))
 
     for (var i = 0; i < length; i++) {
       outputData[i] = encodedData.GetValue(i)

@@ -7,13 +7,13 @@ class PositionalAudioHelper extends Line {
     this.divisionsInnerAngle = divisionsInnerAngle || 16
     this.divisionsOuterAngle = divisionsOuterAngle || 2
 
-    var geometry = new BufferGeometry()
-    var divisions = this.divisionsInnerAngle + this.divisionsOuterAngle * 2
-    var positions = new Float32Array((divisions * 3 + 3) * 3)
+    const geometry = new BufferGeometry()
+    const divisions = this.divisionsInnerAngle + this.divisionsOuterAngle * 2
+    const positions = new Float32Array((divisions * 3 + 3) * 3)
     geometry.setAttribute('position', new BufferAttribute(positions, 3))
 
-    var materialInnerAngle = new LineBasicMaterial({ color: 0x00ff00 })
-    var materialOuterAngle = new LineBasicMaterial({ color: 0xffff00 })
+    const materialInnerAngle = new LineBasicMaterial({ color: 0x00ff00 })
+    const materialOuterAngle = new LineBasicMaterial({ color: 0xffff00 })
 
     super(geometry, [materialOuterAngle, materialInnerAngle])
 
@@ -23,30 +23,30 @@ class PositionalAudioHelper extends Line {
   }
 
   update() {
-    var audio = this.audio
-    var range = this.range
-    var divisionsInnerAngle = this.divisionsInnerAngle
-    var divisionsOuterAngle = this.divisionsOuterAngle
+    const audio = this.audio
+    const range = this.range
+    const divisionsInnerAngle = this.divisionsInnerAngle
+    const divisionsOuterAngle = this.divisionsOuterAngle
 
-    var coneInnerAngle = MathUtils.degToRad(audio.panner.coneInnerAngle)
-    var coneOuterAngle = MathUtils.degToRad(audio.panner.coneOuterAngle)
+    const coneInnerAngle = MathUtils.degToRad(audio.panner.coneInnerAngle)
+    const coneOuterAngle = MathUtils.degToRad(audio.panner.coneOuterAngle)
 
-    var halfConeInnerAngle = coneInnerAngle / 2
-    var halfConeOuterAngle = coneOuterAngle / 2
+    const halfConeInnerAngle = coneInnerAngle / 2
+    const halfConeOuterAngle = coneOuterAngle / 2
 
-    var start = 0
-    var count = 0
-    var i, stride
+    let start = 0
+    let count = 0
+    let i, stride
 
-    var geometry = this.geometry
-    var positionAttribute = geometry.attributes.position
+    const geometry = this.geometry
+    const positionAttribute = geometry.attributes.position
 
     geometry.clearGroups()
 
     //
 
     function generateSegment(from, to, divisions, materialIndex) {
-      var step = (to - from) / divisions
+      const step = (to - from) / divisions
 
       positionAttribute.setXYZ(start, 0, 0, 0)
       count++

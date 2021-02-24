@@ -18,13 +18,13 @@ class RectAreaLightHelper extends Line {
 
     this.color = color // optional hardwired color for the helper
 
-    var positions = [1, 1, 0, -1, 1, 0, -1, -1, 0, 1, -1, 0, 1, 1, 0]
+    const positions = [1, 1, 0, -1, 1, 0, -1, -1, 0, 1, -1, 0, 1, 1, 0]
 
-    var geometry = new BufferGeometry()
+    const geometry = new BufferGeometry()
     geometry.setAttribute('position', new Float32BufferAttribute(positions, 3))
     geometry.computeBoundingSphere()
 
-    var material = new LineBasicMaterial({ fog: false })
+    const material = new LineBasicMaterial({ fog: false })
 
     super(geometry, material)
 
@@ -32,9 +32,9 @@ class RectAreaLightHelper extends Line {
 
     //
 
-    var positions2 = [1, 1, 0, -1, 1, 0, -1, -1, 0, 1, 1, 0, -1, -1, 0, 1, -1, 0]
+    const positions2 = [1, 1, 0, -1, 1, 0, -1, -1, 0, 1, 1, 0, -1, -1, 0, 1, -1, 0]
 
-    var geometry2 = new BufferGeometry()
+    const geometry2 = new BufferGeometry()
     geometry2.setAttribute('position', new Float32BufferAttribute(positions2, 3))
     geometry2.computeBoundingSphere()
 
@@ -51,8 +51,8 @@ class RectAreaLightHelper extends Line {
       this.material.color.copy(this.light.color).multiplyScalar(this.light.intensity)
 
       // prevent hue shift
-      var c = this.material.color
-      var max = Math.max(c.r, c.g, c.b)
+      const c = this.material.color
+      const max = Math.max(c.r, c.g, c.b)
       if (max > 1) c.multiplyScalar(1 / max)
 
       this.children[0].material.color.copy(this.material.color)

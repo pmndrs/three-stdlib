@@ -6,7 +6,7 @@ class LightProbeHelper extends Mesh {
 
     this.size = size
 
-    var material = new ShaderMaterial({
+    const material = new ShaderMaterial({
       type: 'LightProbeHelperMaterial',
 
       uniforms: {
@@ -86,7 +86,7 @@ class LightProbeHelper extends Mesh {
       ].join('\n'),
     })
 
-    var geometry = new SphereGeometry(1, 32, 16)
+    const geometry = new SphereGeometry(1, 32, 16)
 
     super(geometry, material)
 

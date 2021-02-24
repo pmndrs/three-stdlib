@@ -52,7 +52,7 @@ import { BufferAttribute, BufferGeometry, Matrix4, Vector3, Vector4 } from '../.
 class TeapotGeometry extends BufferGeometry {
   constructor(size, segments, bottom, lid, body, fitLid, blinn) {
     // 32 * 4 * 4 Bezier spline patches
-    var teapotPatches = [
+    const teapotPatches = [
       /*rim*/
       0,
       1,
@@ -573,7 +573,7 @@ class TeapotGeometry extends BufferGeometry {
       92,
     ]
 
-    var teapotVertices = [
+    const teapotVertices = [
       1.4,
       0,
       2.4,
@@ -1468,83 +1468,83 @@ class TeapotGeometry extends BufferGeometry {
     // real teapot and the computer model, the ratio for the bowl of the
     // real teapot is more like 1.25, but since 1.3 is the traditional
     // value given, we use it here.
-    var blinnScale = 1.3
+    const blinnScale = 1.3
     blinn = blinn === undefined ? true : blinn
 
     // scale the size to be the real scaling factor
-    var maxHeight = 3.15 * (blinn ? 1 : blinnScale)
+    const maxHeight = 3.15 * (blinn ? 1 : blinnScale)
 
-    var maxHeight2 = maxHeight / 2
-    var trueSize = size / maxHeight2
+    const maxHeight2 = maxHeight / 2
+    const trueSize = size / maxHeight2
 
     // Number of elements depends on what is needed. Subtract degenerate
     // triangles at tip of bottom and lid out in advance.
-    var numTriangles = bottom ? (8 * segments - 4) * segments : 0
+    let numTriangles = bottom ? (8 * segments - 4) * segments : 0
     numTriangles += lid ? (16 * segments - 4) * segments : 0
     numTriangles += body ? 40 * segments * segments : 0
 
-    var indices = new Uint32Array(numTriangles * 3)
+    const indices = new Uint32Array(numTriangles * 3)
 
-    var numVertices = bottom ? 4 : 0
+    let numVertices = bottom ? 4 : 0
     numVertices += lid ? 8 : 0
     numVertices += body ? 20 : 0
     numVertices *= (segments + 1) * (segments + 1)
 
-    var vertices = new Float32Array(numVertices * 3)
-    var normals = new Float32Array(numVertices * 3)
-    var uvs = new Float32Array(numVertices * 2)
+    const vertices = new Float32Array(numVertices * 3)
+    const normals = new Float32Array(numVertices * 3)
+    const uvs = new Float32Array(numVertices * 2)
 
     // Bezier form
-    var ms = new Matrix4()
+    const ms = new Matrix4()
     ms.set(-1.0, 3.0, -3.0, 1.0, 3.0, -6.0, 3.0, 0.0, -3.0, 3.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0)
 
-    var g = []
-    var i, r, c
+    const g = []
+    let i, r, c
 
-    var sp = []
-    var tp = []
-    var dsp = []
-    var dtp = []
+    const sp = []
+    const tp = []
+    const dsp = []
+    const dtp = []
 
     // M * G * M matrix, sort of see
     // http://www.cs.helsinki.fi/group/goa/mallinnus/curves/surfaces.html
-    var mgm = []
+    const mgm = []
 
-    var vert = []
-    var sdir = []
-    var tdir = []
+    const vert = []
+    const sdir = []
+    const tdir = []
 
-    var norm = new Vector3()
+    const norm = new Vector3()
 
-    var tcoord
+    let tcoord
 
-    var sstep, tstep
-    var vertPerRow
+    let sstep, tstep
+    let vertPerRow
 
-    var s, t, sval, tval, p
-    var dsval = 0
-    var dtval = 0
+    let s, t, sval, tval, p
+    let dsval = 0
+    let dtval = 0
 
-    var normOut = new Vector3()
-    var v1, v2, v3, v4
+    const normOut = new Vector3()
+    let v1, v2, v3, v4
 
-    var gmx = new Matrix4()
-    var tmtx = new Matrix4()
+    const gmx = new Matrix4()
+    const tmtx = new Matrix4()
 
-    var vsp = new Vector4()
-    var vtp = new Vector4()
-    var vdsp = new Vector4()
-    var vdtp = new Vector4()
+    const vsp = new Vector4()
+    const vtp = new Vector4()
+    const vdsp = new Vector4()
+    const vdtp = new Vector4()
 
-    var vsdir = new Vector3()
-    var vtdir = new Vector3()
+    const vsdir = new Vector3()
+    const vtdir = new Vector3()
 
-    var mst = ms.clone()
+    const mst = ms.clone()
     mst.transpose()
 
     // internal function: test if triangle has any matching vertices;
     // if so, don't save triangle, since it won't display anything.
-    var notDegenerate = (
+    const notDegenerate = (
       vtx1,
       vtx2,
       vtx3, // if any vertex matches, return false
@@ -1565,20 +1565,20 @@ class TeapotGeometry extends BufferGeometry {
       mgm[i] = new Matrix4()
     }
 
-    var minPatches = body ? 0 : 20
-    var maxPatches = bottom ? 32 : 28
+    const minPatches = body ? 0 : 20
+    const maxPatches = bottom ? 32 : 28
 
     vertPerRow = segments + 1
 
-    var surfCount = 0
+    let surfCount = 0
 
-    var vertCount = 0
-    var normCount = 0
-    var uvCount = 0
+    let vertCount = 0
+    let normCount = 0
+    let uvCount = 0
 
-    var indexCount = 0
+    let indexCount = 0
 
-    for (var surf = minPatches; surf < maxPatches; surf++) {
+    for (let surf = minPatches; surf < maxPatches; surf++) {
       // lid is in the middle of the data, patches 20-27,
       // so ignore it for this part of the loop if the lid is not desired
       if (lid || surf < 20 || surf >= 28) {

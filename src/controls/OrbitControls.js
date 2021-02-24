@@ -123,19 +123,19 @@ class OrbitControls extends EventDispatcher {
 
     // this method is exposed, but perhaps it would be better if we can make it private...
     this.update = (() => {
-      var offset = new Vector3()
+      const offset = new Vector3()
 
       // so camera.up is the orbit axis
-      var quat = new Quaternion().setFromUnitVectors(object.up, new Vector3(0, 1, 0))
-      var quatInverse = quat.clone().invert()
+      const quat = new Quaternion().setFromUnitVectors(object.up, new Vector3(0, 1, 0))
+      const quatInverse = quat.clone().invert()
 
-      var lastPosition = new Vector3()
-      var lastQuaternion = new Quaternion()
+      const lastPosition = new Vector3()
+      const lastQuaternion = new Quaternion()
 
-      var twoPI = 2 * Math.PI
+      const twoPI = 2 * Math.PI
 
       return function update() {
-        var position = scope.object.position
+        const position = scope.object.position
 
         offset.copy(position).sub(scope.target)
 
@@ -159,8 +159,8 @@ class OrbitControls extends EventDispatcher {
 
         // restrict theta to be between desired limits
 
-        var min = scope.minAzimuthAngle
-        var max = scope.maxAzimuthAngle
+        let min = scope.minAzimuthAngle
+        let max = scope.maxAzimuthAngle
 
         if (isFinite(min) && isFinite(max)) {
           if (min < -Math.PI) min += twoPI
@@ -266,8 +266,8 @@ class OrbitControls extends EventDispatcher {
     var scope = this
 
     var changeEvent = { type: 'change' }
-    var startEvent = { type: 'start' }
-    var endEvent = { type: 'end' }
+    const startEvent = { type: 'start' }
+    const endEvent = { type: 'end' }
 
     var STATE = {
       NONE: -1,
@@ -292,17 +292,17 @@ class OrbitControls extends EventDispatcher {
     var panOffset = new Vector3()
     var zoomChanged = false
 
-    var rotateStart = new Vector2()
-    var rotateEnd = new Vector2()
-    var rotateDelta = new Vector2()
+    const rotateStart = new Vector2()
+    const rotateEnd = new Vector2()
+    const rotateDelta = new Vector2()
 
-    var panStart = new Vector2()
-    var panEnd = new Vector2()
-    var panDelta = new Vector2()
+    const panStart = new Vector2()
+    const panEnd = new Vector2()
+    const panDelta = new Vector2()
 
-    var dollyStart = new Vector2()
-    var dollyEnd = new Vector2()
-    var dollyDelta = new Vector2()
+    const dollyStart = new Vector2()
+    const dollyEnd = new Vector2()
+    const dollyDelta = new Vector2()
 
     function getAutoRotationAngle() {
       return ((2 * Math.PI) / 60 / 60) * scope.autoRotateSpeed
@@ -320,8 +320,8 @@ class OrbitControls extends EventDispatcher {
       sphericalDelta.phi -= angle
     }
 
-    var panLeft = (() => {
-      var v = new Vector3()
+    const panLeft = (() => {
+      const v = new Vector3()
 
       return function panLeft(distance, objectMatrix) {
         v.setFromMatrixColumn(objectMatrix, 0) // get X column of objectMatrix
@@ -331,8 +331,8 @@ class OrbitControls extends EventDispatcher {
       }
     })()
 
-    var panUp = (() => {
-      var v = new Vector3()
+    const panUp = (() => {
+      const v = new Vector3()
 
       return function panUp(distance, objectMatrix) {
         if (scope.screenSpacePanning === true) {
@@ -349,17 +349,17 @@ class OrbitControls extends EventDispatcher {
     })()
 
     // deltaX and deltaY are in pixels; right and down are positive
-    var pan = (() => {
-      var offset = new Vector3()
+    const pan = (() => {
+      const offset = new Vector3()
 
       return function pan(deltaX, deltaY) {
-        var element = scope.domElement
+        const element = scope.domElement
 
         if (scope.object.isPerspectiveCamera) {
           // perspective
-          var position = scope.object.position
+          const position = scope.object.position
           offset.copy(position).sub(scope.target)
-          var targetDistance = offset.length()
+          let targetDistance = offset.length()
 
           // half of the fov is center to top of screen
           targetDistance *= Math.tan(((scope.object.fov / 2) * Math.PI) / 180.0)
@@ -432,7 +432,7 @@ class OrbitControls extends EventDispatcher {
 
       rotateDelta.subVectors(rotateEnd, rotateStart).multiplyScalar(scope.rotateSpeed)
 
-      var element = scope.domElement
+      const element = scope.domElement
 
       rotateLeft((2 * Math.PI * rotateDelta.x) / element.clientHeight) // yes, height
 
@@ -486,7 +486,7 @@ class OrbitControls extends EventDispatcher {
     }
 
     function handleKeyDown(event) {
-      var needsUpdate = false
+      let needsUpdate = false
 
       switch (event.keyCode) {
         case scope.keys.UP:
@@ -522,8 +522,8 @@ class OrbitControls extends EventDispatcher {
       if (event.touches.length == 1) {
         rotateStart.set(event.touches[0].pageX, event.touches[0].pageY)
       } else {
-        var x = 0.5 * (event.touches[0].pageX + event.touches[1].pageX)
-        var y = 0.5 * (event.touches[0].pageY + event.touches[1].pageY)
+        const x = 0.5 * (event.touches[0].pageX + event.touches[1].pageX)
+        const y = 0.5 * (event.touches[0].pageY + event.touches[1].pageY)
 
         rotateStart.set(x, y)
       }
@@ -533,18 +533,18 @@ class OrbitControls extends EventDispatcher {
       if (event.touches.length == 1) {
         panStart.set(event.touches[0].pageX, event.touches[0].pageY)
       } else {
-        var x = 0.5 * (event.touches[0].pageX + event.touches[1].pageX)
-        var y = 0.5 * (event.touches[0].pageY + event.touches[1].pageY)
+        const x = 0.5 * (event.touches[0].pageX + event.touches[1].pageX)
+        const y = 0.5 * (event.touches[0].pageY + event.touches[1].pageY)
 
         panStart.set(x, y)
       }
     }
 
     function handleTouchStartDolly(event) {
-      var dx = event.touches[0].pageX - event.touches[1].pageX
-      var dy = event.touches[0].pageY - event.touches[1].pageY
+      const dx = event.touches[0].pageX - event.touches[1].pageX
+      const dy = event.touches[0].pageY - event.touches[1].pageY
 
-      var distance = Math.sqrt(dx * dx + dy * dy)
+      const distance = Math.sqrt(dx * dx + dy * dy)
 
       dollyStart.set(0, distance)
     }
@@ -565,15 +565,15 @@ class OrbitControls extends EventDispatcher {
       if (event.touches.length == 1) {
         rotateEnd.set(event.touches[0].pageX, event.touches[0].pageY)
       } else {
-        var x = 0.5 * (event.touches[0].pageX + event.touches[1].pageX)
-        var y = 0.5 * (event.touches[0].pageY + event.touches[1].pageY)
+        const x = 0.5 * (event.touches[0].pageX + event.touches[1].pageX)
+        const y = 0.5 * (event.touches[0].pageY + event.touches[1].pageY)
 
         rotateEnd.set(x, y)
       }
 
       rotateDelta.subVectors(rotateEnd, rotateStart).multiplyScalar(scope.rotateSpeed)
 
-      var element = scope.domElement
+      const element = scope.domElement
 
       rotateLeft((2 * Math.PI * rotateDelta.x) / element.clientHeight) // yes, height
 
@@ -586,8 +586,8 @@ class OrbitControls extends EventDispatcher {
       if (event.touches.length == 1) {
         panEnd.set(event.touches[0].pageX, event.touches[0].pageY)
       } else {
-        var x = 0.5 * (event.touches[0].pageX + event.touches[1].pageX)
-        var y = 0.5 * (event.touches[0].pageY + event.touches[1].pageY)
+        const x = 0.5 * (event.touches[0].pageX + event.touches[1].pageX)
+        const y = 0.5 * (event.touches[0].pageY + event.touches[1].pageY)
 
         panEnd.set(x, y)
       }
@@ -600,10 +600,10 @@ class OrbitControls extends EventDispatcher {
     }
 
     function handleTouchMoveDolly(event) {
-      var dx = event.touches[0].pageX - event.touches[1].pageX
-      var dy = event.touches[0].pageY - event.touches[1].pageY
+      const dx = event.touches[0].pageX - event.touches[1].pageX
+      const dy = event.touches[0].pageY - event.touches[1].pageY
 
-      var distance = Math.sqrt(dx * dx + dy * dy)
+      const distance = Math.sqrt(dx * dx + dy * dy)
 
       dollyEnd.set(0, distance)
 
@@ -680,7 +680,7 @@ class OrbitControls extends EventDispatcher {
 
       scope.domElement.focus ? scope.domElement.focus() : window.focus()
 
-      var mouseAction
+      let mouseAction
 
       switch (event.button) {
         case 0:

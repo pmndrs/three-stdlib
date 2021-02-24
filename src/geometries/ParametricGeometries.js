@@ -4,13 +4,13 @@ import { BufferGeometry, Curve, ParametricGeometry, Vector3 } from '../../../bui
  * Experimenting of primitive geometry creation using Surface Parametric equations
  */
 
-var ParametricGeometries = {
+const ParametricGeometries = {
   klein: function (v, u, target) {
     u *= Math.PI
     v *= 2 * Math.PI
 
     u = u * 2
-    var x, y, z
+    let x, y, z
     if (u < Math.PI) {
       x = 3 * Math.cos(u) * (1 + Math.sin(u)) + 2 * (1 - Math.cos(u) / 2) * Math.cos(u) * Math.cos(v)
       z = -8 * Math.sin(u) - 2 * (1 - Math.cos(u) / 2) * Math.sin(u) * Math.cos(v)
@@ -26,9 +26,9 @@ var ParametricGeometries = {
 
   plane: function (width, height) {
     return (u, v, target) => {
-      var x = u * width
-      var y = 0
-      var z = v * height
+      const x = u * width
+      const y = 0
+      const z = v * height
 
       target.set(x, y, z)
     }
@@ -38,11 +38,11 @@ var ParametricGeometries = {
     // flat mobius strip
     // http://www.wolframalpha.com/input/?i=M%C3%B6bius+strip+parametric+equations&lk=1&a=ClashPrefs_*Surface.MoebiusStrip.SurfaceProperty.ParametricEquations-
     u = u - 0.5
-    var v = 2 * Math.PI * t
+    const v = 2 * Math.PI * t
 
-    var x, y, z
+    let x, y, z
 
-    var a = 2
+    const a = 2
 
     x = Math.cos(v) * (a + u * Math.cos(v / 2))
     y = Math.sin(v) * (a + u * Math.cos(v / 2))
@@ -58,12 +58,12 @@ var ParametricGeometries = {
     t *= 2 * Math.PI
 
     u = u * 2
-    var phi = u / 2
-    var major = 2.25,
+    const phi = u / 2
+    const major = 2.25,
       a = 0.125,
       b = 0.65
 
-    var x, y, z
+    let x, y, z
 
     x = a * Math.cos(t) * Math.cos(phi) - b * Math.sin(t) * Math.sin(phi)
     z = a * Math.cos(t) * Math.sin(phi) + b * Math.sin(t) * Math.cos(phi)
@@ -87,10 +87,10 @@ ParametricGeometries.TubeGeometry = function (path, segments, radius, segmentsRa
   this.segmentsRadius = segmentsRadius || 8
   this.closed = closed || false
 
-  var scope = this,
+  const scope = this,
     numpoints = this.segments + 1
 
-  var frames = path.computeFrenetFrames(segments, closed),
+  const frames = path.computeFrenetFrames(segments, closed),
     tangents = frames.tangents,
     normals = frames.normals,
     binormals = frames.binormals
@@ -101,21 +101,21 @@ ParametricGeometries.TubeGeometry = function (path, segments, radius, segmentsRa
   this.normals = normals
   this.binormals = binormals
 
-  var position = new Vector3()
+  const position = new Vector3()
 
-  var ParametricTube = (u, v, target) => {
+  const ParametricTube = (u, v, target) => {
     v *= 2 * Math.PI
 
-    var i = u * (numpoints - 1)
+    let i = u * (numpoints - 1)
     i = Math.floor(i)
 
     path.getPointAt(u, position)
 
-    var normal = normals[i]
-    var binormal = binormals[i]
+    const normal = normals[i]
+    const binormal = binormals[i]
 
-    var cx = -scope.radius * Math.cos(v) // TODO: Hack: Negating it so it faces outside.
-    var cy = scope.radius * Math.sin(v)
+    const cx = -scope.radius * Math.cos(v) // TODO: Hack: Negating it so it faces outside.
+    const cy = scope.radius * Math.sin(v)
 
     position.x += cx * normal.x + cy * binormal.x
     position.y += cx * normal.y + cy * binormal.y
@@ -149,23 +149,23 @@ ParametricGeometries.TorusKnotGeometry = function (radius, tube, segmentsT, segm
     }
 
     getPoint(t, optionalTarget) {
-      var point = optionalTarget || new Vector3()
+      const point = optionalTarget || new Vector3()
 
       t *= Math.PI * 2
 
-      var r = 0.5
+      const r = 0.5
 
-      var x = (1 + r * Math.cos(q * t)) * Math.cos(p * t)
-      var y = (1 + r * Math.cos(q * t)) * Math.sin(p * t)
-      var z = r * Math.sin(q * t)
+      const x = (1 + r * Math.cos(q * t)) * Math.cos(p * t)
+      const y = (1 + r * Math.cos(q * t)) * Math.sin(p * t)
+      const z = r * Math.sin(q * t)
 
       return point.set(x, y, z).multiplyScalar(radius)
     }
   }
 
-  var segments = segmentsT
-  var radiusSegments = segmentsR
-  var extrudePath = new TorusKnotCurve()
+  const segments = segmentsT
+  const radiusSegments = segmentsR
+  const extrudePath = new TorusKnotCurve()
 
   ParametricGeometries.TubeGeometry.call(this, extrudePath, segments, tube, radiusSegments, true, false)
 }
@@ -183,9 +183,9 @@ ParametricGeometries.SphereGeometry = function (size, u, v) {
     u *= Math.PI
     v *= 2 * Math.PI
 
-    var x = size * Math.sin(u) * Math.cos(v)
-    var y = size * Math.sin(u) * Math.sin(v)
-    var z = size * Math.cos(u)
+    const x = size * Math.sin(u) * Math.cos(v)
+    const y = size * Math.sin(u) * Math.sin(v)
+    const z = size * Math.cos(u)
 
     target.set(x, y, z)
   }
@@ -204,9 +204,9 @@ ParametricGeometries.SphereGeometry.prototype.constructor = ParametricGeometries
 
 ParametricGeometries.PlaneGeometry = function (width, depth, segmentsWidth, segmentsDepth) {
   function plane(u, v, target) {
-    var x = u * width
-    var y = 0
-    var z = v * depth
+    const x = u * width
+    const y = 0
+    const z = v * depth
 
     target.set(x, y, z)
   }

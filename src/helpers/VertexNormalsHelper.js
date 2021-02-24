@@ -7,9 +7,9 @@ import {
   Vector3,
 } from '../../../build/three.module.js'
 
-var _v1 = new Vector3()
-var _v2 = new Vector3()
-var _normalMatrix = new Matrix3()
+const _v1 = new Vector3()
+const _v2 = new Vector3()
+const _normalMatrix = new Matrix3()
 
 class VertexNormalsHelper extends LineSegments {
   constructor(object, size, hex) {
@@ -17,13 +17,13 @@ class VertexNormalsHelper extends LineSegments {
 
     this.size = size !== undefined ? size : 0.1
 
-    var color = hex !== undefined ? hex : 0xff0000
+    const color = hex !== undefined ? hex : 0xff0000
 
     //
 
-    var nNormals = 0
+    let nNormals = 0
 
-    var objGeometry = this.object.geometry
+    const objGeometry = this.object.geometry
 
     if (objGeometry && objGeometry.isGeometry) {
       console.error('THREE.VertexNormalsHelper no longer supports Geometry. Use BufferGeometry instead.')
@@ -34,9 +34,9 @@ class VertexNormalsHelper extends LineSegments {
 
     //
 
-    var geometry = new BufferGeometry()
+    const geometry = new BufferGeometry()
 
-    var positions = new Float32BufferAttribute(nNormals * 2 * 3, 3)
+    const positions = new Float32BufferAttribute(nNormals * 2 * 3, 3)
 
     geometry.setAttribute('position', positions)
 
@@ -56,27 +56,27 @@ class VertexNormalsHelper extends LineSegments {
 
     _normalMatrix.getNormalMatrix(this.object.matrixWorld)
 
-    var matrixWorld = this.object.matrixWorld
+    const matrixWorld = this.object.matrixWorld
 
-    var position = this.geometry.attributes.position
+    const position = this.geometry.attributes.position
 
     //
 
-    var objGeometry = this.object.geometry
+    const objGeometry = this.object.geometry
 
     if (objGeometry && objGeometry.isGeometry) {
       console.error('THREE.VertexNormalsHelper no longer supports Geometry. Use BufferGeometry instead.')
       return
     } else if (objGeometry && objGeometry.isBufferGeometry) {
-      var objPos = objGeometry.attributes.position
+      const objPos = objGeometry.attributes.position
 
-      var objNorm = objGeometry.attributes.normal
+      const objNorm = objGeometry.attributes.normal
 
-      var idx = 0
+      let idx = 0
 
       // for simplicity, ignore index and drawcalls, and render every normal
 
-      for (var j = 0, jl = objPos.count; j < jl; j++) {
+      for (let j = 0, jl = objPos.count; j < jl; j++) {
         _v1.set(objPos.getX(j), objPos.getY(j), objPos.getZ(j)).applyMatrix4(matrixWorld)
 
         _v2.set(objNorm.getX(j), objNorm.getY(j), objNorm.getZ(j))

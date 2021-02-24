@@ -5,7 +5,7 @@
  * 16 April 2012 - @blurspline
  */
 
-var AsciiEffect = function (renderer, charSet, options) {
+const AsciiEffect = function (renderer, charSet, options) {
   // its fun to create one your own!
 
   charSet = charSet === undefined ? ' .:-=+*#%@' : charSet
@@ -18,25 +18,25 @@ var AsciiEffect = function (renderer, charSet, options) {
 
   // Some ASCII settings
 
-  var bResolution = !options['resolution'] ? 0.15 : options['resolution'] // Higher for more details
-  var iScale = !options['scale'] ? 1 : options['scale']
-  var bColor = !options['color'] ? false : options['color'] // nice but slows down rendering!
-  var bAlpha = !options['alpha'] ? false : options['alpha'] // Transparency
-  var bBlock = !options['block'] ? false : options['block'] // blocked characters. like good O dos
-  var bInvert = !options['invert'] ? false : options['invert'] // black is white, white is black
+  const bResolution = !options['resolution'] ? 0.15 : options['resolution'] // Higher for more details
+  const iScale = !options['scale'] ? 1 : options['scale']
+  const bColor = !options['color'] ? false : options['color'] // nice but slows down rendering!
+  const bAlpha = !options['alpha'] ? false : options['alpha'] // Transparency
+  const bBlock = !options['block'] ? false : options['block'] // blocked characters. like good O dos
+  const bInvert = !options['invert'] ? false : options['invert'] // black is white, white is black
 
-  var strResolution = 'low'
+  const strResolution = 'low'
 
-  var width, height
+  let width, height
 
-  var domElement = document.createElement('div')
+  const domElement = document.createElement('div')
   domElement.style.cursor = 'default'
 
-  var oAscii = document.createElement('table')
+  const oAscii = document.createElement('table')
   domElement.appendChild(oAscii)
 
-  var iWidth, iHeight
-  var oImg
+  let iWidth, iHeight
+  let oImg
 
   this.setSize = (w, h) => {
     width = w
@@ -82,7 +82,7 @@ var AsciiEffect = function (renderer, charSet, options) {
     oAscii.cellSpacing = 0
     oAscii.cellPadding = 0
 
-    var oStyle = oAscii.style
+    const oStyle = oAscii.style
     oStyle.display = 'inline'
     oStyle.width = `${Math.round((iWidth / fResolution) * iScale)}px`
     oStyle.height = `${Math.round((iHeight / fResolution) * iScale)}px`
@@ -97,23 +97,23 @@ var AsciiEffect = function (renderer, charSet, options) {
     oStyle.textDecoration = 'none'
   }
 
-  var aDefaultCharList = ' .,:;i1tfLCG08@'.split('')
-  var aDefaultColorCharList = ' CGO08@'.split('')
+  const aDefaultCharList = ' .,:;i1tfLCG08@'.split('')
+  const aDefaultColorCharList = ' CGO08@'.split('')
   var strFont = 'courier new, monospace'
 
-  var oCanvasImg = renderer.domElement
+  const oCanvasImg = renderer.domElement
 
   var oCanvas = document.createElement('canvas')
   if (!oCanvas.getContext) {
     return
   }
 
-  var oCtx = oCanvas.getContext('2d')
+  const oCtx = oCanvas.getContext('2d')
   if (!oCtx.getImageData) {
     return
   }
 
-  var aCharList = bColor ? aDefaultColorCharList : aDefaultCharList
+  let aCharList = bColor ? aDefaultColorCharList : aDefaultCharList
 
   if (charSet) aCharList = charSet
 
@@ -199,24 +199,24 @@ var AsciiEffect = function (renderer, charSet, options) {
   function asciifyImage(canvasRenderer, oAscii) {
     oCtx.clearRect(0, 0, iWidth, iHeight)
     oCtx.drawImage(oCanvasImg, 0, 0, iWidth, iHeight)
-    var oImgData = oCtx.getImageData(0, 0, iWidth, iHeight).data
+    const oImgData = oCtx.getImageData(0, 0, iWidth, iHeight).data
 
     // Coloring loop starts now
-    var strChars = ''
+    let strChars = ''
 
     // console.time('rendering');
 
-    for (var y = 0; y < iHeight; y += 2) {
-      for (var x = 0; x < iWidth; x++) {
-        var iOffset = (y * iWidth + x) * 4
+    for (let y = 0; y < iHeight; y += 2) {
+      for (let x = 0; x < iWidth; x++) {
+        const iOffset = (y * iWidth + x) * 4
 
-        var iRed = oImgData[iOffset]
-        var iGreen = oImgData[iOffset + 1]
-        var iBlue = oImgData[iOffset + 2]
-        var iAlpha = oImgData[iOffset + 3]
-        var iCharIdx
+        const iRed = oImgData[iOffset]
+        const iGreen = oImgData[iOffset + 1]
+        const iBlue = oImgData[iOffset + 2]
+        const iAlpha = oImgData[iOffset + 3]
+        let iCharIdx
 
-        var fBrightness
+        let fBrightness
 
         fBrightness = (0.3 * iRed + 0.59 * iGreen + 0.11 * iBlue) / 255
         // fBrightness = (0.3*iRed + 0.5*iGreen + 0.3*iBlue) / 255;
@@ -237,7 +237,7 @@ var AsciiEffect = function (renderer, charSet, options) {
         //fBrightness = Math.floor(fBrightness * 10);
         //strThisChar = fBrightness;
 
-        var strThisChar = aCharList[iCharIdx]
+        let strThisChar = aCharList[iCharIdx]
 
         if (strThisChar === undefined || strThisChar == ' ') strThisChar = '&nbsp;'
 

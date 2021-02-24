@@ -11,23 +11,23 @@ import {
   WebGLRenderTarget,
 } from '../../../build/three.module.js'
 
-var ParallaxBarrierEffect = function (renderer) {
-  var _camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1)
+const ParallaxBarrierEffect = function (renderer) {
+  const _camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1)
 
-  var _scene = new Scene()
+  const _scene = new Scene()
 
-  var _stereo = new StereoCamera()
+  const _stereo = new StereoCamera()
 
-  var _params = {
+  const _params = {
     minFilter: LinearFilter,
     magFilter: NearestFilter,
     format: RGBAFormat,
   }
 
-  var _renderTargetL = new WebGLRenderTarget(512, 512, _params)
-  var _renderTargetR = new WebGLRenderTarget(512, 512, _params)
+  const _renderTargetL = new WebGLRenderTarget(512, 512, _params)
+  const _renderTargetR = new WebGLRenderTarget(512, 512, _params)
 
-  var _material = new ShaderMaterial({
+  const _material = new ShaderMaterial({
     uniforms: {
       mapLeft: { value: _renderTargetL.texture },
       mapRight: { value: _renderTargetR.texture },
@@ -67,13 +67,13 @@ var ParallaxBarrierEffect = function (renderer) {
     ].join('\n'),
   })
 
-  var mesh = new Mesh(new PlaneGeometry(2, 2), _material)
+  const mesh = new Mesh(new PlaneGeometry(2, 2), _material)
   _scene.add(mesh)
 
   this.setSize = (width, height) => {
     renderer.setSize(width, height)
 
-    var pixelRatio = renderer.getPixelRatio()
+    const pixelRatio = renderer.getPixelRatio()
 
     _renderTargetL.setSize(width * pixelRatio, height * pixelRatio)
     _renderTargetR.setSize(width * pixelRatio, height * pixelRatio)

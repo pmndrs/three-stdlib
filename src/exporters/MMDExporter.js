@@ -6,20 +6,20 @@ import { MMDParser } from '../libs/mmdparser.module.js'
  *  - mmd-parser https://github.com/takahirox/mmd-parser
  */
 
-var MMDExporter = function () {
+const MMDExporter = function () {
   // Unicode to Shift_JIS table
-  var u2sTable
+  let u2sTable
 
   function unicodeToShiftjis(str) {
     if (u2sTable === undefined) {
-      var encoder = new MMDParser.CharsetEncoder() // eslint-disable-line no-undef
-      var table = encoder.s2uTable
+      const encoder = new MMDParser.CharsetEncoder() // eslint-disable-line no-undef
+      const table = encoder.s2uTable
       u2sTable = {}
 
-      var keys = Object.keys(table)
+      const keys = Object.keys(table)
 
       for (var i = 0, il = keys.length; i < il; i++) {
-        var key = keys[i]
+        let key = keys[i]
 
         var value = table[key]
         key = parseInt(key)
@@ -28,10 +28,10 @@ var MMDExporter = function () {
       }
     }
 
-    var array = []
+    const array = []
 
     for (var i = 0, il = str.length; i < il; i++) {
-      var code = str.charCodeAt(i)
+      const code = str.charCodeAt(i)
 
       var value = u2sTable[code]
 
@@ -50,7 +50,7 @@ var MMDExporter = function () {
 
   function getBindBones(skin) {
     // any more efficient ways?
-    var poseSkin = skin.clone()
+    const poseSkin = skin.clone()
     poseSkin.pose()
     return poseSkin.skeleton.bones
   }
@@ -82,7 +82,7 @@ var MMDExporter = function () {
     function toStringsFromNumber(num) {
       if (Math.abs(num) < 1e-6) num = 0
 
-      var a = num.toString()
+      let a = num.toString()
 
       if (a.indexOf('.') === -1) {
         a += '.'
@@ -90,18 +90,18 @@ var MMDExporter = function () {
 
       a += '000000'
 
-      var index = a.indexOf('.')
+      const index = a.indexOf('.')
 
-      var d = a.slice(0, index)
-      var p = a.slice(index + 1, index + 7)
+      const d = a.slice(0, index)
+      const p = a.slice(index + 1, index + 7)
 
       return `${d}.${p}`
     }
 
     function toStringsFromArray(array) {
-      var a = []
+      const a = []
 
-      for (var i = 0, il = array.length; i < il; i++) {
+      for (let i = 0, il = array.length; i < il; i++) {
         a.push(toStringsFromNumber(array[i]))
       }
 
@@ -110,24 +110,24 @@ var MMDExporter = function () {
 
     skin.updateMatrixWorld(true)
 
-    var bones = skin.skeleton.bones
-    var bones2 = getBindBones(skin)
+    const bones = skin.skeleton.bones
+    const bones2 = getBindBones(skin)
 
-    var position = new Vector3()
-    var quaternion = new Quaternion()
-    var quaternion2 = new Quaternion()
-    var matrix = new Matrix4()
+    const position = new Vector3()
+    const quaternion = new Quaternion()
+    const quaternion2 = new Quaternion()
+    const matrix = new Matrix4()
 
-    var array = []
+    const array = []
     array.push('Vocaloid Pose Data file')
     array.push('')
     array.push(`${skin.name !== '' ? skin.name.replace(/\s/g, '_') : 'skin'}.osm;`)
     array.push(`${bones.length};`)
     array.push('')
 
-    for (var i = 0, il = bones.length; i < il; i++) {
-      var bone = bones[i]
-      var bone2 = bones2[i]
+    for (let i = 0, il = bones.length; i < il; i++) {
+      const bone = bones[i]
+      const bone2 = bones2[i]
 
       /*
        * use the bone matrix saved before solving IK.
@@ -146,8 +146,8 @@ var MMDExporter = function () {
       position.setFromMatrixPosition(matrix)
       quaternion.setFromRotationMatrix(matrix)
 
-      var pArray = position.sub(bone2.position).toArray()
-      var qArray = quaternion2.copy(bone2.quaternion).conjugate().multiply(quaternion).toArray()
+      const pArray = position.sub(bone2.position).toArray()
+      const qArray = quaternion2.copy(bone2.quaternion).conjugate().multiply(quaternion).toArray()
 
       // right to left
       pArray[2] = -pArray[2]
@@ -163,7 +163,7 @@ var MMDExporter = function () {
 
     array.push('')
 
-    var lines = array.join('\n')
+    const lines = array.join('\n')
 
     return outputShiftJis === true ? unicodeToShiftjis(lines) : lines
   }

@@ -21,21 +21,21 @@ class DecalGeometry extends BufferGeometry {
 
     // buffers
 
-    var vertices = []
-    var normals = []
-    var uvs = []
+    const vertices = []
+    const normals = []
+    const uvs = []
 
     // helpers
 
-    var plane = new Vector3()
+    const plane = new Vector3()
 
     // this matrix represents the transformation of the decal projector
 
-    var projectorMatrix = new Matrix4()
+    const projectorMatrix = new Matrix4()
     projectorMatrix.makeRotationFromEuler(orientation)
     projectorMatrix.setPosition(position)
 
-    var projectorMatrixInverse = new Matrix4()
+    const projectorMatrixInverse = new Matrix4()
     projectorMatrixInverse.copy(projectorMatrix).invert()
 
     // generate buffers
@@ -49,12 +49,12 @@ class DecalGeometry extends BufferGeometry {
     this.setAttribute('uv', new Float32BufferAttribute(uvs, 2))
 
     function generate() {
-      var i
+      let i
 
-      var decalVertices = []
+      let decalVertices = []
 
-      var vertex = new Vector3()
-      var normal = new Vector3()
+      const vertex = new Vector3()
+      const normal = new Vector3()
 
       // handle different geometry types
 
@@ -63,10 +63,10 @@ class DecalGeometry extends BufferGeometry {
         return
       }
 
-      var geometry = mesh.geometry
+      const geometry = mesh.geometry
 
-      var positionAttribute = geometry.attributes.position
-      var normalAttribute = geometry.attributes.normal
+      const positionAttribute = geometry.attributes.position
+      const normalAttribute = geometry.attributes.normal
 
       // first, create an array of 'DecalVertex' objects
       // three consecutive 'DecalVertex' objects represent a single face
@@ -76,7 +76,7 @@ class DecalGeometry extends BufferGeometry {
       if (geometry.index !== null) {
         // indexed BufferGeometry
 
-        var index = geometry.index
+        const index = geometry.index
 
         for (i = 0; i < index.count; i++) {
           vertex.fromBufferAttribute(positionAttribute, index.getX(i))
@@ -107,7 +107,7 @@ class DecalGeometry extends BufferGeometry {
       // third, generate final vertices, normals and uvs
 
       for (i = 0; i < decalVertices.length; i++) {
-        var decalVertex = decalVertices[i]
+        const decalVertex = decalVertices[i]
 
         // create texture coordinates (we are still in projector space)
 
@@ -136,23 +136,23 @@ class DecalGeometry extends BufferGeometry {
     }
 
     function clipGeometry(inVertices, plane) {
-      var outVertices = []
+      const outVertices = []
 
-      var s = 0.5 * Math.abs(size.dot(plane))
+      const s = 0.5 * Math.abs(size.dot(plane))
 
       // a single iteration clips one face,
       // which consists of three consecutive 'DecalVertex' objects
 
-      for (var i = 0; i < inVertices.length; i += 3) {
-        var v1Out,
+      for (let i = 0; i < inVertices.length; i += 3) {
+        let v1Out,
           v2Out,
           v3Out,
           total = 0
-        var nV1, nV2, nV3, nV4
+        let nV1, nV2, nV3, nV4
 
-        var d1 = inVertices[i + 0].position.dot(plane) - s
-        var d2 = inVertices[i + 1].position.dot(plane) - s
-        var d3 = inVertices[i + 2].position.dot(plane) - s
+        const d1 = inVertices[i + 0].position.dot(plane) - s
+        const d2 = inVertices[i + 1].position.dot(plane) - s
+        const d3 = inVertices[i + 2].position.dot(plane) - s
 
         v1Out = d1 > 0
         v2Out = d2 > 0
@@ -261,12 +261,12 @@ class DecalGeometry extends BufferGeometry {
     }
 
     function clip(v0, v1, p, s) {
-      var d0 = v0.position.dot(p) - s
-      var d1 = v1.position.dot(p) - s
+      const d0 = v0.position.dot(p) - s
+      const d1 = v1.position.dot(p) - s
 
-      var s0 = d0 / (d0 - d1)
+      const s0 = d0 / (d0 - d1)
 
-      var v = new DecalVertex(
+      const v = new DecalVertex(
         new Vector3(
           v0.position.x + s0 * (v1.position.x - v0.position.x),
           v0.position.y + s0 * (v1.position.y - v0.position.y),

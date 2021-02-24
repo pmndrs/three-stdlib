@@ -21,7 +21,7 @@ import {
   Vector3,
 } from '../../../build/three.module.js'
 
-var GLTFExporter = (() => {
+const GLTFExporter = (() => {
   function GLTFExporter() {
     this.pluginCallbacks = []
 
@@ -58,10 +58,10 @@ var GLTFExporter = (() => {
      * @param  {Object} options options
      */
     parse: function (input, onDone, options) {
-      var writer = new GLTFWriter()
-      var plugins = []
+      const writer = new GLTFWriter()
+      const plugins = []
 
-      for (var i = 0, il = this.pluginCallbacks.length; i < il; i++) {
+      for (let i = 0, il = this.pluginCallbacks.length; i < il; i++) {
         plugins.push(this.pluginCallbacks[i](writer))
       }
 
@@ -74,7 +74,7 @@ var GLTFExporter = (() => {
   // Constants
   //------------------------------------------------------------------------------
 
-  var WEBGL_CONSTANTS = {
+  const WEBGL_CONSTANTS = {
     POINTS: 0x0000,
     LINES: 0x0001,
     LINE_LOOP: 0x0002,
@@ -102,7 +102,7 @@ var GLTFExporter = (() => {
     REPEAT: 10497,
   }
 
-  var THREE_TO_WEBGL = {}
+  const THREE_TO_WEBGL = {}
 
   THREE_TO_WEBGL[NearestFilter] = WEBGL_CONSTANTS.NEAREST
   THREE_TO_WEBGL[NearestMipmapNearestFilter] = WEBGL_CONSTANTS.NEAREST_MIPMAP_NEAREST
@@ -115,7 +115,7 @@ var GLTFExporter = (() => {
   THREE_TO_WEBGL[RepeatWrapping] = WEBGL_CONSTANTS.REPEAT
   THREE_TO_WEBGL[MirroredRepeatWrapping] = WEBGL_CONSTANTS.MIRRORED_REPEAT
 
-  var PATH_PROPERTIES = {
+  const PATH_PROPERTIES = {
     scale: 'scale',
     position: 'translation',
     quaternion: 'rotation',
@@ -125,13 +125,13 @@ var GLTFExporter = (() => {
   // GLB constants
   // https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#glb-file-format-specification
 
-  var GLB_HEADER_BYTES = 12
-  var GLB_HEADER_MAGIC = 0x46546c67
-  var GLB_VERSION = 2
+  const GLB_HEADER_BYTES = 12
+  const GLB_HEADER_MAGIC = 0x46546c67
+  const GLB_VERSION = 2
 
-  var GLB_CHUNK_PREFIX_BYTES = 8
-  var GLB_CHUNK_TYPE_JSON = 0x4e4f534a
-  var GLB_CHUNK_TYPE_BIN = 0x004e4942
+  const GLB_CHUNK_PREFIX_BYTES = 8
+  const GLB_CHUNK_TYPE_JSON = 0x4e4f534a
+  const GLB_CHUNK_TYPE_BIN = 0x004e4942
 
   //------------------------------------------------------------------------------
   // Utility functions
@@ -157,10 +157,10 @@ var GLTFExporter = (() => {
       return new TextEncoder().encode(text).buffer
     }
 
-    var array = new Uint8Array(new ArrayBuffer(text.length))
+    const array = new Uint8Array(new ArrayBuffer(text.length))
 
-    for (var i = 0, il = text.length; i < il; i++) {
-      var value = text.charCodeAt(i)
+    for (let i = 0, il = text.length; i < il; i++) {
+      const value = text.charCodeAt(i)
 
       // Replacing multi-byte character with space(0x20).
       array[i] = value > 0xff ? 0x20 : value
@@ -187,14 +187,14 @@ var GLTFExporter = (() => {
    * @return {Object} Object containing the `min` and `max` values (As an array of attribute.itemSize components)
    */
   function getMinMax(attribute, start, count) {
-    var output = {
+    const output = {
       min: new Array(attribute.itemSize).fill(Number.POSITIVE_INFINITY),
       max: new Array(attribute.itemSize).fill(Number.NEGATIVE_INFINITY),
     }
 
-    for (var i = start; i < start + count; i++) {
-      for (var a = 0; a < attribute.itemSize; a++) {
-        var value
+    for (let i = start; i < start + count; i++) {
+      for (let a = 0; a < attribute.itemSize; a++) {
+        let value
 
         if (attribute.itemSize > 4) {
           // no support for interleaved data for itemSize > 4
@@ -237,14 +237,14 @@ var GLTFExporter = (() => {
   function getPaddedArrayBuffer(arrayBuffer, paddingByte) {
     paddingByte = paddingByte || 0
 
-    var paddedLength = getPaddedBufferSize(arrayBuffer.byteLength)
+    const paddedLength = getPaddedBufferSize(arrayBuffer.byteLength)
 
     if (paddedLength !== arrayBuffer.byteLength) {
-      var array = new Uint8Array(paddedLength)
+      const array = new Uint8Array(paddedLength)
       array.set(new Uint8Array(arrayBuffer))
 
       if (paddingByte !== 0) {
-        for (var i = arrayBuffer.byteLength; i < paddedLength; i++) {
+        for (let i = arrayBuffer.byteLength; i < paddedLength; i++) {
           array[i] = paddingByte
         }
       }
@@ -255,7 +255,7 @@ var GLTFExporter = (() => {
     return arrayBuffer
   }
 
-  var cachedCanvas = null
+  let cachedCanvas = null
 
   /**
    * Writer
@@ -330,19 +330,19 @@ var GLTFExporter = (() => {
 
       this.processInput(input)
 
-      var writer = this
+      const writer = this
 
       Promise.all(this.pending).then(() => {
-        var buffers = writer.buffers
-        var json = writer.json
-        var options = writer.options
-        var extensionsUsed = writer.extensionsUsed
+        const buffers = writer.buffers
+        const json = writer.json
+        const options = writer.options
+        const extensionsUsed = writer.extensionsUsed
 
         // Merge buffers.
-        var blob = new Blob(buffers, { type: 'application/octet-stream' })
+        const blob = new Blob(buffers, { type: 'application/octet-stream' })
 
         // Declare extensions.
-        var extensionsUsedList = Object.keys(extensionsUsed)
+        const extensionsUsedList = Object.keys(extensionsUsed)
 
         if (extensionsUsedList.length > 0) json.extensionsUsed = extensionsUsedList
 
@@ -356,23 +356,23 @@ var GLTFExporter = (() => {
           reader.readAsArrayBuffer(blob)
           reader.onloadend = () => {
             // Binary chunk.
-            var binaryChunk = getPaddedArrayBuffer(reader.result)
-            var binaryChunkPrefix = new DataView(new ArrayBuffer(GLB_CHUNK_PREFIX_BYTES))
+            const binaryChunk = getPaddedArrayBuffer(reader.result)
+            const binaryChunkPrefix = new DataView(new ArrayBuffer(GLB_CHUNK_PREFIX_BYTES))
             binaryChunkPrefix.setUint32(0, binaryChunk.byteLength, true)
             binaryChunkPrefix.setUint32(4, GLB_CHUNK_TYPE_BIN, true)
 
             // JSON chunk.
-            var jsonChunk = getPaddedArrayBuffer(stringToArrayBuffer(JSON.stringify(json)), 0x20)
-            var jsonChunkPrefix = new DataView(new ArrayBuffer(GLB_CHUNK_PREFIX_BYTES))
+            const jsonChunk = getPaddedArrayBuffer(stringToArrayBuffer(JSON.stringify(json)), 0x20)
+            const jsonChunkPrefix = new DataView(new ArrayBuffer(GLB_CHUNK_PREFIX_BYTES))
             jsonChunkPrefix.setUint32(0, jsonChunk.byteLength, true)
             jsonChunkPrefix.setUint32(4, GLB_CHUNK_TYPE_JSON, true)
 
             // GLB header.
-            var header = new ArrayBuffer(GLB_HEADER_BYTES)
-            var headerView = new DataView(header)
+            const header = new ArrayBuffer(GLB_HEADER_BYTES)
+            const headerView = new DataView(header)
             headerView.setUint32(0, GLB_HEADER_MAGIC, true)
             headerView.setUint32(4, GLB_VERSION, true)
-            var totalByteLength =
+            const totalByteLength =
               GLB_HEADER_BYTES +
               jsonChunkPrefix.byteLength +
               jsonChunk.byteLength +
@@ -380,11 +380,11 @@ var GLTFExporter = (() => {
               binaryChunk.byteLength
             headerView.setUint32(8, totalByteLength, true)
 
-            var glbBlob = new Blob([header, jsonChunkPrefix, jsonChunk, binaryChunkPrefix, binaryChunk], {
+            const glbBlob = new Blob([header, jsonChunkPrefix, jsonChunk, binaryChunkPrefix, binaryChunk], {
               type: 'application/octet-stream',
             })
 
-            var glbReader = new window.FileReader()
+            const glbReader = new window.FileReader()
             glbReader.readAsArrayBuffer(glbBlob)
             glbReader.onloadend = () => {
               onDone(glbReader.result)
@@ -395,7 +395,7 @@ var GLTFExporter = (() => {
             var reader = new window.FileReader()
             reader.readAsDataURL(blob)
             reader.onloadend = () => {
-              var base64data = reader.result
+              const base64data = reader.result
               json.buffers[0].uri = base64data
               onDone(json)
             }
@@ -415,16 +415,16 @@ var GLTFExporter = (() => {
     serializeUserData: function (object, objectDef) {
       if (Object.keys(object.userData).length === 0) return
 
-      var options = this.options
-      var extensionsUsed = this.extensionsUsed
+      const options = this.options
+      const extensionsUsed = this.extensionsUsed
 
       try {
-        var json = JSON.parse(JSON.stringify(object.userData))
+        const json = JSON.parse(JSON.stringify(object.userData))
 
         if (options.includeCustomExtensions && json.gltfExtensions) {
           if (objectDef.extensions === undefined) objectDef.extensions = {}
 
-          for (var extensionName in json.gltfExtensions) {
+          for (const extensionName in json.gltfExtensions) {
             objectDef.extensions[extensionName] = json.gltfExtensions[extensionName]
             extensionsUsed[extensionName] = true
           }
@@ -459,13 +459,13 @@ var GLTFExporter = (() => {
      * @returns {Boolean}
      */
     isNormalizedNormalAttribute: function (normal) {
-      var cache = this.cache
+      const cache = this.cache
 
       if (cache.attributesNormalized.has(normal)) return false
 
-      var v = new Vector3()
+      const v = new Vector3()
 
-      for (var i = 0, il = normal.count; i < il; i++) {
+      for (let i = 0, il = normal.count; i < il; i++) {
         // 0.0005 is from glTF-validator
         if (Math.abs(v.fromBufferAttribute(normal, i).length() - 1.0) > 0.0005) return false
       }
@@ -481,14 +481,14 @@ var GLTFExporter = (() => {
      *
      */
     createNormalizedNormalAttribute: function (normal) {
-      var cache = this.cache
+      const cache = this.cache
 
       if (cache.attributesNormalized.has(normal)) return cache.attributesNormalized.get(normal)
 
-      var attribute = normal.clone()
-      var v = new Vector3()
+      const attribute = normal.clone()
+      const v = new Vector3()
 
-      for (var i = 0, il = attribute.count; i < il; i++) {
+      for (let i = 0, il = attribute.count; i < il; i++) {
         v.fromBufferAttribute(attribute, i)
 
         if (v.x === 0 && v.y === 0 && v.z === 0) {
@@ -514,8 +514,8 @@ var GLTFExporter = (() => {
      * @param {THREE.Texture} texture
      */
     applyTextureTransform: function (mapDef, texture) {
-      var didTransform = false
-      var transformDef = {}
+      let didTransform = false
+      const transformDef = {}
 
       if (texture.offset.x !== 0 || texture.offset.y !== 0) {
         transformDef.offset = texture.offset.toArray()
@@ -545,8 +545,8 @@ var GLTFExporter = (() => {
      * @return {Integer}
      */
     processBuffer: function (buffer) {
-      var json = this.json
-      var buffers = this.buffers
+      const json = this.json
+      const buffers = this.buffers
 
       if (!json.buffers) json.buffers = [{ byteLength: 0 }]
 
@@ -566,13 +566,13 @@ var GLTFExporter = (() => {
      * @return {Object}
      */
     processBufferView: function (attribute, componentType, start, count, target) {
-      var json = this.json
+      const json = this.json
 
       if (!json.bufferViews) json.bufferViews = []
 
       // Create a new dataview and dump the attribute's array into it
 
-      var componentSize
+      let componentSize
 
       if (componentType === WEBGL_CONSTANTS.UNSIGNED_BYTE) {
         componentSize = 1
@@ -582,13 +582,13 @@ var GLTFExporter = (() => {
         componentSize = 4
       }
 
-      var byteLength = getPaddedBufferSize(count * attribute.itemSize * componentSize)
-      var dataView = new DataView(new ArrayBuffer(byteLength))
-      var offset = 0
+      const byteLength = getPaddedBufferSize(count * attribute.itemSize * componentSize)
+      const dataView = new DataView(new ArrayBuffer(byteLength))
+      let offset = 0
 
-      for (var i = start; i < start + count; i++) {
-        for (var a = 0; a < attribute.itemSize; a++) {
-          var value
+      for (let i = start; i < start + count; i++) {
+        for (let a = 0; a < attribute.itemSize; a++) {
+          let value
 
           if (attribute.itemSize > 4) {
             // no support for interleaved data for itemSize > 4
@@ -615,7 +615,7 @@ var GLTFExporter = (() => {
         }
       }
 
-      var bufferViewDef = {
+      const bufferViewDef = {
         buffer: this.processBuffer(dataView.buffer),
         byteOffset: this.byteOffset,
         byteLength,
@@ -633,7 +633,7 @@ var GLTFExporter = (() => {
       json.bufferViews.push(bufferViewDef)
 
       // @TODO Merge bufferViews where possible.
-      var output = {
+      const output = {
         id: json.bufferViews.length - 1,
         byteLength: 0,
       }
@@ -647,18 +647,18 @@ var GLTFExporter = (() => {
      * @return {Promise<Integer>}
      */
     processBufferViewImage: function (blob) {
-      var writer = this
-      var json = writer.json
+      const writer = this
+      const json = writer.json
 
       if (!json.bufferViews) json.bufferViews = []
 
       return new Promise((resolve) => {
-        var reader = new window.FileReader()
+        const reader = new window.FileReader()
         reader.readAsArrayBuffer(blob)
         reader.onloadend = () => {
-          var buffer = getPaddedArrayBuffer(reader.result)
+          const buffer = getPaddedArrayBuffer(reader.result)
 
-          var bufferViewDef = {
+          const bufferViewDef = {
             buffer: writer.processBuffer(buffer),
             byteOffset: writer.byteOffset,
             byteLength: buffer.byteLength,
@@ -679,10 +679,10 @@ var GLTFExporter = (() => {
      * @return {Integer|null} Index of the processed accessor on the "accessors" array
      */
     processAccessor: function (attribute, geometry, start, count) {
-      var options = this.options
-      var json = this.json
+      const options = this.options
+      const json = this.json
 
-      var types = {
+      const types = {
         1: 'SCALAR',
         2: 'VEC2',
         3: 'VEC3',
@@ -690,7 +690,7 @@ var GLTFExporter = (() => {
         16: 'MAT4',
       }
 
-      var componentType
+      let componentType
 
       // Detect the component type of the attribute array (float, uint or ushort)
       if (attribute.array.constructor === Float32Array) {
@@ -710,8 +710,8 @@ var GLTFExporter = (() => {
 
       // @TODO Indexed buffer geometry with drawRange not supported yet
       if (options.truncateDrawRange && geometry !== undefined && geometry.index === null) {
-        var end = start + count
-        var end2 =
+        const end = start + count
+        const end2 =
           geometry.drawRange.count === Infinity ? attribute.count : geometry.drawRange.start + geometry.drawRange.count
 
         start = Math.max(start, geometry.drawRange.start)
@@ -723,8 +723,8 @@ var GLTFExporter = (() => {
       // Skip creating an accessor if the attribute doesn't have data to export
       if (count === 0) return null
 
-      var minMax = getMinMax(attribute, start, count)
-      var bufferViewTarget
+      const minMax = getMinMax(attribute, start, count)
+      let bufferViewTarget
 
       // If geometry isn't provided, don't infer the target usage of the bufferView. For
       // animation samplers, target must not be set.
@@ -733,9 +733,9 @@ var GLTFExporter = (() => {
           attribute === geometry.index ? WEBGL_CONSTANTS.ELEMENT_ARRAY_BUFFER : WEBGL_CONSTANTS.ARRAY_BUFFER
       }
 
-      var bufferView = this.processBufferView(attribute, componentType, start, count, bufferViewTarget)
+      const bufferView = this.processBufferView(attribute, componentType, start, count, bufferViewTarget)
 
-      var accessorDef = {
+      const accessorDef = {
         bufferView: bufferView.id,
         byteOffset: bufferView.byteOffset,
         componentType,
@@ -759,31 +759,31 @@ var GLTFExporter = (() => {
      * @return {Integer}     Index of the processed texture in the "images" array
      */
     processImage: function (image, format, flipY) {
-      var writer = this
-      var cache = writer.cache
-      var json = writer.json
-      var options = writer.options
-      var pending = writer.pending
+      const writer = this
+      const cache = writer.cache
+      const json = writer.json
+      const options = writer.options
+      const pending = writer.pending
 
       if (!cache.images.has(image)) cache.images.set(image, {})
 
-      var cachedImages = cache.images.get(image)
-      var mimeType = format === RGBAFormat ? 'image/png' : 'image/jpeg'
-      var key = `${mimeType}:flipY/${flipY.toString()}`
+      const cachedImages = cache.images.get(image)
+      const mimeType = format === RGBAFormat ? 'image/png' : 'image/jpeg'
+      const key = `${mimeType}:flipY/${flipY.toString()}`
 
       if (cachedImages[key] !== undefined) return cachedImages[key]
 
       if (!json.images) json.images = []
 
-      var imageDef = { mimeType }
+      const imageDef = { mimeType }
 
       if (options.embedImages) {
-        var canvas = (cachedCanvas = cachedCanvas || document.createElement('canvas'))
+        const canvas = (cachedCanvas = cachedCanvas || document.createElement('canvas'))
 
         canvas.width = Math.min(image.width, options.maxTextureSize)
         canvas.height = Math.min(image.height, options.maxTextureSize)
 
-        var ctx = canvas.getContext('2d')
+        const ctx = canvas.getContext('2d')
 
         if (flipY === true) {
           ctx.translate(0, canvas.height)
@@ -806,12 +806,12 @@ var GLTFExporter = (() => {
             console.warn('GLTFExporter: Image size is bigger than maxTextureSize', image)
           }
 
-          var data = image.data
+          let data = image.data
 
           if (format === RGBFormat) {
             data = new Uint8ClampedArray(image.height * image.width * 4)
 
-            for (var i = 0, j = 0; i < data.length; i += 4, j += 3) {
+            for (let i = 0, j = 0; i < data.length; i += 4, j += 3) {
               data[i + 0] = image.data[j + 0]
               data[i + 1] = image.data[j + 1]
               data[i + 2] = image.data[j + 2]
@@ -840,7 +840,7 @@ var GLTFExporter = (() => {
         imageDef.uri = image.src
       }
 
-      var index = json.images.push(imageDef) - 1
+      const index = json.images.push(imageDef) - 1
       cachedImages[key] = index
       return index
     },
@@ -851,11 +851,11 @@ var GLTFExporter = (() => {
      * @return {Integer}     Index of the processed texture in the "samplers" array
      */
     processSampler: function (map) {
-      var json = this.json
+      const json = this.json
 
       if (!json.samplers) json.samplers = []
 
-      var samplerDef = {
+      const samplerDef = {
         magFilter: THREE_TO_WEBGL[map.magFilter],
         minFilter: THREE_TO_WEBGL[map.minFilter],
         wrapS: THREE_TO_WEBGL[map.wrapS],
@@ -871,14 +871,14 @@ var GLTFExporter = (() => {
      * @return {Integer} Index of the processed texture in the "textures" array
      */
     processTexture: function (map) {
-      var cache = this.cache
-      var json = this.json
+      const cache = this.cache
+      const json = this.json
 
       if (cache.textures.has(map)) return cache.textures.get(map)
 
       if (!json.textures) json.textures = []
 
-      var textureDef = {
+      const textureDef = {
         sampler: this.processSampler(map),
         source: this.processImage(map.image, map.format, map.flipY),
       }
@@ -889,7 +889,7 @@ var GLTFExporter = (() => {
         ext.writeTexture && ext.writeTexture(map, textureDef)
       })
 
-      var index = json.textures.push(textureDef) - 1
+      const index = json.textures.push(textureDef) - 1
       cache.textures.set(map, index)
       return index
     },
@@ -900,8 +900,8 @@ var GLTFExporter = (() => {
      * @return {Integer|null} Index of the processed material in the "materials" array
      */
     processMaterial: function (material) {
-      var cache = this.cache
-      var json = this.json
+      const cache = this.cache
+      const json = this.json
 
       if (cache.materials.has(material)) return cache.materials.get(material)
 
@@ -913,14 +913,14 @@ var GLTFExporter = (() => {
       if (!json.materials) json.materials = []
 
       // @QUESTION Should we avoid including any attribute that has the default value?
-      var materialDef = { pbrMetallicRoughness: {} }
+      const materialDef = { pbrMetallicRoughness: {} }
 
       if (material.isMeshStandardMaterial !== true && material.isMeshBasicMaterial !== true) {
         console.warn('GLTFExporter: Use MeshStandardMaterial or MeshBasicMaterial for best results.')
       }
 
       // pbrMetallicRoughness.baseColorFactor
-      var color = material.color.toArray().concat([material.opacity])
+      const color = material.color.toArray().concat([material.opacity])
 
       if (!equalArray(color, [1, 1, 1, 1])) {
         materialDef.pbrMetallicRoughness.baseColorFactor = color
@@ -937,7 +937,7 @@ var GLTFExporter = (() => {
       // pbrMetallicRoughness.metallicRoughnessTexture
       if (material.metalnessMap || material.roughnessMap) {
         if (material.metalnessMap === material.roughnessMap) {
-          var metalRoughMapDef = {
+          const metalRoughMapDef = {
             index: this.processTexture(material.metalnessMap),
           }
           this.applyTextureTransform(metalRoughMapDef, material.metalnessMap)
@@ -951,14 +951,14 @@ var GLTFExporter = (() => {
 
       // pbrMetallicRoughness.baseColorTexture or pbrSpecularGlossiness diffuseTexture
       if (material.map) {
-        var baseColorMapDef = { index: this.processTexture(material.map) }
+        const baseColorMapDef = { index: this.processTexture(material.map) }
         this.applyTextureTransform(baseColorMapDef, material.map)
         materialDef.pbrMetallicRoughness.baseColorTexture = baseColorMapDef
       }
 
       if (material.emissive) {
         // emissiveFactor
-        var emissive = material.emissive.clone().multiplyScalar(material.emissiveIntensity).toArray()
+        const emissive = material.emissive.clone().multiplyScalar(material.emissiveIntensity).toArray()
 
         if (!equalArray(emissive, [0, 0, 0])) {
           materialDef.emissiveFactor = emissive
@@ -966,7 +966,7 @@ var GLTFExporter = (() => {
 
         // emissiveTexture
         if (material.emissiveMap) {
-          var emissiveMapDef = {
+          const emissiveMapDef = {
             index: this.processTexture(material.emissiveMap),
           }
           this.applyTextureTransform(emissiveMapDef, material.emissiveMap)
@@ -976,7 +976,7 @@ var GLTFExporter = (() => {
 
       // normalTexture
       if (material.normalMap) {
-        var normalMapDef = { index: this.processTexture(material.normalMap) }
+        const normalMapDef = { index: this.processTexture(material.normalMap) }
 
         if (material.normalScale && material.normalScale.x !== -1) {
           if (material.normalScale.x !== material.normalScale.y) {
@@ -992,7 +992,7 @@ var GLTFExporter = (() => {
 
       // occlusionTexture
       if (material.aoMap) {
-        var occlusionMapDef = {
+        const occlusionMapDef = {
           index: this.processTexture(material.aoMap),
           texCoord: 1,
         }
@@ -1025,7 +1025,7 @@ var GLTFExporter = (() => {
         ext.writeMaterial && ext.writeMaterial(material, materialDef)
       })
 
-      var index = json.materials.push(materialDef) - 1
+      const index = json.materials.push(materialDef) - 1
       cache.materials.set(material, index)
       return index
     },
@@ -1036,10 +1036,10 @@ var GLTFExporter = (() => {
      * @return {Integer|null} Index of the processed mesh in the "meshes" array
      */
     processMesh: function (mesh) {
-      var cache = this.cache
-      var json = this.json
+      const cache = this.cache
+      const json = this.json
 
-      var meshCacheKeyParts = [mesh.geometry.uuid]
+      const meshCacheKeyParts = [mesh.geometry.uuid]
 
       if (Array.isArray(mesh.material)) {
         for (var i = 0, l = mesh.material.length; i < l; i++) {
@@ -1049,12 +1049,12 @@ var GLTFExporter = (() => {
         meshCacheKeyParts.push(mesh.material.uuid)
       }
 
-      var meshCacheKey = meshCacheKeyParts.join(':')
+      const meshCacheKey = meshCacheKeyParts.join(':')
 
       if (cache.meshes.has(meshCacheKey)) return cache.meshes.get(meshCacheKey)
 
-      var geometry = mesh.geometry
-      var mode
+      const geometry = mesh.geometry
+      let mode
 
       // Use the correct mode
       if (mesh.isLineSegments) {
@@ -1073,13 +1073,13 @@ var GLTFExporter = (() => {
         throw new Error('THREE.GLTFExporter: Geometry is not of type THREE.BufferGeometry.')
       }
 
-      var meshDef = {}
-      var attributes = {}
-      var primitives = []
-      var targets = []
+      const meshDef = {}
+      const attributes = {}
+      const primitives = []
+      const targets = []
 
       // Conversion between attributes names in threejs and gltf spec
-      var nameConversion = {
+      const nameConversion = {
         uv: 'TEXCOORD_0',
         uv2: 'TEXCOORD_1',
         color: 'COLOR_0',
@@ -1087,7 +1087,7 @@ var GLTFExporter = (() => {
         skinIndex: 'JOINTS_0',
       }
 
-      var originalNormal = geometry.getAttribute('normal')
+      const originalNormal = geometry.getAttribute('normal')
 
       if (originalNormal !== undefined && !this.isNormalizedNormalAttribute(originalNormal)) {
         console.warn('THREE.GLTFExporter: Creating normalized normal attribute from the non-normalized one.')
@@ -1097,7 +1097,7 @@ var GLTFExporter = (() => {
 
       // @QUESTION Detect if .vertexColors = true?
       // For every attribute create an accessor
-      var modifiedAttribute = null
+      let modifiedAttribute = null
 
       for (var attributeName in geometry.attributes) {
         // Ignore morph target attributes, which are exported later.
@@ -1108,7 +1108,7 @@ var GLTFExporter = (() => {
 
         // Prefix all geometry attributes except the ones specifically
         // listed in the spec; non-spec attributes are considered custom.
-        var validVertexAttributes = /^(POSITION|NORMAL|TANGENT|TEXCOORD_\d+|COLOR_\d+|JOINTS_\d+|WEIGHTS_\d+)$/
+        const validVertexAttributes = /^(POSITION|NORMAL|TANGENT|TEXCOORD_\d+|COLOR_\d+|JOINTS_\d+|WEIGHTS_\d+)$/
 
         if (!validVertexAttributes.test(attributeName)) attributeName = `_${attributeName}`
 
@@ -1119,14 +1119,14 @@ var GLTFExporter = (() => {
 
         // JOINTS_0 must be UNSIGNED_BYTE or UNSIGNED_SHORT.
         modifiedAttribute = null
-        var array = attribute.array
+        const array = attribute.array
 
         if (attributeName === 'JOINTS_0' && !(array instanceof Uint16Array) && !(array instanceof Uint8Array)) {
           console.warn('GLTFExporter: Attribute "skinIndex" converted to type UNSIGNED_SHORT.')
           modifiedAttribute = new BufferAttribute(new Uint16Array(array), attribute.itemSize, attribute.normalized)
         }
 
-        var accessor = this.processAccessor(modifiedAttribute || attribute, geometry)
+        const accessor = this.processAccessor(modifiedAttribute || attribute, geometry)
 
         if (accessor !== null) {
           attributes[attributeName] = accessor
@@ -1141,19 +1141,19 @@ var GLTFExporter = (() => {
 
       // Morph targets
       if (mesh.morphTargetInfluences !== undefined && mesh.morphTargetInfluences.length > 0) {
-        var weights = []
-        var targetNames = []
-        var reverseDictionary = {}
+        const weights = []
+        const targetNames = []
+        const reverseDictionary = {}
 
         if (mesh.morphTargetDictionary !== undefined) {
-          for (var key in mesh.morphTargetDictionary) {
+          for (const key in mesh.morphTargetDictionary) {
             reverseDictionary[mesh.morphTargetDictionary[key]] = key
           }
         }
 
         for (var i = 0; i < mesh.morphTargetInfluences.length; ++i) {
-          var target = {}
-          var warned = false
+          const target = {}
+          let warned = false
 
           for (var attributeName in geometry.morphAttributes) {
             // glTF 2.0 morph supports only POSITION/NORMAL/TANGENT.
@@ -1169,14 +1169,14 @@ var GLTFExporter = (() => {
             }
 
             var attribute = geometry.morphAttributes[attributeName][i]
-            var gltfAttributeName = attributeName.toUpperCase()
+            const gltfAttributeName = attributeName.toUpperCase()
 
             // Three.js morph attribute has absolute values while the one of glTF has relative values.
             //
             // glTF 2.0 Specification:
             // https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#morph-targets
 
-            var baseAttribute = geometry.attributes[attributeName]
+            const baseAttribute = geometry.attributes[attributeName]
 
             if (cache.attributes.has(this.getUID(attribute))) {
               target[gltfAttributeName] = cache.attributes.get(this.getUID(attribute))
@@ -1184,10 +1184,10 @@ var GLTFExporter = (() => {
             }
 
             // Clones attribute not to override
-            var relativeAttribute = attribute.clone()
+            const relativeAttribute = attribute.clone()
 
             if (!geometry.morphTargetsRelative) {
-              for (var j = 0, jl = attribute.count; j < jl; j++) {
+              for (let j = 0, jl = attribute.count; j < jl; j++) {
                 relativeAttribute.setXYZ(
                   j,
                   attribute.getX(j) - baseAttribute.getX(j),
@@ -1216,15 +1216,15 @@ var GLTFExporter = (() => {
         }
       }
 
-      var isMultiMaterial = Array.isArray(mesh.material)
+      const isMultiMaterial = Array.isArray(mesh.material)
 
       if (isMultiMaterial && geometry.groups.length === 0) return null
 
-      var materials = isMultiMaterial ? mesh.material : [mesh.material]
-      var groups = isMultiMaterial ? geometry.groups : [{ materialIndex: 0, start: undefined, count: undefined }]
+      const materials = isMultiMaterial ? mesh.material : [mesh.material]
+      const groups = isMultiMaterial ? geometry.groups : [{ materialIndex: 0, start: undefined, count: undefined }]
 
-      for (var i = 0, il = groups.length; i < il; i++) {
-        var primitive = {
+      for (const i = 0, il = groups.length; i < il; i++) {
+        const primitive = {
           mode,
           attributes,
         }
@@ -1234,7 +1234,7 @@ var GLTFExporter = (() => {
         if (targets.length > 0) primitive.targets = targets
 
         if (geometry.index !== null) {
-          var cacheKey = this.getUID(geometry.index)
+          let cacheKey = this.getUID(geometry.index)
 
           if (groups[i].start !== undefined || groups[i].count !== undefined) {
             cacheKey += `:${groups[i].start}:${groups[i].count}`
@@ -1250,7 +1250,7 @@ var GLTFExporter = (() => {
           if (primitive.indices === null) delete primitive.indices
         }
 
-        var material = this.processMaterial(materials[groups[i].materialIndex])
+        const material = this.processMaterial(materials[groups[i].materialIndex])
 
         if (material !== null) primitive.material = material
 
@@ -1265,7 +1265,7 @@ var GLTFExporter = (() => {
         ext.writeMesh && ext.writeMesh(mesh, meshDef)
       })
 
-      var index = json.meshes.push(meshDef) - 1
+      const index = json.meshes.push(meshDef) - 1
       cache.meshes.set(meshCacheKey, index)
       return index
     },
@@ -1276,13 +1276,13 @@ var GLTFExporter = (() => {
      * @return {Integer}      Index of the processed mesh in the "camera" array
      */
     processCamera: function (camera) {
-      var json = this.json
+      const json = this.json
 
       if (!json.cameras) json.cameras = []
 
-      var isOrtho = camera.isOrthographicCamera
+      const isOrtho = camera.isOrthographicCamera
 
-      var cameraDef = {
+      const cameraDef = {
         type: isOrtho ? 'orthographic' : 'perspective',
       }
 
@@ -1319,22 +1319,22 @@ var GLTFExporter = (() => {
      * @return {number|null}
      */
     processAnimation: function (clip, root) {
-      var json = this.json
-      var nodeMap = this.nodeMap
+      const json = this.json
+      const nodeMap = this.nodeMap
 
       if (!json.animations) json.animations = []
 
       clip = GLTFExporter.Utils.mergeMorphTargetTracks(clip.clone(), root)
 
-      var tracks = clip.tracks
-      var channels = []
-      var samplers = []
+      const tracks = clip.tracks
+      const channels = []
+      const samplers = []
 
-      for (var i = 0; i < tracks.length; ++i) {
-        var track = tracks[i]
-        var trackBinding = PropertyBinding.parseTrackName(track.name)
-        var trackNode = PropertyBinding.findNode(root, trackBinding.nodeName)
-        var trackProperty = PATH_PROPERTIES[trackBinding.propertyName]
+      for (let i = 0; i < tracks.length; ++i) {
+        const track = tracks[i]
+        const trackBinding = PropertyBinding.parseTrackName(track.name)
+        let trackNode = PropertyBinding.findNode(root, trackBinding.nodeName)
+        const trackProperty = PATH_PROPERTIES[trackBinding.propertyName]
 
         if (trackBinding.objectName === 'bones') {
           if (trackNode.isSkinnedMesh === true) {
@@ -1349,14 +1349,14 @@ var GLTFExporter = (() => {
           return null
         }
 
-        var inputItemSize = 1
-        var outputItemSize = track.values.length / track.times.length
+        const inputItemSize = 1
+        let outputItemSize = track.values.length / track.times.length
 
         if (trackProperty === PATH_PROPERTIES.morphTargetInfluences) {
           outputItemSize /= trackNode.morphTargetInfluences.length
         }
 
-        var interpolation
+        let interpolation
 
         // @TODO export CubicInterpolant(InterpolateSmooth) as CUBICSPLINE
 
@@ -1405,24 +1405,24 @@ var GLTFExporter = (() => {
      * @return {number|null}
      */
     processSkin: function (object) {
-      var json = this.json
-      var nodeMap = this.nodeMap
+      const json = this.json
+      const nodeMap = this.nodeMap
 
-      var node = json.nodes[nodeMap.get(object)]
+      const node = json.nodes[nodeMap.get(object)]
 
-      var skeleton = object.skeleton
+      const skeleton = object.skeleton
 
       if (skeleton === undefined) return null
 
-      var rootJoint = object.skeleton.bones[0]
+      const rootJoint = object.skeleton.bones[0]
 
       if (rootJoint === undefined) return null
 
-      var joints = []
-      var inverseBindMatrices = new Float32Array(skeleton.bones.length * 16)
-      var temporaryBoneInverse = new Matrix4()
+      const joints = []
+      const inverseBindMatrices = new Float32Array(skeleton.bones.length * 16)
+      const temporaryBoneInverse = new Matrix4()
 
-      for (var i = 0; i < skeleton.bones.length; ++i) {
+      for (let i = 0; i < skeleton.bones.length; ++i) {
         joints.push(nodeMap.get(skeleton.bones[i]))
         temporaryBoneInverse.copy(skeleton.boneInverses[i])
         temporaryBoneInverse.multiply(object.bindMatrix).toArray(inverseBindMatrices, i * 16)
@@ -1436,7 +1436,7 @@ var GLTFExporter = (() => {
         skeleton: nodeMap.get(rootJoint),
       })
 
-      var skinIndex = (node.skin = json.skins.length - 1)
+      const skinIndex = (node.skin = json.skins.length - 1)
 
       return skinIndex
     },
@@ -1447,18 +1447,18 @@ var GLTFExporter = (() => {
      * @return {Integer} Index of the node in the nodes list
      */
     processNode: function (object) {
-      var json = this.json
-      var options = this.options
-      var nodeMap = this.nodeMap
+      const json = this.json
+      const options = this.options
+      const nodeMap = this.nodeMap
 
       if (!json.nodes) json.nodes = []
 
-      var nodeDef = {}
+      const nodeDef = {}
 
       if (options.trs) {
-        var rotation = object.quaternion.toArray()
-        var position = object.position.toArray()
-        var scale = object.scale.toArray()
+        const rotation = object.quaternion.toArray()
+        const position = object.position.toArray()
+        const scale = object.scale.toArray()
 
         if (!equalArray(rotation, [0, 0, 0, 1])) {
           nodeDef.rotation = rotation
@@ -1487,7 +1487,7 @@ var GLTFExporter = (() => {
       this.serializeUserData(object, nodeDef)
 
       if (object.isMesh || object.isLine || object.isPoints) {
-        var meshIndex = this.processMesh(object)
+        const meshIndex = this.processMesh(object)
 
         if (meshIndex !== null) nodeDef.mesh = meshIndex
       } else if (object.isCamera) {
@@ -1497,10 +1497,10 @@ var GLTFExporter = (() => {
       if (object.isSkinnedMesh) this.skins.push(object)
 
       if (object.children.length > 0) {
-        var children = []
+        const children = []
 
-        for (var i = 0, l = object.children.length; i < l; i++) {
-          var child = object.children[i]
+        for (let i = 0, l = object.children.length; i < l; i++) {
+          const child = object.children[i]
 
           if (child.visible || options.onlyVisible === false) {
             var nodeIndex = this.processNode(child)
@@ -1526,27 +1526,27 @@ var GLTFExporter = (() => {
      * @param  {Scene} node Scene to process
      */
     processScene: function (scene) {
-      var json = this.json
-      var options = this.options
+      const json = this.json
+      const options = this.options
 
       if (!json.scenes) {
         json.scenes = []
         json.scene = 0
       }
 
-      var sceneDef = {}
+      const sceneDef = {}
 
       if (scene.name !== '') sceneDef.name = scene.name
 
       json.scenes.push(sceneDef)
 
-      var nodes = []
+      const nodes = []
 
-      for (var i = 0, l = scene.children.length; i < l; i++) {
-        var child = scene.children[i]
+      for (let i = 0, l = scene.children.length; i < l; i++) {
+        const child = scene.children[i]
 
         if (child.visible || options.onlyVisible === false) {
-          var nodeIndex = this.processNode(child)
+          const nodeIndex = this.processNode(child)
 
           if (nodeIndex !== null) nodes.push(nodeIndex)
         }
@@ -1562,10 +1562,10 @@ var GLTFExporter = (() => {
      * @param  {Array} objects List of objects to process
      */
     processObjects: function (objects) {
-      var scene = new Scene()
+      const scene = new Scene()
       scene.name = 'AuxScene'
 
-      for (var i = 0; i < objects.length; i++) {
+      for (let i = 0; i < objects.length; i++) {
         // We push directly to children instead of calling `add` to prevent
         // modify the .parent and break its original scene and hierarchy
         scene.children.push(objects[i])
@@ -1578,7 +1578,7 @@ var GLTFExporter = (() => {
      * @param {THREE.Object3D|Array<THREE.Object3D>} input
      */
     processInput: function (input) {
-      var options = this.options
+      const options = this.options
 
       input = input instanceof Array ? input : [input]
 
@@ -1586,7 +1586,7 @@ var GLTFExporter = (() => {
         ext.beforeParse && ext.beforeParse(input)
       })
 
-      var objectsWithoutScene = []
+      const objectsWithoutScene = []
 
       for (var i = 0; i < input.length; i++) {
         if (input[i] instanceof Scene) {
@@ -1612,7 +1612,7 @@ var GLTFExporter = (() => {
     },
 
     _invokeAll: function (func) {
-      for (var i = 0, il = this.plugins.length; i < il; i++) {
+      for (let i = 0, il = this.plugins.length; i < il; i++) {
         func(this.plugins[i])
       }
     },
@@ -1639,11 +1639,11 @@ var GLTFExporter = (() => {
         return
       }
 
-      var writer = this.writer
-      var json = writer.json
-      var extensionsUsed = writer.extensionsUsed
+      const writer = this.writer
+      const json = writer.json
+      const extensionsUsed = writer.extensionsUsed
 
-      var lightDef = {}
+      const lightDef = {}
 
       if (light.name) lightDef.name = light.name
 
@@ -1692,7 +1692,7 @@ var GLTFExporter = (() => {
         extensionsUsed[this.name] = true
       }
 
-      var lights = json.extensions[this.name].lights
+      const lights = json.extensions[this.name].lights
       lights.push(lightDef)
 
       nodeDef.extensions = nodeDef.extensions || {}
@@ -1716,8 +1716,8 @@ var GLTFExporter = (() => {
     writeMaterial: function (material, materialDef) {
       if (!material.isMeshBasicMaterial) return
 
-      var writer = this.writer
-      var extensionsUsed = writer.extensionsUsed
+      const writer = this.writer
+      const extensionsUsed = writer.extensionsUsed
 
       materialDef.extensions = materialDef.extensions || {}
       materialDef.extensions[this.name] = {}
@@ -1745,16 +1745,16 @@ var GLTFExporter = (() => {
     writeMaterial: function (material, materialDef) {
       if (!material.isGLTFSpecularGlossinessMaterial) return
 
-      var writer = this.writer
-      var extensionsUsed = writer.extensionsUsed
+      const writer = this.writer
+      const extensionsUsed = writer.extensionsUsed
 
-      var extensionDef = {}
+      const extensionDef = {}
 
       if (materialDef.pbrMetallicRoughness.baseColorFactor) {
         extensionDef.diffuseFactor = materialDef.pbrMetallicRoughness.baseColorFactor
       }
 
-      var specularFactor = [1, 1, 1]
+      const specularFactor = [1, 1, 1]
       material.specular.toArray(specularFactor, 0)
       extensionDef.specularFactor = specularFactor
       extensionDef.glossinessFactor = material.glossiness
@@ -1764,7 +1764,7 @@ var GLTFExporter = (() => {
       }
 
       if (material.specularMap) {
-        var specularMapDef = {
+        const specularMapDef = {
           index: writer.processTexture(material.specularMap),
         }
         writer.applyTextureTransform(specularMapDef, material.specularMap)
@@ -1782,14 +1782,14 @@ var GLTFExporter = (() => {
    */
   GLTFExporter.Utils = {
     insertKeyframe: function (track, time) {
-      var tolerance = 0.001 // 1ms
-      var valueSize = track.getValueSize()
+      const tolerance = 0.001 // 1ms
+      const valueSize = track.getValueSize()
 
-      var times = new track.TimeBufferType(track.times.length + 1)
-      var values = new track.ValueBufferType(track.values.length + valueSize)
-      var interpolant = track.createInterpolant(new track.ValueBufferType(valueSize))
+      const times = new track.TimeBufferType(track.times.length + 1)
+      const values = new track.ValueBufferType(track.values.length + valueSize)
+      const interpolant = track.createInterpolant(new track.ValueBufferType(valueSize))
 
-      var index
+      let index
 
       if (track.times.length === 0) {
         times[0] = time
@@ -1848,14 +1848,14 @@ var GLTFExporter = (() => {
     },
 
     mergeMorphTargetTracks: function (clip, root) {
-      var tracks = []
-      var mergedTracks = {}
-      var sourceTracks = clip.tracks
+      const tracks = []
+      const mergedTracks = {}
+      const sourceTracks = clip.tracks
 
-      for (var i = 0; i < sourceTracks.length; ++i) {
-        var sourceTrack = sourceTracks[i]
-        var sourceTrackBinding = PropertyBinding.parseTrackName(sourceTrack.name)
-        var sourceTrackNode = PropertyBinding.findNode(root, sourceTrackBinding.nodeName)
+      for (let i = 0; i < sourceTracks.length; ++i) {
+        let sourceTrack = sourceTracks[i]
+        const sourceTrackBinding = PropertyBinding.parseTrackName(sourceTrack.name)
+        const sourceTrackNode = PropertyBinding.findNode(root, sourceTrackBinding.nodeName)
 
         if (
           sourceTrackBinding.propertyName !== 'morphTargetInfluences' ||
@@ -1882,21 +1882,21 @@ var GLTFExporter = (() => {
           sourceTrack.setInterpolation(InterpolateLinear)
         }
 
-        var targetCount = sourceTrackNode.morphTargetInfluences.length
-        var targetIndex = sourceTrackNode.morphTargetDictionary[sourceTrackBinding.propertyIndex]
+        const targetCount = sourceTrackNode.morphTargetInfluences.length
+        const targetIndex = sourceTrackNode.morphTargetDictionary[sourceTrackBinding.propertyIndex]
 
         if (targetIndex === undefined) {
           throw new Error(`THREE.GLTFExporter: Morph target name not found: ${sourceTrackBinding.propertyIndex}`)
         }
 
-        var mergedTrack
+        let mergedTrack
 
         // If this is the first time we've seen this object, create a new
         // track to store merged keyframe data for each morph target.
         if (mergedTracks[sourceTrackNode.uuid] === undefined) {
           mergedTrack = sourceTrack.clone()
 
-          var values = new mergedTrack.ValueBufferType(targetCount * mergedTrack.times.length)
+          const values = new mergedTrack.ValueBufferType(targetCount * mergedTrack.times.length)
 
           for (var j = 0; j < mergedTrack.times.length; j++) {
             values[j * targetCount + targetIndex] = mergedTrack.values[j]
@@ -1913,7 +1913,7 @@ var GLTFExporter = (() => {
           continue
         }
 
-        var sourceInterpolant = sourceTrack.createInterpolant(new sourceTrack.ValueBufferType(1))
+        const sourceInterpolant = sourceTrack.createInterpolant(new sourceTrack.ValueBufferType(1))
 
         mergedTrack = mergedTracks[sourceTrackNode.uuid]
 
@@ -1927,7 +1927,7 @@ var GLTFExporter = (() => {
         // new) keyframe to the merged track. Values from the previous loop may
         // be written again, but keyframes are de-duplicated.
         for (var j = 0; j < sourceTrack.times.length; j++) {
-          var keyframeIndex = this.insertKeyframe(mergedTrack, sourceTrack.times[j])
+          const keyframeIndex = this.insertKeyframe(mergedTrack, sourceTrack.times[j])
           mergedTrack.values[keyframeIndex * targetCount + targetIndex] = sourceTrack.values[j]
         }
       }

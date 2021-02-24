@@ -9,8 +9,8 @@ class TrackballControls extends EventDispatcher {
         'THREE.TrackballControls: "document" should not be used as the target "domElement". Please use "renderer.domElement" instead.',
       )
 
-    var scope = this
-    var STATE = {
+    const scope = this
+    const STATE = {
       NONE: -1,
       ROTATE: 0,
       ZOOM: 1,
@@ -54,24 +54,24 @@ class TrackballControls extends EventDispatcher {
 
     this.target = new Vector3()
 
-    var EPS = 0.000001
+    const EPS = 0.000001
 
-    var lastPosition = new Vector3()
-    var lastZoom = 1
+    const lastPosition = new Vector3()
+    let lastZoom = 1
 
-    var _state = STATE.NONE,
-      _keyState = STATE.NONE,
-      _eye = new Vector3(),
-      _movePrev = new Vector2(),
-      _moveCurr = new Vector2(),
-      _lastAxis = new Vector3(),
-      _lastAngle = 0,
-      _zoomStart = new Vector2(),
-      _zoomEnd = new Vector2(),
-      _touchZoomDistanceStart = 0,
-      _touchZoomDistanceEnd = 0,
-      _panStart = new Vector2(),
-      _panEnd = new Vector2()
+    let _state = STATE.NONE
+    let _keyState = STATE.NONE
+    const _eye = new Vector3()
+    const _movePrev = new Vector2()
+    const _moveCurr = new Vector2()
+    const _lastAxis = new Vector3()
+    let _lastAngle = 0
+    const _zoomStart = new Vector2()
+    const _zoomEnd = new Vector2()
+    let _touchZoomDistanceStart = 0
+    let _touchZoomDistanceEnd = 0
+    const _panStart = new Vector2()
+    const _panEnd = new Vector2()
 
     // for reset
 
@@ -82,24 +82,24 @@ class TrackballControls extends EventDispatcher {
 
     // events
 
-    var changeEvent = { type: 'change' }
-    var startEvent = { type: 'start' }
-    var endEvent = { type: 'end' }
+    const changeEvent = { type: 'change' }
+    const startEvent = { type: 'start' }
+    const endEvent = { type: 'end' }
 
     // methods
 
     this.handleResize = () => {
-      var box = scope.domElement.getBoundingClientRect()
+      const box = scope.domElement.getBoundingClientRect()
       // adjustments come from similar code in the jquery offset() function
-      var d = scope.domElement.ownerDocument.documentElement
+      const d = scope.domElement.ownerDocument.documentElement
       scope.screen.left = box.left + window.pageXOffset - d.clientLeft
       scope.screen.top = box.top + window.pageYOffset - d.clientTop
       scope.screen.width = box.width
       scope.screen.height = box.height
     }
 
-    var getMouseOnScreen = (() => {
-      var vector = new Vector2()
+    const getMouseOnScreen = (() => {
+      const vector = new Vector2()
 
       return function getMouseOnScreen(pageX, pageY) {
         vector.set((pageX - scope.screen.left) / scope.screen.width, (pageY - scope.screen.top) / scope.screen.height)
@@ -108,8 +108,8 @@ class TrackballControls extends EventDispatcher {
       }
     })()
 
-    var getMouseOnCircle = (() => {
-      var vector = new Vector2()
+    const getMouseOnCircle = (() => {
+      const vector = new Vector2()
 
       return function getMouseOnCircle(pageX, pageY) {
         vector.set(
@@ -122,13 +122,13 @@ class TrackballControls extends EventDispatcher {
     })()
 
     this.rotateCamera = (() => {
-      var axis = new Vector3(),
-        quaternion = new Quaternion(),
-        eyeDirection = new Vector3(),
-        objectUpDirection = new Vector3(),
-        objectSidewaysDirection = new Vector3(),
-        moveDirection = new Vector3(),
-        angle
+      const axis = new Vector3()
+      const quaternion = new Quaternion()
+      const eyeDirection = new Vector3()
+      const objectUpDirection = new Vector3()
+      const objectSidewaysDirection = new Vector3()
+      const moveDirection = new Vector3()
+      let angle
 
       return function rotateCamera() {
         moveDirection.set(_moveCurr.x - _movePrev.x, _moveCurr.y - _movePrev.y, 0)
@@ -169,7 +169,7 @@ class TrackballControls extends EventDispatcher {
     })()
 
     this.zoomCamera = function () {
-      var factor
+      let factor
 
       if (_state === STATE.TOUCH_ZOOM_PAN) {
         factor = _touchZoomDistanceStart / _touchZoomDistanceEnd
@@ -206,7 +206,7 @@ class TrackballControls extends EventDispatcher {
     }
 
     this.panCamera = (() => {
-      var mouseChange = new Vector2(),
+      const mouseChange = new Vector2(),
         objectUp = new Vector3(),
         pan = new Vector3()
 
@@ -215,8 +215,8 @@ class TrackballControls extends EventDispatcher {
 
         if (mouseChange.lengthSq()) {
           if (scope.object.isOrthographicCamera) {
-            var scale_x = (scope.object.right - scope.object.left) / scope.object.zoom / scope.domElement.clientWidth
-            var scale_y = (scope.object.top - scope.object.bottom) / scope.object.zoom / scope.domElement.clientWidth
+            const scale_x = (scope.object.right - scope.object.left) / scope.object.zoom / scope.domElement.clientWidth
+            const scale_y = (scope.object.top - scope.object.bottom) / scope.object.zoom / scope.domElement.clientWidth
 
             mouseChange.x *= scale_x
             mouseChange.y *= scale_y
@@ -403,7 +403,7 @@ class TrackballControls extends EventDispatcher {
         }
       }
 
-      var state = _keyState !== STATE.NONE ? _keyState : _state
+      const state = _keyState !== STATE.NONE ? _keyState : _state
 
       if (state === STATE.ROTATE && !scope.noRotate) {
         _moveCurr.copy(getMouseOnCircle(event.pageX, event.pageY))
@@ -428,7 +428,7 @@ class TrackballControls extends EventDispatcher {
       event.preventDefault()
       event.stopPropagation()
 
-      var state = _keyState !== STATE.NONE ? _keyState : _state
+      const state = _keyState !== STATE.NONE ? _keyState : _state
 
       if (state === STATE.ROTATE && !scope.noRotate) {
         _movePrev.copy(_moveCurr)
@@ -498,12 +498,12 @@ class TrackballControls extends EventDispatcher {
         default:
           // 2 or more
           _state = STATE.TOUCH_ZOOM_PAN
-          var dx = event.touches[0].pageX - event.touches[1].pageX
-          var dy = event.touches[0].pageY - event.touches[1].pageY
+          const dx = event.touches[0].pageX - event.touches[1].pageX
+          const dy = event.touches[0].pageY - event.touches[1].pageY
           _touchZoomDistanceEnd = _touchZoomDistanceStart = Math.sqrt(dx * dx + dy * dy)
 
-          var x = (event.touches[0].pageX + event.touches[1].pageX) / 2
-          var y = (event.touches[0].pageY + event.touches[1].pageY) / 2
+          const x = (event.touches[0].pageX + event.touches[1].pageX) / 2
+          const y = (event.touches[0].pageY + event.touches[1].pageY) / 2
           _panStart.copy(getMouseOnScreen(x, y))
           _panEnd.copy(_panStart)
           break
@@ -526,12 +526,12 @@ class TrackballControls extends EventDispatcher {
 
         default:
           // 2 or more
-          var dx = event.touches[0].pageX - event.touches[1].pageX
-          var dy = event.touches[0].pageY - event.touches[1].pageY
+          const dx = event.touches[0].pageX - event.touches[1].pageX
+          const dy = event.touches[0].pageY - event.touches[1].pageY
           _touchZoomDistanceEnd = Math.sqrt(dx * dx + dy * dy)
 
-          var x = (event.touches[0].pageX + event.touches[1].pageX) / 2
-          var y = (event.touches[0].pageY + event.touches[1].pageY) / 2
+          const x = (event.touches[0].pageX + event.touches[1].pageX) / 2
+          const y = (event.touches[0].pageY + event.touches[1].pageY) / 2
           _panEnd.copy(getMouseOnScreen(x, y))
           break
       }

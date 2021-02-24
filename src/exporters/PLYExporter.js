@@ -13,7 +13,7 @@ import { Matrix3, Vector3 } from '../../../build/three.module.js'
  * http://paulbourke.net/dataformats/ply/
  */
 
-var PLYExporter = () => {}
+const PLYExporter = () => {}
 
 PLYExporter.prototype = {
   constructor: PLYExporter,
@@ -31,8 +31,8 @@ PLYExporter.prototype = {
     function traverseMeshes(cb) {
       object.traverse((child) => {
         if (child.isMesh === true) {
-          var mesh = child
-          var geometry = mesh.geometry
+          const mesh = child
+          const geometry = mesh.geometry
 
           if (geometry.isBufferGeometry !== true) {
             throw new Error('THREE.PLYExporter: Geometry is not of type THREE.BufferGeometry.')
@@ -46,7 +46,7 @@ PLYExporter.prototype = {
     }
 
     // Default options
-    var defaultOptions = {
+    const defaultOptions = {
       binary: false,
       excludeAttributes: [], // normal, uv, color, index
       littleEndian: false,
@@ -54,29 +54,29 @@ PLYExporter.prototype = {
 
     options = Object.assign(defaultOptions, options)
 
-    var excludeAttributes = options.excludeAttributes
-    var includeNormals = false
-    var includeColors = false
-    var includeUVs = false
+    const excludeAttributes = options.excludeAttributes
+    let includeNormals = false
+    let includeColors = false
+    let includeUVs = false
 
     // count the vertices, check which properties are used,
     // and cache the BufferGeometry
-    var vertexCount = 0
-    var faceCount = 0
+    let vertexCount = 0
+    let faceCount = 0
     object.traverse((child) => {
       if (child.isMesh === true) {
-        var mesh = child
-        var geometry = mesh.geometry
+        const mesh = child
+        const geometry = mesh.geometry
 
         if (geometry.isBufferGeometry !== true) {
           throw new Error('THREE.PLYExporter: Geometry is not of type THREE.BufferGeometry.')
         }
 
-        var vertices = geometry.getAttribute('position')
-        var normals = geometry.getAttribute('normal')
-        var uvs = geometry.getAttribute('uv')
-        var colors = geometry.getAttribute('color')
-        var indices = geometry.getIndex()
+        const vertices = geometry.getAttribute('position')
+        const normals = geometry.getAttribute('normal')
+        const uvs = geometry.getAttribute('uv')
+        const colors = geometry.getAttribute('color')
+        const indices = geometry.getIndex()
 
         if (vertices === undefined) {
           return
@@ -93,7 +93,7 @@ PLYExporter.prototype = {
       }
     })
 
-    var includeIndices = excludeAttributes.indexOf('index') === -1
+    const includeIndices = excludeAttributes.indexOf('index') === -1
     includeNormals = includeNormals && excludeAttributes.indexOf('normal') === -1
     includeColors = includeColors && excludeAttributes.indexOf('color') === -1
     includeUVs = includeUVs && excludeAttributes.indexOf('uv') === -1
@@ -110,9 +110,9 @@ PLYExporter.prototype = {
       return null
     }
 
-    var indexByteCount = 4
+    const indexByteCount = 4
 
-    var header =
+    let header =
       // position
       `ply\n${`format ${
         options.binary ? (options.littleEndian ? 'binary_little_endian' : 'binary_big_endian') : 'ascii'
@@ -141,36 +141,36 @@ PLYExporter.prototype = {
     header += 'end_header\n'
 
     // Generate attribute data
-    var vertex = new Vector3()
-    var normalMatrixWorld = new Matrix3()
-    var result = null
+    const vertex = new Vector3()
+    const normalMatrixWorld = new Matrix3()
+    let result = null
 
     if (options.binary === true) {
       // Binary File Generation
-      var headerBin = new TextEncoder().encode(header)
+      const headerBin = new TextEncoder().encode(header)
 
       // 3 position values at 4 bytes
       // 3 normal values at 4 bytes
       // 3 color channels with 1 byte
       // 2 uv values at 4 bytes
-      var vertexListLength =
+      const vertexListLength =
         vertexCount * (4 * 3 + (includeNormals ? 4 * 3 : 0) + (includeColors ? 3 : 0) + (includeUVs ? 4 * 2 : 0))
 
       // 1 byte shape desciptor
       // 3 vertex indices at ${indexByteCount} bytes
-      var faceListLength = includeIndices ? faceCount * (indexByteCount * 3 + 1) : 0
-      var output = new DataView(new ArrayBuffer(headerBin.length + vertexListLength + faceListLength))
+      const faceListLength = includeIndices ? faceCount * (indexByteCount * 3 + 1) : 0
+      const output = new DataView(new ArrayBuffer(headerBin.length + vertexListLength + faceListLength))
       new Uint8Array(output.buffer).set(headerBin, 0)
 
-      var vOffset = headerBin.length
-      var fOffset = headerBin.length + vertexListLength
+      let vOffset = headerBin.length
+      let fOffset = headerBin.length + vertexListLength
       var writtenVertices = 0
       traverseMeshes((mesh, geometry) => {
-        var vertices = geometry.getAttribute('position')
-        var normals = geometry.getAttribute('normal')
-        var uvs = geometry.getAttribute('uv')
-        var colors = geometry.getAttribute('color')
-        var indices = geometry.getIndex()
+        const vertices = geometry.getAttribute('position')
+        const normals = geometry.getAttribute('normal')
+        const uvs = geometry.getAttribute('uv')
+        const colors = geometry.getAttribute('color')
+        const indices = geometry.getIndex()
 
         normalMatrixWorld.getNormalMatrix(mesh.matrixWorld)
 
@@ -305,15 +305,15 @@ PLYExporter.prototype = {
       // Ascii File Generation
       // count the number of vertices
       var writtenVertices = 0
-      var vertexList = ''
-      var faceList = ''
+      let vertexList = ''
+      let faceList = ''
 
       traverseMeshes((mesh, geometry) => {
-        var vertices = geometry.getAttribute('position')
-        var normals = geometry.getAttribute('normal')
-        var uvs = geometry.getAttribute('uv')
-        var colors = geometry.getAttribute('color')
-        var indices = geometry.getIndex()
+        const vertices = geometry.getAttribute('position')
+        const normals = geometry.getAttribute('normal')
+        const uvs = geometry.getAttribute('uv')
+        const colors = geometry.getAttribute('color')
+        const indices = geometry.getIndex()
 
         normalMatrixWorld.getNormalMatrix(mesh.matrixWorld)
 
@@ -326,7 +326,7 @@ PLYExporter.prototype = {
           vertex.applyMatrix4(mesh.matrixWorld)
 
           // Position information
-          var line = `${vertex.x} ${vertex.y} ${vertex.z}`
+          let line = `${vertex.x} ${vertex.y} ${vertex.z}`
 
           // Normal information
           if (includeNormals === true) {

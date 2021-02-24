@@ -26,7 +26,7 @@ import {
 
 /* global Ammo */
 
-var MMDPhysics = (() => {
+const MMDPhysics = (() => {
   /**
    * @param {THREE.SkinnedMesh} mesh
    * @param {Array<Object>} rigidBodyParams
@@ -78,18 +78,18 @@ var MMDPhysics = (() => {
      * @return {MMDPhysics}
      */
     update: function (delta) {
-      var manager = this.manager
-      var mesh = this.mesh
+      const manager = this.manager
+      const mesh = this.mesh
 
       // rigid bodies and constrains are for
       // mesh's world scale (1, 1, 1).
       // Convert to (1, 1, 1) if it isn't.
 
-      var isNonDefaultScale = false
+      let isNonDefaultScale = false
 
-      var position = manager.allocThreeVector3()
-      var quaternion = manager.allocThreeQuaternion()
-      var scale = manager.allocThreeVector3()
+      const position = manager.allocThreeVector3()
+      const quaternion = manager.allocThreeQuaternion()
+      const scale = manager.allocThreeVector3()
 
       mesh.matrixWorld.decompose(position, quaternion, scale)
 
@@ -97,7 +97,7 @@ var MMDPhysics = (() => {
         isNonDefaultScale = true
       }
 
-      var parent
+      let parent
 
       if (isNonDefaultScale) {
         parent = mesh.parent
@@ -137,7 +137,7 @@ var MMDPhysics = (() => {
      * @return {MMDPhysics}
      */
     reset: function () {
-      for (var i = 0, il = this.bodies.length; i < il; i++) {
+      for (let i = 0, il = this.bodies.length; i < il; i++) {
         this.bodies[i].reset()
       }
 
@@ -151,7 +151,7 @@ var MMDPhysics = (() => {
      * @return {MMDPhysics}
      */
     warmup: function (cycles) {
-      for (var i = 0; i < cycles; i++) {
+      for (let i = 0; i < cycles; i++) {
         this.update(1 / 60)
       }
 
@@ -183,19 +183,19 @@ var MMDPhysics = (() => {
     // private methods
 
     _init: function (mesh, rigidBodyParams, constraintParams) {
-      var manager = this.manager
+      const manager = this.manager
 
       // rigid body/constraint parameters are for
       // mesh's default world transform as position(0, 0, 0),
       // quaternion(0, 0, 0, 1) and scale(0, 0, 0)
 
-      var parent = mesh.parent
+      let parent = mesh.parent
 
       if (parent !== null) parent = null
 
-      var currentPosition = manager.allocThreeVector3()
-      var currentQuaternion = manager.allocThreeQuaternion()
-      var currentScale = manager.allocThreeVector3()
+      const currentPosition = manager.allocThreeVector3()
+      const currentQuaternion = manager.allocThreeQuaternion()
+      const currentScale = manager.allocThreeVector3()
 
       currentPosition.copy(mesh.position)
       currentQuaternion.copy(mesh.quaternion)
@@ -231,33 +231,33 @@ var MMDPhysics = (() => {
     },
 
     _createWorld: function () {
-      var config = new Ammo.btDefaultCollisionConfiguration()
-      var dispatcher = new Ammo.btCollisionDispatcher(config)
-      var cache = new Ammo.btDbvtBroadphase()
-      var solver = new Ammo.btSequentialImpulseConstraintSolver()
-      var world = new Ammo.btDiscreteDynamicsWorld(dispatcher, cache, solver, config)
+      const config = new Ammo.btDefaultCollisionConfiguration()
+      const dispatcher = new Ammo.btCollisionDispatcher(config)
+      const cache = new Ammo.btDbvtBroadphase()
+      const solver = new Ammo.btSequentialImpulseConstraintSolver()
+      const world = new Ammo.btDiscreteDynamicsWorld(dispatcher, cache, solver, config)
       return world
     },
 
     _initRigidBodies: function (rigidBodies) {
-      for (var i = 0, il = rigidBodies.length; i < il; i++) {
+      for (let i = 0, il = rigidBodies.length; i < il; i++) {
         this.bodies.push(new RigidBody(this.mesh, this.world, rigidBodies[i], this.manager))
       }
     },
 
     _initConstraints: function (constraints) {
-      for (var i = 0, il = constraints.length; i < il; i++) {
-        var params = constraints[i]
-        var bodyA = this.bodies[params.rigidBodyIndex1]
-        var bodyB = this.bodies[params.rigidBodyIndex2]
+      for (let i = 0, il = constraints.length; i < il; i++) {
+        const params = constraints[i]
+        const bodyA = this.bodies[params.rigidBodyIndex1]
+        const bodyB = this.bodies[params.rigidBodyIndex2]
         this.constraints.push(new Constraint(this.mesh, this.world, bodyA, bodyB, params, this.manager))
       }
     },
 
     _stepSimulation: function (delta) {
-      var unitStep = this.unitStep
-      var stepTime = delta
-      var maxStepNum = ((delta / unitStep) | 0) + 1
+      const unitStep = this.unitStep
+      let stepTime = delta
+      let maxStepNum = ((delta / unitStep) | 0) + 1
 
       if (stepTime < unitStep) {
         stepTime = unitStep
@@ -272,13 +272,13 @@ var MMDPhysics = (() => {
     },
 
     _updateRigidBodies: function () {
-      for (var i = 0, il = this.bodies.length; i < il; i++) {
+      for (let i = 0, il = this.bodies.length; i < il; i++) {
         this.bodies[i].updateFromBone()
       }
     },
 
     _updateBones: function () {
-      for (var i = 0, il = this.bodies.length; i < il; i++) {
+      for (let i = 0, il = this.bodies.length; i < il; i++) {
         this.bodies[i].updateBone()
       }
     },
@@ -370,14 +370,14 @@ var MMDPhysics = (() => {
     },
 
     getBasis: function (t) {
-      var q = this.allocQuaternion()
+      const q = this.allocQuaternion()
       t.getBasis().getRotation(q)
       return q
     },
 
     getBasisAsMatrix3: function (t) {
-      var q = this.getBasis(t)
-      var m = this.quaternionToMatrix3(q)
+      const q = this.getBasis(t)
+      const m = this.quaternionToMatrix3(q)
       this.freeQuaternion(q)
       return m
     },
@@ -391,7 +391,7 @@ var MMDPhysics = (() => {
     },
 
     copyOrigin: function (t1, t2) {
-      var o = t2.getOrigin()
+      const o = t2.getOrigin()
       this.setOrigin(t1, o)
     },
 
@@ -400,7 +400,7 @@ var MMDPhysics = (() => {
     },
 
     setBasisFromMatrix3: function (t, m) {
-      var q = this.matrix3ToQuaternion(m)
+      const q = this.matrix3ToQuaternion(m)
       this.setBasis(t, q)
       this.freeQuaternion(q)
     },
@@ -414,8 +414,8 @@ var MMDPhysics = (() => {
     },
 
     setBasisFromArray3: function (t, a) {
-      var thQ = this.allocThreeQuaternion()
-      var thE = this.allocThreeEuler()
+      const thQ = this.allocThreeQuaternion()
+      const thE = this.allocThreeEuler()
       thE.set(a[0], a[1], a[2])
       this.setBasisFromThreeQuaternion(t, thQ.setFromEuler(thE))
 
@@ -424,7 +424,7 @@ var MMDPhysics = (() => {
     },
 
     setBasisFromThreeQuaternion: function (t, a) {
-      var q = this.allocQuaternion()
+      const q = this.allocQuaternion()
 
       q.setX(a.x)
       q.setY(a.y)
@@ -436,20 +436,20 @@ var MMDPhysics = (() => {
     },
 
     multiplyTransforms: function (t1, t2) {
-      var t = this.allocTransform()
+      const t = this.allocTransform()
       this.setIdentity(t)
 
-      var m1 = this.getBasisAsMatrix3(t1)
-      var m2 = this.getBasisAsMatrix3(t2)
+      const m1 = this.getBasisAsMatrix3(t1)
+      const m2 = this.getBasisAsMatrix3(t2)
 
-      var o1 = this.getOrigin(t1)
-      var o2 = this.getOrigin(t2)
+      const o1 = this.getOrigin(t1)
+      const o2 = this.getOrigin(t2)
 
-      var v1 = this.multiplyMatrix3ByVector3(m1, o2)
-      var v2 = this.addVector3(v1, o1)
+      const v1 = this.multiplyMatrix3ByVector3(m1, o2)
+      const v2 = this.addVector3(v1, o1)
       this.setOrigin(t, v2)
 
-      var m3 = this.multiplyMatrices3(m1, m2)
+      const m3 = this.multiplyMatrices3(m1, m2)
       this.setBasisFromMatrix3(t, m3)
 
       this.freeVector3(v1)
@@ -459,14 +459,14 @@ var MMDPhysics = (() => {
     },
 
     inverseTransform: function (t) {
-      var t2 = this.allocTransform()
+      const t2 = this.allocTransform()
 
-      var m1 = this.getBasisAsMatrix3(t)
-      var o = this.getOrigin(t)
+      const m1 = this.getBasisAsMatrix3(t)
+      const o = this.getOrigin(t)
 
-      var m2 = this.transposeMatrix3(m1)
-      var v1 = this.negativeVector3(o)
-      var v2 = this.multiplyMatrix3ByVector3(m2, v1)
+      const m2 = this.transposeMatrix3(m1)
+      const v1 = this.negativeVector3(o)
+      const v2 = this.multiplyMatrix3ByVector3(m2, v1)
 
       this.setOrigin(t2, v2)
       this.setBasisFromMatrix3(t2, m2)
@@ -478,15 +478,15 @@ var MMDPhysics = (() => {
     },
 
     multiplyMatrices3: function (m1, m2) {
-      var m3 = []
+      const m3 = []
 
-      var v10 = this.rowOfMatrix3(m1, 0)
-      var v11 = this.rowOfMatrix3(m1, 1)
-      var v12 = this.rowOfMatrix3(m1, 2)
+      const v10 = this.rowOfMatrix3(m1, 0)
+      const v11 = this.rowOfMatrix3(m1, 1)
+      const v12 = this.rowOfMatrix3(m1, 2)
 
-      var v20 = this.columnOfMatrix3(m2, 0)
-      var v21 = this.columnOfMatrix3(m2, 1)
-      var v22 = this.columnOfMatrix3(m2, 2)
+      const v20 = this.columnOfMatrix3(m2, 0)
+      const v21 = this.columnOfMatrix3(m2, 1)
+      const v22 = this.columnOfMatrix3(m2, 2)
 
       m3[0] = this.dotVectors3(v10, v20)
       m3[1] = this.dotVectors3(v10, v21)
@@ -509,7 +509,7 @@ var MMDPhysics = (() => {
     },
 
     addVector3: function (v1, v2) {
-      var v = this.allocVector3()
+      const v = this.allocVector3()
       v.setValue(v1.x() + v2.x(), v1.y() + v2.y(), v1.z() + v2.z())
       return v
     },
@@ -519,32 +519,32 @@ var MMDPhysics = (() => {
     },
 
     rowOfMatrix3: function (m, i) {
-      var v = this.allocVector3()
+      const v = this.allocVector3()
       v.setValue(m[i * 3 + 0], m[i * 3 + 1], m[i * 3 + 2])
       return v
     },
 
     columnOfMatrix3: function (m, i) {
-      var v = this.allocVector3()
+      const v = this.allocVector3()
       v.setValue(m[i + 0], m[i + 3], m[i + 6])
       return v
     },
 
     negativeVector3: function (v) {
-      var v2 = this.allocVector3()
+      const v2 = this.allocVector3()
       v2.setValue(-v.x(), -v.y(), -v.z())
       return v2
     },
 
     multiplyMatrix3ByVector3: function (m, v) {
-      var v4 = this.allocVector3()
+      const v4 = this.allocVector3()
 
-      var v0 = this.rowOfMatrix3(m, 0)
-      var v1 = this.rowOfMatrix3(m, 1)
-      var v2 = this.rowOfMatrix3(m, 2)
-      var x = this.dotVectors3(v0, v)
-      var y = this.dotVectors3(v1, v)
-      var z = this.dotVectors3(v2, v)
+      const v0 = this.rowOfMatrix3(m, 0)
+      const v1 = this.rowOfMatrix3(m, 1)
+      const v2 = this.rowOfMatrix3(m, 2)
+      const x = this.dotVectors3(v0, v)
+      const y = this.dotVectors3(v1, v)
+      const z = this.dotVectors3(v2, v)
 
       v4.setValue(x, y, z)
 
@@ -556,7 +556,7 @@ var MMDPhysics = (() => {
     },
 
     transposeMatrix3: function (m) {
-      var m2 = []
+      const m2 = []
       m2[0] = m[0]
       m2[1] = m[3]
       m2[2] = m[6]
@@ -570,24 +570,24 @@ var MMDPhysics = (() => {
     },
 
     quaternionToMatrix3: function (q) {
-      var m = []
+      const m = []
 
-      var x = q.x()
-      var y = q.y()
-      var z = q.z()
-      var w = q.w()
+      const x = q.x()
+      const y = q.y()
+      const z = q.z()
+      const w = q.w()
 
-      var xx = x * x
-      var yy = y * y
-      var zz = z * z
+      const xx = x * x
+      const yy = y * y
+      const zz = z * z
 
-      var xy = x * y
-      var yz = y * z
-      var zx = z * x
+      const xy = x * y
+      const yz = y * z
+      const zx = z * x
 
-      var xw = x * w
-      var yw = y * w
-      var zw = z * w
+      const xw = x * w
+      const yw = y * w
+      const zw = z * w
 
       m[0] = 1 - 2 * (yy + zz)
       m[1] = 2 * (xy - zw)
@@ -603,8 +603,8 @@ var MMDPhysics = (() => {
     },
 
     matrix3ToQuaternion: function (m) {
-      var t = m[0] + m[4] + m[8]
-      var s, x, y, z, w
+      const t = m[0] + m[4] + m[8]
+      let s, x, y, z, w
 
       if (t > 0) {
         s = Math.sqrt(t + 1.0) * 2
@@ -632,7 +632,7 @@ var MMDPhysics = (() => {
         z = 0.25 * s
       }
 
-      var q = this.allocQuaternion()
+      const q = this.allocQuaternion()
       q.setX(x)
       q.setY(y)
       q.setZ(z)
@@ -731,38 +731,38 @@ var MMDPhysics = (() => {
         }
       }
 
-      var manager = this.manager
-      var params = this.params
-      var bones = this.mesh.skeleton.bones
-      var bone = params.boneIndex === -1 ? new Bone() : bones[params.boneIndex]
+      const manager = this.manager
+      const params = this.params
+      const bones = this.mesh.skeleton.bones
+      const bone = params.boneIndex === -1 ? new Bone() : bones[params.boneIndex]
 
-      var shape = generateShape(params)
-      var weight = params.type === 0 ? 0 : params.weight
-      var localInertia = manager.allocVector3()
+      const shape = generateShape(params)
+      const weight = params.type === 0 ? 0 : params.weight
+      const localInertia = manager.allocVector3()
       localInertia.setValue(0, 0, 0)
 
       if (weight !== 0) {
         shape.calculateLocalInertia(weight, localInertia)
       }
 
-      var boneOffsetForm = manager.allocTransform()
+      const boneOffsetForm = manager.allocTransform()
       manager.setIdentity(boneOffsetForm)
       manager.setOriginFromArray3(boneOffsetForm, params.position)
       manager.setBasisFromArray3(boneOffsetForm, params.rotation)
 
-      var vector = manager.allocThreeVector3()
-      var boneForm = manager.allocTransform()
+      const vector = manager.allocThreeVector3()
+      const boneForm = manager.allocTransform()
       manager.setIdentity(boneForm)
       manager.setOriginFromThreeVector3(boneForm, bone.getWorldPosition(vector))
 
-      var form = manager.multiplyTransforms(boneForm, boneOffsetForm)
-      var state = new Ammo.btDefaultMotionState(form)
+      const form = manager.multiplyTransforms(boneForm, boneOffsetForm)
+      const state = new Ammo.btDefaultMotionState(form)
 
-      var info = new Ammo.btRigidBodyConstructionInfo(weight, state, shape, localInertia)
+      const info = new Ammo.btRigidBodyConstructionInfo(weight, state, shape, localInertia)
       info.set_m_friction(params.friction)
       info.set_m_restitution(params.restitution)
 
-      var body = new Ammo.btRigidBody(info)
+      const body = new Ammo.btRigidBody(info)
 
       if (params.type === 0) {
         body.setCollisionFlags(body.getCollisionFlags() | 2)
@@ -792,18 +792,18 @@ var MMDPhysics = (() => {
     },
 
     _getBoneTransform: function () {
-      var manager = this.manager
-      var p = manager.allocThreeVector3()
-      var q = manager.allocThreeQuaternion()
-      var s = manager.allocThreeVector3()
+      const manager = this.manager
+      const p = manager.allocThreeVector3()
+      const q = manager.allocThreeQuaternion()
+      const s = manager.allocThreeVector3()
 
       this.bone.matrixWorld.decompose(p, q, s)
 
-      var tr = manager.allocTransform()
+      const tr = manager.allocTransform()
       manager.setOriginFromThreeVector3(tr, p)
       manager.setBasisFromThreeQuaternion(tr, q)
 
-      var form = manager.multiplyTransforms(tr, this.boneOffsetForm)
+      const form = manager.multiplyTransforms(tr, this.boneOffsetForm)
 
       manager.freeTransform(tr)
       manager.freeThreeVector3(s)
@@ -814,14 +814,14 @@ var MMDPhysics = (() => {
     },
 
     _getWorldTransformForBone: function () {
-      var manager = this.manager
-      var tr = this.body.getCenterOfMassTransform()
+      const manager = this.manager
+      const tr = this.body.getCenterOfMassTransform()
       return manager.multiplyTransforms(tr, this.boneOffsetFormInverse)
     },
 
     _setTransformFromBone: function () {
-      var manager = this.manager
-      var form = this._getBoneTransform()
+      const manager = this.manager
+      const form = this._getBoneTransform()
 
       // TODO: check the most appropriate way to set
       //this.body.setWorldTransform( form );
@@ -832,10 +832,10 @@ var MMDPhysics = (() => {
     },
 
     _setPositionFromBone: function () {
-      var manager = this.manager
-      var form = this._getBoneTransform()
+      const manager = this.manager
+      const form = this._getBoneTransform()
 
-      var tr = manager.allocTransform()
+      const tr = manager.allocTransform()
       this.body.getMotionState().getWorldTransform(tr)
       manager.copyOrigin(tr, form)
 
@@ -849,14 +849,14 @@ var MMDPhysics = (() => {
     },
 
     _updateBoneRotation: function () {
-      var manager = this.manager
+      const manager = this.manager
 
-      var tr = this._getWorldTransformForBone()
-      var q = manager.getBasis(tr)
+      const tr = this._getWorldTransformForBone()
+      const q = manager.getBasis(tr)
 
-      var thQ = manager.allocThreeQuaternion()
-      var thQ2 = manager.allocThreeQuaternion()
-      var thQ3 = manager.allocThreeQuaternion()
+      const thQ = manager.allocThreeQuaternion()
+      const thQ2 = manager.allocThreeQuaternion()
+      const thQ3 = manager.allocThreeQuaternion()
 
       thQ.set(q.x(), q.y(), q.z(), q.w())
       thQ2.setFromRotationMatrix(this.bone.matrixWorld)
@@ -881,13 +881,13 @@ var MMDPhysics = (() => {
     },
 
     _updateBonePosition: function () {
-      var manager = this.manager
+      const manager = this.manager
 
-      var tr = this._getWorldTransformForBone()
+      const tr = this._getWorldTransformForBone()
 
-      var thV = manager.allocThreeVector3()
+      const thV = manager.allocThreeVector3()
 
-      var o = manager.getOrigin(tr)
+      const o = manager.getOrigin(tr)
       thV.set(o.x(), o.y(), o.z())
 
       if (this.bone.parent) {
@@ -929,34 +929,34 @@ var MMDPhysics = (() => {
     // private method
 
     _init: function () {
-      var manager = this.manager
-      var params = this.params
-      var bodyA = this.bodyA
-      var bodyB = this.bodyB
+      const manager = this.manager
+      const params = this.params
+      const bodyA = this.bodyA
+      const bodyB = this.bodyB
 
-      var form = manager.allocTransform()
+      const form = manager.allocTransform()
       manager.setIdentity(form)
       manager.setOriginFromArray3(form, params.position)
       manager.setBasisFromArray3(form, params.rotation)
 
-      var formA = manager.allocTransform()
-      var formB = manager.allocTransform()
+      const formA = manager.allocTransform()
+      const formB = manager.allocTransform()
 
       bodyA.body.getMotionState().getWorldTransform(formA)
       bodyB.body.getMotionState().getWorldTransform(formB)
 
-      var formInverseA = manager.inverseTransform(formA)
-      var formInverseB = manager.inverseTransform(formB)
+      const formInverseA = manager.inverseTransform(formA)
+      const formInverseB = manager.inverseTransform(formB)
 
-      var formA2 = manager.multiplyTransforms(formInverseA, form)
-      var formB2 = manager.multiplyTransforms(formInverseB, form)
+      const formA2 = manager.multiplyTransforms(formInverseA, form)
+      const formB2 = manager.multiplyTransforms(formInverseB, form)
 
-      var constraint = new Ammo.btGeneric6DofSpringConstraint(bodyA.body, bodyB.body, formA2, formB2, true)
+      const constraint = new Ammo.btGeneric6DofSpringConstraint(bodyA.body, bodyB.body, formA2, formB2, true)
 
-      var lll = manager.allocVector3()
-      var lul = manager.allocVector3()
-      var all = manager.allocVector3()
-      var aul = manager.allocVector3()
+      const lll = manager.allocVector3()
+      const lul = manager.allocVector3()
+      const all = manager.allocVector3()
+      const aul = manager.allocVector3()
 
       lll.setValue(params.translationLimitation1[0], params.translationLimitation1[1], params.translationLimitation1[2])
       lul.setValue(params.translationLimitation2[0], params.translationLimitation2[1], params.translationLimitation2[2])
@@ -1072,16 +1072,16 @@ var MMDPhysics = (() => {
      * Updates Rigid Bodies visualization.
      */
     updateMatrixWorld: (() => {
-      var position = new Vector3()
-      var quaternion = new Quaternion()
-      var scale = new Vector3()
-      var matrixWorldInv = new Matrix4()
+      const position = new Vector3()
+      const quaternion = new Quaternion()
+      const scale = new Vector3()
+      const matrixWorldInv = new Matrix4()
 
       return function updateMatrixWorld(force) {
-        var mesh = this.root
+        const mesh = this.root
 
         if (this.visible) {
-          var bodies = this.physics.bodies
+          const bodies = this.physics.bodies
 
           matrixWorldInv
             .copy(mesh.matrixWorld)
@@ -1089,13 +1089,13 @@ var MMDPhysics = (() => {
             .compose(position, quaternion, scale.set(1, 1, 1))
             .invert()
 
-          for (var i = 0, il = bodies.length; i < il; i++) {
-            var body = bodies[i].body
-            var child = this.children[i]
+          for (let i = 0, il = bodies.length; i < il; i++) {
+            const body = bodies[i].body
+            const child = this.children[i]
 
-            var tr = body.getCenterOfMassTransform()
-            var origin = tr.getOrigin()
-            var rotation = tr.getRotation()
+            const tr = body.getCenterOfMassTransform()
+            const origin = tr.getOrigin()
+            const rotation = tr.getRotation()
 
             child.position.set(origin.x(), origin.y(), origin.z()).applyMatrix4(matrixWorldInv)
 
@@ -1117,7 +1117,7 @@ var MMDPhysics = (() => {
     // private method
 
     _init: function () {
-      var bodies = this.physics.bodies
+      const bodies = this.physics.bodies
 
       function createGeometry(param) {
         switch (param.shapeType) {
@@ -1137,11 +1137,11 @@ var MMDPhysics = (() => {
 
       // copy from http://www20.atpages.jp/katwat/three.js_r58/examples/mytest37/mytest37.js?ver=20160815
       function createCapsuleGeometry(radius, cylinderHeight, segmentsRadius, segmentsHeight) {
-        var geometry = new CylinderGeometry(radius, radius, cylinderHeight, segmentsRadius, segmentsHeight, true)
-        var upperSphere = new Mesh(
+        const geometry = new CylinderGeometry(radius, radius, cylinderHeight, segmentsRadius, segmentsHeight, true)
+        const upperSphere = new Mesh(
           new SphereGeometry(radius, segmentsRadius, segmentsHeight, 0, Math.PI * 2, 0, Math.PI / 2),
         )
-        var lowerSphere = new Mesh(
+        const lowerSphere = new Mesh(
           new SphereGeometry(radius, segmentsRadius, segmentsHeight, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2),
         )
 
@@ -1157,8 +1157,8 @@ var MMDPhysics = (() => {
         return geometry
       }
 
-      for (var i = 0, il = bodies.length; i < il; i++) {
-        var param = bodies[i].params
+      for (let i = 0, il = bodies.length; i < il; i++) {
+        const param = bodies[i].params
         this.add(new Mesh(createGeometry(param), this.materials[param.type]))
       }
     },

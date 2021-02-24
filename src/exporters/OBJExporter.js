@@ -1,47 +1,47 @@
 import { Color, Matrix3, Vector2, Vector3 } from '../../../build/three.module.js'
 
-var OBJExporter = () => {}
+const OBJExporter = () => {}
 
 OBJExporter.prototype = {
   constructor: OBJExporter,
 
   parse: function (object) {
-    var output = ''
+    let output = ''
 
-    var indexVertex = 0
-    var indexVertexUvs = 0
-    var indexNormals = 0
+    let indexVertex = 0
+    let indexVertexUvs = 0
+    let indexNormals = 0
 
-    var vertex = new Vector3()
-    var color = new Color()
-    var normal = new Vector3()
-    var uv = new Vector2()
+    const vertex = new Vector3()
+    const color = new Color()
+    const normal = new Vector3()
+    const uv = new Vector2()
 
-    var i,
-      j,
-      k,
-      l,
-      m,
-      face = []
+    let i
+    let j
+    let k
+    let l
+    let m
+    const face = []
 
-    var parseMesh = (mesh) => {
-      var nbVertex = 0
-      var nbNormals = 0
-      var nbVertexUvs = 0
+    const parseMesh = (mesh) => {
+      let nbVertex = 0
+      let nbNormals = 0
+      let nbVertexUvs = 0
 
-      var geometry = mesh.geometry
+      const geometry = mesh.geometry
 
-      var normalMatrixWorld = new Matrix3()
+      const normalMatrixWorld = new Matrix3()
 
       if (geometry.isBufferGeometry !== true) {
         throw new Error('THREE.OBJExporter: Geometry is not of type THREE.BufferGeometry.')
       }
 
       // shortcuts
-      var vertices = geometry.getAttribute('position')
-      var normals = geometry.getAttribute('normal')
-      var uvs = geometry.getAttribute('uv')
-      var indices = geometry.getIndex()
+      const vertices = geometry.getAttribute('position')
+      const normals = geometry.getAttribute('normal')
+      const uvs = geometry.getAttribute('uv')
+      const indices = geometry.getIndex()
 
       // name of the mesh object
       output += `o ${mesh.name}\n`
@@ -135,18 +135,18 @@ OBJExporter.prototype = {
       indexNormals += nbNormals
     }
 
-    var parseLine = (line) => {
-      var nbVertex = 0
+    const parseLine = (line) => {
+      let nbVertex = 0
 
-      var geometry = line.geometry
-      var type = line.type
+      const geometry = line.geometry
+      const type = line.type
 
       if (geometry.isBufferGeometry !== true) {
         throw new Error('THREE.OBJExporter: Geometry is not of type THREE.BufferGeometry.')
       }
 
       // shortcuts
-      var vertices = geometry.getAttribute('position')
+      const vertices = geometry.getAttribute('position')
 
       // name of the line object
       output += `o ${line.name}\n`
@@ -185,17 +185,17 @@ OBJExporter.prototype = {
       indexVertex += nbVertex
     }
 
-    var parsePoints = (points) => {
-      var nbVertex = 0
+    const parsePoints = (points) => {
+      let nbVertex = 0
 
-      var geometry = points.geometry
+      const geometry = points.geometry
 
       if (geometry.isBufferGeometry !== true) {
         throw new Error('THREE.OBJExporter: Geometry is not of type THREE.BufferGeometry.')
       }
 
-      var vertices = geometry.getAttribute('position')
-      var colors = geometry.getAttribute('color')
+      const vertices = geometry.getAttribute('position')
+      const colors = geometry.getAttribute('color')
 
       output += `o ${points.name}\n`
 

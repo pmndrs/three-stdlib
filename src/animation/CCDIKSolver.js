@@ -33,7 +33,7 @@ import {
  * } ];
  */
 
-var CCDIKSolver = (() => {
+const CCDIKSolver = (() => {
   /**
    * @param {THREE.SkinnedMesh} mesh
    * @param {Array<Object>} iks
@@ -54,49 +54,49 @@ var CCDIKSolver = (() => {
      * @return {CCDIKSolver}
      */
     update: (() => {
-      var q = new Quaternion()
-      var targetPos = new Vector3()
-      var targetVec = new Vector3()
-      var effectorPos = new Vector3()
-      var effectorVec = new Vector3()
-      var linkPos = new Vector3()
-      var invLinkQ = new Quaternion()
-      var linkScale = new Vector3()
-      var axis = new Vector3()
-      var vector = new Vector3()
+      const q = new Quaternion()
+      const targetPos = new Vector3()
+      const targetVec = new Vector3()
+      const effectorPos = new Vector3()
+      const effectorVec = new Vector3()
+      const linkPos = new Vector3()
+      const invLinkQ = new Quaternion()
+      const linkScale = new Vector3()
+      const axis = new Vector3()
+      const vector = new Vector3()
 
       return function update() {
-        var bones = this.mesh.skeleton.bones
-        var iks = this.iks
+        const bones = this.mesh.skeleton.bones
+        const iks = this.iks
 
         // for reference overhead reduction in loop
-        var math = Math
+        const math = Math
 
-        for (var i = 0, il = iks.length; i < il; i++) {
-          var ik = iks[i]
-          var effector = bones[ik.effector]
-          var target = bones[ik.target]
+        for (let i = 0, il = iks.length; i < il; i++) {
+          const ik = iks[i]
+          const effector = bones[ik.effector]
+          const target = bones[ik.target]
 
           // don't use getWorldPosition() here for the performance
           // because it calls updateMatrixWorld( true ) inside.
           targetPos.setFromMatrixPosition(target.matrixWorld)
 
-          var links = ik.links
-          var iteration = ik.iteration !== undefined ? ik.iteration : 1
+          const links = ik.links
+          const iteration = ik.iteration !== undefined ? ik.iteration : 1
 
-          for (var j = 0; j < iteration; j++) {
-            var rotated = false
+          for (let j = 0; j < iteration; j++) {
+            let rotated = false
 
-            for (var k = 0, kl = links.length; k < kl; k++) {
-              var link = bones[links[k].index]
+            for (let k = 0, kl = links.length; k < kl; k++) {
+              const link = bones[links[k].index]
 
               // skip this link and following links.
               // this skip is used for MMD performance optimization.
               if (links[k].enabled === false) break
 
-              var limitation = links[k].limitation
-              var rotationMin = links[k].rotationMin
-              var rotationMax = links[k].rotationMax
+              const limitation = links[k].limitation
+              const rotationMin = links[k].rotationMin
+              const rotationMax = links[k].rotationMax
 
               // don't use getWorldPosition/Quaternion() here for the performance
               // because they call updateMatrixWorld( true ) inside.
@@ -113,7 +113,7 @@ var CCDIKSolver = (() => {
               targetVec.applyQuaternion(invLinkQ)
               targetVec.normalize()
 
-              var angle = targetVec.dot(effectorVec)
+              let angle = targetVec.dot(effectorVec)
 
               if (angle > 1.0) {
                 angle = 1.0
@@ -143,11 +143,11 @@ var CCDIKSolver = (() => {
 
               // TODO: re-consider the limitation specification
               if (limitation !== undefined) {
-                var c = link.quaternion.w
+                let c = link.quaternion.w
 
                 if (c > 1.0) c = 1.0
 
-                var c2 = math.sqrt(1 - c * c)
+                const c2 = math.sqrt(1 - c * c)
                 link.quaternion.set(limitation.x * c2, limitation.y * c2, limitation.z * c2, c)
               }
 
@@ -184,18 +184,18 @@ var CCDIKSolver = (() => {
     // private methods
 
     _valid: function () {
-      var iks = this.iks
-      var bones = this.mesh.skeleton.bones
+      const iks = this.iks
+      const bones = this.mesh.skeleton.bones
 
-      for (var i = 0, il = iks.length; i < il; i++) {
-        var ik = iks[i]
-        var effector = bones[ik.effector]
-        var links = ik.links
-        var link0, link1
+      for (let i = 0, il = iks.length; i < il; i++) {
+        const ik = iks[i]
+        const effector = bones[ik.effector]
+        const links = ik.links
+        let link0, link1
 
         link0 = effector
 
-        for (var j = 0, jl = links.length; j < jl; j++) {
+        for (let j = 0, jl = links.length; j < jl; j++) {
           link1 = bones[links[j].index]
 
           if (link0.parent !== link1) {
@@ -263,15 +263,15 @@ var CCDIKSolver = (() => {
      * Updates IK bones visualization.
      */
     updateMatrixWorld: (() => {
-      var matrix = new Matrix4()
-      var vector = new Vector3()
+      const matrix = new Matrix4()
+      const vector = new Vector3()
 
       function getPosition(bone, matrixWorldInv) {
         return vector.setFromMatrixPosition(bone.matrixWorld).applyMatrix4(matrixWorldInv)
       }
 
       function setPositionOfBoneToAttributeArray(array, index, bone, matrixWorldInv) {
-        var v = getPosition(bone, matrixWorldInv)
+        const v = getPosition(bone, matrixWorldInv)
 
         array[index * 3 + 0] = v.x
         array[index * 3 + 1] = v.y
@@ -279,24 +279,24 @@ var CCDIKSolver = (() => {
       }
 
       return function updateMatrixWorld(force) {
-        var mesh = this.root
+        const mesh = this.root
 
         if (this.visible) {
-          var offset = 0
+          let offset = 0
 
-          var iks = this.iks
-          var bones = mesh.skeleton.bones
+          const iks = this.iks
+          const bones = mesh.skeleton.bones
 
           matrix.copy(mesh.matrixWorld).invert()
 
-          for (var i = 0, il = iks.length; i < il; i++) {
-            var ik = iks[i]
+          for (let i = 0, il = iks.length; i < il; i++) {
+            const ik = iks[i]
 
-            var targetBone = bones[ik.target]
-            var effectorBone = bones[ik.effector]
+            const targetBone = bones[ik.target]
+            const effectorBone = bones[ik.effector]
 
-            var targetMesh = this.children[offset++]
-            var effectorMesh = this.children[offset++]
+            const targetMesh = this.children[offset++]
+            const effectorMesh = this.children[offset++]
 
             targetMesh.position.copy(getPosition(targetBone, matrix))
             effectorMesh.position.copy(getPosition(effectorBone, matrix))
@@ -305,13 +305,13 @@ var CCDIKSolver = (() => {
               var link = ik.links[j]
               var linkBone = bones[link.index]
 
-              var linkMesh = this.children[offset++]
+              const linkMesh = this.children[offset++]
 
               linkMesh.position.copy(getPosition(linkBone, matrix))
             }
 
-            var line = this.children[offset++]
-            var array = line.geometry.attributes.position.array
+            const line = this.children[offset++]
+            const array = line.geometry.attributes.position.array
 
             setPositionOfBoneToAttributeArray(array, 0, targetBone, matrix)
             setPositionOfBoneToAttributeArray(array, 1, effectorBone, matrix)
@@ -335,12 +335,12 @@ var CCDIKSolver = (() => {
     // private method
 
     _init: function () {
-      var scope = this
-      var iks = this.iks
+      const scope = this
+      const iks = this.iks
 
       function createLineGeometry(ik) {
-        var geometry = new BufferGeometry()
-        var vertices = new Float32Array((2 + ik.links.length) * 3)
+        const geometry = new BufferGeometry()
+        const vertices = new Float32Array((2 + ik.links.length) * 3)
         geometry.setAttribute('position', new BufferAttribute(vertices, 3))
 
         return geometry
@@ -362,13 +362,13 @@ var CCDIKSolver = (() => {
         return new Line(createLineGeometry(ik), scope.lineMaterial)
       }
 
-      for (var i = 0, il = iks.length; i < il; i++) {
-        var ik = iks[i]
+      for (let i = 0, il = iks.length; i < il; i++) {
+        const ik = iks[i]
 
         this.add(createTargetMesh())
         this.add(createEffectorMesh())
 
-        for (var j = 0, jl = ik.links.length; j < jl; j++) {
+        for (let j = 0, jl = ik.links.length; j < jl; j++) {
           this.add(createLinkMesh())
         }
 

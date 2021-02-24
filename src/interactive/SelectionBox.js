@@ -4,26 +4,26 @@ import { Frustum, Vector3 } from '../../../build/three.module.js'
  * This is a class to check whether objects are in a selection area in 3D space
  */
 
-var SelectionBox = (() => {
-  var frustum = new Frustum()
-  var center = new Vector3()
+const SelectionBox = (() => {
+  const frustum = new Frustum()
+  const center = new Vector3()
 
-  var tmpPoint = new Vector3()
+  const tmpPoint = new Vector3()
 
-  var vecNear = new Vector3()
-  var vecTopLeft = new Vector3()
-  var vecTopRight = new Vector3()
-  var vecDownRight = new Vector3()
-  var vecDownLeft = new Vector3()
+  const vecNear = new Vector3()
+  const vecTopLeft = new Vector3()
+  const vecTopRight = new Vector3()
+  const vecDownRight = new Vector3()
+  const vecDownLeft = new Vector3()
 
-  var vecFarTopLeft = new Vector3()
-  var vecFarTopRight = new Vector3()
-  var vecFarDownRight = new Vector3()
-  var vecFarDownLeft = new Vector3()
+  const vecFarTopLeft = new Vector3()
+  const vecFarTopRight = new Vector3()
+  const vecFarDownRight = new Vector3()
+  const vecFarDownLeft = new Vector3()
 
-  var vectemp1 = new Vector3()
-  var vectemp2 = new Vector3()
-  var vectemp3 = new Vector3()
+  const vectemp1 = new Vector3()
+  const vectemp2 = new Vector3()
+  const vectemp3 = new Vector3()
 
   class SelectionBox {
     constructor(camera, scene, deep) {
@@ -105,10 +105,10 @@ var SelectionBox = (() => {
         planes[5].setFromCoplanarPoints(vectemp3, vectemp2, vectemp1)
         planes[5].normal.multiplyScalar(-1)
       } else if (this.camera.isOrthographicCamera) {
-        var left = Math.min(startPoint.x, endPoint.x)
-        var top = Math.max(startPoint.y, endPoint.y)
-        var right = Math.max(startPoint.x, endPoint.x)
-        var down = Math.min(startPoint.y, endPoint.y)
+        const left = Math.min(startPoint.x, endPoint.x)
+        const top = Math.max(startPoint.y, endPoint.y)
+        const right = Math.max(startPoint.x, endPoint.x)
+        const down = Math.min(startPoint.y, endPoint.y)
 
         vecTopLeft.set(left, top, -1)
         vecTopRight.set(right, top, -1)
@@ -160,7 +160,7 @@ var SelectionBox = (() => {
       }
 
       if (object.children.length > 0) {
-        for (var x = 0; x < object.children.length; x++) {
+        for (let x = 0; x < object.children.length; x++) {
           this.searchChildInFrustum(frustum, object.children[x])
         }
       }
