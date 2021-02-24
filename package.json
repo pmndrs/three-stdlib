@@ -1,0 +1,19 @@
+{
+  "name": "three-stdlib",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pmndrs/three-stdlib.git"
+  },
+  "author": "Paul Henschel",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/pmndrs/three-stdlib/issues"
+  },
+  "homepage": "https://github.com/pmndrs/three-stdlib#readme"
+}
