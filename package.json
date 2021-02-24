@@ -1,10 +1,26 @@
 {
   "name": "three-stdlib",
   "version": "0.0.0",
+  "private": true,
   "description": "",
   "main": "index.js",
   "scripts": {
+    "prebuild": "rimraf dist",
+    "build": "rollup -c && npm run copy",
+    "prepare": "npm run build",
+    "copy": "copyfiles package.json readme.md LICENSE dist && json -I -f dist/package.json -e \"this.private=false; this.devDependencies=undefined; this.optionalDependencies=undefined; this.scripts=undefined; this.husky=undefined; this.prettier=undefined; this.jest=undefined; this['lint-staged']=undefined;\"",
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "sideEffects": false,
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "prettier --write"
+    ]
   },
   "repository": {
     "type": "git",
@@ -15,5 +31,31 @@
   "bugs": {
     "url": "https://github.com/pmndrs/three-stdlib/issues"
   },
-  "homepage": "https://github.com/pmndrs/three-stdlib#readme"
+  "homepage": "https://github.com/pmndrs/three-stdlib#readme",
+  "devDependencies": {
+    "@babel/core": "7.11.1",
+    "@babel/plugin-proposal-class-properties": "^7.10.4",
+    "@babel/plugin-transform-modules-commonjs": "7.10.4",
+    "@babel/plugin-transform-parameters": "7.10.5",
+    "@babel/plugin-transform-runtime": "7.11.0",
+    "@babel/plugin-transform-template-literals": "7.10.5",
+    "@babel/preset-env": "7.11.0",
+    "@babel/preset-react": "7.10.4",
+    "@babel/preset-typescript": "^7.10.4",
+    "babel-plugin-transform-react-remove-prop-types": "^0.4.24",
+    "copyfiles": "^2.3.0",
+    "husky": "^4.2.5",
+    "json": "^10.0.0",
+    "lint-staged": "^10.2.11",
+    "prettier": "^2.2.1",
+    "rimraf": "^3.0.2",
+    "rollup": "^2.26.4",
+    "rollup-plugin-babel": "^4.4.0",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-glslify": "^1.2.0",
+    "rollup-plugin-json": "^4.0.0",
+    "rollup-plugin-multi-input": "^1.1.1",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-size-snapshot": "^0.12.0"
+  }
 }
