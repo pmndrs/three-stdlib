@@ -9,6 +9,8 @@ import { EventDispatcher, MOUSE, Quaternion, Spherical, TOUCH, Vector2, Vector3 
 
 class OrbitControls extends EventDispatcher {
   constructor(object, domElement) {
+    super()
+
     if (domElement === undefined)
       console.warn('THREE.OrbitControls: The second parameter "domElement" is now mandatory.')
     if (domElement === document)
