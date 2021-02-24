@@ -1,4 +1,4 @@
-import { Color, Matrix3, Vector2, Vector3 } from '../../../build/three.module.js'
+import { Color, Matrix3, Vector2, Vector3 } from 'three'
 
 const OBJExporter = () => {}
 

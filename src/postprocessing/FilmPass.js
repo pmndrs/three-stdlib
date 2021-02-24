@@ -1,4 +1,4 @@
-import { ShaderMaterial, UniformsUtils } from '../../../build/three.module.js'
+import { ShaderMaterial, UniformsUtils } from 'three'
 import { Pass } from '../postprocessing/Pass.js'
 import { FilmShader } from '../shaders/FilmShader.js'
 

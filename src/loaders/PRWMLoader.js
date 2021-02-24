@@ -1,4 +1,4 @@
-import { BufferAttribute, BufferGeometry, FileLoader, Loader } from '../../../build/three.module.js'
+import { BufferAttribute, BufferGeometry, FileLoader, Loader } from 'three'
 
 /**
  * See https://github.com/kchapelier/PRWM for more informations about this file format

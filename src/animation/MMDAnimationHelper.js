@@ -1,4 +1,4 @@
-import { AnimationMixer, Object3D, Quaternion, Vector3 } from '../../../build/three.module.js'
+import { AnimationMixer, Object3D, Quaternion, Vector3 } from 'three'
 import { CCDIKSolver } from '../animation/CCDIKSolver.js'
 import { MMDPhysics } from '../animation/MMDPhysics.js'
 

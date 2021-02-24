@@ -1,4 +1,4 @@
-import { Color } from '../../../build/three.module.js'
+import { Color } from 'three'
 import { Pass } from '../postprocessing/Pass.js'
 
 var ClearPass = function (clearColor, clearAlpha) {

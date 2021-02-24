@@ -1,4 +1,4 @@
-import { UniformsLib, UniformsUtils } from '../../../../../build/three.module.js'
+import { UniformsLib, UniformsUtils } from 'three'
 
 import { Node } from '../../core/Node.js'
 import { ExpressionNode } from '../../core/ExpressionNode.js'

@@ -1,4 +1,4 @@
-import { BufferAttribute, BufferGeometry, Quaternion, Raycaster, Vector3 } from '../../../build/three.module.js'
+import { BufferAttribute, BufferGeometry, Quaternion, Raycaster, Vector3 } from 'three'
 
 var RollerCoasterGeometry = function (curve, divisions) {
   BufferGeometry.call(this)

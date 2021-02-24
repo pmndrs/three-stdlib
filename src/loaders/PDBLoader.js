@@ -1,4 +1,4 @@
-import { BufferGeometry, FileLoader, Float32BufferAttribute, Loader } from '../../../build/three.module.js'
+import { BufferGeometry, FileLoader, Float32BufferAttribute, Loader } from 'three'
 
 var PDBLoader = function (manager) {
   Loader.call(this, manager)

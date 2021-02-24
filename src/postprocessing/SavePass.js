@@ -4,7 +4,7 @@ import {
   ShaderMaterial,
   UniformsUtils,
   WebGLRenderTarget,
-} from '../../../build/three.module.js'
+} from 'three'
 import { Pass } from '../postprocessing/Pass.js'
 import { CopyShader } from '../shaders/CopyShader.js'
 

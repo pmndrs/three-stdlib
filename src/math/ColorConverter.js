@@ -1,4 +1,4 @@
-import { MathUtils } from '../../../build/three.module.js'
+import { MathUtils } from 'three'
 
 var ColorConverter = {
   setHSV: function (color, h, s, v) {

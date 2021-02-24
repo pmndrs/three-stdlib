@@ -1,4 +1,4 @@
-import { Vector3 } from '../../../build/three.module.js'
+import { Vector3 } from 'three'
 
 var Capsule = (function () {
   var _v1 = new Vector3()

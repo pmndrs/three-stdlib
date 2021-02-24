@@ -13,7 +13,7 @@ import {
   Vector3,
   Vector4,
   WebGLRenderTarget,
-} from '../../../build/three.module.js'
+} from 'three'
 
 var Refractor = function (geometry, options) {
   Mesh.call(this, geometry)

@@ -1,4 +1,4 @@
-import { PerspectiveCamera, Quaternion, Vector3 } from '../../../build/three.module.js'
+import { PerspectiveCamera, Quaternion, Vector3 } from 'three'
 
 /**
  * peppers ghost effect based on http://www.instructables.com/id/Reflective-Prism/?ALLSTEPS

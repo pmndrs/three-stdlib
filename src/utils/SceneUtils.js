@@ -1,4 +1,4 @@
-import { Group, Mesh } from '../../../build/three.module.js'
+import { Group, Mesh } from 'three'
 
 var SceneUtils = {
   createMeshesFromInstancedMesh: function (instancedMesh) {

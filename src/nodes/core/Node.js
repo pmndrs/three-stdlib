@@ -1,4 +1,4 @@
-import { MathUtils } from '../../../../build/three.module.js'
+import { MathUtils } from 'three'
 
 function Node(type) {
   this.uuid = MathUtils.generateUUID()

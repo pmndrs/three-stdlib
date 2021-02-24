@@ -1,4 +1,4 @@
-import { Matrix4, Vector2 } from '../../../build/three.module.js'
+import { Matrix4, Vector2 } from 'three'
 
 /**
  * References:

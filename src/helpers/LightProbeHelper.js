@@ -1,4 +1,4 @@
-import { Mesh, ShaderMaterial, SphereGeometry } from '../../../build/three.module.js'
+import { Mesh, ShaderMaterial, SphereGeometry } from 'three'
 
 class LightProbeHelper extends Mesh {
   constructor(lightProbe, size) {

@@ -1,4 +1,4 @@
-import { DefaultLoadingManager, FileLoader } from '../../../build/three.module.js'
+import { DefaultLoadingManager, FileLoader } from 'three'
 
 import * as Nodes from '../nodes/Nodes.js'
 

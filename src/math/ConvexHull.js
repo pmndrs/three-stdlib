@@ -1,4 +1,4 @@
-import { Line3, Plane, Triangle, Vector3 } from '../../../build/three.module.js'
+import { Line3, Plane, Triangle, Vector3 } from 'three'
 
 /**
  * Ported from: https://github.com/maurizzzio/quickhull3d/ by Mauricio Poppe (https://github.com/maurizzzio)

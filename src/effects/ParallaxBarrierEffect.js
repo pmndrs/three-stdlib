@@ -9,7 +9,7 @@ import {
   ShaderMaterial,
   StereoCamera,
   WebGLRenderTarget,
-} from '../../../build/three.module.js'
+} from 'three'
 
 const ParallaxBarrierEffect = function (renderer) {
   const _camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1)

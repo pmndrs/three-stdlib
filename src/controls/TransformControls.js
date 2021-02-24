@@ -19,7 +19,7 @@ import {
   SphereGeometry,
   TorusGeometry,
   Vector3,
-} from '../../../build/three.module.js'
+} from 'three'
 
 const TransformControls = function (camera, domElement) {
   if (domElement === undefined) {

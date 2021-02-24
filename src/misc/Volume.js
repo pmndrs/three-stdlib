@@ -1,4 +1,4 @@
-import { Matrix3, Matrix4, Vector3 } from '../../../build/three.module.js'
+import { Matrix3, Matrix4, Vector3 } from 'three'
 import { VolumeSlice } from '../misc/VolumeSlice.js'
 
 /**

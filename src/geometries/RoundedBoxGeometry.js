@@ -1,4 +1,4 @@
-import { BoxGeometry, Vector3 } from '../../../build/three.module.js'
+import { BoxGeometry, Vector3 } from 'three'
 
 const tempNormal = new Vector3()
 function getUv(faceDirVector, normal, uvAxis, projectionAxis, radius, sideLength) {

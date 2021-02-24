@@ -1,4 +1,4 @@
-import { Color, Vector2 } from '../../../../../build/three.module.js'
+import { Color, Vector2 } from 'three'
 
 import { StandardNode } from './StandardNode.js'
 import { PropertyNode } from '../../inputs/PropertyNode.js'

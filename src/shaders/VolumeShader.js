@@ -1,4 +1,4 @@
-import { Vector2, Vector3 } from '../../../build/three.module.js'
+import { Vector2, Vector3 } from 'three'
 
 /**
  * Shaders to render 3D volumes using raycasting.

@@ -1,4 +1,4 @@
-import { Object3D } from '../../../build/three.module.js'
+import { Object3D } from 'three'
 
 import { XRHandPrimitiveModel } from './XRHandPrimitiveModel.js'
 

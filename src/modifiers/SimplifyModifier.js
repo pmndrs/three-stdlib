@@ -1,4 +1,4 @@
-import { BufferGeometry, Float32BufferAttribute, Vector3 } from '../../../build/three.module.js'
+import { BufferGeometry, Float32BufferAttribute, Vector3 } from 'three'
 import { BufferGeometryUtils } from '../utils/BufferGeometryUtils.js'
 
 /**

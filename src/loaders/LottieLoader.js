@@ -1,4 +1,4 @@
-import { FileLoader, Loader, CanvasTexture, NearestFilter } from '../../../build/three.module.js'
+import { FileLoader, Loader, CanvasTexture, NearestFilter } from 'three'
 
 class LottieLoader extends Loader {
   setQuality(value) {

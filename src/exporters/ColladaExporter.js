@@ -1,4 +1,4 @@
-import { Color, DoubleSide, Matrix4, MeshBasicMaterial } from '../../../build/three.module.js'
+import { Color, DoubleSide, Matrix4, MeshBasicMaterial } from 'three'
 
 /**
  * https://github.com/gkjohnson/collada-exporter-js

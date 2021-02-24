@@ -64,7 +64,7 @@ import {
   DstColorFactor,
   OneMinusDstColorFactor,
   SrcAlphaSaturateFactor,
-} from '../../../../build/three.module.js'
+} from 'three'
 
 class WebGPURenderPipelines {
   constructor(renderer, properties, device, glslang, sampleCount, nodes) {

@@ -1,4 +1,4 @@
-import { MathUtils, Mesh } from '../../../build/three.module.js'
+import { MathUtils, Mesh } from 'three'
 
 var MorphBlendMesh = function (geometry, material) {
   Mesh.call(this, geometry, material)

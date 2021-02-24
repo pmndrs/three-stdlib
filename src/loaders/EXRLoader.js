@@ -11,7 +11,7 @@ import {
   RGBEFormat,
   RGBFormat,
   UnsignedByteType,
-} from '../../../build/three.module.js'
+} from 'three'
 import * as fflate from '../libs/fflate.module.min.js'
 
 /**

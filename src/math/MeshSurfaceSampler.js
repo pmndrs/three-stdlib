@@ -1,4 +1,4 @@
-import { Triangle, Vector3 } from '../../../build/three.module.js'
+import { Triangle, Vector3 } from 'three'
 
 /**
  * Utility class for sampling weighted random points on the surface of a mesh.

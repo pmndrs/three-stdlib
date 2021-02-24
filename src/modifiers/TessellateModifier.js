@@ -1,4 +1,4 @@
-import { BufferGeometry, Color, Float32BufferAttribute, Vector2, Vector3 } from '../../../build/three.module.js'
+import { BufferGeometry, Color, Float32BufferAttribute, Vector2, Vector3 } from 'three'
 
 /**
  * Break faces with edges longer than maxEdgeLength

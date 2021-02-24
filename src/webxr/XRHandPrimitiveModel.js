@@ -1,4 +1,4 @@
-import { SphereGeometry, BoxGeometry, MeshStandardMaterial, Mesh, Group } from '../../../build/three.module.js'
+import { SphereGeometry, BoxGeometry, MeshStandardMaterial, Mesh, Group } from 'three'
 
 class XRHandPrimitiveModel {
   constructor(handModel, controller, path, handedness, options) {

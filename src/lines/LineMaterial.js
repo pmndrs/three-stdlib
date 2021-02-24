@@ -1,4 +1,4 @@
-import { ShaderLib, ShaderMaterial, UniformsLib, UniformsUtils, Vector2 } from '../../../build/three.module.js'
+import { ShaderLib, ShaderMaterial, UniformsLib, UniformsUtils, Vector2 } from 'three'
 
 /**
  * parameters = {

@@ -1,4 +1,4 @@
-import { BufferAttribute, BufferGeometry, Color, ImmediateRenderObject, NoColors } from '../../../build/three.module.js'
+import { BufferAttribute, BufferGeometry, Color, ImmediateRenderObject, NoColors } from 'three'
 
 /**
  * Port of http://webglsamples.org/blob/blob.html

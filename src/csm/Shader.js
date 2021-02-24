@@ -1,4 +1,4 @@
-import { ShaderChunk } from '../../../build/three.module.js'
+import { ShaderChunk } from 'three'
 
 export default {
   lights_fragment_begin: /* glsl */ `

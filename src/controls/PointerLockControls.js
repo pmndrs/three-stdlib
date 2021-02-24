@@ -1,4 +1,4 @@
-import { Euler, EventDispatcher, Vector3 } from '../../../build/three.module.js'
+import { Euler, EventDispatcher, Vector3 } from 'three'
 
 class PointerLockControls extends EventDispatcher {
   constructor(camera, domElement) {

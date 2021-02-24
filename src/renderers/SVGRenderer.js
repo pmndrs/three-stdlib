@@ -1,4 +1,4 @@
-import { Box2, Camera, Color, Matrix3, Matrix4, Object3D, Vector3 } from '../../../build/three.module.js'
+import { Box2, Camera, Color, Matrix3, Matrix4, Object3D, Vector3 } from 'three'
 import { Projector } from '../renderers/Projector.js'
 import { RenderableFace } from '../renderers/Projector.js'
 import { RenderableLine } from '../renderers/Projector.js'

@@ -1,4 +1,4 @@
-import { FileLoader, Loader } from '../../../build/three.module.js'
+import { FileLoader, Loader } from 'three'
 import { opentype } from '../libs/opentype.module.min.js'
 
 /**

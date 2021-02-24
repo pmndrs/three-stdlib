@@ -1,4 +1,4 @@
-import { StereoCamera, Vector2 } from '../../../build/three.module.js'
+import { StereoCamera, Vector2 } from 'three'
 
 const StereoEffect = function (renderer) {
   const _stereo = new StereoCamera()

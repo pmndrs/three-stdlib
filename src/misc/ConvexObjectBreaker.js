@@ -1,4 +1,4 @@
-import { Line3, Mesh, Plane, Vector3 } from '../../../build/three.module.js'
+import { Line3, Mesh, Plane, Vector3 } from 'three'
 import { ConvexGeometry } from '../geometries/ConvexGeometry.js'
 
 /**

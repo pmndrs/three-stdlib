@@ -1,4 +1,4 @@
-import { EventDispatcher, MOUSE, Quaternion, Vector2, Vector3 } from '../../../build/three.module.js'
+import { EventDispatcher, MOUSE, Quaternion, Vector2, Vector3 } from 'three'
 
 class TrackballControls extends EventDispatcher {
   constructor(object, domElement) {

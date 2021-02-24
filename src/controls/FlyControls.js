@@ -1,4 +1,4 @@
-import { EventDispatcher, Quaternion, Vector3 } from '../../../build/three.module.js'
+import { EventDispatcher, Quaternion, Vector3 } from 'three'
 
 class FlyControls extends EventDispatcher {
   constructor(object, domElement) {

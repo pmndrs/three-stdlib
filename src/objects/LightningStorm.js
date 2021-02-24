@@ -1,4 +1,4 @@
-import { MathUtils, Mesh, MeshBasicMaterial, Object3D } from '../../../build/three.module.js'
+import { MathUtils, Mesh, MeshBasicMaterial, Object3D } from 'three'
 import { LightningStrike } from '../geometries/LightningStrike.js'
 
 /**

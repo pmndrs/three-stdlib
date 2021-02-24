@@ -20,7 +20,7 @@ import {
   FileLoader,
   LinearEncoding,
   sRGBEncoding,
-} from '../../../build/three.module.js'
+} from 'three'
 
 import { BasisTextureLoader } from './BasisTextureLoader.js'
 import { ZSTDDecoder } from '../libs/zstddec.module.js'

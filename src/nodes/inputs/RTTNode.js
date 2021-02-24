@@ -1,4 +1,4 @@
-import { Mesh, OrthographicCamera, PlaneGeometry, Scene, WebGLRenderTarget } from '../../../../build/three.module.js'
+import { Mesh, OrthographicCamera, PlaneGeometry, Scene, WebGLRenderTarget } from 'three'
 
 import { NodeBuilder } from '../core/NodeBuilder.js'
 import { NodeMaterial } from '../materials/NodeMaterial.js'

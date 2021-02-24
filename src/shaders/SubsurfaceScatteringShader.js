@@ -1,4 +1,4 @@
-import { Color, ShaderChunk, ShaderLib, UniformsUtils } from '../../../build/three.module.js'
+import { Color, ShaderChunk, ShaderLib, UniformsUtils } from 'three'
 
 /**
  * ------------------------------------------------------------------------------------------

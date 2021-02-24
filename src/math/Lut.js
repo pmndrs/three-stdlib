@@ -1,4 +1,4 @@
-import { Color } from '../../../build/three.module.js'
+import { Color } from 'three'
 
 var Lut = function (colormap, numberofcolors) {
   this.lut = []

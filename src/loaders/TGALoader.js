@@ -1,4 +1,4 @@
-import { FileLoader, Loader, Texture } from '../../../build/three.module.js'
+import { FileLoader, Loader, Texture } from 'three'
 
 var TGALoader = function (manager) {
   Loader.call(this, manager)

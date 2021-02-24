@@ -1,4 +1,4 @@
-import { AnimationClip, AnimationMixer, Mesh } from '../../../build/three.module.js'
+import { AnimationClip, AnimationMixer, Mesh } from 'three'
 
 var MorphAnimMesh = function (geometry, material) {
   Mesh.call(this, geometry, material)

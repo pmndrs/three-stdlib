@@ -1,4 +1,4 @@
-import { Box3, Line3, Plane, Sphere, Triangle, Vector3 } from '../../../build/three.module.js'
+import { Box3, Line3, Plane, Sphere, Triangle, Vector3 } from 'three'
 import { Capsule } from '../math/Capsule.js'
 
 var Octree = (function () {

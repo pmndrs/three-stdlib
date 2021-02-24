@@ -10,7 +10,7 @@
  * vertex data for each frame (sequence of float32)
  */
 
-import { AnimationClip, BufferAttribute, FileLoader, Loader, NumberKeyframeTrack } from '../../../build/three.module.js'
+import { AnimationClip, BufferAttribute, FileLoader, Loader, NumberKeyframeTrack } from 'three'
 
 var MDDLoader = function (manager) {
   Loader.call(this, manager)

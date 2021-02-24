@@ -1,4 +1,4 @@
-import { Matrix4, Vector2 } from '../../../build/three.module.js'
+import { Matrix4, Vector2 } from 'three'
 /**
  * References:
  * https://lettier.github.io/3d-game-shaders-for-beginners/screen-space-reflection.html

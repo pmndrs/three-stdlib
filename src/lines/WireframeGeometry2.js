@@ -1,4 +1,4 @@
-import { WireframeGeometry } from '../../../build/three.module.js'
+import { WireframeGeometry } from 'three'
 import { LineSegmentsGeometry } from '../lines/LineSegmentsGeometry.js'
 
 var WireframeGeometry2 = function (geometry) {

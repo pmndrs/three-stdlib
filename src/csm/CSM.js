@@ -6,7 +6,7 @@ import {
   ShaderChunk,
   Matrix4,
   Box3,
-} from '../../../build/three.module.js'
+} from 'three'
 import Frustum from './Frustum.js'
 import Shader from './Shader.js'
 

@@ -7,7 +7,7 @@ import {
   Mesh,
   Vector3,
   Vector4,
-} from '../../../build/three.module.js'
+} from 'three'
 import { LineSegmentsGeometry } from '../lines/LineSegmentsGeometry.js'
 import { LineMaterial } from '../lines/LineMaterial.js'
 

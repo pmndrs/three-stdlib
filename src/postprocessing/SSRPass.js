@@ -16,7 +16,7 @@ import {
   UnsignedShortType,
   WebGLRenderTarget,
   HalfFloatType,
-} from '../../../build/three.module.js'
+} from 'three'
 import { Pass } from '../postprocessing/Pass.js'
 import { SSRShader } from '../shaders/SSRShader.js'
 import { SSRBlurShader } from '../shaders/SSRShader.js'

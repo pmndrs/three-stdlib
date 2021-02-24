@@ -1,4 +1,4 @@
-import { DirectionalLight, Group, LightProbe, WebGLCubeRenderTarget } from '../../../build/three.module.js'
+import { DirectionalLight, Group, LightProbe, WebGLCubeRenderTarget } from 'three'
 
 class SessionLightProbe {
   constructor(xrLight, renderer, lightProbe, environmentEstimation, estimationStartCallback) {

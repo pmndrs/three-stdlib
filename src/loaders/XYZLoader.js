@@ -1,4 +1,4 @@
-import { BufferGeometry, FileLoader, Float32BufferAttribute, Loader } from '../../../build/three.module.js'
+import { BufferGeometry, FileLoader, Float32BufferAttribute, Loader } from 'three'
 
 class XYZLoader extends Loader {
   load(url, onLoad, onProgress, onError) {

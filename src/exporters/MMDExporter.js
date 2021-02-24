@@ -1,4 +1,4 @@
-import { Matrix4, Quaternion, Vector3 } from '../../../build/three.module.js'
+import { Matrix4, Quaternion, Vector3 } from 'three'
 import { MMDParser } from '../libs/mmdparser.module.js'
 
 /**

@@ -1,4 +1,4 @@
-import { OrthographicCamera, PlaneGeometry, Mesh } from '../../../build/three.module.js'
+import { OrthographicCamera, PlaneGeometry, Mesh } from 'three'
 
 function Pass() {
   // if set to true, the pass is processed by the composer

@@ -1,4 +1,4 @@
-import { BufferGeometry, FileLoader, Float32BufferAttribute, Loader, LoaderUtils } from '../../../build/three.module.js'
+import { BufferGeometry, FileLoader, Float32BufferAttribute, Loader, LoaderUtils } from 'three'
 
 /**
  * Description: A THREE loader for PLY ASCII files (known as the Polygon

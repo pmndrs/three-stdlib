@@ -1,4 +1,4 @@
-import { MathUtils, Spherical, Vector3 } from '../../../build/three.module.js'
+import { MathUtils, Spherical, Vector3 } from 'three'
 
 const FirstPersonControls = function (object, domElement) {
   if (domElement === undefined) {

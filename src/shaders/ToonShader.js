@@ -1,4 +1,4 @@
-import { Color, Vector3 } from '../../../build/three.module.js'
+import { Color, Vector3 } from 'three'
 
 /**
  * Currently contains:

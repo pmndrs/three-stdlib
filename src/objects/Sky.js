@@ -1,4 +1,4 @@
-import { BackSide, BoxGeometry, Mesh, ShaderMaterial, UniformsUtils, Vector3 } from '../../../build/three.module.js'
+import { BackSide, BoxGeometry, Mesh, ShaderMaterial, UniformsUtils, Vector3 } from 'three'
 
 /**
  * Based on "A Practical Analytic Model for Daylight"

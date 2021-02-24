@@ -1,4 +1,4 @@
-import { Matrix4, Mesh, MeshBasicMaterial } from '../../../build/three.module.js'
+import { Matrix4, Mesh, MeshBasicMaterial } from 'three'
 
 /**
  * A shadow Mesh that follows a shadow-casting Mesh in the scene, but is confined to a single plane.

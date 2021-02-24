@@ -1,4 +1,4 @@
-import { EventDispatcher, Matrix4, Plane, Raycaster, Vector2, Vector3 } from '../../../build/three.module.js'
+import { EventDispatcher, Matrix4, Plane, Raycaster, Vector2, Vector3 } from 'three'
 
 class DragControls extends EventDispatcher {
   constructor(_objects, _camera, _domElement) {
