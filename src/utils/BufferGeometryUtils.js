@@ -394,7 +394,7 @@ class BufferGeometryUtils {
 
         for (var k = 0; k < itemSize; k++) {
           // double tilde truncates the decimal value
-          hash += `${~~(attribute[getters[k]](index) * shiftMultiplier)}`
+          hash += `${~~(attribute[getters[k]](index) * shiftMultiplier)},`
         }
       }
 
