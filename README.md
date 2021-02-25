@@ -10,4 +10,4 @@ Our main goals are:
 
 But most importantly, allowing the people that use and rely on these primitives to hold a little stake, and to distribute the weight of maintaining it. Jsm/examples were always considered as something that you copy/paste into your project and adapt to your needs. But that is not how people use it.
 
-We invite each and everyone of you to give jsm/examples the care it deserves!
+Let's give jsm/examples the care it deserves!
