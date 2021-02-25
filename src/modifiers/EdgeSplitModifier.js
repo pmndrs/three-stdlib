@@ -1,5 +1,5 @@
 import { BufferAttribute, BufferGeometry, Vector3 } from 'three'
-import { BufferGeometryUtils } from '../utils/BufferGeometryUtils.js'
+import * as BufferGeometryUtils from '../utils/BufferGeometryUtils.js'
 
 class EdgeSplitModifier {
   constructor() {

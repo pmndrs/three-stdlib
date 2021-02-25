@@ -1,5 +1,5 @@
 import { Vector4 } from 'three'
-import { NURBSUtils } from '../curves/NURBSUtils.js'
+import * as NURBSUtils from '../curves/NURBSUtils.js'
 
 /**
  * NURBS surface object
