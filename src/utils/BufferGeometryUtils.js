@@ -10,20 +10,23 @@ import {
   Vector3,
 } from 'three'
 
-var BufferGeometryUtils = {
-  computeTangents: function (geometry) {
+class BufferGeometryUtils {
+  constructor() {
+    super()
+  }
+  computeTangents(geometry) {
     geometry.computeTangents()
     console.warn(
       'THREE.BufferGeometryUtils: .computeTangents() has been removed. Use BufferGeometry.computeTangents() instead.',
     )
-  },
+  }
 
   /**
    * @param  {Array<BufferGeometry>} geometries
    * @param  {Boolean} useGroups
    * @return {BufferGeometry}
    */
-  mergeBufferGeometries: function (geometries, useGroups) {
+  mergeBufferGeometries(geometries, useGroups) {
     var isIndexed = geometries[0].index !== null
 
     var attributesUsed = new Set(Object.keys(geometries[0].attributes))
@@ -207,13 +210,13 @@ var BufferGeometryUtils = {
     }
 
     return mergedGeometry
-  },
+  }
 
   /**
    * @param {Array<BufferAttribute>} attributes
    * @return {BufferAttribute}
    */
-  mergeBufferAttributes: function (attributes) {
+  mergeBufferAttributes(attributes) {
     var TypedArray
     var itemSize
     var normalized
@@ -266,13 +269,13 @@ var BufferGeometryUtils = {
     }
 
     return new BufferAttribute(array, itemSize, normalized)
-  },
+  }
 
   /**
    * @param {Array<BufferAttribute>} attributes
    * @return {Array<InterleavedBufferAttribute>}
    */
-  interleaveAttributes: function (attributes) {
+  interleaveAttributes(attributes) {
     // Interleaves the provided attributes into an InterleavedBuffer and returns
     // a set of InterleavedBufferAttributes for each attribute
     var TypedArray
@@ -319,13 +322,13 @@ var BufferGeometryUtils = {
     }
 
     return res
-  },
+  }
 
   /**
    * @param {Array<BufferGeometry>} geometry
    * @return {number}
    */
-  estimateBytesUsed: function (geometry) {
+  estimateBytesUsed(geometry) {
     // Return the estimated memory used by this geometry in bytes
     // Calculate using itemSize, count, and BYTES_PER_ELEMENT to account
     // for InterleavedBufferAttributes.
@@ -338,14 +341,14 @@ var BufferGeometryUtils = {
     var indices = geometry.getIndex()
     mem += indices ? indices.count * indices.itemSize * indices.array.BYTES_PER_ELEMENT : 0
     return mem
-  },
+  }
 
   /**
    * @param {BufferGeometry} geometry
    * @param {number} tolerance
    * @return {BufferGeometry>}
    */
-  mergeVertices: function (geometry, tolerance = 1e-4) {
+  mergeVertices(geometry, tolerance = 1e-4) {
     tolerance = Math.max(tolerance, Number.EPSILON)
 
     // Generate an index buffer if the geometry doesn't have one, or optimize it
@@ -392,7 +395,7 @@ var BufferGeometryUtils = {
 
         for (var k = 0; k < itemSize; k++) {
           // double tilde truncates the decimal value
-          hash += `${~~(attribute[getters[k]](index) * shiftMultiplier)},`
+          hash += `${~~(attribute[getters[k]](index) * shiftMultiplier)}`
         }
       }
 
@@ -457,14 +460,14 @@ var BufferGeometryUtils = {
     result.setIndex(newIndices)
 
     return result
-  },
+  }
 
   /**
    * @param {BufferGeometry} geometry
    * @param {number} drawMode
    * @return {BufferGeometry>}
    */
-  toTrianglesDrawMode: function (geometry, drawMode) {
+  toTrianglesDrawMode(geometry, drawMode) {
     if (drawMode === TrianglesDrawMode) {
       console.warn('THREE.BufferGeometryUtils.toTrianglesDrawMode(): Geometry already defined as triangles.')
       return geometry
@@ -541,7 +544,7 @@ var BufferGeometryUtils = {
       console.error('THREE.BufferGeometryUtils.toTrianglesDrawMode(): Unknown draw mode:', drawMode)
       return geometry
     }
-  },
+  }
 
   /**
    * Calculates the morphed attributes of a morphed/skinned BufferGeometry.
@@ -549,7 +552,7 @@ var BufferGeometryUtils = {
    * @param {Mesh | Line | Points} object An instance of Mesh, Line or Points.
    * @return {Object} An Object with original position/normal attributes and morphed ones.
    */
-  computeMorphedAttributes: function (object) {
+  computeMorphedAttributes(object) {
     if (object.geometry.isBufferGeometry !== true) {
       console.error('THREE.BufferGeometryUtils: Geometry is not of type BufferGeometry.')
       return null
@@ -813,7 +816,7 @@ var BufferGeometryUtils = {
       morphedPositionAttribute: morphedPositionAttribute,
       morphedNormalAttribute: morphedNormalAttribute,
     }
-  },
+  }
 }
 
 export { BufferGeometryUtils }
