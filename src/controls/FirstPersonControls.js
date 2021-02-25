@@ -83,7 +83,6 @@ class FirstPersonControls extends EventDispatcher {
       }
 
       event.preventDefault()
-      event.stopPropagation()
 
       if (this.activeLook) {
         switch (event.button) {
@@ -101,7 +100,6 @@ class FirstPersonControls extends EventDispatcher {
 
     this.onMouseUp = function (event) {
       event.preventDefault()
-      event.stopPropagation()
 
       if (this.activeLook) {
         switch (event.button) {

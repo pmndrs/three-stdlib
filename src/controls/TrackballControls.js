@@ -384,7 +384,6 @@ class TrackballControls extends EventDispatcher {
 
     function onMouseDown(event) {
       event.preventDefault()
-      event.stopPropagation()
 
       if (_state === STATE.NONE) {
         switch (event.button) {
@@ -428,7 +427,6 @@ class TrackballControls extends EventDispatcher {
       if (scope.enabled === false) return
 
       event.preventDefault()
-      event.stopPropagation()
 
       const state = _keyState !== STATE.NONE ? _keyState : _state
 
@@ -446,7 +444,6 @@ class TrackballControls extends EventDispatcher {
       if (scope.enabled === false) return
 
       event.preventDefault()
-      event.stopPropagation()
 
       _state = STATE.NONE
 
@@ -462,7 +459,6 @@ class TrackballControls extends EventDispatcher {
       if (scope.noZoom === true) return
 
       event.preventDefault()
-      event.stopPropagation()
 
       switch (event.deltaMode) {
         case 2:
@@ -518,7 +514,6 @@ class TrackballControls extends EventDispatcher {
       if (scope.enabled === false) return
 
       event.preventDefault()
-      event.stopPropagation()
 
       switch (event.touches.length) {
         case 1:

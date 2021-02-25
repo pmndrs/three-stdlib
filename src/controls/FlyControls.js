@@ -171,7 +171,6 @@ class FlyControls extends EventDispatcher {
       }
 
       event.preventDefault()
-      event.stopPropagation()
 
       if (this.dragToLook) {
         this.mouseStatus++
@@ -204,7 +203,6 @@ class FlyControls extends EventDispatcher {
 
     this.mouseup = function (event) {
       event.preventDefault()
-      event.stopPropagation()
 
       if (this.dragToLook) {
         this.mouseStatus--

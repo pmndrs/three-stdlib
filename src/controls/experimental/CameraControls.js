@@ -1,12 +1,4 @@
-import {
-  EventDispatcher,
-  MOUSE,
-  Quaternion,
-  Spherical,
-  TOUCH,
-  Vector2,
-  Vector3,
-} from 'three'
+import { EventDispatcher, MOUSE, Quaternion, Spherical, TOUCH, Vector2, Vector3 } from 'three'
 
 class CameraControls extends EventDispatcher {
   constructor(object, domElement) {
@@ -784,7 +776,6 @@ class CameraControls extends EventDispatcher {
         return
 
       event.preventDefault()
-      event.stopPropagation()
 
       scope.dispatchEvent(startEvent)
 
@@ -870,7 +861,6 @@ class CameraControls extends EventDispatcher {
       if (scope.enabled === false) return
 
       event.preventDefault()
-      event.stopPropagation()
 
       switch (state) {
         case STATE.TOUCH_ROTATE:

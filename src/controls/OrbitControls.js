@@ -739,7 +739,6 @@ class OrbitControls extends EventDispatcher {
         return
 
       event.preventDefault()
-      event.stopPropagation()
 
       scope.dispatchEvent(startEvent)
 
@@ -812,7 +811,6 @@ class OrbitControls extends EventDispatcher {
       if (scope.enabled === false) return
 
       event.preventDefault() // prevent scrolling
-      event.stopPropagation()
 
       switch (state) {
         case STATE.TOUCH_ROTATE:
