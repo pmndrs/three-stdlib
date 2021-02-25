@@ -11,9 +11,8 @@ import {
 } from 'three'
 
 class BufferGeometryUtils {
-  constructor() {
-    super()
-  }
+  constructor() {}
+
   computeTangents(geometry) {
     geometry.computeTangents()
     console.warn(

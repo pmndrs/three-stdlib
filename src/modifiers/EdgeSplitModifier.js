@@ -3,7 +3,6 @@ import { BufferGeometryUtils } from '../utils/BufferGeometryUtils.js'
 
 class EdgeSplitModifier {
   constructor() {
-    super()
     var A = new Vector3()
     var B = new Vector3()
     var C = new Vector3()
