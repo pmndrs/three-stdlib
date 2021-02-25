@@ -4551,6 +4551,11 @@ terser@^4.1.2, terser@^4.7.0:
     source-map "~0.6.1"
     source-map-support "~0.5.12"
 
+three@^0.126.0:
+  version "0.126.0"
+  resolved "https://registry.yarnpkg.com/three/-/three-0.126.0.tgz#924818341cd4441ef247e3cbf236f6160b90a216"
+  integrity sha512-/MecvboUefStCkUfXLImoJxthN+FoLPcEP7pz1r1Dd9i8BPGGuj+S1sOPRvW4Z+ViZjP2oWWm1inNC/MT52ybA==
+
 through2@^0.6.3:
   version "0.6.5"
   resolved "https://registry.yarnpkg.com/through2/-/through2-0.6.5.tgz#41ab9c67b29d57209071410e1d7a7a968cd3ad48"
