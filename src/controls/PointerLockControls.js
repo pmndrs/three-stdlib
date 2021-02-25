@@ -2,6 +2,8 @@ import { Euler, EventDispatcher, Vector3 } from 'three'
 
 class PointerLockControls extends EventDispatcher {
   constructor(camera, domElement) {
+    super()
+
     if (domElement === undefined) {
       console.warn('THREE.PointerLockControls: The second parameter "domElement" is now mandatory.')
       domElement = document.body

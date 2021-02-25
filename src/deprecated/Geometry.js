@@ -18,45 +18,43 @@ const _m1 = new Matrix4()
 const _obj = new Object3D()
 const _offset = new Vector3()
 
-function Geometry() {
-  this.uuid = MathUtils.generateUUID()
+export class Geometry extends EventDispatcher {
+  constructor() {
+    super()
+    this.isGeometry = true
+    this.uuid = MathUtils.generateUUID()
 
-  this.name = ''
-  this.type = 'Geometry'
+    this.name = ''
+    this.type = 'Geometry'
 
-  this.vertices = []
-  this.colors = []
-  this.faces = []
-  this.faceVertexUvs = [[]]
+    this.vertices = []
+    this.colors = []
+    this.faces = []
+    this.faceVertexUvs = [[]]
 
-  this.morphTargets = []
-  this.morphNormals = []
+    this.morphTargets = []
+    this.morphNormals = []
 
-  this.skinWeights = []
-  this.skinIndices = []
+    this.skinWeights = []
+    this.skinIndices = []
 
-  this.lineDistances = []
+    this.lineDistances = []
 
-  this.boundingBox = null
-  this.boundingSphere = null
+    this.boundingBox = null
+    this.boundingSphere = null
 
-  // update flags
+    // update flags
 
-  this.elementsNeedUpdate = false
-  this.verticesNeedUpdate = false
-  this.uvsNeedUpdate = false
-  this.normalsNeedUpdate = false
-  this.colorsNeedUpdate = false
-  this.lineDistancesNeedUpdate = false
-  this.groupsNeedUpdate = false
-}
+    this.elementsNeedUpdate = false
+    this.verticesNeedUpdate = false
+    this.uvsNeedUpdate = false
+    this.normalsNeedUpdate = false
+    this.colorsNeedUpdate = false
+    this.lineDistancesNeedUpdate = false
+    this.groupsNeedUpdate = false
+  }
 
-Geometry.prototype = Object.assign(Object.create(EventDispatcher.prototype), {
-  constructor: Geometry,
-
-  isGeometry: true,
-
-  applyMatrix4: function (matrix) {
+  applyMatrix4(matrix) {
     const normalMatrix = new Matrix3().getNormalMatrix(matrix)
 
     for (let i = 0, il = this.vertices.length; i < il; i++) {
@@ -85,9 +83,9 @@ Geometry.prototype = Object.assign(Object.create(EventDispatcher.prototype), {
     this.normalsNeedUpdate = true
 
     return this
-  },
+  }
 
-  rotateX: function (angle) {
+  rotateX(angle) {
     // rotate geometry around world x-axis
 
     _m1.makeRotationX(angle)
@@ -95,9 +93,9 @@ Geometry.prototype = Object.assign(Object.create(EventDispatcher.prototype), {
     this.applyMatrix4(_m1)
 
     return this
-  },
+  }
 
-  rotateY: function (angle) {
+  rotateY(angle) {
     // rotate geometry around world y-axis
 
     _m1.makeRotationY(angle)
@@ -105,9 +103,9 @@ Geometry.prototype = Object.assign(Object.create(EventDispatcher.prototype), {
     this.applyMatrix4(_m1)
 
     return this
-  },
+  }
 
-  rotateZ: function (angle) {
+  rotateZ(angle) {
     // rotate geometry around world z-axis
 
     _m1.makeRotationZ(angle)
@@ -115,9 +113,9 @@ Geometry.prototype = Object.assign(Object.create(EventDispatcher.prototype), {
     this.applyMatrix4(_m1)
 
     return this
-  },
+  }
 
-  translate: function (x, y, z) {
+  translate(x, y, z) {
     // translate geometry
 
     _m1.makeTranslation(x, y, z)
@@ -125,9 +123,9 @@ Geometry.prototype = Object.assign(Object.create(EventDispatcher.prototype), {
     this.applyMatrix4(_m1)
 
     return this
-  },
+  }
 
-  scale: function (x, y, z) {
+  scale(x, y, z) {
     // scale geometry
 
     _m1.makeScale(x, y, z)
@@ -135,9 +133,9 @@ Geometry.prototype = Object.assign(Object.create(EventDispatcher.prototype), {
     this.applyMatrix4(_m1)
 
     return this
-  },
+  }
 
-  lookAt: function (vector) {
+  lookAt(vector) {
     _obj.lookAt(vector)
 
     _obj.updateMatrix()
@@ -145,9 +143,9 @@ Geometry.prototype = Object.assign(Object.create(EventDispatcher.prototype), {
     this.applyMatrix4(_obj.matrix)
 
     return this
-  },
+  }
 
-  fromBufferGeometry: function (geometry) {
+  fromBufferGeometry(geometry) {
     const scope = this
 
     const index = geometry.index !== null ? geometry.index : undefined
@@ -248,9 +246,9 @@ Geometry.prototype = Object.assign(Object.create(EventDispatcher.prototype), {
     }
 
     return this
-  },
+  }
 
-  center: function () {
+  center() {
     this.computeBoundingBox()
 
     this.boundingBox.getCenter(_offset).negate()
@@ -258,9 +256,9 @@ Geometry.prototype = Object.assign(Object.create(EventDispatcher.prototype), {
     this.translate(_offset.x, _offset.y, _offset.z)
 
     return this
-  },
+  }
 
-  normalize: function () {
+  normalize() {
     this.computeBoundingSphere()
 
     const center = this.boundingSphere.center
@@ -274,9 +272,9 @@ Geometry.prototype = Object.assign(Object.create(EventDispatcher.prototype), {
     this.applyMatrix4(matrix)
 
     return this
-  },
+  }
 
-  computeFaceNormals: function () {
+  computeFaceNormals() {
     const cb = new Vector3(),
       ab = new Vector3()
 
@@ -295,9 +293,9 @@ Geometry.prototype = Object.assign(Object.create(EventDispatcher.prototype), {
 
       face.normal.copy(cb)
     }
-  },
+  }
 
-  computeVertexNormals: function (areaWeighted = true) {
+  computeVertexNormals(areaWeighted = true) {
     const vertices = new Array(this.vertices.length)
 
     for (let v = 0, vl = this.vertices.length; v < vl; v++) {
@@ -361,9 +359,9 @@ Geometry.prototype = Object.assign(Object.create(EventDispatcher.prototype), {
     if (this.faces.length > 0) {
       this.normalsNeedUpdate = true
     }
-  },
+  }
 
-  computeFlatVertexNormals: function () {
+  computeFlatVertexNormals() {
     this.computeFaceNormals()
 
     for (let f = 0, fl = this.faces.length; f < fl; f++) {
@@ -385,9 +383,9 @@ Geometry.prototype = Object.assign(Object.create(EventDispatcher.prototype), {
     if (this.faces.length > 0) {
       this.normalsNeedUpdate = true
     }
-  },
+  }
 
-  computeMorphNormals: function () {
+  computeMorphNormals() {
     // save original normals
     // - create temp variables on first access
     //   otherwise just copy (for faster repeated calls)
@@ -476,25 +474,25 @@ Geometry.prototype = Object.assign(Object.create(EventDispatcher.prototype), {
       face.normal = face.__originalFaceNormal
       face.vertexNormals = face.__originalVertexNormals
     }
-  },
+  }
 
-  computeBoundingBox: function () {
+  computeBoundingBox() {
     if (this.boundingBox === null) {
       this.boundingBox = new Box3()
     }
 
     this.boundingBox.setFromPoints(this.vertices)
-  },
+  }
 
-  computeBoundingSphere: function () {
+  computeBoundingSphere() {
     if (this.boundingSphere === null) {
       this.boundingSphere = new Sphere()
     }
 
     this.boundingSphere.setFromPoints(this.vertices)
-  },
+  }
 
-  merge: function (geometry, matrix, materialIndexOffset = 0) {
+  merge(geometry, matrix, materialIndexOffset = 0) {
     if (!(geometry && geometry.isGeometry)) {
       console.error('THREE.Geometry.merge(): geometry not an instance of THREE.Geometry.', geometry)
       return
@@ -586,9 +584,9 @@ Geometry.prototype = Object.assign(Object.create(EventDispatcher.prototype), {
         this.faceVertexUvs[i].push(uvsCopy)
       }
     }
-  },
+  }
 
-  mergeMesh: function (mesh) {
+  mergeMesh(mesh) {
     if (!(mesh && mesh.isMesh)) {
       console.error('THREE.Geometry.mergeMesh(): mesh not an instance of THREE.Mesh.', mesh)
       return
@@ -597,7 +595,7 @@ Geometry.prototype = Object.assign(Object.create(EventDispatcher.prototype), {
     if (mesh.matrixAutoUpdate) mesh.updateMatrix()
 
     this.merge(mesh.geometry, mesh.matrix)
-  },
+  }
 
   /*
    * Checks for duplicate vertices with hashmap.
@@ -605,7 +603,7 @@ Geometry.prototype = Object.assign(Object.create(EventDispatcher.prototype), {
    * and faces' vertices are updated.
    */
 
-  mergeVertices: function (precisionPoints = 4) {
+  mergeVertices(precisionPoints = 4) {
     const verticesMap = {} // Hashmap for looking up vertices by position coordinates (and making sure they are unique)
     const unique = [],
       changes = []
@@ -664,9 +662,9 @@ Geometry.prototype = Object.assign(Object.create(EventDispatcher.prototype), {
     const diff = this.vertices.length - unique.length
     this.vertices = unique
     return diff
-  },
+  }
 
-  setFromPoints: function (points) {
+  setFromPoints(points) {
     this.vertices = []
 
     for (let i = 0, l = points.length; i < l; i++) {
@@ -675,9 +673,9 @@ Geometry.prototype = Object.assign(Object.create(EventDispatcher.prototype), {
     }
 
     return this
-  },
+  }
 
-  sortFacesByMaterialIndex: function () {
+  sortFacesByMaterialIndex() {
     const faces = this.faces
     const length = faces.length
 
@@ -714,9 +712,9 @@ Geometry.prototype = Object.assign(Object.create(EventDispatcher.prototype), {
 
     if (newUvs1) this.faceVertexUvs[0] = newUvs1
     if (newUvs2) this.faceVertexUvs[1] = newUvs2
-  },
+  }
 
-  toJSON: function () {
+  toJSON() {
     const data = {
       metadata: {
         version: 4.5,
@@ -861,9 +859,9 @@ Geometry.prototype = Object.assign(Object.create(EventDispatcher.prototype), {
     data.data.faces = faces
 
     return data
-  },
+  }
 
-  clone: function () {
+  clone() {
     /*
 		 // Handle primitives
 
@@ -889,9 +887,9 @@ Geometry.prototype = Object.assign(Object.create(EventDispatcher.prototype), {
 		 */
 
     return new Geometry().copy(this)
-  },
+  }
 
-  copy: function (source) {
+  copy(source) {
     // reset
 
     this.vertices = []
@@ -1076,9 +1074,9 @@ Geometry.prototype = Object.assign(Object.create(EventDispatcher.prototype), {
     this.groupsNeedUpdate = source.groupsNeedUpdate
 
     return this
-  },
+  }
 
-  toBufferGeometry: function () {
+  toBufferGeometry() {
     const geometry = new DirectGeometry().fromGeometry(this)
 
     const buffergeometry = new BufferGeometry()
@@ -1151,27 +1149,27 @@ Geometry.prototype = Object.assign(Object.create(EventDispatcher.prototype), {
     }
 
     return buffergeometry
-  },
+  }
 
-  computeTangents: function () {
+  computeTangents() {
     console.error('THREE.Geometry: .computeTangents() has been removed.')
-  },
+  }
 
-  computeLineDistances: function () {
+  computeLineDistances() {
     console.error(
       'THREE.Geometry: .computeLineDistances() has been removed. Use THREE.Line.computeLineDistances() instead.',
     )
-  },
+  }
 
-  applyMatrix: function (matrix) {
+  applyMatrix(matrix) {
     console.warn('THREE.Geometry: .applyMatrix() has been renamed to .applyMatrix4().')
     return this.applyMatrix4(matrix)
-  },
+  }
 
-  dispose: function () {
+  dispose() {
     this.dispatchEvent({ type: 'dispose' })
-  },
-})
+  }
+}
 
 Geometry.createBufferGeometryFromObject = (object) => {
   let buffergeometry = new BufferGeometry()

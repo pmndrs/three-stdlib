@@ -6,6 +6,8 @@ import { Euler, EventDispatcher, MathUtils, Quaternion, Vector3 } from 'three'
 
 class DeviceOrientationControls extends EventDispatcher {
   constructor(object) {
+    super()
+
     const scope = this
     const changeEvent = { type: 'change' }
     const EPS = 0.000001

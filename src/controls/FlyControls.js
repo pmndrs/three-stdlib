@@ -2,6 +2,8 @@ import { EventDispatcher, Quaternion, Vector3 } from 'three'
 
 class FlyControls extends EventDispatcher {
   constructor(object, domElement) {
+    super()
+
     if (domElement === undefined) {
       console.warn('THREE.FlyControls: The second parameter "domElement" is now mandatory.')
       domElement = document

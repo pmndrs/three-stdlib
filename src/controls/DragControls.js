@@ -2,6 +2,8 @@ import { EventDispatcher, Matrix4, Plane, Raycaster, Vector2, Vector3 } from 'th
 
 class DragControls extends EventDispatcher {
   constructor(_objects, _camera, _domElement) {
+    super()
+
     const _plane = new Plane()
     const _raycaster = new Raycaster()
 
