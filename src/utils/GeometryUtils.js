@@ -14,7 +14,7 @@ import { Vector3 } from 'three'
  * @param v2         Corner index +X, +Z.
  * @param v3         Corner index +X, -Z.
  */
-export function hilbert2D(center, size, iterations, v0, v1, v2, v3) {
+const hilbert2D = (center, size, iterations, v0, v1, v2, v3) => {
   // Default Vars
   var center = center !== undefined ? center : new Vector3(0, 0, 0),
     size = size !== undefined ? size : 10,
@@ -37,10 +37,10 @@ export function hilbert2D(center, size, iterations, v0, v1, v2, v3) {
   if (0 <= --iterations) {
     var tmp = []
 
-    Array.prototype.push.apply(tmp, GeometryUtils.hilbert2D(vec[0], half, iterations, v0, v3, v2, v1))
-    Array.prototype.push.apply(tmp, GeometryUtils.hilbert2D(vec[1], half, iterations, v0, v1, v2, v3))
-    Array.prototype.push.apply(tmp, GeometryUtils.hilbert2D(vec[2], half, iterations, v0, v1, v2, v3))
-    Array.prototype.push.apply(tmp, GeometryUtils.hilbert2D(vec[3], half, iterations, v2, v1, v0, v3))
+    Array.prototype.push.apply(tmp, hilbert2D(vec[0], half, iterations, v0, v3, v2, v1))
+    Array.prototype.push.apply(tmp, hilbert2D(vec[1], half, iterations, v0, v1, v2, v3))
+    Array.prototype.push.apply(tmp, hilbert2D(vec[2], half, iterations, v0, v1, v2, v3))
+    Array.prototype.push.apply(tmp, hilbert2D(vec[3], half, iterations, v2, v1, v0, v3))
 
     // Return recursive call
     return tmp
@@ -68,7 +68,7 @@ export function hilbert2D(center, size, iterations, v0, v1, v2, v3) {
  * @param v6         Corner index +X, +Y, +Z.
  * @param v7         Corner index +X, +Y, -Z.
  */
-export function hilbert3D(center, size, iterations, v0, v1, v2, v3, v4, v5, v6, v7) {
+const hilbert3D = (center, size, iterations, v0, v1, v2, v3, v4, v5, v6, v7) => {
   // Default Vars
   var center = center !== undefined ? center : new Vector3(0, 0, 0),
     size = size !== undefined ? size : 10,
@@ -99,14 +99,14 @@ export function hilbert3D(center, size, iterations, v0, v1, v2, v3, v4, v5, v6, 
   if (--iterations >= 0) {
     var tmp = []
 
-    Array.prototype.push.apply(tmp, GeometryUtils.hilbert3D(vec[0], half, iterations, v0, v3, v4, v7, v6, v5, v2, v1))
-    Array.prototype.push.apply(tmp, GeometryUtils.hilbert3D(vec[1], half, iterations, v0, v7, v6, v1, v2, v5, v4, v3))
-    Array.prototype.push.apply(tmp, GeometryUtils.hilbert3D(vec[2], half, iterations, v0, v7, v6, v1, v2, v5, v4, v3))
-    Array.prototype.push.apply(tmp, GeometryUtils.hilbert3D(vec[3], half, iterations, v2, v3, v0, v1, v6, v7, v4, v5))
-    Array.prototype.push.apply(tmp, GeometryUtils.hilbert3D(vec[4], half, iterations, v2, v3, v0, v1, v6, v7, v4, v5))
-    Array.prototype.push.apply(tmp, GeometryUtils.hilbert3D(vec[5], half, iterations, v4, v3, v2, v5, v6, v1, v0, v7))
-    Array.prototype.push.apply(tmp, GeometryUtils.hilbert3D(vec[6], half, iterations, v4, v3, v2, v5, v6, v1, v0, v7))
-    Array.prototype.push.apply(tmp, GeometryUtils.hilbert3D(vec[7], half, iterations, v6, v5, v2, v1, v0, v3, v4, v7))
+    Array.prototype.push.apply(tmp, hilbert3D(vec[0], half, iterations, v0, v3, v4, v7, v6, v5, v2, v1))
+    Array.prototype.push.apply(tmp, hilbert3D(vec[1], half, iterations, v0, v7, v6, v1, v2, v5, v4, v3))
+    Array.prototype.push.apply(tmp, hilbert3D(vec[2], half, iterations, v0, v7, v6, v1, v2, v5, v4, v3))
+    Array.prototype.push.apply(tmp, hilbert3D(vec[3], half, iterations, v2, v3, v0, v1, v6, v7, v4, v5))
+    Array.prototype.push.apply(tmp, hilbert3D(vec[4], half, iterations, v2, v3, v0, v1, v6, v7, v4, v5))
+    Array.prototype.push.apply(tmp, hilbert3D(vec[5], half, iterations, v4, v3, v2, v5, v6, v1, v0, v7))
+    Array.prototype.push.apply(tmp, hilbert3D(vec[6], half, iterations, v4, v3, v2, v5, v6, v1, v0, v7))
+    Array.prototype.push.apply(tmp, hilbert3D(vec[7], half, iterations, v6, v5, v2, v1, v0, v3, v4, v7))
 
     // Return recursive call
     return tmp
@@ -123,7 +123,7 @@ export function hilbert3D(center, size, iterations, v0, v1, v2, v3, v4, v5, v6, 
  *
  * @param size The size of a single gosper island.
  */
-export function gosper(size) {
+const gosper = (size) => {
   size = size !== undefined ? size : 1
 
   function fractalize(config) {
@@ -192,3 +192,5 @@ export function gosper(size) {
 
   return points
 }
+
+export { hilbert2D, hilbert3D, gosper }
