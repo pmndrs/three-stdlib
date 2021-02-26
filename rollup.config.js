@@ -39,4 +39,18 @@ export default [
       resolve({ extensions }),
     ],
   },
+  {
+    input: ['src/**/*.js'],
+    output: { dir: `dist`, format: 'cjs' },
+    external,
+    plugins: [
+      multiInput({
+        transformOutputPath: (output) => path.join(path.dirname(output), path.basename(output, '.js') + '.cjs.js'),
+      }),
+      json(),
+      glslify(),
+      babel(getBabelOptions({ useESModules: false })),
+      resolve({ extensions }),
+    ],
+  },
 ]
