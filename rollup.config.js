@@ -32,6 +32,7 @@ export default [
       json(),
       babel(getBabelOptions({ useESModules: true }, '>1%, not dead, not ie 11, not op_mini all')),
       resolve({ extensions }),
+      typescript(),
     ],
     preserveModules: true,
   },
@@ -58,12 +59,13 @@ export default [
       json(),
       babel(getBabelOptions({ useESModules: false })),
       resolve({ extensions }),
+      typescript(),
     ],
   },
   {
     input: `./src/index.js`,
     output: { file: `dist/index.cjs.js`, format: 'cjs' },
     external,
-    plugins: [json(), babel(getBabelOptions({ useESModules: false })), resolve({ extensions })],
+    plugins: [json(), babel(getBabelOptions({ useESModules: false })), resolve({ extensions }, typescript())],
   },
 ]
