@@ -8,6 +8,6 @@ Our main goals are:
 - Typesafety with simple annotation-like types
 - CI, tests, linting, formatting (prettier)
 
-But most importantly, allowing the people that use and rely on these primitives to hold a little stake, and to distribute the weight of maintaining it. The Threejs project is arguably large in scope, and managing hundreds of extras is not an easy task for just 2-3 maintainers, hence bugs were sometimes left standing, features and extensions were very hard to merge. Jsm was always considered a dumping ground, something that you copy/paste into your project and adapt to your needs. But that is not how we used it, and is not how this magnificient collection of helpers should be treated.
+But most importantly, allowing the people that use and rely on these primitives to hold a little stake, and to distribute the weight of maintaining it. Jsm/examples were always considered as something that you copy/paste into your project and adapt to your needs. But that is not how people use it.
 
-We invite each and everyone of you to give jsm/examples the love and care it deserves! Contact us if you need actual stake, and we will gladly review and accept submissions/PR's.
+Let's give jsm/examples the care it deserves!
