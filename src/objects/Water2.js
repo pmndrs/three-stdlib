@@ -25,7 +25,7 @@ import { Refractor } from '../objects/Refractor.js'
 var Water2 = function (geometry, options) {
   Mesh.call(this, geometry)
 
-  this.type = 'Water'
+  this.type = 'Water2'
 
   var scope = this
 
@@ -39,7 +39,7 @@ var Water2 = function (geometry, options) {
   var flowSpeed = options.flowSpeed || 0.03
   var reflectivity = options.reflectivity || 0.02
   var scale = options.scale || 1
-  var shader = options.shader || Water.WaterShader
+  var shader = options.shader || Water2.WaterShader
   var encoding = options.encoding !== undefined ? options.encoding : LinearEncoding
 
   var textureLoader = new TextureLoader()
@@ -175,10 +175,10 @@ var Water2 = function (geometry, options) {
   }
 }
 
-Water.prototype = Object.create(Mesh.prototype)
-Water.prototype.constructor = Water
+Water2.prototype = Object.create(Mesh.prototype)
+Water2.prototype.constructor = Water2
 
-Water.WaterShader = {
+Water2.WaterShader = {
   uniforms: {
     color: {
       type: 'c',

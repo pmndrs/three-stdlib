@@ -1,4 +1,4 @@
-import { MathUtils, Spherical, Vector3 } from 'three'
+import { MathUtils, Spherical, Vector3, EventDispatcher } from 'three'
 
 class FirstPersonControls extends EventDispatcher {
   constructor(object, domElement) {
