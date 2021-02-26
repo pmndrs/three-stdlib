@@ -20,7 +20,7 @@ import {
 var ReflectorForSSRPass = function (geometry, options) {
   Mesh.call(this, geometry)
 
-  this.type = 'Reflector'
+  this.type = 'ReflectorForSSRPass'
 
   var scope = this
 
@@ -30,7 +30,7 @@ var ReflectorForSSRPass = function (geometry, options) {
   var textureWidth = options.textureWidth || 512
   var textureHeight = options.textureHeight || 512
   var clipBias = options.clipBias || 0
-  var shader = options.shader || Reflector.ReflectorShader
+  var shader = options.shader || ReflectorForSSRPass.ReflectorShader
   var useDepthTexture = options.useDepthTexture
   var yAxis = new Vector3(0, 1, 0)
   var vecTemp0 = new Vector3()
@@ -39,10 +39,10 @@ var ReflectorForSSRPass = function (geometry, options) {
   //
 
   scope.needsUpdate = false
-  scope.maxDistance = Reflector.ReflectorShader.uniforms.maxDistance.value
-  scope.opacity = Reflector.ReflectorShader.uniforms.opacity.value
+  scope.maxDistance = ReflectorForSSRPass.ReflectorShader.uniforms.maxDistance.value
+  scope.opacity = ReflectorForSSRPass.ReflectorShader.uniforms.opacity.value
 
-  scope._isDistanceAttenuation = Reflector.ReflectorShader.defines.isDistanceAttenuation
+  scope._isDistanceAttenuation = ReflectorForSSRPass.ReflectorShader.defines.isDistanceAttenuation
   Object.defineProperty(scope, 'isDistanceAttenuation', {
     get() {
       return scope._isDistanceAttenuation
@@ -55,7 +55,7 @@ var ReflectorForSSRPass = function (geometry, options) {
     },
   })
 
-  scope._isFresnel = Reflector.ReflectorShader.defines.isFresnel
+  scope._isFresnel = ReflectorForSSRPass.ReflectorShader.defines.isFresnel
   Object.defineProperty(scope, 'isFresnel', {
     get() {
       return scope._isFresnel
@@ -109,7 +109,7 @@ var ReflectorForSSRPass = function (geometry, options) {
       {
         useDepthTexture: useDepthTexture,
       },
-      Reflector.ReflectorShader.defines,
+      ReflectorForSSRPass.ReflectorShader.defines,
     ),
     uniforms: UniformsUtils.clone(shader.uniforms),
     fragmentShader: shader.fragmentShader,
@@ -247,11 +247,11 @@ var ReflectorForSSRPass = function (geometry, options) {
   }
 }
 
-Reflector.prototype = Object.create(Mesh.prototype)
-Reflector.prototype.constructor = Reflector
+ReflectorForSSRPass.prototype = Object.create(Mesh.prototype)
+ReflectorForSSRPass.prototype.constructor = ReflectorForSSRPass
 
-Reflector.ReflectorShader = {
-  ///todo: Will conflict with Reflector.js?
+ReflectorForSSRPass.ReflectorShader = {
+  ///todo: Will conflict with ReflectorForSSRPass.js?
 
   defines: {
     isDistanceAttenuation: true,
