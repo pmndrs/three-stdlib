@@ -3,7 +3,7 @@
 ```jsx
 // Export collection
 import * as STDLIB from 'three-stdlib'
-// Flatbunbundle
+// Flatbundle
 import { OrbitControls, ... } from 'three-stdlib'
 // Pick individual objects
 import { OrbitControls } from 'three-stdlib/controls/OrbitControls'
