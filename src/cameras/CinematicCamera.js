@@ -10,7 +10,7 @@ import {
   UniformsUtils,
   WebGLRenderTarget,
 } from 'three'
-import { BokehShader } from '../shaders/BokehShader2.js'
+import { BokehShader2 } from '../shaders/BokehShader2.js'
 import { BokehDepthShader } from '../shaders/BokehShader2.js'
 
 class CinematicCamera extends PerspectiveCamera {
@@ -130,7 +130,7 @@ class CinematicCamera extends PerspectiveCamera {
       this.postprocessing.rtTextureDepth = new WebGLRenderTarget(window.innerWidth, window.innerHeight, pars)
       this.postprocessing.rtTextureColor = new WebGLRenderTarget(window.innerWidth, window.innerHeight, pars)
 
-      const bokeh_shader = BokehShader
+      const bokeh_shader = BokehShader2
 
       this.postprocessing.bokeh_uniforms = UniformsUtils.clone(bokeh_shader.uniforms)
 

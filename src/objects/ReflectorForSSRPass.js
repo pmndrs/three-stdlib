@@ -17,7 +17,7 @@ import {
   NearestFilter,
 } from 'three'
 
-var Reflector = function (geometry, options) {
+var ReflectorForSSRPass = function (geometry, options) {
   Mesh.call(this, geometry)
 
   this.type = 'Reflector'
@@ -317,4 +317,4 @@ Reflector.ReflectorShader = {
 	`,
 }
 
-export { Reflector }
+export { ReflectorForSSRPass }

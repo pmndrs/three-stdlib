@@ -953,7 +953,7 @@ class CameraControls extends EventDispatcher {
 //    Zoom - middle mouse, or mousewheel / touch: two-finger spread or squish
 //    Pan - right mouse, or left mouse + ctrl/meta/shiftKey, or arrow keys / touch: two-finger move
 
-class OrbitControls extends EventDispatcher {
+class OrbitControlsExp extends EventDispatcher {
   constructor(object, domElement) {
     CameraControls.call(this, object, domElement)
 
@@ -971,7 +971,7 @@ class OrbitControls extends EventDispatcher {
 //    Zoom - middle mouse, or mousewheel / touch: two-finger spread or squish
 //    Pan - left mouse, or left right + ctrl/meta/shiftKey, or arrow keys / touch: one-finger move
 
-class MapControls extends EventDispatcher {
+class MapControlsExp extends EventDispatcher {
   constructor(object, domElement) {
     CameraControls.call(this, object, domElement)
 
@@ -989,7 +989,7 @@ class MapControls extends EventDispatcher {
 //    Zoom - middle mouse, or mousewheel / touch: two-finger spread or squish
 //    Pan - right mouse, or left mouse + ctrl/meta/shiftKey, or arrow keys / touch: two-finger move
 
-class TrackballControls extends EventDispatcher {
+class TrackballControlsExp extends EventDispatcher {
   constructor(object, domElement) {
     CameraControls.call(this, object, domElement)
 
@@ -1005,4 +1005,4 @@ class TrackballControls extends EventDispatcher {
   }
 }
 
-export { CameraControls, OrbitControls, MapControls, TrackballControls }
+export { CameraControls, OrbitControlsExp, MapControlsExp, TrackballControlsExp }

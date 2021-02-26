@@ -1,3 +1,14 @@
+    npm install three-stdlib
+
+```jsx
+// Export collection
+import * as STDLIB from 'three-stdlib'
+// Flatbunbundle
+import { OrbitControls, ... } from 'three-stdlib'
+// Pick individual objects
+import { OrbitControls } from 'three-stdlib/controls/OrbitControls'
+```
+
 This is a stand-alone of https://github.com/mrdoob/three.js/tree/dev/examples/jsm
 
 Our main goals are:
@@ -5,6 +16,7 @@ Our main goals are:
 - Real, npm/node conform esm modules with marked dependencies
 - Class based, optimized for tree-shaking, no global pollution, exports instead of collections
 - A build system for esm and cjs
+- Flatbundle
 - Typesafety with simple annotation-like types
 - CI, tests, linting, formatting (prettier)
 

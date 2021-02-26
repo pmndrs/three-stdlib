@@ -22,7 +22,7 @@ import { Refractor } from '../objects/Refractor.js'
  *
  */
 
-var Water = function (geometry, options) {
+var Water2 = function (geometry, options) {
   Mesh.call(this, geometry)
 
   this.type = 'Water'
@@ -326,4 +326,4 @@ Water.WaterShader = {
   ].join('\n'),
 }
 
-export { Water }
+export { Water2 }

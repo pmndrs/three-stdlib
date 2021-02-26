@@ -8,7 +8,7 @@ import { Vector2 } from 'three'
  * Requires #define RINGS and SAMPLES integers
  */
 
-var BokehShader = {
+var BokehShader2 = {
   uniforms: {
     textureWidth: { value: 1.0 },
     textureHeight: { value: 1.0 },
@@ -375,4 +375,4 @@ var BokehDepthShader = {
   ].join('\n'),
 }
 
-export { BokehShader, BokehDepthShader }
+export { BokehShader2, BokehDepthShader }
