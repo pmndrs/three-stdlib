@@ -1,4 +1,4 @@
-import { GPULoadOp } from './constants.js'
+import { GPULoadOp } from './constants'
 import { Color } from 'three'
 
 let _clearAlpha

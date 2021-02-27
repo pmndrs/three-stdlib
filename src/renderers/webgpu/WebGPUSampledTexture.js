@@ -1,5 +1,5 @@
-import WebGPUBinding from './WebGPUBinding.js'
-import { GPUBindingType, GPUTextureViewDimension } from './constants.js'
+import WebGPUBinding from './WebGPUBinding'
+import { GPUBindingType, GPUTextureViewDimension } from './constants'
 
 class WebGPUSampledTexture extends WebGPUBinding {
   constructor(name, texture) {

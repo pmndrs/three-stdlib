@@ -1,7 +1,7 @@
-import { TempNode } from '../core/TempNode.js'
-import { FunctionNode } from '../core/FunctionNode.js'
-import { FloatNode } from '../inputs/FloatNode.js'
-import { PositionNode } from '../accessors/PositionNode.js'
+import { TempNode } from '../core/TempNode'
+import { FunctionNode } from '../core/FunctionNode'
+import { FloatNode } from '../inputs/FloatNode'
+import { PositionNode } from '../accessors/PositionNode'
 
 function CameraNode(scope, camera) {
   TempNode.call(this, 'v3')

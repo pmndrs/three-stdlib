@@ -10,7 +10,7 @@ import {
   Texture,
   UniformsUtils,
 } from 'three'
-import { UnpackDepthRGBAShader } from '../shaders/UnpackDepthRGBAShader.js'
+import { UnpackDepthRGBAShader } from '../shaders/UnpackDepthRGBAShader'
 
 /**
  * This is a helper for visualising a given light's shadow map.

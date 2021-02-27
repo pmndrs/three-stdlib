@@ -1,4 +1,4 @@
-import { InputNode } from '../core/InputNode.js'
+import { InputNode } from '../core/InputNode'
 
 function BoolNode(value) {
   InputNode.call(this, 'b')

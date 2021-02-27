@@ -1,4 +1,4 @@
-import InputNode from '../core/InputNode.js'
+import InputNode from '../core/InputNode'
 
 class ColorNode extends InputNode {
   constructor(value) {

@@ -1,8 +1,8 @@
-import { TempNode } from '../core/TempNode.js'
-import { FloatNode } from '../inputs/FloatNode.js'
-import { TextureCubeUVNode } from './TextureCubeUVNode.js'
-import { ReflectNode } from '../accessors/ReflectNode.js'
-import { NormalNode } from '../accessors/NormalNode.js'
+import { TempNode } from '../core/TempNode'
+import { FloatNode } from '../inputs/FloatNode'
+import { TextureCubeUVNode } from './TextureCubeUVNode'
+import { ReflectNode } from '../accessors/ReflectNode'
+import { NormalNode } from '../accessors/NormalNode'
 
 function TextureCubeNode(value, uv, bias) {
   TempNode.call(this, 'v4')

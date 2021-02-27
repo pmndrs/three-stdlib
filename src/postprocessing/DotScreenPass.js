@@ -1,6 +1,6 @@
 import { ShaderMaterial, UniformsUtils } from 'three'
-import { Pass } from '../postprocessing/Pass.js'
-import { DotScreenShader } from '../shaders/DotScreenShader.js'
+import { Pass } from '../postprocessing/Pass'
+import { DotScreenShader } from '../shaders/DotScreenShader'
 
 var DotScreenPass = function (center, angle, scale) {
   Pass.call(this)

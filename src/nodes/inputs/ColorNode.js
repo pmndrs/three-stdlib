@@ -1,7 +1,7 @@
 import { Color } from 'three'
 
-import { InputNode } from '../core/InputNode.js'
-import { NodeUtils } from '../core/NodeUtils.js'
+import { InputNode } from '../core/InputNode'
+import { NodeUtils } from '../core/NodeUtils'
 
 function ColorNode(color, g, b) {
   InputNode.call(this, 'c')

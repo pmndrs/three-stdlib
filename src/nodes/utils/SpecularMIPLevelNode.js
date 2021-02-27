@@ -1,6 +1,6 @@
-import { TempNode } from '../core/TempNode.js'
-import { FunctionNode } from '../core/FunctionNode.js'
-import { MaxMIPLevelNode } from './MaxMIPLevelNode.js'
+import { TempNode } from '../core/TempNode'
+import { FunctionNode } from '../core/FunctionNode'
+import { MaxMIPLevelNode } from './MaxMIPLevelNode'
 
 function SpecularMIPLevelNode(roughness, texture) {
   TempNode.call(this, 'f')

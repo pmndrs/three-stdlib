@@ -1,5 +1,5 @@
 import { MathUtils, Mesh, MeshBasicMaterial, Object3D } from 'three'
-import { LightningStrike } from '../geometries/LightningStrike.js'
+import { LightningStrike } from '../geometries/LightningStrike'
 
 /**
  * @fileoverview Lightning strike object generator

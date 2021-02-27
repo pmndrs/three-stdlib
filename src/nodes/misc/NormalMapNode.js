@@ -1,11 +1,11 @@
 import { BackSide } from 'three'
 
-import { TempNode } from '../core/TempNode.js'
-import { Vector2Node } from '../inputs/Vector2Node.js'
-import { FunctionNode } from '../core/FunctionNode.js'
-import { UVNode } from '../accessors/UVNode.js'
-import { NormalNode } from '../accessors/NormalNode.js'
-import { PositionNode } from '../accessors/PositionNode.js'
+import { TempNode } from '../core/TempNode'
+import { Vector2Node } from '../inputs/Vector2Node'
+import { FunctionNode } from '../core/FunctionNode'
+import { UVNode } from '../accessors/UVNode'
+import { NormalNode } from '../accessors/NormalNode'
+import { PositionNode } from '../accessors/PositionNode'
 
 function NormalMapNode(value, scale) {
   TempNode.call(this, 'v3')

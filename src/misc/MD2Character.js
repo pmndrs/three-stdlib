@@ -8,7 +8,7 @@ import {
   UVMapping,
   sRGBEncoding,
 } from 'three'
-import { MD2Loader } from '../loaders/MD2Loader.js'
+import { MD2Loader } from '../loaders/MD2Loader'
 
 var MD2Character = function () {
   var scope = this

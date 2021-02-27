@@ -1,8 +1,8 @@
 import { Mesh, OrthographicCamera, PlaneGeometry, Scene, WebGLRenderTarget } from 'three'
 
-import { NodeBuilder } from '../core/NodeBuilder.js'
-import { NodeMaterial } from '../materials/NodeMaterial.js'
-import { TextureNode } from './TextureNode.js'
+import { NodeBuilder } from '../core/NodeBuilder'
+import { NodeMaterial } from '../materials/NodeMaterial'
+import { TextureNode } from './TextureNode'
 
 function RTTNode(width, height, input, options) {
   options = options || {}

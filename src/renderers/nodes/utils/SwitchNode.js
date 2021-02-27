@@ -1,4 +1,4 @@
-import Node from '../core/Node.js'
+import Node from '../core/Node'
 
 class SwitchNode extends Node {
   constructor(node, components = 'x') {

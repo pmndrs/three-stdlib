@@ -1,6 +1,6 @@
 import { Mesh, MeshBasicMaterial, Object3D, Quaternion, SphereGeometry } from 'three'
 
-import { GLTFLoader } from '../loaders/GLTFLoader.js'
+import { GLTFLoader } from '../loaders/GLTFLoader'
 
 import {
   Constants as MotionControllerConstants,

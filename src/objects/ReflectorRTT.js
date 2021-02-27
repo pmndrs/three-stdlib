@@ -1,4 +1,4 @@
-import { Reflector } from '../objects/Reflector.js'
+import { Reflector } from '../objects/Reflector'
 
 var ReflectorRTT = function (geometry, options) {
   Reflector.call(this, geometry, options)

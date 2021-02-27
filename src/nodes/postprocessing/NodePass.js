@@ -1,8 +1,8 @@
 import { MathUtils } from 'three'
 
-import { ShaderPass } from '../../postprocessing/ShaderPass.js'
-import { NodeMaterial } from '../materials/NodeMaterial.js'
-import { ScreenNode } from '../inputs/ScreenNode.js'
+import { ShaderPass } from '../../postprocessing/ShaderPass'
+import { NodeMaterial } from '../materials/NodeMaterial'
+import { ScreenNode } from '../inputs/ScreenNode'
 
 function NodePass() {
   ShaderPass.call(this)

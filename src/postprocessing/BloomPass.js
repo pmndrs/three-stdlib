@@ -7,9 +7,9 @@ import {
   Vector2,
   WebGLRenderTarget,
 } from 'three'
-import { Pass } from '../postprocessing/Pass.js'
-import { CopyShader } from '../shaders/CopyShader.js'
-import { ConvolutionShader } from '../shaders/ConvolutionShader.js'
+import { Pass } from '../postprocessing/Pass'
+import { CopyShader } from '../shaders/CopyShader'
+import { ConvolutionShader } from '../shaders/ConvolutionShader'
 
 var BloomPass = function (strength, kernelSize, sigma, resolution) {
   Pass.call(this)

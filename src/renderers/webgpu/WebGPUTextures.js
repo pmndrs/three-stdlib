@@ -1,4 +1,4 @@
-import { GPUTextureFormat, GPUAddressMode, GPUFilterMode, GPUTextureDimension } from './constants.js'
+import { GPUTextureFormat, GPUAddressMode, GPUFilterMode, GPUTextureDimension } from './constants'
 import {
   CubeTexture,
   Texture,
@@ -20,7 +20,7 @@ import {
   HalfFloatType,
   sRGBEncoding,
 } from 'three'
-import WebGPUTextureUtils from './WebGPUTextureUtils.js'
+import WebGPUTextureUtils from './WebGPUTextureUtils'
 
 class WebGPUTextures {
   constructor(device, properties, info, glslang) {

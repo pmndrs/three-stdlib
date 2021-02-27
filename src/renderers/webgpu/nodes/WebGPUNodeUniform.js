@@ -6,7 +6,7 @@ import {
   ColorUniform,
   Matrix3Uniform,
   Matrix4Uniform,
-} from '../WebGPUUniform.js'
+} from '../WebGPUUniform'
 
 class FloatNodeUniform extends FloatUniform {
   constructor(nodeUniform) {

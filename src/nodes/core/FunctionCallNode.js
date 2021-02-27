@@ -1,4 +1,4 @@
-import { TempNode } from './TempNode.js'
+import { TempNode } from './TempNode'
 
 function FunctionCallNode(func, inputs) {
   TempNode.call(this)

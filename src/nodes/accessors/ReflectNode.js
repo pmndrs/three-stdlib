@@ -1,6 +1,6 @@
-import { TempNode } from '../core/TempNode.js'
-import { PositionNode } from './PositionNode.js'
-import { NormalNode } from './NormalNode.js'
+import { TempNode } from '../core/TempNode'
+import { PositionNode } from './PositionNode'
+import { NormalNode } from './NormalNode'
 
 function ReflectNode(scope) {
   TempNode.call(this, 'v3')

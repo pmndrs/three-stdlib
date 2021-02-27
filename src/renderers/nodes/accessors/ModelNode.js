@@ -1,7 +1,7 @@
-import Node from '../core/Node.js'
-import Matrix4Node from '../inputs/Matrix4Node.js'
-import Matrix3Node from '../inputs/Matrix3Node.js'
-import { NodeUpdateType } from '../core/constants.js'
+import Node from '../core/Node'
+import Matrix4Node from '../inputs/Matrix4Node'
+import Matrix3Node from '../inputs/Matrix3Node'
+import { NodeUpdateType } from '../core/constants'
 
 class ModelNode extends Node {
   static VIEW = 'view'

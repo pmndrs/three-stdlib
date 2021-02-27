@@ -13,7 +13,7 @@ import {
   GPUColorWriteFlags,
   GPUStencilOperation,
   GPUInputStepMode,
-} from './constants.js'
+} from './constants'
 import {
   FrontSide,
   BackSide,

@@ -1,5 +1,5 @@
-import Node from './Node.js'
-import { NodeShaderStage } from './constants.js'
+import Node from './Node'
+import { NodeShaderStage } from './constants'
 
 class VaryNode extends Node {
   constructor(value) {

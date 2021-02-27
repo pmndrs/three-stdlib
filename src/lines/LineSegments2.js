@@ -8,8 +8,8 @@ import {
   Vector3,
   Vector4,
 } from 'three'
-import { LineSegmentsGeometry } from '../lines/LineSegmentsGeometry.js'
-import { LineMaterial } from '../lines/LineMaterial.js'
+import { LineSegmentsGeometry } from '../lines/LineSegmentsGeometry'
+import { LineMaterial } from '../lines/LineMaterial'
 
 var LineSegments2 = function (geometry, material) {
   if (geometry === undefined) geometry = new LineSegmentsGeometry()

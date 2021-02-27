@@ -1,6 +1,6 @@
 import { FileLoader, Loader, Matrix4, Vector3 } from 'three'
 import { gunzipSync } from 'fflate'
-import { Volume } from '../misc/Volume.js'
+import { Volume } from '../misc/Volume'
 
 var NRRDLoader = function (manager) {
   Loader.call(this, manager)

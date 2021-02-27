@@ -1,5 +1,5 @@
-import { TempNode } from '../core/TempNode.js'
-import { NodeUtils } from '../core/NodeUtils.js'
+import { TempNode } from '../core/TempNode'
+import { NodeUtils } from '../core/NodeUtils'
 
 var inputs = NodeUtils.elements
 

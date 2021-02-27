@@ -1,5 +1,5 @@
-import WebGPUBinding from './WebGPUBinding.js'
-import { GPUBindingType } from './constants.js'
+import WebGPUBinding from './WebGPUBinding'
+import { GPUBindingType } from './constants'
 
 class WebGPUUniformsGroup extends WebGPUBinding {
   constructor(name) {

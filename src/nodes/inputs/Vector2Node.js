@@ -1,7 +1,7 @@
 import { Vector2 } from 'three'
 
-import { InputNode } from '../core/InputNode.js'
-import { NodeUtils } from '../core/NodeUtils.js'
+import { InputNode } from '../core/InputNode'
+import { NodeUtils } from '../core/NodeUtils'
 
 function Vector2Node(x, y) {
   InputNode.call(this, 'v2')

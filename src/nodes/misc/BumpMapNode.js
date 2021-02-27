@@ -1,8 +1,8 @@
-import { TempNode } from '../core/TempNode.js'
-import { FloatNode } from '../inputs/FloatNode.js'
-import { FunctionNode } from '../core/FunctionNode.js'
-import { NormalNode } from '../accessors/NormalNode.js'
-import { PositionNode } from '../accessors/PositionNode.js'
+import { TempNode } from '../core/TempNode'
+import { FloatNode } from '../inputs/FloatNode'
+import { FunctionNode } from '../core/FunctionNode'
+import { NormalNode } from '../accessors/NormalNode'
+import { PositionNode } from '../accessors/PositionNode'
 
 function BumpMapNode(value, scale) {
   TempNode.call(this, 'v3')

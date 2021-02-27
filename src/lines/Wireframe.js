@@ -1,6 +1,6 @@
 import { InstancedInterleavedBuffer, InterleavedBufferAttribute, Mesh, Vector3 } from 'three'
-import { LineSegmentsGeometry } from '../lines/LineSegmentsGeometry.js'
-import { LineMaterial } from '../lines/LineMaterial.js'
+import { LineSegmentsGeometry } from '../lines/LineSegmentsGeometry'
+import { LineMaterial } from '../lines/LineMaterial'
 
 var Wireframe = function (geometry, material) {
   Mesh.call(this)

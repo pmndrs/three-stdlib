@@ -15,8 +15,8 @@ import {
   Vector3,
   WebGLRenderTarget,
 } from 'three'
-import { Pass } from '../postprocessing/Pass.js'
-import { CopyShader } from '../shaders/CopyShader.js'
+import { Pass } from '../postprocessing/Pass'
+import { CopyShader } from '../shaders/CopyShader'
 
 var OutlinePass = function (resolution, scene, camera, selectedObjects) {
   this.renderScene = scene

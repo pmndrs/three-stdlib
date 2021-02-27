@@ -1,5 +1,5 @@
-import { TempNode } from './TempNode.js'
-import { NodeLib } from './NodeLib.js'
+import { TempNode } from './TempNode'
+import { NodeLib } from './NodeLib'
 
 var declarationRegexp = /^\s*([a-z_0-9]+)\s([a-z_0-9]+)\s*\((.*?)\)/i,
   propertiesRegexp = /[a-z_0-9]+/gi

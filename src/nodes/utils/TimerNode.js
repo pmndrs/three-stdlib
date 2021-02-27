@@ -1,5 +1,5 @@
-import { FloatNode } from '../inputs/FloatNode.js'
-import { NodeLib } from '../core/NodeLib.js'
+import { FloatNode } from '../inputs/FloatNode'
+import { NodeLib } from '../core/NodeLib'
 
 function TimerNode(scale, scope, timeScale) {
   FloatNode.call(this)

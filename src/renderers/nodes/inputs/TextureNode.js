@@ -1,5 +1,5 @@
-import InputNode from '../core/InputNode.js'
-import UVNode from '../accessors/UVNode.js'
+import InputNode from '../core/InputNode'
+import UVNode from '../accessors/UVNode'
 
 class TextureNode extends InputNode {
   constructor(value, uv = new UVNode()) {

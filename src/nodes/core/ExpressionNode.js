@@ -1,4 +1,4 @@
-import { FunctionNode } from './FunctionNode.js'
+import { FunctionNode } from './FunctionNode'
 
 function ExpressionNode(src, type, keywords, extensions, includes) {
   FunctionNode.call(this, src, includes, extensions, keywords, type)

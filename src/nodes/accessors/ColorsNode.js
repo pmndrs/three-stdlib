@@ -1,4 +1,4 @@
-import { TempNode } from '../core/TempNode.js'
+import { TempNode } from '../core/TempNode'
 
 var vertexDict = ['color', 'color2'],
   fragmentDict = ['vColor', 'vColor2']

@@ -1,6 +1,6 @@
-import { LineSegments2 } from '../lines/LineSegments2.js'
-import { LineGeometry } from '../lines/LineGeometry.js'
-import { LineMaterial } from '../lines/LineMaterial.js'
+import { LineSegments2 } from '../lines/LineSegments2'
+import { LineGeometry } from '../lines/LineGeometry'
+import { LineMaterial } from '../lines/LineMaterial'
 
 var Line2 = function (geometry, material) {
   if (geometry === undefined) geometry = new LineGeometry()

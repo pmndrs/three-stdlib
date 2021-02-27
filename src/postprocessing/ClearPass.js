@@ -1,5 +1,5 @@
 import { Color } from 'three'
-import { Pass } from '../postprocessing/Pass.js'
+import { Pass } from '../postprocessing/Pass'
 
 var ClearPass = function (clearColor, clearAlpha) {
   Pass.call(this)

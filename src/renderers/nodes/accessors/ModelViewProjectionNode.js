@@ -1,8 +1,8 @@
-import Node from '../core/Node.js'
-import CameraNode from '../accessors/CameraNode.js'
-import ModelNode from '../accessors/ModelNode.js'
-import OperatorNode from '../math/OperatorNode.js'
-import PositionNode from '../accessors/PositionNode.js'
+import Node from '../core/Node'
+import CameraNode from '../accessors/CameraNode'
+import ModelNode from '../accessors/ModelNode'
+import OperatorNode from '../math/OperatorNode'
+import PositionNode from '../accessors/PositionNode'
 
 class ModelViewProjectionNode extends Node {
   constructor(position = new PositionNode()) {

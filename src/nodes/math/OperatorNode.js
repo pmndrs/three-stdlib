@@ -1,4 +1,4 @@
-import { TempNode } from '../core/TempNode.js'
+import { TempNode } from '../core/TempNode'
 
 function OperatorNode(a, b, op) {
   TempNode.call(this)

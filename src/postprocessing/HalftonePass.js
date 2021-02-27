@@ -1,6 +1,6 @@
 import { ShaderMaterial, UniformsUtils } from 'three'
-import { Pass } from '../postprocessing/Pass.js'
-import { HalftoneShader } from '../shaders/HalftoneShader.js'
+import { Pass } from '../postprocessing/Pass'
+import { HalftoneShader } from '../shaders/HalftoneShader'
 
 /**
  * RGB Halftone pass for three.js effects composer. Requires HalftoneShader.

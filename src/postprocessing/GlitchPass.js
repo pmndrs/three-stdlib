@@ -1,6 +1,6 @@
 import { DataTexture, FloatType, MathUtils, RGBFormat, ShaderMaterial, UniformsUtils } from 'three'
-import { Pass } from '../postprocessing/Pass.js'
-import { DigitalGlitch } from '../shaders/DigitalGlitch.js'
+import { Pass } from '../postprocessing/Pass'
+import { DigitalGlitch } from '../shaders/DigitalGlitch'
 
 var GlitchPass = function (dt_size) {
   Pass.call(this)
