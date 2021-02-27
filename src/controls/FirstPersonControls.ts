@@ -268,7 +268,6 @@ class FirstPersonControls extends EventDispatcher {
   }
 
   lookAt = (x: Vector3 | number, y?: number, z?: number) => {
-    // TODO: i didn't
     if (x instanceof Vector3) {
       x.isVector3
       this.target.copy(x)
