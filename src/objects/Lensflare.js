@@ -214,7 +214,7 @@ var Lensflare = function () {
       var vecX = -positionScreen.x * 2
       var vecY = -positionScreen.y * 2
 
-      for (var i = 0, l = elements.length; i < l; i++) {
+      for (let i = 0, l = elements.length; i < l; i++) {
         var element = elements[i]
 
         var uniforms = material2.uniforms
@@ -244,7 +244,7 @@ var Lensflare = function () {
     tempMap.dispose()
     occlusionMap.dispose()
 
-    for (var i = 0, l = elements.length; i < l; i++) {
+    for (let i = 0, l = elements.length; i < l; i++) {
       elements[i].texture.dispose()
     }
   }

@@ -86,7 +86,7 @@ MTLLoader.prototype = Object.assign(Object.create(Loader.prototype), {
     var delimiter_pattern = /\s+/
     var materialsInfo = {}
 
-    for (var i = 0; i < lines.length; i++) {
+    for (let i = 0; i < lines.length; i++) {
       var line = lines[i]
       line = line.trim()
 
@@ -179,7 +179,7 @@ MTLLoader.MaterialCreator.prototype = {
 
     var converted = {}
 
-    for (var mn in materialsInfo) {
+    for (let mn in materialsInfo) {
       // Convert materials info into normalized form based on options
 
       var mat = materialsInfo[mn]
@@ -188,7 +188,7 @@ MTLLoader.MaterialCreator.prototype = {
 
       converted[mn] = covmat
 
-      for (var prop in mat) {
+      for (let prop in mat) {
         var save = true
         var value = mat[prop]
         var lprop = prop.toLowerCase()
@@ -227,7 +227,7 @@ MTLLoader.MaterialCreator.prototype = {
   },
 
   preload: function () {
-    for (var mn in this.materialsInfo) {
+    for (let mn in this.materialsInfo) {
       this.create(mn)
     }
   },
@@ -239,7 +239,7 @@ MTLLoader.MaterialCreator.prototype = {
   getAsArray: function () {
     var index = 0
 
-    for (var mn in this.materialsInfo) {
+    for (let mn in this.materialsInfo) {
       this.materialsArray[index] = this.create(mn)
       this.nameLookup[mn] = index
       index++
@@ -290,7 +290,7 @@ MTLLoader.MaterialCreator.prototype = {
       params[mapType] = map
     }
 
-    for (var prop in mat) {
+    for (let prop in mat) {
       var value = mat[prop]
       var n
 

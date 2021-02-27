@@ -260,7 +260,7 @@ var ImprovedNoise = function () {
     180,
   ]
 
-  for (var i = 0; i < 256; i++) {
+  for (let i = 0; i < 256; i++) {
     p[256 + i] = p[i]
   }
 

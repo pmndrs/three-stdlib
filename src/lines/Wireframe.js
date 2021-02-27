@@ -29,7 +29,7 @@ Wireframe.prototype = Object.assign(Object.create(Mesh.prototype), {
       var instanceEnd = geometry.attributes.instanceEnd
       var lineDistances = new Float32Array(2 * instanceStart.data.count)
 
-      for (var i = 0, j = 0, l = instanceStart.data.count; i < l; i++, j += 2) {
+      for (let i = 0, j = 0, l = instanceStart.data.count; i < l; i++, j += 2) {
         start.fromBufferAttribute(instanceStart, i)
         end.fromBufferAttribute(instanceEnd, i)
 

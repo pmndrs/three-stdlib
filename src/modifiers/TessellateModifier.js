@@ -153,7 +153,7 @@ class TessellateModifier {
         uv2s2 = []
       }
 
-      for (var i = 0, i2 = 0, il = positions.length; i < il; i += 9, i2 += 6) {
+      for (let i = 0, i2 = 0, il = positions.length; i < il; i += 9, i2 += 6) {
         va.fromArray(positions, i + 0)
         vb.fromArray(positions, i + 3)
         vc.fromArray(positions, i + 6)

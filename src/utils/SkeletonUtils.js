@@ -357,7 +357,7 @@ var SkeletonUtils = {
   renameBones: function (skeleton, names) {
     var bones = this.getBones(skeleton)
 
-    for (var i = 0; i < bones.length; ++i) {
+    for (let i = 0; i < bones.length; ++i) {
       var bone = bones[i]
 
       if (names[bone.name]) {
@@ -373,7 +373,7 @@ var SkeletonUtils = {
   },
 
   getBoneByName: function (name, skeleton) {
-    for (var i = 0, bones = this.getBones(skeleton); i < bones.length; i++) {
+    for (let i = 0, bones = this.getBones(skeleton); i < bones.length; i++) {
       if (name === bones[i].name) return bones[i]
     }
   },
@@ -392,7 +392,7 @@ var SkeletonUtils = {
     var regexp = /\[(.*)\]\.(.*)/,
       result = { name: name }
 
-    for (var i = 0; i < tracks.length; ++i) {
+    for (let i = 0; i < tracks.length; ++i) {
       // 1 is track name
       // 2 is track type
       var trackData = regexp.exec(tracks[i].name)
@@ -410,10 +410,10 @@ var SkeletonUtils = {
       targetBones = this.getBones(targetSkeleton),
       bones = []
 
-    search: for (var i = 0; i < sourceBones.length; i++) {
+    search: for (let i = 0; i < sourceBones.length; i++) {
       var boneName = sourceBones[i].name
 
-      for (var j = 0; j < targetBones.length; j++) {
+      for (let j = 0; j < targetBones.length; j++) {
         if (boneName === targetBones[j].name) {
           bones.push(boneName)
 
@@ -460,7 +460,7 @@ var SkeletonUtils = {
 function parallelTraverse(a, b, callback) {
   callback(a, b)
 
-  for (var i = 0; i < a.children.length; i++) {
+  for (let i = 0; i < a.children.length; i++) {
     parallelTraverse(a.children[i], b.children[i], callback)
   }
 }

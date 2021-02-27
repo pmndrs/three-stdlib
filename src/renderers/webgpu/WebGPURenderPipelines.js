@@ -161,7 +161,7 @@ class WebGPURenderPipelines {
       const vertexBuffers = []
       const geometry = object.geometry
 
-      for (const attribute of shaderAttributes) {
+      for (let attribute of shaderAttributes) {
         const name = attribute.name
         const geometryAttribute = geometry.getAttribute(name)
         const stepMode =

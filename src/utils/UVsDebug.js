@@ -45,7 +45,7 @@ var UVsDebug = function (geometry, size) {
     if (index) {
       // indexed geometry
 
-      for (var i = 0, il = index.count; i < il; i += 3) {
+      for (let i = 0, il = index.count; i < il; i += 3) {
         face[0] = index.getX(i)
         face[1] = index.getX(i + 1)
         face[2] = index.getX(i + 2)
@@ -59,7 +59,7 @@ var UVsDebug = function (geometry, size) {
     } else {
       // non-indexed geometry
 
-      for (var i = 0, il = uvAttribute.count; i < il; i += 3) {
+      for (let i = 0, il = uvAttribute.count; i < il; i += 3) {
         face[0] = i
         face[1] = i + 1
         face[2] = i + 2
@@ -82,7 +82,7 @@ var UVsDebug = function (geometry, size) {
 
     a.set(0, 0)
 
-    for (var j = 0, jl = uvs.length; j < jl; j++) {
+    for (let j = 0, jl = uvs.length; j < jl; j++) {
       var uv = uvs[j]
 
       a.x += uv.x

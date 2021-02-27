@@ -1,11 +1,4 @@
-import {
-  Color,
-  LightProbe,
-  LinearEncoding,
-  SphericalHarmonics3,
-  Vector3,
-  sRGBEncoding,
-} from 'three'
+import { Color, LightProbe, LinearEncoding, SphericalHarmonics3, Vector3, sRGBEncoding } from 'three'
 
 var LightProbeGenerator = {
   // https://www.ppsloan.org/publications/StupidSH36.pdf
@@ -26,7 +19,7 @@ var LightProbeGenerator = {
     var sh = new SphericalHarmonics3()
     var shCoefficients = sh.coefficients
 
-    for (var faceIndex = 0; faceIndex < 6; faceIndex++) {
+    for (let faceIndex = 0; faceIndex < 6; faceIndex++) {
       var image = cubeTexture.image[faceIndex]
 
       var width = image.width
@@ -49,7 +42,7 @@ var LightProbeGenerator = {
 
       var pixelSize = 2 / imageWidth
 
-      for (var i = 0, il = data.length; i < il; i += 4) {
+      for (let i = 0, il = data.length; i < il; i += 4) {
         // RGBA assumed
 
         // pixel color
@@ -107,7 +100,7 @@ var LightProbeGenerator = {
         SphericalHarmonics3.getBasisAt(dir, shBasis)
 
         // accummuulate
-        for (var j = 0; j < 9; j++) {
+        for (let j = 0; j < 9; j++) {
           shCoefficients[j].x += shBasis[j] * color.r * weight
           shCoefficients[j].y += shBasis[j] * color.g * weight
           shCoefficients[j].z += shBasis[j] * color.b * weight
@@ -118,7 +111,7 @@ var LightProbeGenerator = {
     // normalize
     norm = (4 * Math.PI) / totalWeight
 
-    for (var j = 0; j < 9; j++) {
+    for (let j = 0; j < 9; j++) {
       shCoefficients[j].x *= norm
       shCoefficients[j].y *= norm
       shCoefficients[j].z *= norm
@@ -145,14 +138,14 @@ var LightProbeGenerator = {
     var sh = new SphericalHarmonics3()
     var shCoefficients = sh.coefficients
 
-    for (var faceIndex = 0; faceIndex < 6; faceIndex++) {
+    for (let faceIndex = 0; faceIndex < 6; faceIndex++) {
       var imageWidth = cubeRenderTarget.width // assumed to be square
       var data = new Uint8Array(imageWidth * imageWidth * 4)
       renderer.readRenderTargetPixels(cubeRenderTarget, 0, 0, imageWidth, imageWidth, data, faceIndex)
 
       var pixelSize = 2 / imageWidth
 
-      for (var i = 0, il = data.length; i < il; i += 4) {
+      for (let i = 0, il = data.length; i < il; i += 4) {
         // RGBA assumed
 
         // pixel color
@@ -210,7 +203,7 @@ var LightProbeGenerator = {
         SphericalHarmonics3.getBasisAt(dir, shBasis)
 
         // accummuulate
-        for (var j = 0; j < 9; j++) {
+        for (let j = 0; j < 9; j++) {
           shCoefficients[j].x += shBasis[j] * color.r * weight
           shCoefficients[j].y += shBasis[j] * color.g * weight
           shCoefficients[j].z += shBasis[j] * color.b * weight
@@ -221,7 +214,7 @@ var LightProbeGenerator = {
     // normalize
     norm = (4 * Math.PI) / totalWeight
 
-    for (var j = 0; j < 9; j++) {
+    for (let j = 0; j < 9; j++) {
       shCoefficients[j].x *= norm
       shCoefficients[j].y *= norm
       shCoefficients[j].z *= norm

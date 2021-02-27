@@ -101,10 +101,10 @@ function _(t) {
 }
 function g(t) {
   let e = 0
-  for (const n of t) e += n.byteLength
+  for (let n of t) e += n.byteLength
   const n = new Uint8Array(e)
   let i = 0
-  for (const e of t) n.set(new Uint8Array(e), i), (i += e.byteLength)
+  for (let e of t) n.set(new Uint8Array(e), i), (i += e.byteLength)
   return n
 }
 function p(t) {
@@ -276,7 +276,7 @@ function y(n, s = {}) {
   const r = []
   let o = n.keyValue
   s.keepWriter || (o = x({}, n.keyValue, { KTXwriter: 'KTX-Parse v0.0.5' }))
-  for (const e in o) {
+  for (let e in o) {
     const n = o[e],
       i = h(e),
       s = 'string' == typeof n ? h(n) : n,

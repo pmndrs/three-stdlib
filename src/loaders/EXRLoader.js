@@ -155,7 +155,7 @@ EXRLoader.prototype = Object.assign(Object.create(DataTextureLoader.prototype), 
       var steps = Math.min(3, Math.ceil(Math.abs(exponent) / 1023))
       var result = mantissa
 
-      for (var i = 0; i < steps; i++) result *= Math.pow(2, Math.floor((exponent + i) / steps))
+      for (let i = 0; i < steps; i++) result *= Math.pow(2, Math.floor((exponent + i) / steps))
 
       return result
     }
@@ -163,7 +163,7 @@ EXRLoader.prototype = Object.assign(Object.create(DataTextureLoader.prototype), 
     function reverseLutFromBitmap(bitmap, lut) {
       var k = 0
 
-      for (var i = 0; i < USHORT_RANGE; ++i) {
+      for (let i = 0; i < USHORT_RANGE; ++i) {
         if (i == 0 || bitmap[i >> 3] & (1 << (i & 7))) {
           lut[k++] = i
         }
@@ -177,7 +177,7 @@ EXRLoader.prototype = Object.assign(Object.create(DataTextureLoader.prototype), 
     }
 
     function hufClearDecTable(hdec) {
-      for (var i = 0; i < HUF_DECSIZE; i++) {
+      for (let i = 0; i < HUF_DECSIZE; i++) {
         hdec[i] = {}
         hdec[i].len = 0
         hdec[i].lit = 0
@@ -203,18 +203,18 @@ EXRLoader.prototype = Object.assign(Object.create(DataTextureLoader.prototype), 
     const hufTableBuffer = new Array(59)
 
     function hufCanonicalCodeTable(hcode) {
-      for (var i = 0; i <= 58; ++i) hufTableBuffer[i] = 0
-      for (var i = 0; i < HUF_ENCSIZE; ++i) hufTableBuffer[hcode[i]] += 1
+      for (let i = 0; i <= 58; ++i) hufTableBuffer[i] = 0
+      for (let i = 0; i < HUF_ENCSIZE; ++i) hufTableBuffer[hcode[i]] += 1
 
       var c = 0
 
-      for (var i = 58; i > 0; --i) {
+      for (let i = 58; i > 0; --i) {
         var nc = (c + hufTableBuffer[i]) >> 1
         hufTableBuffer[i] = c
         c = nc
       }
 
-      for (var i = 0; i < HUF_ENCSIZE; ++i) {
+      for (let i = 0; i < HUF_ENCSIZE; ++i) {
         var l = hcode[i]
         if (l > 0) hcode[i] = l | (hufTableBuffer[l]++ << 6)
       }
@@ -300,7 +300,7 @@ EXRLoader.prototype = Object.assign(Object.create(DataTextureLoader.prototype), 
             var p = pl.p
             pl.p = new Array(pl.lit)
 
-            for (var i = 0; i < pl.lit - 1; ++i) {
+            for (let i = 0; i < pl.lit - 1; ++i) {
               pl.p[i] = p[i]
             }
           } else {
@@ -311,7 +311,7 @@ EXRLoader.prototype = Object.assign(Object.create(DataTextureLoader.prototype), 
         } else if (l) {
           var plOffset = 0
 
-          for (var i = 1 << (HUF_DECBITS - l); i > 0; i--) {
+          for (let i = 1 << (HUF_DECBITS - l); i > 0; i--) {
             var pl = hdecod[(c << (HUF_DECBITS - l)) + plOffset]
 
             if (pl.len || pl.p) {
@@ -661,13 +661,13 @@ EXRLoader.prototype = Object.assign(Object.create(DataTextureLoader.prototype), 
     }
 
     function applyLut(lut, data, nData) {
-      for (var i = 0; i < nData; ++i) {
+      for (let i = 0; i < nData; ++i) {
         data[i] = lut[data[i]]
       }
     }
 
     function predictor(source) {
-      for (var t = 1; t < source.length; t++) {
+      for (let t = 1; t < source.length; t++) {
         var d = source[t - 1] + source[t] - 128
         source[t] = d
       }
@@ -702,7 +702,7 @@ EXRLoader.prototype = Object.assign(Object.create(DataTextureLoader.prototype), 
           var count = -l
           size -= count + 1
 
-          for (var i = 0; i < count; i++) {
+          for (let i = 0; i < count; i++) {
             out.push(reader.getUint8(p++))
           }
         } else {
@@ -711,7 +711,7 @@ EXRLoader.prototype = Object.assign(Object.create(DataTextureLoader.prototype), 
 
           var value = reader.getUint8(p++)
 
-          for (var i = 0; i < count + 1; i++) {
+          for (let i = 0; i < count + 1; i++) {
             out.push(value)
           }
         }
@@ -825,20 +825,20 @@ EXRLoader.prototype = Object.assign(Object.create(DataTextureLoader.prototype), 
       var dataView = new DataView(outBuffer.buffer)
 
       // convert channels back to float, if needed
-      for (var comp = 0; comp < numComp; ++comp) {
+      for (let comp = 0; comp < numComp; ++comp) {
         channelData[cscSet.idx[comp]].decoded = true
         var type = channelData[cscSet.idx[comp]].type
 
         if (channelData[comp].type != 2) continue
 
-        for (var y = 0; y < height; ++y) {
+        for (let y = 0; y < height; ++y) {
           const offset = rowOffsets[comp][y]
 
-          for (var x = 0; x < width; ++x) {
+          for (let x = 0; x < width; ++x) {
             halfRow[x] = dataView.getUint16(offset + x * INT16_SIZE * type, true)
           }
 
-          for (var x = 0; x < width; ++x) {
+          for (let x = 0; x < width; ++x) {
             dataView.setFloat32(offset + x * INT16_SIZE * type, decodeFloat16(halfRow[x]), true)
           }
         }
@@ -952,7 +952,7 @@ EXRLoader.prototype = Object.assign(Object.create(DataTextureLoader.prototype), 
       var theta = new Array(4)
       var gamma = new Array(4)
 
-      for (var row = 0; row < 8; ++row) {
+      for (let row = 0; row < 8; ++row) {
         var rowPtr = row * 8
 
         alpha[0] = c * data[rowPtr + 2]
@@ -986,7 +986,7 @@ EXRLoader.prototype = Object.assign(Object.create(DataTextureLoader.prototype), 
         data[rowPtr + 7] = gamma[0] - beta[0]
       }
 
-      for (var column = 0; column < 8; ++column) {
+      for (let column = 0; column < 8; ++column) {
         alpha[0] = c * data[16 + column]
         alpha[1] = f * data[16 + column]
         alpha[2] = c * data[48 + column]
@@ -1021,7 +1021,7 @@ EXRLoader.prototype = Object.assign(Object.create(DataTextureLoader.prototype), 
     }
 
     function csc709Inverse(data) {
-      for (var i = 0; i < 64; ++i) {
+      for (let i = 0; i < 64; ++i) {
         var y = data[0][i]
         var cb = data[1][i]
         var cr = data[2][i]
@@ -1033,7 +1033,7 @@ EXRLoader.prototype = Object.assign(Object.create(DataTextureLoader.prototype), 
     }
 
     function convertToHalf(src, dst, idx) {
-      for (var i = 0; i < 64; ++i) {
+      for (let i = 0; i < 64; ++i) {
         dst[idx + i] = DataUtils.toHalfFloat(toLinear(src[i]))
       }
     }
@@ -1091,7 +1091,7 @@ EXRLoader.prototype = Object.assign(Object.create(DataTextureLoader.prototype), 
       // Setup channel info
       var outBufferEnd = 0
       var pizChannelData = new Array(info.channels)
-      for (var i = 0; i < info.channels; i++) {
+      for (let i = 0; i < info.channels; i++) {
         pizChannelData[i] = {}
         pizChannelData[i]['start'] = outBufferEnd
         pizChannelData[i]['end'] = pizChannelData[i]['start']
@@ -1111,7 +1111,7 @@ EXRLoader.prototype = Object.assign(Object.create(DataTextureLoader.prototype), 
       }
 
       if (minNonZero <= maxNonZero) {
-        for (var i = 0; i < maxNonZero - minNonZero + 1; i++) {
+        for (let i = 0; i < maxNonZero - minNonZero + 1; i++) {
           bitmap[i + minNonZero] = parseUint8(inDataView, inOffset)
         }
       }
@@ -1126,10 +1126,10 @@ EXRLoader.prototype = Object.assign(Object.create(DataTextureLoader.prototype), 
       hufUncompress(info.array, inDataView, inOffset, length, outBuffer, outBufferEnd)
 
       // Wavelet decoding
-      for (var i = 0; i < info.channels; ++i) {
+      for (let i = 0; i < info.channels; ++i) {
         var cd = pizChannelData[i]
 
-        for (var j = 0; j < pizChannelData[i].size; ++j) {
+        for (let j = 0; j < pizChannelData[i].size; ++j) {
           wav2Decode(outBuffer, cd.start + j, cd.nx, cd.size, cd.ny, cd.nx * cd.size, maxValue)
         }
       }
@@ -1140,8 +1140,8 @@ EXRLoader.prototype = Object.assign(Object.create(DataTextureLoader.prototype), 
       // Rearrange the pixel data into the format expected by the caller.
       var tmpOffset = 0
       var tmpBuffer = new Uint8Array(outBuffer.buffer.byteLength)
-      for (var y = 0; y < info.lines; y++) {
-        for (var c = 0; c < info.channels; c++) {
+      for (let y = 0; y < info.lines; y++) {
+        for (let c = 0; c < info.channels; c++) {
           var cd = pizChannelData[c]
 
           var n = cd.nx * cd.size
@@ -1265,7 +1265,7 @@ EXRLoader.prototype = Object.assign(Object.create(DataTextureLoader.prototype), 
       var channels = EXRHeader.channels
       var channelData = new Array(info.channels)
 
-      for (var i = 0; i < info.channels; ++i) {
+      for (let i = 0; i < info.channels; ++i) {
         var cd = (channelData[i] = {})
         var channel = channels[i]
 
@@ -1282,10 +1282,10 @@ EXRLoader.prototype = Object.assign(Object.create(DataTextureLoader.prototype), 
         idx: new Array(3),
       }
 
-      for (var offset = 0; offset < info.channels; ++offset) {
+      for (let offset = 0; offset < info.channels; ++offset) {
         var cd = channelData[offset]
 
-        for (var i = 0; i < channelRules.length; ++i) {
+        for (let i = 0; i < channelRules.length; ++i) {
           var rule = channelRules[i]
 
           if (cd.name == rule.name) {
@@ -1347,12 +1347,12 @@ EXRLoader.prototype = Object.assign(Object.create(DataTextureLoader.prototype), 
       // Prepare outbuffer data offset
       var outBufferEnd = 0
       var rowOffsets = new Array(channelData.length)
-      for (var i = 0; i < rowOffsets.length; ++i) {
+      for (let i = 0; i < rowOffsets.length; ++i) {
         rowOffsets[i] = new Array()
       }
 
-      for (var y = 0; y < info.lines; ++y) {
-        for (var chan = 0; chan < channelData.length; ++chan) {
+      for (let y = 0; y < info.lines; ++y) {
+        for (let chan = 0; chan < channelData.length; ++chan) {
           rowOffsets[chan].push(outBufferEnd)
           outBufferEnd += channelData[chan].width * info.type * INT16_SIZE
         }
@@ -1362,7 +1362,7 @@ EXRLoader.prototype = Object.assign(Object.create(DataTextureLoader.prototype), 
       lossyDctDecode(cscSet, rowOffsets, channelData, acBuffer, dcBuffer, outBuffer)
 
       // Decode other channels
-      for (var i = 0; i < channelData.length; ++i) {
+      for (let i = 0; i < channelData.length; ++i) {
         var cd = channelData[i]
 
         if (cd.decoded) continue
@@ -1372,11 +1372,11 @@ EXRLoader.prototype = Object.assign(Object.create(DataTextureLoader.prototype), 
             var row = 0
             var rleOffset = 0
 
-            for (var y = 0; y < info.lines; ++y) {
+            for (let y = 0; y < info.lines; ++y) {
               var rowOffsetBytes = rowOffsets[i][row]
 
-              for (var x = 0; x < cd.width; ++x) {
-                for (var byte = 0; byte < INT16_SIZE * cd.type; ++byte) {
+              for (let x = 0; x < cd.width; ++x) {
+                for (let byte = 0; byte < INT16_SIZE * cd.type; ++byte) {
                   outBuffer[rowOffsetBytes++] = rleBuffer[rleOffset + byte * cd.width * cd.height]
                 }
 
@@ -1782,7 +1782,7 @@ EXRLoader.prototype = Object.assign(Object.create(DataTextureLoader.prototype), 
 
     var numBlocks = dataWindowHeight / scanlineBlockSize
 
-    for (var i = 0; i < numBlocks; i++) {
+    for (let i = 0; i < numBlocks; i++) {
       parseUlong(bufferDataView, offset) // scanlineOffset
     }
 
@@ -1846,7 +1846,7 @@ EXRLoader.prototype = Object.assign(Object.create(DataTextureLoader.prototype), 
     var viewer
     var tmpOffset = { value: 0 }
 
-    for (var scanlineBlockIdx = 0; scanlineBlockIdx < height / scanlineBlockSize; scanlineBlockIdx++) {
+    for (let scanlineBlockIdx = 0; scanlineBlockIdx < height / scanlineBlockSize; scanlineBlockIdx++) {
       line = parseUint32(bufferDataView, offset) // line_no
       size = parseUint32(bufferDataView, offset) // data_len
 
@@ -1858,15 +1858,15 @@ EXRLoader.prototype = Object.assign(Object.create(DataTextureLoader.prototype), 
 
       offset.value += size
 
-      for (var line_y = 0; line_y < scanlineBlockSize; line_y++) {
+      for (let line_y = 0; line_y < scanlineBlockSize; line_y++) {
         var true_y = line_y + scanlineBlockIdx * scanlineBlockSize
 
         if (true_y >= height) break
 
-        for (var channelID = 0; channelID < EXRHeader.channels.length; channelID++) {
+        for (let channelID = 0; channelID < EXRHeader.channels.length; channelID++) {
           var cOff = channelOffsets[EXRHeader.channels[channelID].name]
 
-          for (var x = 0; x < width; x++) {
+          for (let x = 0; x < width; x++) {
             var idx = line_y * (EXRHeader.channels.length * width) + channelID * width + x
             tmpOffset.value = idx * size_t
 

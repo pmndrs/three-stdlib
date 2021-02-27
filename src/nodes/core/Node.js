@@ -92,7 +92,7 @@ Node.prototype = {
     }
 
     if (this.hashProperties) {
-      for (var i = 0; i < this.hashProperties.length; i++) {
+      for (let i = 0; i < this.hashProperties.length; i++) {
         prop = this.hashProperties[i]
         obj = this[prop]
 

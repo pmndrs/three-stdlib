@@ -38,7 +38,7 @@ var MD2Character = function () {
     this.loadCounter = config.weapons.length * 2 + config.skins.length + 1
 
     var weaponsTextures = []
-    for (var i = 0; i < config.weapons.length; i++) weaponsTextures[i] = config.weapons[i][1]
+    for (let i = 0; i < config.weapons.length; i++) weaponsTextures[i] = config.weapons[i][1]
     // SKINS
 
     this.skinsBody = loadTextures(config.baseUrl + 'skins/', config.skins)
@@ -88,7 +88,7 @@ var MD2Character = function () {
       }
     }
 
-    for (var i = 0; i < config.weapons.length; i++) {
+    for (let i = 0; i < config.weapons.length; i++) {
       loader.load(config.baseUrl + config.weapons[i][0], generateCallback(i, config.weapons[i][0]))
     }
   }
@@ -118,7 +118,7 @@ var MD2Character = function () {
   }
 
   this.setWeapon = function (index) {
-    for (var i = 0; i < this.weapons.length; i++) this.weapons[i].visible = false
+    for (let i = 0; i < this.weapons.length; i++) this.weapons[i].visible = false
 
     var activeWeapon = this.weapons[index]
 
@@ -174,7 +174,7 @@ var MD2Character = function () {
     var textureLoader = new TextureLoader()
     var textures = []
 
-    for (var i = 0; i < textureUrls.length; i++) {
+    for (let i = 0; i < textureUrls.length; i++) {
       textures[i] = textureLoader.load(baseUrl + textureUrls[i], checkLoadingComplete)
       textures[i].mapping = UVMapping
       textures[i].name = textureUrls[i]

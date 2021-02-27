@@ -102,7 +102,7 @@ DRACOLoader.prototype = Object.assign(Object.create(Loader.prototype), {
     // TODO: For backward-compatibility, support 'attributeTypes' objects containing
     // references (rather than names) to typed array constructors. These must be
     // serialized before sending them to the worker.
-    for (var attribute in taskConfig.attributeTypes) {
+    for (let attribute in taskConfig.attributeTypes) {
       var type = taskConfig.attributeTypes[attribute]
 
       if (type.BYTES_PER_ELEMENT !== undefined) {
@@ -183,7 +183,7 @@ DRACOLoader.prototype = Object.assign(Object.create(Loader.prototype), {
       geometry.setIndex(new BufferAttribute(geometryData.index.array, 1))
     }
 
-    for (var i = 0; i < geometryData.attributes.length; i++) {
+    for (let i = 0; i < geometryData.attributes.length; i++) {
       var attribute = geometryData.attributes[i]
       var name = attribute.name
       var array = attribute.array
@@ -304,7 +304,7 @@ DRACOLoader.prototype = Object.assign(Object.create(Loader.prototype), {
   },
 
   dispose: function () {
-    for (var i = 0; i < this.workerPool.length; ++i) {
+    for (let i = 0; i < this.workerPool.length; ++i) {
       this.workerPool[i].terminate()
     }
 
@@ -396,7 +396,7 @@ DRACOLoader.DRACOWorker = function () {
     var geometry = { index: null, attributes: [] }
 
     // Gather all vertex attributes.
-    for (var attributeName in attributeIDs) {
+    for (let attributeName in attributeIDs) {
       var attributeType = self[attributeTypes[attributeName]]
 
       var attribute

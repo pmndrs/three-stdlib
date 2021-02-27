@@ -14,13 +14,7 @@
  * - DFD: https://www.khronos.org/registry/DataFormat/specs/1.3/dataformat.1.3.html#basicdescriptor
  */
 
-import {
-  CompressedTexture,
-  CompressedTextureLoader,
-  FileLoader,
-  LinearEncoding,
-  sRGBEncoding,
-} from 'three'
+import { CompressedTexture, CompressedTextureLoader, FileLoader, LinearEncoding, sRGBEncoding } from 'three'
 
 import { BasisTextureLoader } from './BasisTextureLoader.js'
 import { ZSTDDecoder } from '../libs/zstddec.module.js'
@@ -191,7 +185,7 @@ var KTX2Utils = {
     var width = ktx.pixelWidth
     var height = ktx.pixelHeight
 
-    for (var levelIndex = 0; levelIndex < ktx.levels.length; levelIndex++) {
+    for (let levelIndex = 0; levelIndex < ktx.levels.length; levelIndex++) {
       var levelWidth = Math.max(1, Math.floor(width / Math.pow(2, levelIndex)))
       var levelHeight = Math.max(1, Math.floor(height / Math.pow(2, levelIndex)))
       var levelData = ktx.levels[levelIndex].levelData

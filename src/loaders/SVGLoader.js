@@ -144,7 +144,7 @@ SVGLoader.prototype = Object.assign(Object.create(Loader.prototype), {
       if (traverseChildNodes) {
         var nodes = node.childNodes
 
-        for (var i = 0; i < nodes.length; i++) {
+        for (let i = 0; i < nodes.length; i++) {
           parseNode(nodes[i], style)
         }
       }
@@ -176,7 +176,7 @@ SVGLoader.prototype = Object.assign(Object.create(Loader.prototype), {
 
       var commands = d.match(/[a-df-z][^a-df-z]*/gi)
 
-      for (var i = 0, l = commands.length; i < l; i++) {
+      for (let i = 0, l = commands.length; i < l; i++) {
         var command = commands[i]
 
         var type = command.charAt(0)
@@ -190,7 +190,7 @@ SVGLoader.prototype = Object.assign(Object.create(Loader.prototype), {
         switch (type) {
           case 'M':
             var numbers = parseFloats(data)
-            for (var j = 0, jl = numbers.length; j < jl; j += 2) {
+            for (let j = 0, jl = numbers.length; j < jl; j += 2) {
               point.x = numbers[j + 0]
               point.y = numbers[j + 1]
               control.x = point.x
@@ -210,7 +210,7 @@ SVGLoader.prototype = Object.assign(Object.create(Loader.prototype), {
           case 'H':
             var numbers = parseFloats(data)
 
-            for (var j = 0, jl = numbers.length; j < jl; j++) {
+            for (let j = 0, jl = numbers.length; j < jl; j++) {
               point.x = numbers[j]
               control.x = point.x
               control.y = point.y
@@ -224,7 +224,7 @@ SVGLoader.prototype = Object.assign(Object.create(Loader.prototype), {
           case 'V':
             var numbers = parseFloats(data)
 
-            for (var j = 0, jl = numbers.length; j < jl; j++) {
+            for (let j = 0, jl = numbers.length; j < jl; j++) {
               point.y = numbers[j]
               control.x = point.x
               control.y = point.y
@@ -238,7 +238,7 @@ SVGLoader.prototype = Object.assign(Object.create(Loader.prototype), {
           case 'L':
             var numbers = parseFloats(data)
 
-            for (var j = 0, jl = numbers.length; j < jl; j += 2) {
+            for (let j = 0, jl = numbers.length; j < jl; j += 2) {
               point.x = numbers[j + 0]
               point.y = numbers[j + 1]
               control.x = point.x
@@ -253,7 +253,7 @@ SVGLoader.prototype = Object.assign(Object.create(Loader.prototype), {
           case 'C':
             var numbers = parseFloats(data)
 
-            for (var j = 0, jl = numbers.length; j < jl; j += 6) {
+            for (let j = 0, jl = numbers.length; j < jl; j += 6) {
               path.bezierCurveTo(
                 numbers[j + 0],
                 numbers[j + 1],
@@ -275,7 +275,7 @@ SVGLoader.prototype = Object.assign(Object.create(Loader.prototype), {
           case 'S':
             var numbers = parseFloats(data)
 
-            for (var j = 0, jl = numbers.length; j < jl; j += 4) {
+            for (let j = 0, jl = numbers.length; j < jl; j += 4) {
               path.bezierCurveTo(
                 getReflection(point.x, control.x),
                 getReflection(point.y, control.y),
@@ -297,7 +297,7 @@ SVGLoader.prototype = Object.assign(Object.create(Loader.prototype), {
           case 'Q':
             var numbers = parseFloats(data)
 
-            for (var j = 0, jl = numbers.length; j < jl; j += 4) {
+            for (let j = 0, jl = numbers.length; j < jl; j += 4) {
               path.quadraticCurveTo(numbers[j + 0], numbers[j + 1], numbers[j + 2], numbers[j + 3])
               control.x = numbers[j + 0]
               control.y = numbers[j + 1]
@@ -312,7 +312,7 @@ SVGLoader.prototype = Object.assign(Object.create(Loader.prototype), {
           case 'T':
             var numbers = parseFloats(data)
 
-            for (var j = 0, jl = numbers.length; j < jl; j += 2) {
+            for (let j = 0, jl = numbers.length; j < jl; j += 2) {
               var rx = getReflection(point.x, control.x)
               var ry = getReflection(point.y, control.y)
               path.quadraticCurveTo(rx, ry, numbers[j + 0], numbers[j + 1])
@@ -329,7 +329,7 @@ SVGLoader.prototype = Object.assign(Object.create(Loader.prototype), {
           case 'A':
             var numbers = parseFloats(data)
 
-            for (var j = 0, jl = numbers.length; j < jl; j += 7) {
+            for (let j = 0, jl = numbers.length; j < jl; j += 7) {
               // skip command if start point == end point
               if (numbers[j + 5] == point.x && numbers[j + 6] == point.y) continue
 
@@ -357,7 +357,7 @@ SVGLoader.prototype = Object.assign(Object.create(Loader.prototype), {
           case 'm':
             var numbers = parseFloats(data)
 
-            for (var j = 0, jl = numbers.length; j < jl; j += 2) {
+            for (let j = 0, jl = numbers.length; j < jl; j += 2) {
               point.x += numbers[j + 0]
               point.y += numbers[j + 1]
               control.x = point.x
@@ -377,7 +377,7 @@ SVGLoader.prototype = Object.assign(Object.create(Loader.prototype), {
           case 'h':
             var numbers = parseFloats(data)
 
-            for (var j = 0, jl = numbers.length; j < jl; j++) {
+            for (let j = 0, jl = numbers.length; j < jl; j++) {
               point.x += numbers[j]
               control.x = point.x
               control.y = point.y
@@ -391,7 +391,7 @@ SVGLoader.prototype = Object.assign(Object.create(Loader.prototype), {
           case 'v':
             var numbers = parseFloats(data)
 
-            for (var j = 0, jl = numbers.length; j < jl; j++) {
+            for (let j = 0, jl = numbers.length; j < jl; j++) {
               point.y += numbers[j]
               control.x = point.x
               control.y = point.y
@@ -405,7 +405,7 @@ SVGLoader.prototype = Object.assign(Object.create(Loader.prototype), {
           case 'l':
             var numbers = parseFloats(data)
 
-            for (var j = 0, jl = numbers.length; j < jl; j += 2) {
+            for (let j = 0, jl = numbers.length; j < jl; j += 2) {
               point.x += numbers[j + 0]
               point.y += numbers[j + 1]
               control.x = point.x
@@ -420,7 +420,7 @@ SVGLoader.prototype = Object.assign(Object.create(Loader.prototype), {
           case 'c':
             var numbers = parseFloats(data)
 
-            for (var j = 0, jl = numbers.length; j < jl; j += 6) {
+            for (let j = 0, jl = numbers.length; j < jl; j += 6) {
               path.bezierCurveTo(
                 point.x + numbers[j + 0],
                 point.y + numbers[j + 1],
@@ -442,7 +442,7 @@ SVGLoader.prototype = Object.assign(Object.create(Loader.prototype), {
           case 's':
             var numbers = parseFloats(data)
 
-            for (var j = 0, jl = numbers.length; j < jl; j += 4) {
+            for (let j = 0, jl = numbers.length; j < jl; j += 4) {
               path.bezierCurveTo(
                 getReflection(point.x, control.x),
                 getReflection(point.y, control.y),
@@ -464,7 +464,7 @@ SVGLoader.prototype = Object.assign(Object.create(Loader.prototype), {
           case 'q':
             var numbers = parseFloats(data)
 
-            for (var j = 0, jl = numbers.length; j < jl; j += 4) {
+            for (let j = 0, jl = numbers.length; j < jl; j += 4) {
               path.quadraticCurveTo(
                 point.x + numbers[j + 0],
                 point.y + numbers[j + 1],
@@ -484,7 +484,7 @@ SVGLoader.prototype = Object.assign(Object.create(Loader.prototype), {
           case 't':
             var numbers = parseFloats(data)
 
-            for (var j = 0, jl = numbers.length; j < jl; j += 2) {
+            for (let j = 0, jl = numbers.length; j < jl; j += 2) {
               var rx = getReflection(point.x, control.x)
               var ry = getReflection(point.y, control.y)
               path.quadraticCurveTo(rx, ry, point.x + numbers[j + 0], point.y + numbers[j + 1])
@@ -501,7 +501,7 @@ SVGLoader.prototype = Object.assign(Object.create(Loader.prototype), {
           case 'a':
             var numbers = parseFloats(data)
 
-            for (var j = 0, jl = numbers.length; j < jl; j += 7) {
+            for (let j = 0, jl = numbers.length; j < jl; j += 7) {
               // skip command if no displacement
               if (numbers[j + 5] == 0 && numbers[j + 6] == 0) continue
 
@@ -554,7 +554,7 @@ SVGLoader.prototype = Object.assign(Object.create(Loader.prototype), {
     function parseCSSStylesheet(node) {
       if (!node.sheet || !node.sheet.cssRules || !node.sheet.cssRules.length) return
 
-      for (var i = 0; i < node.sheet.cssRules.length; i++) {
+      for (let i = 0; i < node.sheet.cssRules.length; i++) {
         var stylesheet = node.sheet.cssRules[i]
 
         if (stylesheet.type !== 1) continue
@@ -564,7 +564,7 @@ SVGLoader.prototype = Object.assign(Object.create(Loader.prototype), {
           .filter(Boolean)
           .map((i) => i.trim())
 
-        for (var j = 0; j < selectorList.length; j++) {
+        for (let j = 0; j < selectorList.length; j++) {
           stylesheets[selectorList[j]] = Object.assign(stylesheets[selectorList[j]] || {}, stylesheet.style)
         }
       }
@@ -786,7 +786,7 @@ SVGLoader.prototype = Object.assign(Object.create(Loader.prototype), {
           .filter(Boolean)
           .map((i) => i.trim())
 
-        for (var i = 0; i < classSelectors.length; i++) {
+        for (let i = 0; i < classSelectors.length; i++) {
           stylesheetStyles = Object.assign(stylesheetStyles, stylesheets['.' + classSelectors[i]])
         }
       }
@@ -1062,7 +1062,7 @@ SVGLoader.prototype = Object.assign(Object.create(Loader.prototype), {
       var theUnit = 'px'
 
       if (typeof string === 'string' || string instanceof String) {
-        for (var i = 0, n = units.length; i < n; i++) {
+        for (let i = 0, n = units.length; i < n; i++) {
           var u = units[i]
 
           if (string.endsWith(u)) {
@@ -1130,7 +1130,7 @@ SVGLoader.prototype = Object.assign(Object.create(Loader.prototype), {
       if (node.hasAttribute('transform')) {
         var transformsTexts = node.getAttribute('transform').split(')')
 
-        for (var tIndex = transformsTexts.length - 1; tIndex >= 0; tIndex--) {
+        for (let tIndex = transformsTexts.length - 1; tIndex >= 0; tIndex--) {
           var transformText = transformsTexts[tIndex].trim()
 
           if (transformText === '') continue
@@ -1240,11 +1240,11 @@ SVGLoader.prototype = Object.assign(Object.create(Loader.prototype), {
 
       var subPaths = path.subPaths
 
-      for (var i = 0, n = subPaths.length; i < n; i++) {
+      for (let i = 0, n = subPaths.length; i < n; i++) {
         var subPath = subPaths[i]
         var curves = subPath.curves
 
-        for (var j = 0; j < curves.length; j++) {
+        for (let j = 0; j < curves.length; j++) {
           var curve = curves[j]
 
           if (curve.isLineCurve) {
@@ -1438,7 +1438,7 @@ SVGLoader.pointsToStrokeWithBuffers = (function () {
     point0L.copy(lastPointL)
     point0R.copy(lastPointR)
 
-    for (var iPoint = 1; iPoint < numPoints; iPoint++) {
+    for (let iPoint = 1; iPoint < numPoints; iPoint++) {
       currentPoint = points[iPoint]
 
       // Get next point
@@ -1760,7 +1760,7 @@ SVGLoader.pointsToStrokeWithBuffers = (function () {
 
       tempV2_3.copy(p1)
 
-      for (var i = 0, il = arcDivisions - 1; i < il; i++) {
+      for (let i = 0, il = arcDivisions - 1; i < il; i++) {
         tempV2_4.copy(tempV2_3).rotateAround(center, angle)
 
         addVertex(tempV2_3, u, v)
@@ -1942,7 +1942,7 @@ SVGLoader.pointsToStrokeWithBuffers = (function () {
       // This does not remove duplicated initial and ending points of a closed path.
 
       var dupPoints = false
-      for (var i = 1, n = points.length - 1; i < n; i++) {
+      for (let i = 1, n = points.length - 1; i < n; i++) {
         if (points[i].distanceTo(points[i + 1]) < minDistance) {
           dupPoints = true
           break
@@ -1954,7 +1954,7 @@ SVGLoader.pointsToStrokeWithBuffers = (function () {
       var newPoints = []
       newPoints.push(points[0])
 
-      for (var i = 1, n = points.length - 1; i < n; i++) {
+      for (let i = 1, n = points.length - 1; i < n; i++) {
         if (points[i].distanceTo(points[i + 1]) >= minDistance) {
           newPoints.push(points[i])
         }

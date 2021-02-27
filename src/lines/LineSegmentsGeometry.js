@@ -168,7 +168,7 @@ LineSegmentsGeometry.prototype = Object.assign(Object.create(InstancedBufferGeom
 
         var maxRadiusSq = 0
 
-        for (var i = 0, il = start.count; i < il; i++) {
+        for (let i = 0, il = start.count; i < il; i++) {
           vector.fromBufferAttribute(start, i)
           maxRadiusSq = Math.max(maxRadiusSq, center.distanceToSquared(vector))
 

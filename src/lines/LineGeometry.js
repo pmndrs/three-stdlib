@@ -17,7 +17,7 @@ LineGeometry.prototype = Object.assign(Object.create(LineSegmentsGeometry.protot
     var length = array.length - 3
     var points = new Float32Array(2 * length)
 
-    for (var i = 0; i < length; i += 3) {
+    for (let i = 0; i < length; i += 3) {
       points[2 * i] = array[i]
       points[2 * i + 1] = array[i + 1]
       points[2 * i + 2] = array[i + 2]
@@ -38,7 +38,7 @@ LineGeometry.prototype = Object.assign(Object.create(LineSegmentsGeometry.protot
     var length = array.length - 3
     var colors = new Float32Array(2 * length)
 
-    for (var i = 0; i < length; i += 3) {
+    for (let i = 0; i < length; i += 3) {
       colors[2 * i] = array[i]
       colors[2 * i + 1] = array[i + 1]
       colors[2 * i + 2] = array[i + 2]

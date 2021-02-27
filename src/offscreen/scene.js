@@ -28,7 +28,7 @@ function init(canvas, width, height, pixelRatio, path) {
       new THREE.MeshMatcapMaterial({ color: 0xe30456, matcap: texture }),
     ]
 
-    for (var i = 0; i < 100; i++) {
+    for (let i = 0; i < 100; i++) {
       var material = materials[i % materials.length]
       var mesh = new THREE.Mesh(geometry, material)
       mesh.position.x = random() * 200 - 100

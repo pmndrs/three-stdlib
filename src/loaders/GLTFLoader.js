@@ -239,7 +239,7 @@ var GLTFLoader = (function () {
 
       parser.fileLoader.setRequestHeader(this.requestHeader)
 
-      for (var i = 0; i < this.pluginCallbacks.length; i++) {
+      for (let i = 0; i < this.pluginCallbacks.length; i++) {
         var plugin = this.pluginCallbacks[i](parser)
         plugins[plugin.name] = plugin
 
@@ -251,7 +251,7 @@ var GLTFLoader = (function () {
       }
 
       if (json.extensionsUsed) {
-        for (var i = 0; i < json.extensionsUsed.length; ++i) {
+        for (let i = 0; i < json.extensionsUsed.length; ++i) {
           var extensionName = json.extensionsUsed[i]
           var extensionsRequired = json.extensionsRequired || []
 
@@ -350,7 +350,7 @@ var GLTFLoader = (function () {
     var parser = this.parser
     var nodeDefs = this.parser.json.nodes || []
 
-    for (var nodeIndex = 0, nodeLength = nodeDefs.length; nodeIndex < nodeLength; nodeIndex++) {
+    for (let nodeIndex = 0, nodeLength = nodeDefs.length; nodeIndex < nodeLength; nodeIndex++) {
       var nodeDef = nodeDefs[nodeIndex]
 
       if (nodeDef.extensions && nodeDef.extensions[this.name] && nodeDef.extensions[this.name].light !== undefined) {
@@ -803,7 +803,7 @@ var GLTFLoader = (function () {
     var attributeNormalizedMap = {}
     var attributeTypeMap = {}
 
-    for (var attributeName in gltfAttributeMap) {
+    for (let attributeName in gltfAttributeMap) {
       var threeAttributeName = ATTRIBUTES[attributeName] || attributeName.toLowerCase()
 
       threeAttributeMap[threeAttributeName] = gltfAttributeMap[attributeName]
@@ -826,7 +826,7 @@ var GLTFLoader = (function () {
         dracoLoader.decodeDracoFile(
           bufferView,
           function (geometry) {
-            for (var attributeName in geometry.attributes) {
+            for (let attributeName in geometry.attributes) {
               var attribute = geometry.attributes[attributeName]
               var normalized = attributeNormalizedMap[attributeName]
 
@@ -941,7 +941,7 @@ var GLTFLoader = (function () {
     this._extraUniforms = uniforms
 
     this.onBeforeCompile = function (shader) {
-      for (var uniformName in uniforms) {
+      for (let uniformName in uniforms) {
         shader.uniforms[uniformName] = uniforms[uniformName]
       }
 
@@ -1182,7 +1182,7 @@ var GLTFLoader = (function () {
       valueSize = this.valueSize,
       offset = index * valueSize * 3 + valueSize
 
-    for (var i = 0; i !== valueSize; i++) {
+    for (let i = 0; i !== valueSize; i++) {
       result[i] = values[offset + i]
     }
 
@@ -1217,7 +1217,7 @@ var GLTFLoader = (function () {
 
     // Layout of keyframe output values for CUBICSPLINE animations:
     //   [ inTangent_1, splineVertex_1, outTangent_1, inTangent_2, splineVertex_2, ... ]
-    for (var i = 0; i !== stride; i++) {
+    for (let i = 0; i !== stride; i++) {
       var p0 = values[offset0 + i + stride] // splineVertex_k
       var m0 = values[offset0 + i + stride2] * td // outTangent_k * (t_k+1 - t_k)
       var p1 = values[offset1 + i + stride] // splineVertex_k+1
@@ -1368,7 +1368,7 @@ var GLTFLoader = (function () {
   function addUnknownExtensionsToUserData(knownExtensions, object, objectDef) {
     // Add unknown glTF extensions to an object's userData.
 
-    for (var name in objectDef.extensions) {
+    for (let name in objectDef.extensions) {
       if (knownExtensions[name] === undefined) {
         object.userData.gltfExtensions = object.userData.gltfExtensions || {}
         object.userData.gltfExtensions[name] = objectDef.extensions[name]
@@ -1402,7 +1402,7 @@ var GLTFLoader = (function () {
     var hasMorphPosition = false
     var hasMorphNormal = false
 
-    for (var i = 0, il = targets.length; i < il; i++) {
+    for (let i = 0, il = targets.length; i < il; i++) {
       var target = targets[i]
 
       if (target.POSITION !== undefined) hasMorphPosition = true
@@ -1416,7 +1416,7 @@ var GLTFLoader = (function () {
     var pendingPositionAccessors = []
     var pendingNormalAccessors = []
 
-    for (var i = 0, il = targets.length; i < il; i++) {
+    for (let i = 0, il = targets.length; i < il; i++) {
       var target = targets[i]
 
       if (hasMorphPosition) {
@@ -1458,7 +1458,7 @@ var GLTFLoader = (function () {
     mesh.updateMorphTargets()
 
     if (meshDef.weights !== undefined) {
-      for (var i = 0, il = meshDef.weights.length; i < il; i++) {
+      for (let i = 0, il = meshDef.weights.length; i < il; i++) {
         mesh.morphTargetInfluences[i] = meshDef.weights[i]
       }
     }
@@ -1470,7 +1470,7 @@ var GLTFLoader = (function () {
       if (mesh.morphTargetInfluences.length === targetNames.length) {
         mesh.morphTargetDictionary = {}
 
-        for (var i = 0, il = targetNames.length; i < il; i++) {
+        for (let i = 0, il = targetNames.length; i < il; i++) {
           mesh.morphTargetDictionary[targetNames[i]] = i
         }
       } else {
@@ -1503,7 +1503,7 @@ var GLTFLoader = (function () {
 
     var keys = Object.keys(attributes).sort()
 
-    for (var i = 0, il = keys.length; i < il; i++) {
+    for (let i = 0, il = keys.length; i < il; i++) {
       attributesKey += keys[i] + ':' + attributes[keys[i]] + ';'
     }
 
@@ -1623,17 +1623,17 @@ var GLTFLoader = (function () {
 
     // Nothing in the node definition indicates whether it is a Bone or an
     // Object3D. Use the skins' joint references to mark bones.
-    for (var skinIndex = 0, skinLength = skinDefs.length; skinIndex < skinLength; skinIndex++) {
+    for (let skinIndex = 0, skinLength = skinDefs.length; skinIndex < skinLength; skinIndex++) {
       var joints = skinDefs[skinIndex].joints
 
-      for (var i = 0, il = joints.length; i < il; i++) {
+      for (let i = 0, il = joints.length; i < il; i++) {
         nodeDefs[joints[i]].isBone = true
       }
     }
 
     // Iterate over all nodes, marking references to shared resources,
     // as well as skeleton joints.
-    for (var nodeIndex = 0, nodeLength = nodeDefs.length; nodeIndex < nodeLength; nodeIndex++) {
+    for (let nodeIndex = 0, nodeLength = nodeDefs.length; nodeIndex < nodeLength; nodeIndex++) {
       var nodeDef = nodeDefs[nodeIndex]
 
       if (nodeDef.mesh !== undefined) {
@@ -1687,7 +1687,7 @@ var GLTFLoader = (function () {
     var extensions = Object.values(this.plugins)
     extensions.push(this)
 
-    for (var i = 0; i < extensions.length; i++) {
+    for (let i = 0; i < extensions.length; i++) {
       var result = func(extensions[i])
 
       if (result) return result
@@ -1700,7 +1700,7 @@ var GLTFLoader = (function () {
 
     var pending = []
 
-    for (var i = 0; i < extensions.length; i++) {
+    for (let i = 0; i < extensions.length; i++) {
       var result = func(extensions[i])
 
       if (result) pending.push(result)
@@ -1960,7 +1960,7 @@ var GLTFLoader = (function () {
           )
         }
 
-        for (var i = 0, il = sparseIndices.length; i < il; i++) {
+        for (let i = 0, il = sparseIndices.length; i < il; i++) {
           var index = sparseIndices[i]
 
           bufferAttribute.setX(index, sparseValues[i * itemSize])
@@ -2364,7 +2364,7 @@ var GLTFLoader = (function () {
 
     var name = sanitizedName
 
-    for (var i = 1; this.nodeNamesUsed[name]; ++i) {
+    for (let i = 1; this.nodeNamesUsed[name]; ++i) {
       name = sanitizedName + '_' + i
     }
 
@@ -2408,7 +2408,7 @@ var GLTFLoader = (function () {
       var maxDisplacement = new Vector3()
       var vector = new Vector3()
 
-      for (var i = 0, il = targets.length; i < il; i++) {
+      for (let i = 0, il = targets.length; i < il; i++) {
         var target = targets[i]
 
         if (target.POSITION !== undefined) {
@@ -2466,7 +2466,7 @@ var GLTFLoader = (function () {
       })
     }
 
-    for (var gltfAttributeName in attributes) {
+    for (let gltfAttributeName in attributes) {
       var threeAttributeName = ATTRIBUTES[gltfAttributeName] || gltfAttributeName.toLowerCase()
 
       // Skip attributes already provided by e.g. Draco extension.
@@ -2508,7 +2508,7 @@ var GLTFLoader = (function () {
       var position = geometry.getAttribute('position')
 
       if (position !== undefined) {
-        for (var i = 0; i < position.count; i++) {
+        for (let i = 0; i < position.count; i++) {
           indices.push(i)
         }
 
@@ -2528,7 +2528,7 @@ var GLTFLoader = (function () {
     if (drawMode === TriangleFanDrawMode) {
       // gl.TRIANGLE_FAN
 
-      for (var i = 1; i <= numberOfTriangles; i++) {
+      for (let i = 1; i <= numberOfTriangles; i++) {
         newIndices.push(index.getX(0))
         newIndices.push(index.getX(i))
         newIndices.push(index.getX(i + 1))
@@ -2536,7 +2536,7 @@ var GLTFLoader = (function () {
     } else {
       // gl.TRIANGLE_STRIP
 
-      for (var i = 0; i < numberOfTriangles; i++) {
+      for (let i = 0; i < numberOfTriangles; i++) {
         if (i % 2 === 0) {
           newIndices.push(index.getX(i))
           newIndices.push(index.getX(i + 1))
@@ -2584,7 +2584,7 @@ var GLTFLoader = (function () {
 
     var pending = []
 
-    for (var i = 0, il = primitives.length; i < il; i++) {
+    for (let i = 0, il = primitives.length; i < il; i++) {
       var primitive = primitives[i]
       var cacheKey = createPrimitiveKey(primitive)
 
@@ -2630,7 +2630,7 @@ var GLTFLoader = (function () {
 
     var pending = []
 
-    for (var i = 0, il = primitives.length; i < il; i++) {
+    for (let i = 0, il = primitives.length; i < il; i++) {
       var material =
         primitives[i].material === undefined
           ? createDefaultMaterial(this.cache)
@@ -2647,7 +2647,7 @@ var GLTFLoader = (function () {
 
       var meshes = []
 
-      for (var i = 0, il = geometries.length; i < il; i++) {
+      for (let i = 0, il = geometries.length; i < il; i++) {
         var geometry = geometries[i]
         var primitive = primitives[i]
 
@@ -2710,7 +2710,7 @@ var GLTFLoader = (function () {
 
       var group = new Group()
 
-      for (var i = 0, il = meshes.length; i < il; i++) {
+      for (let i = 0, il = meshes.length; i < il; i++) {
         group.add(meshes[i])
       }
 
@@ -2788,7 +2788,7 @@ var GLTFLoader = (function () {
     var pendingSamplers = []
     var pendingTargets = []
 
-    for (var i = 0, il = animationDef.channels.length; i < il; i++) {
+    for (let i = 0, il = animationDef.channels.length; i < il; i++) {
       var channel = animationDef.channels[i]
       var sampler = animationDef.samplers[channel.sampler]
       var target = channel.target
@@ -2818,7 +2818,7 @@ var GLTFLoader = (function () {
 
       var tracks = []
 
-      for (var i = 0, il = nodes.length; i < il; i++) {
+      for (let i = 0, il = nodes.length; i < il; i++) {
         var node = nodes[i]
         var inputAccessor = inputAccessors[i]
         var outputAccessor = outputAccessors[i]
@@ -2885,14 +2885,14 @@ var GLTFLoader = (function () {
 
           var scaled = new Float32Array(outputArray.length)
 
-          for (var j = 0, jl = outputArray.length; j < jl; j++) {
+          for (let j = 0, jl = outputArray.length; j < jl; j++) {
             scaled[j] = outputArray[j] * scale
           }
 
           outputArray = scaled
         }
 
-        for (var j = 0, jl = targetNames.length; j < jl; j++) {
+        for (let j = 0, jl = targetNames.length; j < jl; j++) {
           var track = new TypedKeyframeTrack(
             targetNames[j] + '.' + PATH_PROPERTIES[target.path],
             inputAccessor.array,
@@ -2952,7 +2952,7 @@ var GLTFLoader = (function () {
               node.traverse(function (o) {
                 if (!o.isMesh) return
 
-                for (var i = 0, il = nodeDef.weights.length; i < il; i++) {
+                for (let i = 0, il = nodeDef.weights.length; i < il; i++) {
                   o.morphTargetInfluences[i] = nodeDef.weights[i]
                 }
               })
@@ -2995,7 +2995,7 @@ var GLTFLoader = (function () {
       }
 
       if (node !== objects[0]) {
-        for (var i = 0, il = objects.length; i < il; i++) {
+        for (let i = 0, il = objects.length; i < il; i++) {
           node.add(objects[i])
         }
       }
@@ -3060,7 +3060,7 @@ var GLTFLoader = (function () {
 
               var pendingJoints = []
 
-              for (var i = 0, il = skinEntry.joints.length; i < il; i++) {
+              for (let i = 0, il = skinEntry.joints.length; i < il; i++) {
                 pendingJoints.push(parser.getDependency('node', skinEntry.joints[i]))
               }
 
@@ -3073,7 +3073,7 @@ var GLTFLoader = (function () {
                 var bones = []
                 var boneInverses = []
 
-                for (var j = 0, jl = jointNodes.length; j < jl; j++) {
+                for (let j = 0, jl = jointNodes.length; j < jl; j++) {
                   var jointNode = jointNodes[j]
 
                   if (jointNode) {
@@ -3107,7 +3107,7 @@ var GLTFLoader = (function () {
           if (nodeDef.children) {
             var children = nodeDef.children
 
-            for (var i = 0, il = children.length; i < il; i++) {
+            for (let i = 0, il = children.length; i < il; i++) {
               var child = children[i]
               pending.push(buildNodeHierachy(child, node, json, parser))
             }
@@ -3136,7 +3136,7 @@ var GLTFLoader = (function () {
 
       var pending = []
 
-      for (var i = 0, il = nodeIds.length; i < il; i++) {
+      for (let i = 0, il = nodeIds.length; i < il; i++) {
         pending.push(buildNodeHierachy(nodeIds[i], scene, json, parser))
       }
 

@@ -327,7 +327,7 @@ RGBELoader.prototype = Object.assign(Object.create(DataTextureLoader.prototype),
             var numElements = (image_rgba_data.length / 4) * 3
             var floatArray = new Float32Array(numElements)
 
-            for (var j = 0; j < numElements; j++) {
+            for (let j = 0; j < numElements; j++) {
               RGBEByteToRGBFloat(image_rgba_data, j * 4, floatArray, j * 3)
             }
 
@@ -340,7 +340,7 @@ RGBELoader.prototype = Object.assign(Object.create(DataTextureLoader.prototype),
             var numElements = (image_rgba_data.length / 4) * 3
             var halfArray = new Uint16Array(numElements)
 
-            for (var j = 0; j < numElements; j++) {
+            for (let j = 0; j < numElements; j++) {
               RGBEByteToRGBHalf(image_rgba_data, j * 4, halfArray, j * 3)
             }
 

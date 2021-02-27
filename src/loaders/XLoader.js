@@ -29,7 +29,7 @@ var XLoader = (function () {
 
   var createClass = (function () {
     function defineProperties(target, props) {
-      for (var i = 0; i < props.length; i++) {
+      for (let i = 0; i < props.length; i++) {
         var descriptor = props[i]
         descriptor.enumerable = descriptor.enumerable || false
         descriptor.configurable = true
@@ -94,7 +94,7 @@ var XLoader = (function () {
       {
         key: 'make',
         value: function make(XAnimationInfoArray) {
-          for (var i = 0; i < XAnimationInfoArray.length; i++) {
+          for (let i = 0; i < XAnimationInfoArray.length; i++) {
             this.hierarchy.push(this.makeBonekeys(XAnimationInfoArray[i]))
           }
 
@@ -125,7 +125,7 @@ var XLoader = (function () {
         key: 'keyFrameRefactor',
         value: function keyFrameRefactor(XAnimationInfo) {
           var keys = []
-          for (var i = 0; i < XAnimationInfo.keyFrames.length; i++) {
+          for (let i = 0; i < XAnimationInfo.keyFrames.length; i++) {
             var keyframe = {}
             keyframe.time = XAnimationInfo.keyFrames[i].time * this.fps
             if (XAnimationInfo.keyFrames[i].pos && this.putFlags.putPos) {
@@ -212,7 +212,7 @@ var XLoader = (function () {
             return
           }
 
-          for (var i = _start; i < _arg.length; i++) {
+          for (let i = _start; i < _arg.length; i++) {
             switch (i) {
               case 0:
                 this.url = _arg[i]
@@ -335,7 +335,7 @@ var XLoader = (function () {
           }
 
           var fileLength = reader.byteLength
-          for (var index = 0; index < fileLength; index++) {
+          for (let index = 0; index < fileLength; index++) {
             if (reader.getUint8(index, false) > 127) {
               return true
             }
@@ -349,7 +349,7 @@ var XLoader = (function () {
         value: function _ensureBinary(buf) {
           if (typeof buf === 'string') {
             var array_buffer = new Uint8Array(buf.length)
-            for (var i = 0; i < buf.length; i++) {
+            for (let i = 0; i < buf.length; i++) {
               array_buffer[i] = buf.charCodeAt(i) & 0xff
             }
 
@@ -666,7 +666,7 @@ var XLoader = (function () {
           b.FrameTransformMatrix = this._currentFrame.FrameTransformMatrix
           this._currentFrame.putBone = b
           if (this._currentFrame.parentName) {
-            for (var frame in this.HieStack) {
+            for (let frame in this.HieStack) {
               if (this.HieStack[frame].name === this._currentFrame.parentName) {
                 this.HieStack[frame].putBone.add(this._currentFrame.putBone)
               }
@@ -800,7 +800,7 @@ var XLoader = (function () {
 
           var data = this._currentGeo.GeometryData
 
-          for (var i = 0, l = data.indices.length; i < l; i++) {
+          for (let i = 0, l = data.indices.length; i < l; i++) {
             var stride2 = data.indices[i] * 2
             var stride3 = data.indices[i] * 3
             var stride4 = data.indices[i] * 4
@@ -842,7 +842,7 @@ var XLoader = (function () {
           var groups = []
           var materialIndex = undefined
 
-          for (var i = 0; i < materialIndices.length; i++) {
+          for (let i = 0; i < materialIndices.length; i++) {
             var currentMaterialIndex = materialIndices[i]
 
             if (currentMaterialIndex !== materialIndex) {
@@ -930,7 +930,7 @@ var XLoader = (function () {
 
               var line = this._currentObject.data.substr(endRead, find - endRead)
               var data = this._readLine(line.trim()).split(',')
-              for (var i = 0; i < data.length; i++) {
+              for (let i = 0; i < data.length; i++) {
                 this._currentGeo.GeometryData.materialIndices[i] = parseInt(data[i])
               }
 
@@ -1031,7 +1031,7 @@ var XLoader = (function () {
           find = this._currentObject.data.indexOf(';', endRead)
           line = this._currentObject.data.substr(endRead, find - endRead)
           var data = this._readLine(line.trim()).split(',')
-          for (var i = 0; i < data.length; i++) {
+          for (let i = 0; i < data.length; i++) {
             boneInf.Indeces.push(parseInt(data[i]))
           }
 
@@ -1039,7 +1039,7 @@ var XLoader = (function () {
           find = this._currentObject.data.indexOf(';', endRead)
           line = this._currentObject.data.substr(endRead, find - endRead)
           var data2 = this._readLine(line.trim()).split(',')
-          for (var _i = 0; _i < data2.length; _i++) {
+          for (let _i = 0; _i < data2.length; _i++) {
             boneInf.Weights.push(parseFloat(data2[_i]))
           }
 
@@ -1060,7 +1060,7 @@ var XLoader = (function () {
         key: '_makePutBoneList',
         value: function _makePutBoneList(_RootName, _bones) {
           var putting = false
-          for (var frame in this.HieStack) {
+          for (let frame in this.HieStack) {
             if (this.HieStack[frame].name === _RootName || putting) {
               putting = true
               var b = new Bone()
@@ -1072,7 +1072,7 @@ var XLoader = (function () {
               b.rotq = new Quaternion().setFromRotationMatrix(b.FrameTransformMatrix).toArray()
               b.scl = new Vector3().setFromMatrixScale(b.FrameTransformMatrix).toArray()
               if (this.HieStack[frame].parentName && this.HieStack[frame].parentName.length > 0) {
-                for (var i = 0; i < _bones.length; i++) {
+                for (let i = 0; i < _bones.length; i++) {
                   if (this.HieStack[frame].parentName === _bones[i].name) {
                     _bones[i].add(b)
                     b.parent = i
@@ -1093,9 +1093,9 @@ var XLoader = (function () {
           if (this._currentGeo.BoneInfs.length > 0) {
             var putBones = []
             this._makePutBoneList(this._currentGeo.baseFrame.parentName, putBones)
-            for (var bi = 0; bi < this._currentGeo.BoneInfs.length; bi++) {
+            for (let bi = 0; bi < this._currentGeo.BoneInfs.length; bi++) {
               var boneIndex = 0
-              for (var bb = 0; bb < putBones.length; bb++) {
+              for (let bb = 0; bb < putBones.length; bb++) {
                 if (putBones[bb].name === this._currentGeo.BoneInfs[bi].boneName) {
                   boneIndex = bb
                   putBones[bb].OffsetMatrix = new Matrix4()
@@ -1104,7 +1104,7 @@ var XLoader = (function () {
                 }
               }
 
-              for (var vi = 0; vi < this._currentGeo.BoneInfs[bi].Indeces.length; vi++) {
+              for (let vi = 0; vi < this._currentGeo.BoneInfs[bi].Indeces.length; vi++) {
                 var nowVertexID = this._currentGeo.BoneInfs[bi].Indeces[vi]
                 var nowVal = this._currentGeo.BoneInfs[bi].Weights[vi]
 
@@ -1136,12 +1136,12 @@ var XLoader = (function () {
               }
             }
 
-            for (var sk = 0; sk < this._currentGeo.Materials.length; sk++) {
+            for (let sk = 0; sk < this._currentGeo.Materials.length; sk++) {
               this._currentGeo.Materials[sk].skinning = true
             }
 
             var offsetList = []
-            for (var _bi = 0; _bi < putBones.length; _bi++) {
+            for (let _bi = 0; _bi < putBones.length; _bi++) {
               if (putBones[_bi].OffsetMatrix) {
                 offsetList.push(putBones[_bi].OffsetMatrix)
               } else {
@@ -1231,7 +1231,7 @@ var XLoader = (function () {
           endRead = find + 1
           line = this._currentObject.data.substr(endRead)
           var data = this._readLine(line.trim()).split(';;,')
-          for (var i = 0; i < data.length; i++) {
+          for (let i = 0; i < data.length; i++) {
             var data2 = data[i].split(';')
             var keyInfo = new XKeyFrameInfo()
             keyInfo.type = nowKeyType
@@ -1240,7 +1240,7 @@ var XLoader = (function () {
             keyInfo.time = keyInfo.Frame
             if (nowKeyType != 4) {
               var frameFound = false
-              for (var mm = 0; mm < this._currentAnimeFrames.keyFrames.length; mm++) {
+              for (let mm = 0; mm < this._currentAnimeFrames.keyFrames.length; mm++) {
                 if (this._currentAnimeFrames.keyFrames[mm].Frame === keyInfo.Frame) {
                   keyInfo = this._currentAnimeFrames.keyFrames[mm]
                   frameFound = true
@@ -1317,15 +1317,15 @@ var XLoader = (function () {
           put.name = animation.name
           put.length = animation.length
           put.hierarchy = []
-          for (var b = 0; b < model.skeleton.bones.length; b++) {
+          for (let b = 0; b < model.skeleton.bones.length; b++) {
             var findAnimation = false
-            for (var i = 0; i < animation.hierarchy.length; i++) {
+            for (let i = 0; i < animation.hierarchy.length; i++) {
               if (model.skeleton.bones[b].name === animation.hierarchy[i].name) {
                 findAnimation = true
                 var c_key = animation.hierarchy[i].copy()
                 c_key.parent = -1
                 if (model.skeleton.bones[b].parent && model.skeleton.bones[b].parent.type === 'Bone') {
-                  for (var bb = 0; bb < put.hierarchy.length; bb++) {
+                  for (let bb = 0; bb < put.hierarchy.length; bb++) {
                     if (put.hierarchy[bb].name === model.skeleton.bones[b].parent.name) {
                       c_key.parent = bb
                       c_key.parentName = model.skeleton.bones[b].parent.name
@@ -1342,7 +1342,7 @@ var XLoader = (function () {
               var _c_key = animation.hierarchy[0].copy()
               _c_key.name = model.skeleton.bones[b].name
               _c_key.parent = -1
-              for (var k = 0; k < _c_key.keys.length; k++) {
+              for (let k = 0; k < _c_key.keys.length; k++) {
                 if (_c_key.keys[k].pos) {
                   _c_key.keys[k].pos.set(0, 0, 0)
                 }

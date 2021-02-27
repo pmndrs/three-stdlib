@@ -108,7 +108,7 @@ PLYLoader.prototype = Object.assign(Object.create(Loader.prototype), {
         return property
       }
 
-      for (var i = 0; i < lines.length; i++) {
+      for (let i = 0; i < lines.length; i++) {
         var line = lines[i]
         line = line.trim()
 
@@ -193,12 +193,12 @@ PLYLoader.prototype = Object.assign(Object.create(Loader.prototype), {
 
       var element = {}
 
-      for (var i = 0; i < properties.length; i++) {
+      for (let i = 0; i < properties.length; i++) {
         if (properties[i].type === 'list') {
           var list = []
           var n = parseASCIINumber(values.shift(), properties[i].countType)
 
-          for (var j = 0; j < n; j++) {
+          for (let j = 0; j < n; j++) {
             list.push(parseASCIINumber(values.shift(), properties[i].itemType))
           }
 
@@ -235,7 +235,7 @@ PLYLoader.prototype = Object.assign(Object.create(Loader.prototype), {
       var currentElement = 0
       var currentElementCount = 0
 
-      for (var i = 0; i < lines.length; i++) {
+      for (let i = 0; i < lines.length; i++) {
         var line = lines[i]
         line = line.trim()
         if (line === '') {
@@ -361,7 +361,7 @@ PLYLoader.prototype = Object.assign(Object.create(Loader.prototype), {
       var result,
         read = 0
 
-      for (var i = 0; i < properties.length; i++) {
+      for (let i = 0; i < properties.length; i++) {
         if (properties[i].type === 'list') {
           var list = []
 
@@ -369,7 +369,7 @@ PLYLoader.prototype = Object.assign(Object.create(Loader.prototype), {
           var n = result[0]
           read += result[1]
 
-          for (var j = 0; j < n; j++) {
+          for (let j = 0; j < n; j++) {
             result = binaryRead(dataview, at + read, properties[i].itemType, little_endian)
             list.push(result[0])
             read += result[1]
@@ -401,7 +401,7 @@ PLYLoader.prototype = Object.assign(Object.create(Loader.prototype), {
       var result,
         loc = 0
 
-      for (var currentElement = 0; currentElement < header.elements.length; currentElement++) {
+      for (let currentElement = 0; currentElement < header.elements.length; currentElement++) {
         for (
           var currentElementCount = 0;
           currentElementCount < header.elements[currentElement].count;

@@ -42,8 +42,8 @@ Lut.prototype = {
     var step = 1.0 / this.n
 
     this.lut.length = 0
-    for (var i = 0; i <= 1; i += step) {
-      for (var j = 0; j < this.map.length - 1; j++) {
+    for (let i = 0; i <= 1; i += step) {
+      for (let j = 0; j < this.map.length - 1; j++) {
         if (i >= this.map[j][0] && i < this.map[j + 1][0]) {
           var min = this.map[j][0]
           var max = this.map[j + 1][0]
@@ -111,8 +111,8 @@ Lut.prototype = {
 
     var step = 1.0 / this.n
 
-    for (var i = 1; i >= 0; i -= step) {
-      for (var j = this.map.length - 1; j >= 0; j--) {
+    for (let i = 1; i >= 0; i -= step) {
+      for (let j = this.map.length - 1; j >= 0; j--) {
         if (i < this.map[j][0] && i >= this.map[j - 1][0]) {
           var min = this.map[j - 1][0]
           var max = this.map[j][0]

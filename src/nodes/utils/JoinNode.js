@@ -39,7 +39,7 @@ JoinNode.prototype.generate = function (builder, output) {
     length = this.getNumElements(),
     outputs = []
 
-  for (var i = 0; i < length; i++) {
+  for (let i = 0; i < length; i++) {
     var elm = this[inputs[i]]
 
     outputs.push(elm ? elm.build(builder, 'f') : '0.0')
@@ -53,7 +53,7 @@ JoinNode.prototype.generate = function (builder, output) {
 JoinNode.prototype.copy = function (source) {
   TempNode.prototype.copy.call(this, source)
 
-  for (var prop in source.inputs) {
+  for (let prop in source.inputs) {
     this[prop] = source.inputs[prop]
   }
 
@@ -70,7 +70,7 @@ JoinNode.prototype.toJSON = function (meta) {
 
     var length = this.getNumElements()
 
-    for (var i = 0; i < length; i++) {
+    for (let i = 0; i < length; i++) {
       var elm = this[inputs[i]]
 
       if (elm) {

@@ -21,7 +21,7 @@ var NodeMaterialLoaderUtils = {
     if (typeof object === 'object') {
       var keys = Object.keys(object)
 
-      for (var i = 0; i < keys.length; i++) {
+      for (let i = 0; i < keys.length; i++) {
         var key = keys[i]
 
         if (recursive) {
@@ -106,11 +106,11 @@ Object.assign(NodeMaterialLoader.prototype, {
 
       default:
         if (Array.isArray(json)) {
-          for (var i = 0; i < json.length; i++) {
+          for (let i = 0; i < json.length; i++) {
             json[i] = this.resolve(json[i])
           }
         } else {
-          for (var prop in json) {
+          for (let prop in json) {
             if (prop === 'uuid') continue
 
             json[prop] = this.resolve(json[prop])

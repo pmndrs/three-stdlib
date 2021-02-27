@@ -1,11 +1,4 @@
-import {
-  AnimationClip,
-  BufferGeometry,
-  FileLoader,
-  Float32BufferAttribute,
-  Loader,
-  Vector3,
-} from 'three'
+import { AnimationClip, BufferGeometry, FileLoader, Float32BufferAttribute, Loader, Vector3 } from 'three'
 
 var MD2Loader = function (manager) {
   Loader.call(this, manager)
@@ -234,7 +227,7 @@ MD2Loader.prototype = Object.assign(Object.create(Loader.prototype), {
         'offset_end',
       ]
 
-      for (var i = 0; i < headerNames.length; i++) {
+      for (let i = 0; i < headerNames.length; i++) {
         header[headerNames[i]] = data.getInt32(i * 4, true)
       }
 
@@ -257,7 +250,7 @@ MD2Loader.prototype = Object.assign(Object.create(Loader.prototype), {
       var uvsTemp = []
       var offset = header.offset_st
 
-      for (var i = 0, l = header.num_st; i < l; i++) {
+      for (let i = 0, l = header.num_st; i < l; i++) {
         var u = data.getInt16(offset + 0, true)
         var v = data.getInt16(offset + 2, true)
 
@@ -273,7 +266,7 @@ MD2Loader.prototype = Object.assign(Object.create(Loader.prototype), {
       var vertexIndices = []
       var uvIndices = []
 
-      for (var i = 0, l = header.num_tris; i < l; i++) {
+      for (let i = 0, l = header.num_tris; i < l; i++) {
         vertexIndices.push(
           data.getUint16(offset + 0, true),
           data.getUint16(offset + 2, true),
@@ -299,7 +292,7 @@ MD2Loader.prototype = Object.assign(Object.create(Loader.prototype), {
 
       offset = header.offset_frames
 
-      for (var i = 0, l = header.num_frames; i < l; i++) {
+      for (let i = 0, l = header.num_frames; i < l; i++) {
         scale.set(
           data.getFloat32(offset + 0, true),
           data.getFloat32(offset + 4, true),
@@ -314,7 +307,7 @@ MD2Loader.prototype = Object.assign(Object.create(Loader.prototype), {
 
         offset += 24
 
-        for (var j = 0; j < 16; j++) {
+        for (let j = 0; j < 16; j++) {
           var character = data.getUint8(offset + j, true)
           if (character === 0) break
 
@@ -329,7 +322,7 @@ MD2Loader.prototype = Object.assign(Object.create(Loader.prototype), {
 
         offset += 16
 
-        for (var j = 0; j < header.num_vertices; j++) {
+        for (let j = 0; j < header.num_vertices; j++) {
           var x = data.getUint8(offset++, true)
           var y = data.getUint8(offset++, true)
           var z = data.getUint8(offset++, true)
@@ -355,7 +348,7 @@ MD2Loader.prototype = Object.assign(Object.create(Loader.prototype), {
       var verticesTemp = frames[0].vertices
       var normalsTemp = frames[0].normals
 
-      for (var i = 0, l = vertexIndices.length; i < l; i++) {
+      for (let i = 0, l = vertexIndices.length; i < l; i++) {
         var vertexIndex = vertexIndices[i]
         var stride = vertexIndex * 3
 
@@ -395,14 +388,14 @@ MD2Loader.prototype = Object.assign(Object.create(Loader.prototype), {
       var morphPositions = []
       var morphNormals = []
 
-      for (var i = 0, l = frames.length; i < l; i++) {
+      for (let i = 0, l = frames.length; i < l; i++) {
         var frame = frames[i]
         var attributeName = frame.name
 
         if (frame.vertices.length > 0) {
           var positions = []
 
-          for (var j = 0, jl = vertexIndices.length; j < jl; j++) {
+          for (let j = 0, jl = vertexIndices.length; j < jl; j++) {
             var vertexIndex = vertexIndices[j]
             var stride = vertexIndex * 3
 
@@ -422,7 +415,7 @@ MD2Loader.prototype = Object.assign(Object.create(Loader.prototype), {
         if (frame.normals.length > 0) {
           var normals = []
 
-          for (var j = 0, jl = vertexIndices.length; j < jl; j++) {
+          for (let j = 0, jl = vertexIndices.length; j < jl; j++) {
             var vertexIndex = vertexIndices[j]
             var stride = vertexIndex * 3
 

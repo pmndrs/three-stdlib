@@ -76,7 +76,7 @@ class WebGPUUniformsGroup extends WebGPUBinding {
   update() {
     let updated = false
 
-    for (const uniform of this.uniforms) {
+    for (let uniform of this.uniforms) {
       if (this.updateByType(uniform) === true) {
         updated = true
       }

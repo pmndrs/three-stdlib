@@ -220,10 +220,10 @@ ColladaExporter.prototype = {
           indexArray = attrBufferToArray(bufferGeometry.index)
         } else {
           indexArray = new Array(indexCount)
-          for (var i = 0, l = indexArray.length; i < l; i++) indexArray[i] = i
+          for (let i = 0, l = indexArray.length; i < l; i++) indexArray[i] = i
         }
 
-        for (var i = 0, l = groups.length; i < l; i++) {
+        for (let i = 0, l = groups.length; i < l; i++) {
           const group = groups[i]
           const subarr = subArray(indexArray, group.start, group.count)
           const polycount = subarr.length / 3

@@ -19,7 +19,7 @@ class WebGPUGeometries {
 
     const geometryAttributes = geometry.attributes
 
-    for (const name in geometryAttributes) {
+    for (let name in geometryAttributes) {
       this.attributes.update(geometryAttributes[name])
     }
 
@@ -50,7 +50,7 @@ function onGeometryDispose(event) {
     this.attributes.remove(index)
   }
 
-  for (const name in geometryAttributes) {
+  for (let name in geometryAttributes) {
     this.attributes.remove(geometryAttributes[name])
   }
 }

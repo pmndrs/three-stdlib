@@ -124,26 +124,26 @@ export function calcBSplinePoint(p, U, P, u) {
 	*/
 export function calcBasisFunctionDerivatives(span, u, p, n, U) {
   const zeroArr = []
-  for (var i = 0; i <= p; ++i) zeroArr[i] = 0.0
+  for (let i = 0; i <= p; ++i) zeroArr[i] = 0.0
 
   const ders = []
-  for (var i = 0; i <= n; ++i) ders[i] = zeroArr.slice(0)
+  for (let i = 0; i <= n; ++i) ders[i] = zeroArr.slice(0)
 
   const ndu = []
-  for (var i = 0; i <= p; ++i) ndu[i] = zeroArr.slice(0)
+  for (let i = 0; i <= p; ++i) ndu[i] = zeroArr.slice(0)
 
   ndu[0][0] = 1.0
 
   const left = zeroArr.slice(0)
   const right = zeroArr.slice(0)
 
-  for (var j = 1; j <= p; ++j) {
+  for (let j = 1; j <= p; ++j) {
     left[j] = u - U[span + 1 - j]
     right[j] = U[span + j] - u
 
     let saved = 0.0
 
-    for (var r = 0; r < j; ++r) {
+    for (let r = 0; r < j; ++r) {
       const rv = right[r + 1]
       const lv = left[j - r]
       ndu[j][r] = rv + lv
@@ -156,22 +156,22 @@ export function calcBasisFunctionDerivatives(span, u, p, n, U) {
     ndu[j][j] = saved
   }
 
-  for (var j = 0; j <= p; ++j) {
+  for (let j = 0; j <= p; ++j) {
     ders[0][j] = ndu[j][p]
   }
 
-  for (var r = 0; r <= p; ++r) {
+  for (let r = 0; r <= p; ++r) {
     let s1 = 0
     let s2 = 1
 
     const a = []
-    for (var i = 0; i <= p; ++i) {
+    for (let i = 0; i <= p; ++i) {
       a[i] = zeroArr.slice(0)
     }
 
     a[0][0] = 1.0
 
-    for (var k = 1; k <= n; ++k) {
+    for (let k = 1; k <= n; ++k) {
       let d = 0.0
       const rk = r - k
       const pk = p - k
@@ -184,7 +184,7 @@ export function calcBasisFunctionDerivatives(span, u, p, n, U) {
       const j1 = rk >= -1 ? 1 : -rk
       const j2 = r - 1 <= pk ? k - 1 : p - r
 
-      for (var j = j1; j <= j2; ++j) {
+      for (let j = j1; j <= j2; ++j) {
         a[s2][j] = (a[s1][j] - a[s1][j - 1]) / ndu[pk + 1][rk + j]
         d += a[s2][j] * ndu[rk + j][pk]
       }
@@ -204,8 +204,8 @@ export function calcBasisFunctionDerivatives(span, u, p, n, U) {
 
   var r = p
 
-  for (var k = 1; k <= n; ++k) {
-    for (var j = 0; j <= p; ++j) {
+  for (let k = 1; k <= n; ++k) {
+    for (let j = 0; j <= p; ++j) {
       ders[k][j] *= r
     }
 
@@ -244,7 +244,7 @@ export function calcBSplineDerivatives(p, U, P, u, nd) {
     Pw[i] = point
   }
 
-  for (var k = 0; k <= du; ++k) {
+  for (let k = 0; k <= du; ++k) {
     var point = Pw[span - p].clone().multiplyScalar(nders[k][0])
 
     for (let j = 1; j <= p; ++j) {
@@ -254,7 +254,7 @@ export function calcBSplineDerivatives(p, U, P, u, nd) {
     CK[k] = point
   }
 
-  for (var k = du + 1; k <= nd + 1; ++k) {
+  for (let k = du + 1; k <= nd + 1; ++k) {
     CK[k] = new Vector4(0, 0, 0)
   }
 
@@ -269,17 +269,17 @@ export function calcBSplineDerivatives(p, U, P, u, nd) {
 export function calcKoverI(k, i) {
   let nom = 1
 
-  for (var j = 2; j <= k; ++j) {
+  for (let j = 2; j <= k; ++j) {
     nom *= j
   }
 
   let denom = 1
 
-  for (var j = 2; j <= i; ++j) {
+  for (let j = 2; j <= i; ++j) {
     denom *= j
   }
 
-  for (var j = 2; j <= k - i; ++j) {
+  for (let j = 2; j <= k - i; ++j) {
     denom *= j
   }
 
@@ -298,7 +298,7 @@ export function calcRationalCurveDerivatives(Pders) {
   const Aders = []
   const wders = []
 
-  for (var i = 0; i < nd; ++i) {
+  for (let i = 0; i < nd; ++i) {
     const point = Pders[i]
     Aders[i] = new Vector3(point.x, point.y, point.z)
     wders[i] = point.w
@@ -309,7 +309,7 @@ export function calcRationalCurveDerivatives(Pders) {
   for (let k = 0; k < nd; ++k) {
     const v = Aders[k].clone()
 
-    for (var i = 1; i <= k; ++i) {
+    for (let i = 1; i <= k; ++i) {
       v.sub(CK[k - i].clone().multiplyScalar(this.calcKoverI(k, i) * wders[i]))
     }
 
@@ -352,7 +352,7 @@ export function calcSurfacePoint(p, q, U, V, P, u, v, target) {
   const Nv = this.calcBasisFunctions(vspan, v, q, V)
   const temp = []
 
-  for (var l = 0; l <= q; ++l) {
+  for (let l = 0; l <= q; ++l) {
     temp[l] = new Vector4(0, 0, 0, 0)
     for (let k = 0; k <= p; ++k) {
       const point = P[uspan - p + k][vspan - q + l].clone()
@@ -365,7 +365,7 @@ export function calcSurfacePoint(p, q, U, V, P, u, v, target) {
   }
 
   const Sw = new Vector4(0, 0, 0, 0)
-  for (var l = 0; l <= q; ++l) {
+  for (let l = 0; l <= q; ++l) {
     Sw.add(temp[l].multiplyScalar(Nv[l]))
   }
 

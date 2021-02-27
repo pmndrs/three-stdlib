@@ -223,7 +223,7 @@ Volume.prototype = {
     var length = this.data.length
     context = context || this
 
-    for (var i = 0; i < length; i++) {
+    for (let i = 0; i < length; i++) {
       this.data[i] = functionToMap.call(context, this.data[i], i, this.data)
     }
 

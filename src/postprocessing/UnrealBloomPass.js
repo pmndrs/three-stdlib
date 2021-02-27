@@ -50,7 +50,7 @@ var UnrealBloomPass = function (resolution, strength, radius, threshold) {
   this.renderTargetBright.texture.name = 'UnrealBloomPass.bright'
   this.renderTargetBright.texture.generateMipmaps = false
 
-  for (var i = 0; i < this.nMips; i++) {
+  for (let i = 0; i < this.nMips; i++) {
     var renderTargetHorizonal = new WebGLRenderTarget(resx, resy, pars)
 
     renderTargetHorizonal.texture.name = 'UnrealBloomPass.h' + i
@@ -93,7 +93,7 @@ var UnrealBloomPass = function (resolution, strength, radius, threshold) {
   var resx = Math.round(this.resolution.x / 2)
   var resy = Math.round(this.resolution.y / 2)
 
-  for (var i = 0; i < this.nMips; i++) {
+  for (let i = 0; i < this.nMips; i++) {
     this.separableBlurMaterials.push(this.getSeperableBlurMaterial(kernelSizeArray[i]))
 
     this.separableBlurMaterials[i].uniforms['texSize'].value = new Vector2(resx, resy)
@@ -160,11 +160,11 @@ UnrealBloomPass.prototype = Object.assign(Object.create(Pass.prototype), {
   constructor: UnrealBloomPass,
 
   dispose: function () {
-    for (var i = 0; i < this.renderTargetsHorizontal.length; i++) {
+    for (let i = 0; i < this.renderTargetsHorizontal.length; i++) {
       this.renderTargetsHorizontal[i].dispose()
     }
 
-    for (var i = 0; i < this.renderTargetsVertical.length; i++) {
+    for (let i = 0; i < this.renderTargetsVertical.length; i++) {
       this.renderTargetsVertical[i].dispose()
     }
 
@@ -177,7 +177,7 @@ UnrealBloomPass.prototype = Object.assign(Object.create(Pass.prototype), {
 
     this.renderTargetBright.setSize(resx, resy)
 
-    for (var i = 0; i < this.nMips; i++) {
+    for (let i = 0; i < this.nMips; i++) {
       this.renderTargetsHorizontal[i].setSize(resx, resy)
       this.renderTargetsVertical[i].setSize(resx, resy)
 
@@ -223,7 +223,7 @@ UnrealBloomPass.prototype = Object.assign(Object.create(Pass.prototype), {
 
     var inputRenderTarget = this.renderTargetBright
 
-    for (var i = 0; i < this.nMips; i++) {
+    for (let i = 0; i < this.nMips; i++) {
       this.fsQuad.material = this.separableBlurMaterials[i]
 
       this.separableBlurMaterials[i].uniforms['colorTexture'].value = inputRenderTarget.texture

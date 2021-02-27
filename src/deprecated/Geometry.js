@@ -732,7 +732,7 @@ class Geometry extends EventDispatcher {
     if (this.parameters !== undefined) {
       const parameters = this.parameters
 
-      for (const key in parameters) {
+      for (let key in parameters) {
         if (parameters[key] !== undefined) data[key] = parameters[key]
       }
 
@@ -1110,7 +1110,7 @@ class Geometry extends EventDispatcher {
 
     // morphs
 
-    for (const name in geometry.morphTargets) {
+    for (let name in geometry.morphTargets) {
       const array = []
       const morphTargets = geometry.morphTargets[name]
 

@@ -853,7 +853,7 @@ var TransformControlsGizmo = function () {
   const setupGizmo = (gizmoMap) => {
     const gizmo = new Object3D()
 
-    for (const name in gizmoMap) {
+    for (let name in gizmoMap) {
       for (let i = gizmoMap[name].length; i--; ) {
         const object = gizmoMap[name][i][0].clone()
         const position = gizmoMap[name][i][1]

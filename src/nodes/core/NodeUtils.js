@@ -29,7 +29,7 @@ var NodeUtils = {
     return function addShortcuts(proto, proxy, list) {
       var shortcuts = {}
 
-      for (var i = 0; i < list.length; ++i) {
+      for (let i = 0; i < list.length; ++i) {
         var data = list[i].split('.'),
           property = data[0],
           subProperty = data[1]

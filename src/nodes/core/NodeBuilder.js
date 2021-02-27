@@ -156,7 +156,7 @@ NodeBuilder.prototype = {
     this.buildShader('vertex', vertex)
     this.buildShader('fragment', fragment)
 
-    for (var i = 0; i < this.requires.uv.length; i++) {
+    for (let i = 0; i < this.requires.uv.length; i++) {
       if (this.requires.uv[i]) {
         var uvIndex = i > 0 ? i + 1 : ''
 
@@ -427,7 +427,7 @@ NodeBuilder.prototype = {
 
     var code = ''
 
-    for (var i = 0, l = vars.length; i < l; ++i) {
+    for (let i = 0, l = vars.length; i < l; ++i) {
       var nVar = vars[i],
         type = nVar.type,
         name = nVar.name
@@ -568,7 +568,7 @@ NodeBuilder.prototype = {
       var code = '',
         includes = includes.sort(sortByPosition)
 
-      for (var i = 0; i < includes.length; i++) {
+      for (let i = 0; i < includes.length; i++) {
         if (includes[i].src) code += includes[i].src + '\n'
       }
 
@@ -597,7 +597,7 @@ NodeBuilder.prototype = {
   },
 
   findNode: function () {
-    for (var i = 0; i < arguments.length; i++) {
+    for (let i = 0; i < arguments.length; i++) {
       var nodeCandidate = arguments[i]
 
       if (nodeCandidate !== undefined && nodeCandidate.isNode) {
@@ -607,7 +607,7 @@ NodeBuilder.prototype = {
   },
 
   resolve: function () {
-    for (var i = 0; i < arguments.length; i++) {
+    for (let i = 0; i < arguments.length; i++) {
       var nodeCandidate = arguments[i]
 
       if (nodeCandidate !== undefined) {
@@ -745,7 +745,7 @@ NodeBuilder.prototype = {
   },
 
   mergeDefines: function (defines) {
-    for (var name in defines) {
+    for (let name in defines) {
       this.defines[name] = defines[name]
     }
 
@@ -753,7 +753,7 @@ NodeBuilder.prototype = {
   },
 
   mergeUniform: function (uniforms) {
-    for (var name in uniforms) {
+    for (let name in uniforms) {
       this.uniforms[name] = uniforms[name]
     }
 

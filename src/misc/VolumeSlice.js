@@ -1,12 +1,4 @@
-import {
-  ClampToEdgeWrapping,
-  DoubleSide,
-  LinearFilter,
-  Mesh,
-  MeshBasicMaterial,
-  PlaneGeometry,
-  Texture,
-} from 'three'
+import { ClampToEdgeWrapping, DoubleSide, LinearFilter, Mesh, MeshBasicMaterial, PlaneGeometry, Texture } from 'three'
 
 /**
  * This class has been made to hold a slice of a volume data
@@ -126,8 +118,8 @@ VolumeSlice.prototype = {
 
     if (volume.dataType === 'label') {
       //this part is currently useless but will be used when colortables will be handled
-      for (var j = 0; j < jLength; j++) {
-        for (var i = 0; i < iLength; i++) {
+      for (let j = 0; j < jLength; j++) {
+        for (let i = 0; i < iLength; i++) {
           var label = volumeData[sliceAccess(i, j)]
           label = label >= this.colorMap.length ? (label % this.colorMap.length) + 1 : label
           var color = this.colorMap[label]
@@ -139,8 +131,8 @@ VolumeSlice.prototype = {
         }
       }
     } else {
-      for (var j = 0; j < jLength; j++) {
-        for (var i = 0; i < iLength; i++) {
+      for (let j = 0; j < jLength; j++) {
+        for (let i = 0; i < iLength; i++) {
           var value = volumeData[sliceAccess(i, j)]
           var alpha = 0xff
           //apply threshold

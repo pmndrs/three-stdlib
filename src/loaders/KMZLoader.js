@@ -39,7 +39,7 @@ KMZLoader.prototype = Object.assign(Object.create(Loader.prototype), {
 
   parse: function (data) {
     function findFile(url) {
-      for (var path in zip) {
+      for (let path in zip) {
         if (path.substr(-url.length) === url) {
           return zip[path]
         }
@@ -78,7 +78,7 @@ KMZLoader.prototype = Object.assign(Object.create(Loader.prototype), {
     } else {
       console.warn('KMZLoader: Missing doc.kml file.')
 
-      for (var path in zip) {
+      for (let path in zip) {
         var extension = path.split('.').pop().toLowerCase()
 
         if (extension === 'dae') {

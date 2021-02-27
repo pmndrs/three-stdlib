@@ -584,7 +584,7 @@ IFFParser.prototype = {
   // x -> -x and switch material FrontSide -> BackSide
   parsePoints(length) {
     this.currentPoints = []
-    for (var i = 0; i < length / 4; i += 3) {
+    for (let i = 0; i < length / 4; i += 3) {
       // z -> -z to match three.js right handed coords
       this.currentPoints.push(this.reader.getFloat32(), this.reader.getFloat32(), -this.reader.getFloat32())
     }
@@ -715,7 +715,7 @@ IFFParser.prototype = {
       numverts = numverts & 1023 // remaining ten low order bits are vertex num
       polygonDimensions.push(numverts)
 
-      for (var j = 0; j < numverts; j++) indices.push(this.reader.getVariableLengthIndex())
+      for (let j = 0; j < numverts; j++) indices.push(this.reader.getVariableLengthIndex())
     }
 
     var geometryData = {
@@ -845,7 +845,7 @@ DataViewReader.prototype = {
   getFloat32Array: function (size) {
     var a = []
 
-    for (var i = 0; i < size; i++) {
+    for (let i = 0; i < size; i++) {
       a.push(this.getFloat32())
     }
 
@@ -861,7 +861,7 @@ DataViewReader.prototype = {
   getFloat64Array: function (size) {
     var a = []
 
-    for (var i = 0; i < size; i++) {
+    for (let i = 0; i < size; i++) {
       a.push(this.getFloat64())
     }
 
@@ -896,7 +896,7 @@ DataViewReader.prototype = {
     var a = []
 
     if (size) {
-      for (var i = 0; i < size; i++) {
+      for (let i = 0; i < size; i++) {
         a[i] = this.getUint8()
       }
     } else {
@@ -977,7 +977,7 @@ Debugger.prototype = {
   closeForms: function () {
     if (!this.active) return
 
-    for (var i = this.formList.length - 1; i >= 0; i--) {
+    for (let i = this.formList.length - 1; i >= 0; i--) {
       if (this.offset >= this.formList[i]) {
         this.depth -= 1
         console.log('| '.repeat(this.depth) + '}')

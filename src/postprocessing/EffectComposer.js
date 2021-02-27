@@ -88,7 +88,7 @@ Object.assign(EffectComposer.prototype, {
   },
 
   isLastEnabledPass: function (passIndex) {
-    for (var i = passIndex + 1; i < this.passes.length; i++) {
+    for (let i = passIndex + 1; i < this.passes.length; i++) {
       if (this.passes[i].enabled) {
         return false
       }
@@ -179,7 +179,7 @@ Object.assign(EffectComposer.prototype, {
     this.renderTarget1.setSize(effectiveWidth, effectiveHeight)
     this.renderTarget2.setSize(effectiveWidth, effectiveHeight)
 
-    for (var i = 0; i < this.passes.length; i++) {
+    for (let i = 0; i < this.passes.length; i++) {
       this.passes[i].setSize(effectiveWidth, effectiveHeight)
     }
   },

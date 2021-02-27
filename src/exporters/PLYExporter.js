@@ -174,7 +174,7 @@ PLYExporter.prototype = {
 
         normalMatrixWorld.getNormalMatrix(mesh.matrixWorld)
 
-        for (var i = 0, l = vertices.count; i < l; i++) {
+        for (let i = 0, l = vertices.count; i < l; i++) {
           vertex.x = vertices.getX(i)
           vertex.y = vertices.getY(i)
           vertex.z = vertices.getZ(i)
@@ -265,7 +265,7 @@ PLYExporter.prototype = {
           // Create the face list
 
           if (indices !== null) {
-            for (var i = 0, l = indices.count; i < l; i += 3) {
+            for (let i = 0, l = indices.count; i < l; i += 3) {
               output.setUint8(fOffset, 3)
               fOffset += 1
 
@@ -279,7 +279,7 @@ PLYExporter.prototype = {
               fOffset += indexByteCount
             }
           } else {
-            for (var i = 0, l = vertices.count; i < l; i += 3) {
+            for (let i = 0, l = vertices.count; i < l; i += 3) {
               output.setUint8(fOffset, 3)
               fOffset += 1
 
@@ -318,7 +318,7 @@ PLYExporter.prototype = {
         normalMatrixWorld.getNormalMatrix(mesh.matrixWorld)
 
         // form each line
-        for (var i = 0, l = vertices.count; i < l; i++) {
+        for (let i = 0, l = vertices.count; i < l; i++) {
           vertex.x = vertices.getX(i)
           vertex.y = vertices.getY(i)
           vertex.z = vertices.getZ(i)
@@ -369,13 +369,13 @@ PLYExporter.prototype = {
         // Create the face list
         if (includeIndices === true) {
           if (indices !== null) {
-            for (var i = 0, l = indices.count; i < l; i += 3) {
+            for (let i = 0, l = indices.count; i < l; i += 3) {
               faceList += `3 ${indices.getX(i + 0) + writtenVertices}`
               faceList += ` ${indices.getX(i + 1) + writtenVertices}`
               faceList += ` ${indices.getX(i + 2) + writtenVertices}\n`
             }
           } else {
-            for (var i = 0, l = vertices.count; i < l; i += 3) {
+            for (let i = 0, l = vertices.count; i < l; i += 3) {
               faceList += `3 ${writtenVertices + i} ${writtenVertices + i + 1} ${writtenVertices + i + 2}\n`
             }
           }

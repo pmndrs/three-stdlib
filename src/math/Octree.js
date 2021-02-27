@@ -52,9 +52,9 @@ var Octree = (function () {
         v,
         triangle
 
-      for (var x = 0; x < 2; x++) {
-        for (var y = 0; y < 2; y++) {
-          for (var z = 0; z < 2; z++) {
+      for (let x = 0; x < 2; x++) {
+        for (let y = 0; y < 2; y++) {
+          for (let z = 0; z < 2; z++) {
             box = new Box3()
             v = _v1.set(x, y, z)
 
@@ -67,14 +67,14 @@ var Octree = (function () {
       }
 
       while ((triangle = this.triangles.pop())) {
-        for (var i = 0; i < subTrees.length; i++) {
+        for (let i = 0; i < subTrees.length; i++) {
           if (subTrees[i].box.intersectsTriangle(triangle)) {
             subTrees[i].triangles.push(triangle)
           }
         }
       }
 
-      for (var i = 0; i < subTrees.length; i++) {
+      for (let i = 0; i < subTrees.length; i++) {
         var len = subTrees[i].triangles.length
 
         if (len > 8 && level < 16) {
@@ -97,12 +97,12 @@ var Octree = (function () {
     },
 
     getRayTriangles: function (ray, triangles) {
-      for (var i = 0; i < this.subTrees.length; i++) {
+      for (let i = 0; i < this.subTrees.length; i++) {
         var subTree = this.subTrees[i]
         if (!ray.intersectsBox(subTree.box)) continue
 
         if (subTree.triangles.length > 0) {
-          for (var j = 0; j < subTree.triangles.length; j++) {
+          for (let j = 0; j < subTree.triangles.length; j++) {
             if (triangles.indexOf(subTree.triangles[j]) === -1) triangles.push(subTree.triangles[j])
           }
         } else {
@@ -146,7 +146,7 @@ var Octree = (function () {
         [triangle.c, triangle.a],
       ]
 
-      for (var i = 0; i < lines.length; i++) {
+      for (let i = 0; i < lines.length; i++) {
         line2 = _line2.set(lines[i][0], lines[i][1])
         ;[point1, point2] = capsule.lineLineMinimumPoints(line1, line2)
 
@@ -186,7 +186,7 @@ var Octree = (function () {
         [triangle.c, triangle.a],
       ]
 
-      for (var i = 0; i < lines.length; i++) {
+      for (let i = 0; i < lines.length; i++) {
         _line1.set(lines[i][0], lines[i][1])
         _line1.closestPointToPoint(plainPoint, true, _v2)
 
@@ -205,13 +205,13 @@ var Octree = (function () {
     },
 
     getSphereTriangles: function (sphere, triangles) {
-      for (var i = 0; i < this.subTrees.length; i++) {
+      for (let i = 0; i < this.subTrees.length; i++) {
         var subTree = this.subTrees[i]
 
         if (!sphere.intersectsBox(subTree.box)) continue
 
         if (subTree.triangles.length > 0) {
-          for (var j = 0; j < subTree.triangles.length; j++) {
+          for (let j = 0; j < subTree.triangles.length; j++) {
             if (triangles.indexOf(subTree.triangles[j]) === -1) triangles.push(subTree.triangles[j])
           }
         } else {
@@ -221,13 +221,13 @@ var Octree = (function () {
     },
 
     getCapsuleTriangles: function (capsule, triangles) {
-      for (var i = 0; i < this.subTrees.length; i++) {
+      for (let i = 0; i < this.subTrees.length; i++) {
         var subTree = this.subTrees[i]
 
         if (!capsule.intersectsBox(subTree.box)) continue
 
         if (subTree.triangles.length > 0) {
-          for (var j = 0; j < subTree.triangles.length; j++) {
+          for (let j = 0; j < subTree.triangles.length; j++) {
             if (triangles.indexOf(subTree.triangles[j]) === -1) triangles.push(subTree.triangles[j])
           }
         } else {
@@ -245,7 +245,7 @@ var Octree = (function () {
 
       this.getSphereTriangles(sphere, triangles)
 
-      for (var i = 0; i < triangles.length; i++) {
+      for (let i = 0; i < triangles.length; i++) {
         if ((result = this.triangleSphereIntersect(_sphere, triangles[i]))) {
           hit = true
 
@@ -272,7 +272,7 @@ var Octree = (function () {
 
       this.getCapsuleTriangles(_capsule, triangles)
 
-      for (var i = 0; i < triangles.length; i++) {
+      for (let i = 0; i < triangles.length; i++) {
         if ((result = this.triangleCapsuleIntersect(_capsule, triangles[i]))) {
           hit = true
 
@@ -301,7 +301,7 @@ var Octree = (function () {
 
       this.getRayTriangles(ray, triangles)
 
-      for (var i = 0; i < triangles.length; i++) {
+      for (let i = 0; i < triangles.length; i++) {
         result = ray.intersectTriangle(triangles[i].a, triangles[i].b, triangles[i].c, true, _v1)
 
         if (result) {
@@ -337,7 +337,7 @@ var Octree = (function () {
           var positions = geometry.attributes.position.array
           var transform = obj.matrixWorld
 
-          for (var i = 0; i < positions.length; i += 9) {
+          for (let i = 0; i < positions.length; i += 9) {
             var v1 = new Vector3(positions[i], positions[i + 1], positions[i + 2])
             var v2 = new Vector3(positions[i + 3], positions[i + 4], positions[i + 5])
             var v3 = new Vector3(positions[i + 6], positions[i + 7], positions[i + 8])

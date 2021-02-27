@@ -71,7 +71,7 @@ DRACOExporter.prototype = {
       } else {
         var faces = new (vertices.count > 65535 ? Uint32Array : Uint16Array)(vertices.count)
 
-        for (var i = 0; i < faces.length; i++) {
+        for (let i = 0; i < faces.length; i++) {
           faces[i] = i
         }
 
@@ -145,7 +145,7 @@ DRACOExporter.prototype = {
     // Sets the quantization (number of bits used to represent) compression options for a named attribute.
     // The attribute values will be quantized in a box defined by the maximum extent of the attribute values.
     if (options.quantization !== undefined) {
-      for (var i = 0; i < 5; i++) {
+      for (let i = 0; i < 5; i++) {
         if (options.quantization[i] !== undefined) {
           encoder.SetAttributeQuantization(i, options.quantization[i])
         }
@@ -169,7 +169,7 @@ DRACOExporter.prototype = {
     //Copy encoded data to buffer.
     const outputData = new Int8Array(new ArrayBuffer(length))
 
-    for (var i = 0; i < length; i++) {
+    for (let i = 0; i < length; i++) {
       outputData[i] = encodedData.GetValue(i)
     }
 

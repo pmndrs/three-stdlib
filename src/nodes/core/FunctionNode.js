@@ -52,11 +52,11 @@ FunctionNode.prototype.generate = function (builder, output) {
     offset = 0,
     src = this.src
 
-  for (var i = 0; i < this.includes.length; i++) {
+  for (let i = 0; i < this.includes.length; i++) {
     builder.include(this.includes[i], this)
   }
 
-  for (var ext in this.extensions) {
+  for (let ext in this.extensions) {
     builder.extensions[ext] = true
   }
 
@@ -64,7 +64,7 @@ FunctionNode.prototype.generate = function (builder, output) {
 
   while ((match = propertiesRegexp.exec(this.src))) matches.push(match)
 
-  for (var i = 0; i < matches.length; i++) {
+  for (let i = 0; i < matches.length; i++) {
     var match = matches[i]
 
     var prop = match[0],
@@ -189,14 +189,14 @@ FunctionNode.prototype.toJSON = function (meta) {
     data.extensions = JSON.parse(JSON.stringify(this.extensions))
     data.keywords = {}
 
-    for (var keyword in this.keywords) {
+    for (let keyword in this.keywords) {
       data.keywords[keyword] = this.keywords[keyword].toJSON(meta).uuid
     }
 
     if (this.includes.length) {
       data.includes = []
 
-      for (var i = 0; i < this.includes.length; i++) {
+      for (let i = 0; i < this.includes.length; i++) {
         data.includes.push(this.includes[i].toJSON(meta).uuid)
       }
     }

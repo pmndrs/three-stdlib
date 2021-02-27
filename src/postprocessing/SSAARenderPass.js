@@ -93,7 +93,7 @@ SSAARenderPass.prototype = Object.assign(Object.create(Pass.prototype), {
       height = readBuffer.height
 
     // render the scene multiple times, each slightly jitter offset from the last and accumulate the results.
-    for (var i = 0; i < jitterOffsets.length; i++) {
+    for (let i = 0; i < jitterOffsets.length; i++) {
       var jitterOffset = jitterOffsets[i]
 
       if (this.camera.setViewOffset) {

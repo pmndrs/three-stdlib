@@ -120,7 +120,7 @@ var BlurShaderUtils = {
 
     var weights = []
 
-    for (var i = 0; i <= kernelRadius; i++) {
+    for (let i = 0; i <= kernelRadius; i++) {
       weights.push(gaussian(i, stdDev))
     }
 
@@ -130,7 +130,7 @@ var BlurShaderUtils = {
   createSampleOffsets: function (kernelRadius, uvIncrement) {
     var offsets = []
 
-    for (var i = 0; i <= kernelRadius; i++) {
+    for (let i = 0; i <= kernelRadius; i++) {
       offsets.push(uvIncrement.clone().multiplyScalar(i))
     }
 

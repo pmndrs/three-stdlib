@@ -424,7 +424,7 @@ const GLTFExporter = (() => {
         if (options.includeCustomExtensions && json.gltfExtensions) {
           if (objectDef.extensions === undefined) objectDef.extensions = {}
 
-          for (const extensionName in json.gltfExtensions) {
+          for (let extensionName in json.gltfExtensions) {
             objectDef.extensions[extensionName] = json.gltfExtensions[extensionName]
             extensionsUsed[extensionName] = true
           }
@@ -1042,7 +1042,7 @@ const GLTFExporter = (() => {
       const meshCacheKeyParts = [mesh.geometry.uuid]
 
       if (Array.isArray(mesh.material)) {
-        for (var i = 0, l = mesh.material.length; i < l; i++) {
+        for (let i = 0, l = mesh.material.length; i < l; i++) {
           meshCacheKeyParts.push(mesh.material[i].uuid)
         }
       } else {
@@ -1099,7 +1099,7 @@ const GLTFExporter = (() => {
       // For every attribute create an accessor
       let modifiedAttribute = null
 
-      for (var attributeName in geometry.attributes) {
+      for (let attributeName in geometry.attributes) {
         // Ignore morph target attributes, which are exported later.
         if (attributeName.substr(0, 5) === 'morph') continue
 
@@ -1146,16 +1146,16 @@ const GLTFExporter = (() => {
         const reverseDictionary = {}
 
         if (mesh.morphTargetDictionary !== undefined) {
-          for (const key in mesh.morphTargetDictionary) {
+          for (let key in mesh.morphTargetDictionary) {
             reverseDictionary[mesh.morphTargetDictionary[key]] = key
           }
         }
 
-        for (var i = 0; i < mesh.morphTargetInfluences.length; ++i) {
+        for (let i = 0; i < mesh.morphTargetInfluences.length; ++i) {
           const target = {}
           let warned = false
 
-          for (var attributeName in geometry.morphAttributes) {
+          for (let attributeName in geometry.morphAttributes) {
             // glTF 2.0 morph supports only POSITION/NORMAL/TANGENT.
             // Three.js doesn't support TANGENT yet.
 
@@ -1223,7 +1223,7 @@ const GLTFExporter = (() => {
       const materials = isMultiMaterial ? mesh.material : [mesh.material]
       const groups = isMultiMaterial ? geometry.groups : [{ materialIndex: 0, start: undefined, count: undefined }]
 
-      for (const i = 0, il = groups.length; i < il; i++) {
+      for (let i = 0, il = groups.length; i < il; i++) {
         const primitive = {
           mode,
           attributes,
@@ -1588,7 +1588,7 @@ const GLTFExporter = (() => {
 
       const objectsWithoutScene = []
 
-      for (var i = 0; i < input.length; i++) {
+      for (let i = 0; i < input.length; i++) {
         if (input[i] instanceof Scene) {
           this.processScene(input[i])
         } else {
@@ -1598,11 +1598,11 @@ const GLTFExporter = (() => {
 
       if (objectsWithoutScene.length > 0) this.processObjects(objectsWithoutScene)
 
-      for (var i = 0; i < this.skins.length; ++i) {
+      for (let i = 0; i < this.skins.length; ++i) {
         this.processSkin(this.skins[i])
       }
 
-      for (var i = 0; i < options.animations.length; ++i) {
+      for (let i = 0; i < options.animations.length; ++i) {
         this.processAnimation(options.animations[i], input[0])
       }
 
@@ -1794,7 +1794,7 @@ const GLTFExporter = (() => {
       if (track.times.length === 0) {
         times[0] = time
 
-        for (var i = 0; i < valueSize; i++) {
+        for (let i = 0; i < valueSize; i++) {
           values[i] = 0
         }
 
@@ -1822,7 +1822,7 @@ const GLTFExporter = (() => {
 
         index = times.length - 1
       } else {
-        for (var i = 0; i < track.times.length; i++) {
+        for (let i = 0; i < track.times.length; i++) {
           if (Math.abs(track.times[i] - time) < tolerance) return i
 
           if (track.times[i] < time && track.times[i + 1] > time) {
@@ -1898,7 +1898,7 @@ const GLTFExporter = (() => {
 
           const values = new mergedTrack.ValueBufferType(targetCount * mergedTrack.times.length)
 
-          for (var j = 0; j < mergedTrack.times.length; j++) {
+          for (let j = 0; j < mergedTrack.times.length; j++) {
             values[j * targetCount + targetIndex] = mergedTrack.values[j]
           }
 
@@ -1919,14 +1919,14 @@ const GLTFExporter = (() => {
 
         // For every existing keyframe of the merged track, write a (possibly
         // interpolated) value from the source track.
-        for (var j = 0; j < mergedTrack.times.length; j++) {
+        for (let j = 0; j < mergedTrack.times.length; j++) {
           mergedTrack.values[j * targetCount + targetIndex] = sourceInterpolant.evaluate(mergedTrack.times[j])
         }
 
         // For every existing keyframe of the source track, write a (possibly
         // new) keyframe to the merged track. Values from the previous loop may
         // be written again, but keyframes are de-duplicated.
-        for (var j = 0; j < sourceTrack.times.length; j++) {
+        for (let j = 0; j < sourceTrack.times.length; j++) {
           const keyframeIndex = this.insertKeyframe(mergedTrack, sourceTrack.times[j])
           mergedTrack.values[keyframeIndex * targetCount + targetIndex] = sourceTrack.values[j]
         }

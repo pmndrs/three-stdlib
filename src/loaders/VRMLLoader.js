@@ -294,7 +294,7 @@ var VRMLLoader = (function () {
 
         var tokenVocabulary = {}
 
-        for (var i = 0, l = tokens.length; i < l; i++) {
+        for (let i = 0, l = tokens.length; i < l; i++) {
           var token = tokens[i]
 
           tokenVocabulary[token.name] = token
@@ -322,14 +322,14 @@ var VRMLLoader = (function () {
               routes: [],
             }
 
-            for (var i = 0, l = ctx.node.length; i < l; i++) {
+            for (let i = 0, l = ctx.node.length; i < l; i++) {
               var node = ctx.node[i]
 
               data.nodes.push(this.visit(node))
             }
 
             if (ctx.route) {
-              for (var i = 0, l = ctx.route.length; i < l; i++) {
+              for (let i = 0, l = ctx.route.length; i < l; i++) {
                 var route = ctx.route[i]
 
                 data.routes.push(this.visit(route))
@@ -350,7 +350,7 @@ var VRMLLoader = (function () {
             }
 
             if (ctx.field) {
-              for (var i = 0, l = ctx.field.length; i < l; i++) {
+              for (let i = 0, l = ctx.field.length; i < l; i++) {
                 var field = ctx.field[i]
 
                 data.fields.push(this.visit(field))
@@ -428,7 +428,7 @@ var VRMLLoader = (function () {
           if (ctx.node) {
             field.type = 'node'
 
-            for (var i = 0, l = ctx.node.length; i < l; i++) {
+            for (let i = 0, l = ctx.node.length; i < l; i++) {
               var node = ctx.node[i]
 
               field.values.push(scope.visit(node))
@@ -438,7 +438,7 @@ var VRMLLoader = (function () {
           if (ctx.use) {
             field.type = 'use'
 
-            for (var i = 0, l = ctx.use.length; i < l; i++) {
+            for (let i = 0, l = ctx.use.length; i < l; i++) {
               var use = ctx.use[i]
 
               field.values.push(scope.visit(use))
@@ -448,7 +448,7 @@ var VRMLLoader = (function () {
           if (ctx.StringLiteral) {
             field.type = 'string'
 
-            for (var i = 0, l = ctx.StringLiteral.length; i < l; i++) {
+            for (let i = 0, l = ctx.StringLiteral.length; i < l; i++) {
               var stringLiteral = ctx.StringLiteral[i]
 
               field.values.push(stringLiteral.image.replace(/'|"/g, ''))
@@ -458,7 +458,7 @@ var VRMLLoader = (function () {
           if (ctx.NumberLiteral) {
             field.type = 'number'
 
-            for (var i = 0, l = ctx.NumberLiteral.length; i < l; i++) {
+            for (let i = 0, l = ctx.NumberLiteral.length; i < l; i++) {
               var numberLiteral = ctx.NumberLiteral[i]
 
               field.values.push(parseFloat(numberLiteral.image))
@@ -468,7 +468,7 @@ var VRMLLoader = (function () {
           if (ctx.HexLiteral) {
             field.type = 'hex'
 
-            for (var i = 0, l = ctx.HexLiteral.length; i < l; i++) {
+            for (let i = 0, l = ctx.HexLiteral.length; i < l; i++) {
               var hexLiteral = ctx.HexLiteral[i]
 
               field.values.push(hexLiteral.image)
@@ -478,7 +478,7 @@ var VRMLLoader = (function () {
           if (ctx.TrueLiteral) {
             field.type = 'boolean'
 
-            for (var i = 0, l = ctx.TrueLiteral.length; i < l; i++) {
+            for (let i = 0, l = ctx.TrueLiteral.length; i < l; i++) {
               var trueLiteral = ctx.TrueLiteral[i]
 
               if (trueLiteral.image === 'TRUE') field.values.push(true)
@@ -488,7 +488,7 @@ var VRMLLoader = (function () {
           if (ctx.FalseLiteral) {
             field.type = 'boolean'
 
-            for (var i = 0, l = ctx.FalseLiteral.length; i < l; i++) {
+            for (let i = 0, l = ctx.FalseLiteral.length; i < l; i++) {
               var falseLiteral = ctx.FalseLiteral[i]
 
               if (falseLiteral.image === 'FALSE') field.values.push(false)
@@ -517,7 +517,7 @@ var VRMLLoader = (function () {
 
         // first iteration: build nodemap based on DEF statements
 
-        for (var i = 0, l = nodes.length; i < l; i++) {
+        for (let i = 0, l = nodes.length; i < l; i++) {
           var node = nodes[i]
 
           buildNodeMap(node)
@@ -525,7 +525,7 @@ var VRMLLoader = (function () {
 
         // second iteration: build nodes
 
-        for (var i = 0, l = nodes.length; i < l; i++) {
+        for (let i = 0, l = nodes.length; i < l; i++) {
           var node = nodes[i]
           var object = getNode(node)
 
@@ -544,13 +544,13 @@ var VRMLLoader = (function () {
 
         var fields = node.fields
 
-        for (var i = 0, l = fields.length; i < l; i++) {
+        for (let i = 0, l = fields.length; i < l; i++) {
           var field = fields[i]
 
           if (field.type === 'node') {
             var fieldValues = field.values
 
-            for (var j = 0, jl = fieldValues.length; j < jl; j++) {
+            for (let j = 0, jl = fieldValues.length; j < jl; j++) {
               buildNodeMap(fieldValues[j])
             }
           }
@@ -718,7 +718,7 @@ var VRMLLoader = (function () {
 
         var fields = node.fields
 
-        for (var i = 0, l = fields.length; i < l; i++) {
+        for (let i = 0, l = fields.length; i < l; i++) {
           var field = fields[i]
           var fieldName = field.name
           var fieldValues = field.values
@@ -783,7 +783,7 @@ var VRMLLoader = (function () {
 
         var fields = node.fields
 
-        for (var i = 0, l = fields.length; i < l; i++) {
+        for (let i = 0, l = fields.length; i < l; i++) {
           var field = fields[i]
           var fieldName = field.name
           var fieldValues = field.values
@@ -894,7 +894,7 @@ var VRMLLoader = (function () {
         var material = new MeshBasicMaterial({ color: 0x000000 })
         var geometry
 
-        for (var i = 0, l = fields.length; i < l; i++) {
+        for (let i = 0, l = fields.length; i < l; i++) {
           var field = fields[i]
           var fieldName = field.name
           var fieldValues = field.values
@@ -993,7 +993,7 @@ var VRMLLoader = (function () {
 
         var fields = node.fields
 
-        for (var i = 0, l = fields.length; i < l; i++) {
+        for (let i = 0, l = fields.length; i < l; i++) {
           var field = fields[i]
           var fieldName = field.name
           var fieldValues = field.values
@@ -1086,7 +1086,7 @@ var VRMLLoader = (function () {
 
         var fields = node.fields
 
-        for (var i = 0, l = fields.length; i < l; i++) {
+        for (let i = 0, l = fields.length; i < l; i++) {
           var field = fields[i]
           var fieldName = field.name
           var fieldValues = field.values
@@ -1196,7 +1196,7 @@ var VRMLLoader = (function () {
 
         var fields = node.fields
 
-        for (var i = 0, l = fields.length; i < l; i++) {
+        for (let i = 0, l = fields.length; i < l; i++) {
           var field = fields[i]
           var fieldName = field.name
           var fieldValues = field.values
@@ -1215,7 +1215,7 @@ var VRMLLoader = (function () {
 
               var color = { r: 0, g: 0, b: 0, a: 0 }
 
-              for (var j = 3, k = 0, jl = fieldValues.length; j < jl; j++, k++) {
+              for (let j = 3, k = 0, jl = fieldValues.length; j < jl; j++, k++) {
                 parseHexColor(fieldValues[j], textureType, color)
 
                 if (useAlpha === true) {
@@ -1267,7 +1267,7 @@ var VRMLLoader = (function () {
 
         var fields = node.fields
 
-        for (var i = 0, l = fields.length; i < l; i++) {
+        for (let i = 0, l = fields.length; i < l; i++) {
           var field = fields[i]
           var fieldName = field.name
           var fieldValues = field.values
@@ -1310,7 +1310,7 @@ var VRMLLoader = (function () {
 
         var fields = node.fields
 
-        for (var i = 0, l = fields.length; i < l; i++) {
+        for (let i = 0, l = fields.length; i < l; i++) {
           var field = fields[i]
           var fieldName = field.name
           var fieldValues = field.values
@@ -1350,7 +1350,7 @@ var VRMLLoader = (function () {
 
         var fields = node.fields
 
-        for (var i = 0, l = fields.length; i < l; i++) {
+        for (let i = 0, l = fields.length; i < l; i++) {
           var field = fields[i]
           var fieldName = field.name
           var fieldValues = field.values
@@ -1384,7 +1384,7 @@ var VRMLLoader = (function () {
 
         var fields = node.fields
 
-        for (var i = 0, l = fields.length; i < l; i++) {
+        for (let i = 0, l = fields.length; i < l; i++) {
           var field = fields[i]
           var fieldName = field.name
           var fieldValues = field.values
@@ -1600,7 +1600,7 @@ var VRMLLoader = (function () {
 
         var fields = node.fields
 
-        for (var i = 0, l = fields.length; i < l; i++) {
+        for (let i = 0, l = fields.length; i < l; i++) {
           var field = fields[i]
           var fieldName = field.name
           var fieldValues = field.values
@@ -1696,7 +1696,7 @@ var VRMLLoader = (function () {
 
         var fields = node.fields
 
-        for (var i = 0, l = fields.length; i < l; i++) {
+        for (let i = 0, l = fields.length; i < l; i++) {
           var field = fields[i]
           var fieldName = field.name
           var fieldValues = field.values
@@ -1741,7 +1741,7 @@ var VRMLLoader = (function () {
 
         var fields = node.fields
 
-        for (var i = 0, l = fields.length; i < l; i++) {
+        for (let i = 0, l = fields.length; i < l; i++) {
           var field = fields[i]
           var fieldName = field.name
           var fieldValues = field.values
@@ -1771,7 +1771,7 @@ var VRMLLoader = (function () {
 
         var fields = node.fields
 
-        for (var i = 0, l = fields.length; i < l; i++) {
+        for (let i = 0, l = fields.length; i < l; i++) {
           var field = fields[i]
           var fieldName = field.name
           var fieldValues = field.values
@@ -1810,7 +1810,7 @@ var VRMLLoader = (function () {
 
         var fields = node.fields
 
-        for (var i = 0, l = fields.length; i < l; i++) {
+        for (let i = 0, l = fields.length; i < l; i++) {
           var field = fields[i]
           var fieldName = field.name
           var fieldValues = field.values
@@ -1852,7 +1852,7 @@ var VRMLLoader = (function () {
 
         var fields = node.fields
 
-        for (var i = 0, l = fields.length; i < l; i++) {
+        for (let i = 0, l = fields.length; i < l; i++) {
           var field = fields[i]
           var fieldName = field.name
           var fieldValues = field.values
@@ -1891,7 +1891,7 @@ var VRMLLoader = (function () {
 
         var fields = node.fields
 
-        for (var i = 0, l = fields.length; i < l; i++) {
+        for (let i = 0, l = fields.length; i < l; i++) {
           var field = fields[i]
           var fieldName = field.name
           var fieldValues = field.values
@@ -1977,8 +1977,8 @@ var VRMLLoader = (function () {
         var colors = []
         var uvs = []
 
-        for (var i = 0; i < zDimension; i++) {
-          for (var j = 0; j < xDimension; j++) {
+        for (let i = 0; i < zDimension; i++) {
+          for (let j = 0; j < xDimension; j++) {
             // compute a row major index
 
             var index = i * xDimension + j
@@ -2028,8 +2028,8 @@ var VRMLLoader = (function () {
 
         var indices = []
 
-        for (var i = 0; i < xDimension - 1; i++) {
-          for (var j = 0; j < zDimension - 1; j++) {
+        for (let i = 0; i < xDimension - 1; i++) {
+          for (let j = 0; j < zDimension - 1; j++) {
             // from https://tecfa.unige.ch/guides/vrml/vrml97/spec/part1/nodesRef.html#ElevationGrid
 
             var a = i + j * xDimension
@@ -2060,8 +2060,8 @@ var VRMLLoader = (function () {
 
         if (color) {
           if (colorPerVertex === false) {
-            for (var i = 0; i < xDimension - 1; i++) {
-              for (var j = 0; j < zDimension - 1; j++) {
+            for (let i = 0; i < xDimension - 1; i++) {
+              for (let j = 0; j < zDimension - 1; j++) {
                 var index = i + j * (xDimension - 1)
 
                 var r = color[index * 3 + 0]
@@ -2089,8 +2089,8 @@ var VRMLLoader = (function () {
 
         if (normal) {
           if (normalPerVertex === false) {
-            for (var i = 0; i < xDimension - 1; i++) {
-              for (var j = 0; j < zDimension - 1; j++) {
+            for (let i = 0; i < xDimension - 1; i++) {
+              for (let j = 0; j < zDimension - 1; j++) {
                 var index = i + j * (xDimension - 1)
 
                 var xn = normal[index * 3 + 0]
@@ -2147,7 +2147,7 @@ var VRMLLoader = (function () {
 
         var fields = node.fields
 
-        for (var i = 0, l = fields.length; i < l; i++) {
+        for (let i = 0, l = fields.length; i < l; i++) {
           var field = fields[i]
           var fieldName = field.name
           var fieldValues = field.values
@@ -2213,7 +2213,7 @@ var VRMLLoader = (function () {
         var vertex = new Vector3()
         var quaternion = new Quaternion()
 
-        for (var i = 0, j = 0, o = 0, il = spine.length; i < il; i += 3, j += 2, o += 4) {
+        for (let i = 0, j = 0, o = 0, il = spine.length; i < il; i += 3, j += 2, o += 4) {
           spineVector.fromArray(spine, i)
 
           scaling.x = scale ? scale[j + 0] : 1
@@ -2225,7 +2225,7 @@ var VRMLLoader = (function () {
           axis.z = orientation ? orientation[o + 2] : 1
           var angle = orientation ? orientation[o + 3] : 0
 
-          for (var k = 0, kl = crossSection.length; k < kl; k += 2) {
+          for (let k = 0, kl = crossSection.length; k < kl; k += 2) {
             vertex.x = crossSection[k + 0]
             vertex.y = 0
             vertex.z = crossSection[k + 1]
@@ -2254,8 +2254,8 @@ var VRMLLoader = (function () {
         var spineCount = spine.length / 3
         var crossSectionCount = crossSection.length / 2
 
-        for (var i = 0; i < spineCount - 1; i++) {
-          for (var j = 0; j < crossSectionCount - 1; j++) {
+        for (let i = 0; i < spineCount - 1; i++) {
+          for (let j = 0; j < crossSectionCount - 1; j++) {
             var a = j + i * crossSectionCount
             var b = j + 1 + i * crossSectionCount
             var c = j + (i + 1) * crossSectionCount
@@ -2281,14 +2281,14 @@ var VRMLLoader = (function () {
         if (beginCap === true || endCap === true) {
           var contour = []
 
-          for (var i = 0, l = crossSection.length; i < l; i += 2) {
+          for (let i = 0, l = crossSection.length; i < l; i += 2) {
             contour.push(new Vector2(crossSection[i], crossSection[i + 1]))
           }
 
           var faces = ShapeUtils.triangulateShape(contour, [])
           var capIndices = []
 
-          for (var i = 0, l = faces.length; i < l; i++) {
+          for (let i = 0, l = faces.length; i < l; i++) {
             var face = faces[i]
 
             capIndices.push(face[0], face[1], face[2])
@@ -2297,7 +2297,7 @@ var VRMLLoader = (function () {
           // begin cap
 
           if (beginCap === true) {
-            for (var i = 0, l = capIndices.length; i < l; i += 3) {
+            for (let i = 0, l = capIndices.length; i < l; i += 3) {
               if (ccw === true) {
                 indices.push(capIndices[i + 0], capIndices[i + 1], capIndices[i + 2])
               } else {
@@ -2311,7 +2311,7 @@ var VRMLLoader = (function () {
           if (endCap === true) {
             var indexOffset = crossSectionCount * (spineCount - 1) // references to the first vertex of the last cross section
 
-            for (var i = 0, l = capIndices.length; i < l; i += 3) {
+            for (let i = 0, l = capIndices.length; i < l; i += 3) {
               if (ccw === true) {
                 indices.push(
                   indexOffset + capIndices[i + 0],
@@ -2359,7 +2359,7 @@ var VRMLLoader = (function () {
       }
 
       function parseFieldChildren(children, owner) {
-        for (var i = 0, l = children.length; i < l; i++) {
+        for (let i = 0, l = children.length; i < l; i++) {
           var object = getNode(children[i])
 
           if (object instanceof Object3D) owner.add(object)
@@ -2374,7 +2374,7 @@ var VRMLLoader = (function () {
 
         var start = 0
 
-        for (var i = 0, l = index.length; i < l; i++) {
+        for (let i = 0, l = index.length; i < l; i++) {
           var i1 = index[start]
           var i2 = index[i + (ccw ? 1 : 2)]
           var i3 = index[i + (ccw ? 2 : 1)]
@@ -2397,7 +2397,7 @@ var VRMLLoader = (function () {
 
         var start = 0
 
-        for (var i = 0, l = index.length; i < l; i++) {
+        for (let i = 0, l = index.length; i < l; i++) {
           var stride = start * 3
 
           var x = data[stride]
@@ -2420,7 +2420,7 @@ var VRMLLoader = (function () {
       function flattenData(data, index) {
         var flattenData = []
 
-        for (var i = 0, l = index.length; i < l; i++) {
+        for (let i = 0, l = index.length; i < l; i++) {
           var i1 = index[i]
 
           var stride = i1 * 3
@@ -2438,7 +2438,7 @@ var VRMLLoader = (function () {
       function expandLineIndex(index) {
         var indices = []
 
-        for (var i = 0, l = index.length; i < l; i++) {
+        for (let i = 0, l = index.length; i < l; i++) {
           var i1 = index[i]
           var i2 = index[i + 1]
 
@@ -2459,7 +2459,7 @@ var VRMLLoader = (function () {
 
         var start = 0
 
-        for (var i = 0, l = index.length; i < l; i++) {
+        for (let i = 0, l = index.length; i < l; i++) {
           var stride = start * 3
 
           var x = data[stride]
@@ -2492,7 +2492,7 @@ var VRMLLoader = (function () {
 
         // we use the coordIndex.length as delimiter since normalIndex must contain at least as many indices
 
-        for (var i = 0, l = coordIndex.length; i < l; i += 3) {
+        for (let i = 0, l = coordIndex.length; i < l; i += 3) {
           var a = index[i]
           var b = index[i + 1]
           var c = index[i + 2]
@@ -2522,7 +2522,7 @@ var VRMLLoader = (function () {
       function computeAttributeFromFaceData(index, faceData) {
         var array = []
 
-        for (var i = 0, j = 0, l = index.length; i < l; i += 3, j++) {
+        for (let i = 0, j = 0, l = index.length; i < l; i += 3, j++) {
           vA.fromArray(faceData, j * 3)
 
           array.push(vA.x, vA.y, vA.z)
@@ -2536,7 +2536,7 @@ var VRMLLoader = (function () {
       function computeAttributeFromLineData(index, lineData) {
         var array = []
 
-        for (var i = 0, j = 0, l = index.length; i < l; i += 2, j++) {
+        for (let i = 0, j = 0, l = index.length; i < l; i += 2, j++) {
           vA.fromArray(lineData, j * 3)
 
           array.push(vA.x, vA.y, vA.z)
@@ -2555,10 +2555,10 @@ var VRMLLoader = (function () {
         var index = 0,
           index2 = 0
 
-        for (var i = 0, l = indices.length; i < l; i++) {
+        for (let i = 0, l = indices.length; i < l; i++) {
           index = indices[i] * itemSize
 
-          for (var j = 0; j < itemSize; j++) {
+          for (let j = 0; j < itemSize; j++) {
             array2[index2++] = array[index++]
           }
         }
@@ -2575,7 +2575,7 @@ var VRMLLoader = (function () {
 
         // prepare face and raw vertex normals
 
-        for (var i = 0, l = index.length; i < l; i += 3) {
+        for (let i = 0, l = index.length; i < l; i += 3) {
           var a = index[i]
           var b = index[i + 1]
           var c = index[i + 2]
@@ -2609,7 +2609,7 @@ var VRMLLoader = (function () {
 
         var normals = []
 
-        for (var i = 0, l = faces.length; i < l; i++) {
+        for (let i = 0, l = faces.length; i < l; i++) {
           var face = faces[i]
 
           var nA = weightedNormal(vertexNormals[face.a], face.normal, creaseAngle)
@@ -2634,7 +2634,7 @@ var VRMLLoader = (function () {
         if (creaseAngle === 0) {
           normal.copy(vector)
         } else {
-          for (var i = 0, l = normals.length; i < l; i++) {
+          for (let i = 0, l = normals.length; i < l; i++) {
             if (normals[i].angleTo(vector) < creaseAngle) {
               normal.add(normals[i])
             }
@@ -2647,7 +2647,7 @@ var VRMLLoader = (function () {
       function toColorArray(colors) {
         var array = []
 
-        for (var i = 0, l = colors.length; i < l; i += 3) {
+        for (let i = 0, l = colors.length; i < l; i += 3) {
           array.push(new Color(colors[i], colors[i + 1], colors[i + 2]))
         }
 
@@ -2682,7 +2682,7 @@ var VRMLLoader = (function () {
         var thresholds = []
         var startAngle = topDown === true ? 0 : Math.PI
 
-        for (var i = 0, l = colors.length; i < l; i++) {
+        for (let i = 0, l = colors.length; i < l; i++) {
           var angle = i === 0 ? 0 : angles[i - 1]
           angle = topDown === true ? angle : startAngle - angle
 
@@ -2701,14 +2701,14 @@ var VRMLLoader = (function () {
         var position = new Vector3()
         var color = new Color()
 
-        for (var i = 0; i < indices.count; i++) {
+        for (let i = 0; i < indices.count; i++) {
           var index = indices.getX(i)
           position.fromBufferAttribute(positionAttribute, index)
 
           var thresholdIndexA, thresholdIndexB
           var t = 1
 
-          for (var j = 1; j < thresholds.length; j++) {
+          for (let j = 1; j < thresholds.length; j++) {
             thresholdIndexA = j - 1
             thresholdIndexB = j
 

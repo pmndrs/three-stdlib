@@ -209,13 +209,13 @@ class LightningStrike extends BufferGeometry {
 
     this.subrays = []
 
-    for (var i = 0; i < this.maxSubrays; i++) {
+    for (let i = 0; i < this.maxSubrays; i++) {
       this.subrays.push(this.createSubray())
     }
 
     this.raySegments = []
 
-    for (var i = 0; i < this.maxRaySegments; i++) {
+    for (let i = 0; i < this.maxRaySegments; i++) {
       this.raySegments.push(this.createSegment())
     }
 

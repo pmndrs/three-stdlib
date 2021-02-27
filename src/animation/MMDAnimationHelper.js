@@ -169,14 +169,14 @@ const MMDAnimationHelper = (() => {
 
       const boneNameDictionary = {}
 
-      for (var i = 0, il = bones.length; i < il; i++) {
+      for (let i = 0, il = bones.length; i < il; i++) {
         boneNameDictionary[bones[i].name] = i
       }
 
       const vector = new Vector3()
       const quaternion = new Quaternion()
 
-      for (var i = 0, il = boneParams.length; i < il; i++) {
+      for (let i = 0, il = boneParams.length; i < il; i++) {
         const boneParam = boneParams[i]
         const boneIndex = boneNameDictionary[boneParam.name]
 
@@ -515,12 +515,12 @@ const MMDAnimationHelper = (() => {
 
       // get the longest duration
 
-      for (var i = 0, il = meshes.length; i < il; i++) {
+      for (let i = 0, il = meshes.length; i < il; i++) {
         var mixer = this.objects.get(meshes[i]).mixer
 
         if (mixer === undefined) continue
 
-        for (var j = 0; j < mixer._actions.length; j++) {
+        for (let j = 0; j < mixer._actions.length; j++) {
           var clip = mixer._actions[j]._clip
 
           if (!objects.has(clip)) {
@@ -537,7 +537,7 @@ const MMDAnimationHelper = (() => {
         var mixer = this.objects.get(camera).mixer
 
         if (mixer !== undefined) {
-          for (var i = 0, il = mixer._actions.length; i < il; i++) {
+          for (let i = 0, il = mixer._actions.length; i < il; i++) {
             var clip = mixer._actions[i]._clip
 
             if (!objects.has(clip)) {
@@ -559,12 +559,12 @@ const MMDAnimationHelper = (() => {
 
       // update the duration
 
-      for (var i = 0, il = this.meshes.length; i < il; i++) {
+      for (let i = 0, il = this.meshes.length; i < il; i++) {
         var mixer = this.objects.get(this.meshes[i]).mixer
 
         if (mixer === undefined) continue
 
-        for (const j = 0, jl = mixer._actions.length; j < jl; j++) {
+        for (let j = 0, jl = mixer._actions.length; j < jl; j++) {
           mixer._actions[j]._clip.duration = max
         }
       }
@@ -573,7 +573,7 @@ const MMDAnimationHelper = (() => {
         var mixer = this.objects.get(camera).mixer
 
         if (mixer !== undefined) {
-          for (var i = 0, il = mixer._actions.length; i < il; i++) {
+          for (let i = 0, il = mixer._actions.length; i < il; i++) {
             mixer._actions[i]._clip.duration = max
           }
         }
@@ -670,7 +670,7 @@ const MMDAnimationHelper = (() => {
 
       if (physics === null) return
 
-      for (var i = 0, il = this.meshes.length; i < il; i++) {
+      for (let i = 0, il = this.meshes.length; i < il; i++) {
         var p = this.meshes[i].physics
 
         if (p !== null && p !== undefined) {
@@ -680,7 +680,7 @@ const MMDAnimationHelper = (() => {
 
       physics.stepSimulation(delta)
 
-      for (var i = 0, il = this.meshes.length; i < il; i++) {
+      for (let i = 0, il = this.meshes.length; i < il; i++) {
         var p = this.meshes[i].physics
 
         if (p !== null && p !== undefined) {

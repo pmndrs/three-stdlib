@@ -40,7 +40,7 @@ class WebGPUNodes {
     nodeFrame.camera = camera
     nodeFrame.object = object
 
-    for (const node of nodeBuilder.updateNodes) {
+    for (let node of nodeBuilder.updateNodes) {
       nodeFrame.updateNode(node)
     }
   }

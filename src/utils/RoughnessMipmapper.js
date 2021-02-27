@@ -105,7 +105,7 @@ RoughnessMipmapper.prototype = {
 
     var texelSize = _mipmapMaterial.uniforms.texelSize.value
 
-    for (var mip = 0; width >= 1 && height >= 1; ++mip, width /= 2, height /= 2) {
+    for (let mip = 0; width >= 1 && height >= 1; ++mip, width /= 2, height /= 2) {
       // Rendering to a mip level is not allowed in webGL1. Instead we must set
       // up a secondary texture to write the result to, then copy it back to the
       // proper mipmap level.

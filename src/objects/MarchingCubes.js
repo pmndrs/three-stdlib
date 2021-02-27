@@ -398,7 +398,7 @@ var MarchingCubes = function (resolution, material, enableUvs, enableColors) {
   this.end = function (renderCallback) {
     if (this.count === 0) return
 
-    for (var i = this.count * 3; i < this.positionArray.length; i++) {
+    for (let i = this.count * 3; i < this.positionArray.length; i++) {
       this.positionArray[i] = 0.0
     }
 
@@ -629,22 +629,22 @@ var MarchingCubes = function (resolution, material, enableUvs, enableColors) {
     var fieldCopy = field.slice()
     var size = this.size
     var size2 = this.size2
-    for (var x = 0; x < size; x++) {
-      for (var y = 0; y < size; y++) {
-        for (var z = 0; z < size; z++) {
+    for (let x = 0; x < size; x++) {
+      for (let y = 0; y < size; y++) {
+        for (let z = 0; z < size; z++) {
           var index = size2 * z + size * y + x
           var val = fieldCopy[index]
           var count = 1
 
-          for (var x2 = -1; x2 <= 1; x2 += 2) {
+          for (let x2 = -1; x2 <= 1; x2 += 2) {
             var x3 = x2 + x
             if (x3 < 0 || x3 >= size) continue
 
-            for (var y2 = -1; y2 <= 1; y2 += 2) {
+            for (let y2 = -1; y2 <= 1; y2 += 2) {
               var y3 = y2 + y
               if (y3 < 0 || y3 >= size) continue
 
-              for (var z2 = -1; z2 <= 1; z2 += 2) {
+              for (let z2 = -1; z2 <= 1; z2 += 2) {
                 var z3 = z2 + z
                 if (z3 < 0 || z3 >= size) continue
 
@@ -682,15 +682,15 @@ var MarchingCubes = function (resolution, material, enableUvs, enableColors) {
 
     var smin2 = this.size - 2
 
-    for (var z = 1; z < smin2; z++) {
+    for (let z = 1; z < smin2; z++) {
       var z_offset = this.size2 * z
       var fz = (z - this.halfsize) / this.halfsize //+ 1
 
-      for (var y = 1; y < smin2; y++) {
+      for (let y = 1; y < smin2; y++) {
         var y_offset = z_offset + this.size * y
         var fy = (y - this.halfsize) / this.halfsize //+ 1
 
-        for (var x = 1; x < smin2; x++) {
+        for (let x = 1; x < smin2; x++) {
           var fx = (x - this.halfsize) / this.halfsize //+ 1
           var q = y_offset + x
 

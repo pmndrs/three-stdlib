@@ -140,8 +140,8 @@ Object.assign(OBB.prototype, {
 
     // compute rotation matrix expressing b in a's coordinate frame
 
-    for (var i = 0; i < 3; i++) {
-      for (var j = 0; j < 3; j++) {
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
         R[i][j] = a.u[i].dot(b.u[j])
       }
     }
@@ -160,8 +160,8 @@ Object.assign(OBB.prototype, {
     // counteract arithmetic errors when two edges are parallel and
     // their cross product is (near) null
 
-    for (var i = 0; i < 3; i++) {
-      for (var j = 0; j < 3; j++) {
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
         AbsR[i][j] = Math.abs(R[i][j]) + epsilon
       }
     }
@@ -170,7 +170,7 @@ Object.assign(OBB.prototype, {
 
     // test axes L = A0, L = A1, L = A2
 
-    for (var i = 0; i < 3; i++) {
+    for (let i = 0; i < 3; i++) {
       ra = a.e[i]
       rb = b.e[0] * AbsR[i][0] + b.e[1] * AbsR[i][1] + b.e[2] * AbsR[i][2]
       if (Math.abs(t[i]) > ra + rb) return false
@@ -178,7 +178,7 @@ Object.assign(OBB.prototype, {
 
     // test axes L = B0, L = B1, L = B2
 
-    for (var i = 0; i < 3; i++) {
+    for (let i = 0; i < 3; i++) {
       ra = a.e[0] * AbsR[0][i] + a.e[1] * AbsR[1][i] + a.e[2] * AbsR[2][i]
       rb = b.e[i]
       if (Math.abs(t[0] * R[0][i] + t[1] * R[1][i] + t[2] * R[2][i]) > ra + rb) return false

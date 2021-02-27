@@ -78,7 +78,7 @@ class WebGPUBindings {
 
     // iterate over all bindings and check if buffer updates or a new binding group is required
 
-    for (const binding of bindings) {
+    for (let binding of bindings) {
       const isShared = binding.isShared
       const isUpdated = updateMap.get(binding) === frame
 
@@ -138,7 +138,7 @@ class WebGPUBindings {
     let bindingPoint = 0
     const entries = []
 
-    for (const binding of bindings) {
+    for (let binding of bindings) {
       if (binding.isUniformsGroup) {
         if (binding.bufferGPU === null) {
           const byteLength = binding.getByteLength()

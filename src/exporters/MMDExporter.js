@@ -18,7 +18,7 @@ const MMDExporter = function () {
 
       const keys = Object.keys(table)
 
-      for (var i = 0, il = keys.length; i < il; i++) {
+      for (let i = 0, il = keys.length; i < il; i++) {
         let key = keys[i]
 
         var value = table[key]
@@ -30,7 +30,7 @@ const MMDExporter = function () {
 
     const array = []
 
-    for (var i = 0, il = str.length; i < il; i++) {
+    for (let i = 0, il = str.length; i < il; i++) {
       const code = str.charCodeAt(i)
 
       var value = u2sTable[code]

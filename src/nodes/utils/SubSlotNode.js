@@ -25,7 +25,7 @@ SubSlotNode.prototype.generate = function (builder, output) {
 SubSlotNode.prototype.copy = function (source) {
   TempNode.prototype.copy.call(this, source)
 
-  for (var prop in source.slots) {
+  for (let prop in source.slots) {
     this.slots[prop] = source.slots[prop]
   }
 
@@ -40,7 +40,7 @@ SubSlotNode.prototype.toJSON = function (meta) {
 
     data.slots = {}
 
-    for (var prop in this.slots) {
+    for (let prop in this.slots) {
       var slot = this.slots[prop]
 
       if (slot) {

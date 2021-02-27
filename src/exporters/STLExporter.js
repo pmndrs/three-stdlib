@@ -75,7 +75,7 @@ STLExporter.prototype = {
       if (index !== null) {
         // indexed geometry
 
-        for (var j = 0; j < index.count; j += 3) {
+        for (let j = 0; j < index.count; j += 3) {
           var a = index.getX(j + 0)
           var b = index.getX(j + 1)
           var c = index.getX(j + 2)
@@ -85,7 +85,7 @@ STLExporter.prototype = {
       } else {
         // non-indexed geometry
 
-        for (var j = 0; j < positionAttribute.count; j += 3) {
+        for (let j = 0; j < positionAttribute.count; j += 3) {
           var a = j + 0
           var b = j + 1
           var c = j + 2

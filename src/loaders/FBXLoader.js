@@ -202,7 +202,7 @@ var FBXLoader = (function () {
       if ('Video' in fbxTree.Objects) {
         var videoNodes = fbxTree.Objects.Video
 
-        for (var nodeID in videoNodes) {
+        for (let nodeID in videoNodes) {
           var videoNode = videoNodes[nodeID]
 
           var id = parseInt(nodeID)
@@ -223,7 +223,7 @@ var FBXLoader = (function () {
         }
       }
 
-      for (var id in images) {
+      for (let id in images) {
         var filename = images[id]
 
         if (blobs[filename] !== undefined) images[id] = blobs[filename]
@@ -292,7 +292,7 @@ var FBXLoader = (function () {
 
       if ('Texture' in fbxTree.Objects) {
         var textureNodes = fbxTree.Objects.Texture
-        for (var nodeID in textureNodes) {
+        for (let nodeID in textureNodes) {
           var texture = this.parseTexture(textureNodes[nodeID], images)
           textureMap.set(parseInt(nodeID), texture)
         }
@@ -385,7 +385,7 @@ var FBXLoader = (function () {
       if ('Material' in fbxTree.Objects) {
         var materialNodes = fbxTree.Objects.Material
 
-        for (var nodeID in materialNodes) {
+        for (let nodeID in materialNodes) {
           var material = this.parseMaterial(materialNodes[nodeID], textureMap)
 
           if (material !== null) materialMap.set(parseInt(nodeID), material)
@@ -578,7 +578,7 @@ var FBXLoader = (function () {
       if ('Deformer' in fbxTree.Objects) {
         var DeformerNodes = fbxTree.Objects.Deformer
 
-        for (var nodeID in DeformerNodes) {
+        for (let nodeID in DeformerNodes) {
           var deformerNode = DeformerNodes[nodeID]
 
           var relationships = connections.get(parseInt(nodeID))
@@ -652,7 +652,7 @@ var FBXLoader = (function () {
     parseMorphTargets: function (relationships, deformerNodes) {
       var rawMorphTargets = []
 
-      for (var i = 0; i < relationships.children.length; i++) {
+      for (let i = 0; i < relationships.children.length; i++) {
         var child = relationships.children[i]
 
         var morphTargetNode = deformerNodes[child.ID]
@@ -737,7 +737,7 @@ var FBXLoader = (function () {
       var modelMap = new Map()
       var modelNodes = fbxTree.Objects.Model
 
-      for (var nodeID in modelNodes) {
+      for (let nodeID in modelNodes) {
         var id = parseInt(nodeID)
         var node = modelNodes[nodeID]
         var relationships = connections.get(id)
@@ -784,7 +784,7 @@ var FBXLoader = (function () {
       var bone = null
 
       relationships.parents.forEach(function (parent) {
-        for (var ID in skeletons) {
+        for (let ID in skeletons) {
           var skeleton = skeletons[ID]
 
           skeleton.rawBones.forEach(function (rawBone, i) {
@@ -1096,7 +1096,7 @@ var FBXLoader = (function () {
     bindSkeleton: function (skeletons, geometryMap, modelMap) {
       var bindMatrices = this.parsePoseNodes()
 
-      for (var ID in skeletons) {
+      for (let ID in skeletons) {
         var skeleton = skeletons[ID]
 
         var parents = connections.get(parseInt(skeleton.ID)).parents
@@ -1124,7 +1124,7 @@ var FBXLoader = (function () {
       if ('Pose' in fbxTree.Objects) {
         var BindPoseNode = fbxTree.Objects.Pose
 
-        for (var nodeID in BindPoseNode) {
+        for (let nodeID in BindPoseNode) {
           if (BindPoseNode[nodeID].attrType === 'BindPose') {
             var poseNodes = BindPoseNode[nodeID].PoseNode
 
@@ -1214,7 +1214,7 @@ var FBXLoader = (function () {
       if ('Geometry' in fbxTree.Objects) {
         var geoNodes = fbxTree.Objects.Geometry
 
-        for (var nodeID in geoNodes) {
+        for (let nodeID in geoNodes) {
           var relationships = connections.get(parseInt(nodeID))
           var geo = this.parseGeometry(relationships, geoNodes[nodeID], deformers)
 
@@ -1511,7 +1511,7 @@ var FBXLoader = (function () {
             weightIndices.push(0)
           }
 
-          for (var i = 0; i < 4; ++i) {
+          for (let i = 0; i < 4; ++i) {
             faceWeights.push(weights[i])
             faceWeightIndices.push(weightIndices[i])
           }
@@ -1585,7 +1585,7 @@ var FBXLoader = (function () {
       faceWeightIndices,
       faceLength,
     ) {
-      for (var i = 2; i < faceLength; i++) {
+      for (let i = 2; i < faceLength; i++) {
         buffers.vertex.push(geoInfo.vertexPositions[facePositionIndexes[0]])
         buffers.vertex.push(geoInfo.vertexPositions[facePositionIndexes[1]])
         buffers.vertex.push(geoInfo.vertexPositions[facePositionIndexes[2]])
@@ -1714,7 +1714,7 @@ var FBXLoader = (function () {
       var length = parentGeo.attributes.position.count * 3
       var morphPositions = new Float32Array(length)
 
-      for (var i = 0; i < indices.length; i++) {
+      for (let i = 0; i < indices.length; i++) {
         var morphIndex = indices[i] * 3
 
         morphPositions[morphIndex] = morphPositionsSparse[i * 3]
@@ -1821,7 +1821,7 @@ var FBXLoader = (function () {
       // for conforming with the other functions we've written for other data.
       var materialIndices = []
 
-      for (var i = 0; i < materialIndexBuffer.length; ++i) {
+      for (let i = 0; i < materialIndexBuffer.length; ++i) {
         materialIndices.push(i)
       }
 
@@ -1856,7 +1856,7 @@ var FBXLoader = (function () {
       var controlPoints = []
       var pointsValues = geoNode.Points.a
 
-      for (var i = 0, l = pointsValues.length; i < l; i += 4) {
+      for (let i = 0, l = pointsValues.length; i < l; i += 4) {
         controlPoints.push(new Vector4().fromArray(pointsValues, i))
       }
 
@@ -1868,7 +1868,7 @@ var FBXLoader = (function () {
         startKnot = degree
         endKnot = knots.length - 1 - startKnot
 
-        for (var i = 0; i < degree; ++i) {
+        for (let i = 0; i < degree; ++i) {
           controlPoints.push(controlPoints[i])
         }
       }
@@ -1902,7 +1902,7 @@ var FBXLoader = (function () {
       var rawClips = this.parseClips()
 
       if (rawClips !== undefined) {
-        for (var key in rawClips) {
+        for (let key in rawClips) {
           var rawClip = rawClips[key]
 
           var clip = this.addClip(rawClip)
@@ -1937,7 +1937,7 @@ var FBXLoader = (function () {
 
       var curveNodesMap = new Map()
 
-      for (var nodeID in rawCurveNodes) {
+      for (let nodeID in rawCurveNodes) {
         var rawCurveNode = rawCurveNodes[nodeID]
 
         if (rawCurveNode.attrName.match(/S|R|T|DeformPercent/) !== null) {
@@ -1967,7 +1967,7 @@ var FBXLoader = (function () {
       // times: [0], positions [7.23538335023477e-7, 93.67518615722656, -0.9982695579528809]
       // this shows up in nearly every FBX file, and generally time array is length > 100
 
-      for (var nodeID in rawCurves) {
+      for (let nodeID in rawCurves) {
         var animationCurve = {
           id: rawCurves[nodeID].id,
           times: rawCurves[nodeID].KeyTime.a.map(convertFBXTimeToSeconds),
@@ -2001,7 +2001,7 @@ var FBXLoader = (function () {
 
       var layersMap = new Map()
 
-      for (var nodeID in rawLayers) {
+      for (let nodeID in rawLayers) {
         var layerCurveNodes = []
 
         var connection = connections.get(parseInt(nodeID))
@@ -2103,7 +2103,7 @@ var FBXLoader = (function () {
       // connect the stacks (clips) up to the layers
       var rawClips = {}
 
-      for (var nodeID in rawStacks) {
+      for (let nodeID in rawStacks) {
         var children = connections.get(parseInt(nodeID)).children
 
         if (children.length > 1) {
@@ -2231,7 +2231,7 @@ var FBXLoader = (function () {
 
       var quaternionValues = []
 
-      for (var i = 0; i < values.length; i += 3) {
+      for (let i = 0; i < values.length; i += 3) {
         euler.set(values[i], values[i + 1], values[i + 2], eulerOrder)
 
         quaternion.setFromEuler(euler)
@@ -2279,7 +2279,7 @@ var FBXLoader = (function () {
       if (times.length > 1) {
         var targetIndex = 1
         var lastValue = times[0]
-        for (var i = 1; i < times.length; i++) {
+        for (let i = 1; i < times.length; i++) {
           var currentValue = times[i]
           if (currentValue !== lastValue) {
             times[targetIndex] = currentValue
@@ -2342,7 +2342,7 @@ var FBXLoader = (function () {
     // These will be converted to quaternions which don't support values greater than
     // PI, so we'll interpolate large rotations
     interpolateRotations: function (curve) {
-      for (var i = 1; i < curve.values.length; i++) {
+      for (let i = 1; i < curve.values.length; i++) {
         var initialValue = curve.values[i - 1]
         var valuesSpan = curve.values[i] - initialValue
 
@@ -2697,7 +2697,7 @@ var FBXLoader = (function () {
 
       var propertyList = []
 
-      for (var i = 0; i < numProperties; i++) {
+      for (let i = 0; i < numProperties; i++) {
         propertyList.push(this.parseProperty(reader))
       }
 
@@ -2928,7 +2928,7 @@ var FBXLoader = (function () {
     getBooleanArray: function (size) {
       var a = []
 
-      for (var i = 0; i < size; i++) {
+      for (let i = 0; i < size; i++) {
         a.push(this.getBoolean())
       }
 
@@ -2956,7 +2956,7 @@ var FBXLoader = (function () {
     getInt32Array: function (size) {
       var a = []
 
-      for (var i = 0; i < size; i++) {
+      for (let i = 0; i < size; i++) {
         a.push(this.getInt32())
       }
 
@@ -3003,7 +3003,7 @@ var FBXLoader = (function () {
     getInt64Array: function (size) {
       var a = []
 
-      for (var i = 0; i < size; i++) {
+      for (let i = 0; i < size; i++) {
         a.push(this.getInt64())
       }
 
@@ -3034,7 +3034,7 @@ var FBXLoader = (function () {
     getFloat32Array: function (size) {
       var a = []
 
-      for (var i = 0; i < size; i++) {
+      for (let i = 0; i < size; i++) {
         a.push(this.getFloat32())
       }
 
@@ -3050,7 +3050,7 @@ var FBXLoader = (function () {
     getFloat64Array: function (size) {
       var a = []
 
-      for (var i = 0; i < size; i++) {
+      for (let i = 0; i < size; i++) {
         a.push(this.getFloat64())
       }
 
@@ -3067,7 +3067,7 @@ var FBXLoader = (function () {
       // note: safari 9 doesn't support Uint8Array.indexOf; create intermediate array instead
       var a = []
 
-      for (var i = 0; i < size; i++) {
+      for (let i = 0; i < size; i++) {
         a[i] = this.getUint8()
       }
 
@@ -3131,7 +3131,7 @@ var FBXLoader = (function () {
       return result
     }
 
-    for (var i = 0; i < CORRECT.length; ++i) {
+    for (let i = 0; i < CORRECT.length; ++i) {
       var num = read(1)
       if (num === CORRECT[i]) {
         return false
@@ -3351,13 +3351,13 @@ var FBXLoader = (function () {
   }
 
   function append(a, b) {
-    for (var i = 0, j = a.length, l = b.length; i < l; i++, j++) {
+    for (let i = 0, j = a.length, l = b.length; i < l; i++, j++) {
       a[j] = b[i]
     }
   }
 
   function slice(a, b, from, to) {
-    for (var i = from, j = 0; i < to; i++, j++) {
+    for (let i = from, j = 0; i < to; i++, j++) {
       a[j] = b[i]
     }
 

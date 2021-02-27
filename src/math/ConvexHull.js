@@ -44,7 +44,7 @@ var ConvexHull = (function () {
 
       this.makeEmpty()
 
-      for (var i = 0, l = points.length; i < l; i++) {
+      for (let i = 0, l = points.length; i < l; i++) {
         this.vertices.push(new VertexNode(points[i]))
       }
 
@@ -89,7 +89,7 @@ var ConvexHull = (function () {
     containsPoint: function (point) {
       var faces = this.faces
 
-      for (var i = 0, l = faces.length; i < l; i++) {
+      for (let i = 0, l = faces.length; i < l; i++) {
         var face = faces[i]
 
         // compute signed distance and check on what half space the point lies
@@ -108,7 +108,7 @@ var ConvexHull = (function () {
       var tNear = -Infinity
       var tFar = Infinity
 
-      for (var i = 0, l = faces.length; i < l; i++) {
+      for (let i = 0, l = faces.length; i < l; i++) {
         var face = faces[i]
 
         // interpret faces as planes for the further computation
@@ -291,7 +291,7 @@ var ConvexHull = (function () {
 
           var maxFace = null
 
-          for (var i = 0; i < newFaces.length; i++) {
+          for (let i = 0; i < newFaces.length; i++) {
             var face = newFaces[i]
 
             if (face.mark === Visible) {
@@ -536,7 +536,7 @@ var ConvexHull = (function () {
     reindexFaces: function () {
       var activeFaces = []
 
-      for (var i = 0; i < this.faces.length; i++) {
+      for (let i = 0; i < this.faces.length; i++) {
         var face = this.faces[i]
 
         if (face.mark === Visible) {
@@ -649,7 +649,7 @@ var ConvexHull = (function () {
       var firstSideEdge = null
       var previousSideEdge = null
 
-      for (var i = 0; i < horizon.length; i++) {
+      for (let i = 0; i < horizon.length; i++) {
         var horizonEdge = horizon[i]
 
         // returns the right side edge

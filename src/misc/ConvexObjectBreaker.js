@@ -54,7 +54,7 @@ var ConvexObjectBreaker = function (minSizeForBreak, smallDelta) {
 
   this.segments = []
   var n = 30 * 30
-  for (var i = 0; i < n; i++) this.segments[i] = false
+  for (let i = 0; i < n; i++) this.segments[i] = false
 }
 
 ConvexObjectBreaker.prototype = {
@@ -183,7 +183,7 @@ ConvexObjectBreaker.prototype = {
 
     // Reset segments mark
     var numPointPairs = numPoints * numPoints
-    for (var i = 0; i < numPointPairs; i++) this.segments[i] = false
+    for (let i = 0; i < numPointPairs; i++) this.segments[i] = false
 
     var p0 = this.tempVector3_P0
     var p1 = this.tempVector3_P1
@@ -191,7 +191,7 @@ ConvexObjectBreaker.prototype = {
     var n1 = this.tempVector3_N1
 
     // Iterate through the faces to mark edges shared by coplanar faces
-    for (var i = 0; i < numFaces - 1; i++) {
+    for (let i = 0; i < numFaces - 1; i++) {
       var a1 = getVertexIndex(i, 0)
       var b1 = getVertexIndex(i, 1)
       var c1 = getVertexIndex(i, 2)
@@ -199,7 +199,7 @@ ConvexObjectBreaker.prototype = {
       // Assuming all 3 vertices have the same normal
       n0.set(normals[a1], normals[a1] + 1, normals[a1] + 2)
 
-      for (var j = i + 1; j < numFaces; j++) {
+      for (let j = i + 1; j < numFaces; j++) {
         var a2 = getVertexIndex(j, 0)
         var b2 = getVertexIndex(j, 1)
         var c2 = getVertexIndex(j, 2)
@@ -232,12 +232,12 @@ ConvexObjectBreaker.prototype = {
     ConvexObjectBreaker.transformPlaneToLocalSpace(plane, object.matrix, localPlane)
 
     // Iterate through the faces adding points to both pieces
-    for (var i = 0; i < numFaces; i++) {
+    for (let i = 0; i < numFaces; i++) {
       var va = getVertexIndex(i, 0)
       var vb = getVertexIndex(i, 1)
       var vc = getVertexIndex(i, 2)
 
-      for (var segment = 0; segment < 3; segment++) {
+      for (let segment = 0; segment < 3; segment++) {
         var i0 = segment === 0 ? va : segment === 1 ? vb : vc
         var i1 = segment === 0 ? vb : segment === 1 ? vc : va
 
@@ -318,10 +318,10 @@ ConvexObjectBreaker.prototype = {
     var numPoints1 = points1.length
 
     if (numPoints1 > 0) {
-      for (var i = 0; i < numPoints1; i++) this.tempCM1.add(points1[i])
+      for (let i = 0; i < numPoints1; i++) this.tempCM1.add(points1[i])
 
       this.tempCM1.divideScalar(numPoints1)
-      for (var i = 0; i < numPoints1; i++) {
+      for (let i = 0; i < numPoints1; i++) {
         var p = points1[i]
         p.sub(this.tempCM1)
         radius1 = Math.max(radius1, p.x, p.y, p.z)
@@ -334,10 +334,10 @@ ConvexObjectBreaker.prototype = {
     var radius2 = 0
     var numPoints2 = points2.length
     if (numPoints2 > 0) {
-      for (var i = 0; i < numPoints2; i++) this.tempCM2.add(points2[i])
+      for (let i = 0; i < numPoints2; i++) this.tempCM2.add(points2[i])
 
       this.tempCM2.divideScalar(numPoints2)
-      for (var i = 0; i < numPoints2; i++) {
+      for (let i = 0; i < numPoints2; i++) {
         var p = points2[i]
         p.sub(this.tempCM2)
         radius2 = Math.max(radius2, p.x, p.y, p.z)

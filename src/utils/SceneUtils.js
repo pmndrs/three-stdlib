@@ -8,7 +8,7 @@ var SceneUtils = {
     var geometry = instancedMesh.geometry
     var material = instancedMesh.material
 
-    for (var i = 0; i < count; i++) {
+    for (let i = 0; i < count; i++) {
       var mesh = new Mesh(geometry, material)
 
       instancedMesh.getMatrixAt(i, mesh.matrix)
@@ -26,7 +26,7 @@ var SceneUtils = {
   createMultiMaterialObject: function (geometry, materials) {
     var group = new Group()
 
-    for (var i = 0, l = materials.length; i < l; i++) {
+    for (let i = 0, l = materials.length; i < l; i++) {
       group.add(new Mesh(geometry, materials[i]))
     }
 

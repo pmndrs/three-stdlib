@@ -15,7 +15,7 @@ class EdgeSplitModifier {
     function computeNormals() {
       normals = new Float32Array(indexes.length * 3)
 
-      for (var i = 0; i < indexes.length; i += 3) {
+      for (let i = 0; i < indexes.length; i += 3) {
         var index = indexes[i]
 
         A.set(positions[3 * index], positions[3 * index + 1], positions[3 * index + 2])
@@ -31,7 +31,7 @@ class EdgeSplitModifier {
 
         var normal = C.cross(A).normalize()
 
-        for (var j = 0; j < 3; j++) {
+        for (let j = 0; j < 3; j++) {
           normals[3 * (i + j)] = normal.x
           normals[3 * (i + j) + 1] = normal.y
           normals[3 * (i + j) + 2] = normal.z
@@ -42,7 +42,7 @@ class EdgeSplitModifier {
     function mapPositionsToIndexes() {
       pointToIndexMap = Array(positions.length / 3)
 
-      for (var i = 0; i < indexes.length; i++) {
+      for (let i = 0; i < indexes.length; i++) {
         var index = indexes[i]
 
         if (pointToIndexMap[index] == null) {
@@ -61,7 +61,7 @@ class EdgeSplitModifier {
         currentGroup: [firstIndex],
       }
 
-      for (var j of indexes) {
+      for (let j of indexes) {
         if (j !== firstIndex) {
           B.set(normals[3 * j], normals[3 * j + 1], normals[3 * j + 2]).normalize()
 
@@ -81,13 +81,13 @@ class EdgeSplitModifier {
 
       var groupResults = []
 
-      for (var index of indexes) {
+      for (let index of indexes) {
         groupResults.push(edgeSplitToGroups(indexes, cutOff, index))
       }
 
       var result = groupResults[0]
 
-      for (var groupResult of groupResults) {
+      for (let groupResult of groupResults) {
         if (groupResult.currentGroup.length > result.currentGroup.length) {
           result = groupResult
         }
@@ -142,12 +142,12 @@ class EdgeSplitModifier {
 
       splitIndexes = []
 
-      for (var vertexIndexes of pointToIndexMap) {
+      for (let vertexIndexes of pointToIndexMap) {
         edgeSplit(vertexIndexes, Math.cos(cutOffAngle) - 0.001)
       }
 
       const newAttributes = {}
-      for (const name of Object.keys(geometry.attributes)) {
+      for (let name of Object.keys(geometry.attributes)) {
         const oldAttribute = geometry.attributes[name]
         const newArray = new oldAttribute.array.constructor(
           (indexes.length + splitIndexes.length) * oldAttribute.itemSize,
@@ -159,18 +159,18 @@ class EdgeSplitModifier {
       var newIndexes = new Uint32Array(indexes.length)
       newIndexes.set(indexes)
 
-      for (var i = 0; i < splitIndexes.length; i++) {
+      for (let i = 0; i < splitIndexes.length; i++) {
         var split = splitIndexes[i]
         var index = indexes[split.original]
 
-        for (const attribute of Object.values(newAttributes)) {
+        for (let attribute of Object.values(newAttributes)) {
           for (let j = 0; j < attribute.itemSize; j++) {
             attribute.array[(indexes.length + i) * attribute.itemSize + j] =
               attribute.array[index * attribute.itemSize + j]
           }
         }
 
-        for (var j of split.indexes) {
+        for (let j of split.indexes) {
           newIndexes[j] = indexes.length + i
         }
       }
@@ -178,7 +178,7 @@ class EdgeSplitModifier {
       geometry = new BufferGeometry()
       geometry.setIndex(new BufferAttribute(newIndexes, 1))
 
-      for (const name of Object.keys(newAttributes)) {
+      for (let name of Object.keys(newAttributes)) {
         geometry.setAttribute(name, newAttributes[name])
       }
 
@@ -188,7 +188,7 @@ class EdgeSplitModifier {
         if (oldNormals !== null) {
           const changedNormals = new Array(oldNormals.length / 3).fill(false)
 
-          for (const splitData of splitIndexes) changedNormals[splitData.original] = true
+          for (let splitData of splitIndexes) changedNormals[splitData.original] = true
 
           for (let i = 0; i < changedNormals.length; i++) {
             if (changedNormals[i] === false) {

@@ -46,7 +46,7 @@ import {
  *
  *  var colorMap = ...; // Some logic to index colors.
  *
- *  for (var i = 0; i < nGeometryGroups; i++) {
+ *  for (let i = 0; i < nGeometryGroups; i++) {
  *
  *		var material = new THREE.MeshPhongMaterial({
  *			color: colorMap[i],
@@ -119,7 +119,7 @@ STLLoader.prototype = Object.assign(Object.create(Loader.prototype), {
 
       var solid = [115, 111, 108, 105, 100]
 
-      for (var off = 0; off < 5; off++) {
+      for (let off = 0; off < 5; off++) {
         // If "solid" text is matched to the current offset, declare it to be an ASCII STL.
 
         if (matchDataViewAt(solid, reader, off)) return false
@@ -133,7 +133,7 @@ STLLoader.prototype = Object.assign(Object.create(Loader.prototype), {
     function matchDataViewAt(query, reader, offset) {
       // Check if each byte in query matches the corresponding byte from the current offset
 
-      for (var i = 0, il = query.length; i < il; i++) {
+      for (let i = 0, il = query.length; i < il; i++) {
         if (query[i] !== reader.getUint8(offset + i, false)) return false
       }
 
@@ -154,7 +154,7 @@ STLLoader.prototype = Object.assign(Object.create(Loader.prototype), {
       // process STL header
       // check for default color in header ("COLOR=rgba" sequence).
 
-      for (var index = 0; index < 80 - 10; index++) {
+      for (let index = 0; index < 80 - 10; index++) {
         if (
           reader.getUint32(index, false) == 0x434f4c4f /*COLO*/ &&
           reader.getUint8(index + 4) == 0x52 /*'R'*/ &&
@@ -178,7 +178,7 @@ STLLoader.prototype = Object.assign(Object.create(Loader.prototype), {
       var vertices = new Float32Array(faces * 3 * 3)
       var normals = new Float32Array(faces * 3 * 3)
 
-      for (var face = 0; face < faces; face++) {
+      for (let face = 0; face < faces; face++) {
         var start = dataOffset + face * faceLength
         var normalX = reader.getFloat32(start, true)
         var normalY = reader.getFloat32(start + 4, true)
@@ -200,7 +200,7 @@ STLLoader.prototype = Object.assign(Object.create(Loader.prototype), {
           }
         }
 
-        for (var i = 1; i <= 3; i++) {
+        for (let i = 1; i <= 3; i++) {
           var vertexstart = start + i * 12
           var componentIdx = face * 3 * 3 + (i - 1) * 3
 
@@ -317,7 +317,7 @@ STLLoader.prototype = Object.assign(Object.create(Loader.prototype), {
     function ensureBinary(buffer) {
       if (typeof buffer === 'string') {
         var array_buffer = new Uint8Array(buffer.length)
-        for (var i = 0; i < buffer.length; i++) {
+        for (let i = 0; i < buffer.length; i++) {
           array_buffer[i] = buffer.charCodeAt(i) & 0xff // implicitly assumes little-endian
         }
 

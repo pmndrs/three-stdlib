@@ -104,7 +104,7 @@ GCodeLoader.prototype = Object.assign(Object.create(Loader.prototype), {
 
     var lines = data.replace(/;.+/g, '').split('\n')
 
-    for (var i = 0; i < lines.length; i++) {
+    for (let i = 0; i < lines.length; i++) {
       var tokens = lines[i].split(' ')
       var cmd = tokens[0].toUpperCase()
 
@@ -175,7 +175,7 @@ GCodeLoader.prototype = Object.assign(Object.create(Loader.prototype), {
     object.name = 'gcode'
 
     if (this.splitLayer) {
-      for (var i = 0; i < layers.length; i++) {
+      for (let i = 0; i < layers.length; i++) {
         var layer = layers[i]
         addObject(layer.vertex, true)
         addObject(layer.pathVertex, false)
@@ -184,16 +184,16 @@ GCodeLoader.prototype = Object.assign(Object.create(Loader.prototype), {
       var vertex = [],
         pathVertex = []
 
-      for (var i = 0; i < layers.length; i++) {
+      for (let i = 0; i < layers.length; i++) {
         var layer = layers[i]
         var layerVertex = layer.vertex
         var layerPathVertex = layer.pathVertex
 
-        for (var j = 0; j < layerVertex.length; j++) {
+        for (let j = 0; j < layerVertex.length; j++) {
           vertex.push(layerVertex[j])
         }
 
-        for (var j = 0; j < layerPathVertex.length; j++) {
+        for (let j = 0; j < layerPathVertex.length; j++) {
           pathVertex.push(layerPathVertex[j])
         }
       }

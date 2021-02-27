@@ -301,7 +301,7 @@ const CCDIKSolver = (() => {
             targetMesh.position.copy(getPosition(targetBone, matrix))
             effectorMesh.position.copy(getPosition(effectorBone, matrix))
 
-            for (var j = 0, jl = ik.links.length; j < jl; j++) {
+            for (let j = 0, jl = ik.links.length; j < jl; j++) {
               var link = ik.links[j]
               var linkBone = bones[link.index]
 
@@ -316,7 +316,7 @@ const CCDIKSolver = (() => {
             setPositionOfBoneToAttributeArray(array, 0, targetBone, matrix)
             setPositionOfBoneToAttributeArray(array, 1, effectorBone, matrix)
 
-            for (var j = 0, jl = ik.links.length; j < jl; j++) {
+            for (let j = 0, jl = ik.links.length; j < jl; j++) {
               var link = ik.links[j]
               var linkBone = bones[link.index]
               setPositionOfBoneToAttributeArray(array, j + 2, linkBone, matrix)

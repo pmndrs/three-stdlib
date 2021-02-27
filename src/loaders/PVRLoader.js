@@ -192,7 +192,7 @@ PVRLoader._extract = function (pvrDatas) {
 
     dataSize = widthBlocks * heightBlocks * blockSize
 
-    for (var surfIndex = 0; surfIndex < numSurfs; surfIndex++) {
+    for (let surfIndex = 0; surfIndex < numSurfs; surfIndex++) {
       var byteArray = new Uint8Array(buffer, dataOffset, dataSize)
 
       var mipmap = {

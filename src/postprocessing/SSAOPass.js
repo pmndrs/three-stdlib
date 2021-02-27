@@ -333,7 +333,7 @@ SSAOPass.prototype = Object.assign(Object.create(Pass.prototype), {
     var kernelSize = this.kernelSize
     var kernel = this.kernel
 
-    for (var i = 0; i < kernelSize; i++) {
+    for (let i = 0; i < kernelSize; i++) {
       var sample = new Vector3()
       sample.x = Math.random() * 2 - 1
       sample.y = Math.random() * 2 - 1
@@ -362,7 +362,7 @@ SSAOPass.prototype = Object.assign(Object.create(Pass.prototype), {
     var size = width * height
     var data = new Float32Array(size * 4)
 
-    for (var i = 0; i < size; i++) {
+    for (let i = 0; i < size; i++) {
       var stride = i * 4
 
       var x = Math.random() * 2 - 1

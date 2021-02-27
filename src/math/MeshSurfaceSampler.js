@@ -54,7 +54,7 @@ var MeshSurfaceSampler = (function () {
 
       // Accumulate weights for each mesh face.
 
-      for (var i = 0; i < positionAttribute.count; i += 3) {
+      for (let i = 0; i < positionAttribute.count; i += 3) {
         var faceWeight = 1
 
         if (weightAttribute) {
@@ -76,7 +76,7 @@ var MeshSurfaceSampler = (function () {
 
       var cumulativeTotal = 0
 
-      for (var i = 0; i < faceWeights.length; i++) {
+      for (let i = 0; i < faceWeights.length; i++) {
         cumulativeTotal += faceWeights[i]
 
         this.distribution[i] = cumulativeTotal

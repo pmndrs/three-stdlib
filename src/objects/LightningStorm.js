@@ -106,7 +106,7 @@ var LightningStorm = function (stormParams) {
   this.lightningsMeshes = []
   this.deadLightningsMeshes = []
 
-  for (var i = 0; i < this.stormParams.maxLightnings; i++) {
+  for (let i = 0; i < this.stormParams.maxLightnings; i++) {
     var lightning = new LightningStrike(LightningStrike.copyParameters({}, this.lightningParameters))
     var mesh = new Mesh(lightning, this.lightningMaterial)
     this.deadLightningsMeshes.push(mesh)

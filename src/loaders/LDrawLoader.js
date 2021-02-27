@@ -118,7 +118,7 @@ var LDrawLoader = (function () {
     var normals = []
 
     // Save the list of hard edges by hash
-    for (var i = 0, l = lineSegments.length; i < l; i++) {
+    for (let i = 0, l = lineSegments.length; i < l; i++) {
       var ls = lineSegments[i]
       var v0 = ls.v0
       var v1 = ls.v1
@@ -127,9 +127,9 @@ var LDrawLoader = (function () {
     }
 
     // track the half edges associated with each triangle
-    for (var i = 0, l = triangles.length; i < l; i++) {
+    for (let i = 0, l = triangles.length; i < l; i++) {
       var tri = triangles[i]
-      for (var i2 = 0, l2 = 3; i2 < l2; i2++) {
+      for (let i2 = 0, l2 = 3; i2 < l2; i2++) {
         var index = i2
         var next = (i2 + 1) % 3
         var v0 = tri[`v${index}`]
@@ -181,7 +181,7 @@ var LDrawLoader = (function () {
         }
 
         // Check if any edge is connected to another triangle edge
-        for (var i2 = 0, l2 = 3; i2 < l2; i2++) {
+        for (let i2 = 0, l2 = 3; i2 < l2; i2++) {
           var index = i2
           var next = (i2 + 1) % 3
           var v0 = tri[`v${index}`]
@@ -210,7 +210,7 @@ var LDrawLoader = (function () {
             }
 
             // Find the matching edge in this triangle and copy the normal vector over
-            for (var i3 = 0, l3 = 3; i3 < l3; i3++) {
+            for (let i3 = 0, l3 = 3; i3 < l3; i3++) {
               var otherIndex = i3
               var otherNext = (i3 + 1) % 3
               var otherV0 = otherTri[`v${otherIndex}`]
@@ -239,7 +239,7 @@ var LDrawLoader = (function () {
     }
 
     // The normals of each face have been added up so now we average them by normalizing the vector.
-    for (var i = 0, l = normals.length; i < l; i++) {
+    for (let i = 0, l = normals.length; i < l; i++) {
       normals[i].normalize()
     }
   }
@@ -337,7 +337,7 @@ var LDrawLoader = (function () {
     var index0 = 0
     var numGroupVerts = 0
 
-    for (var iElem = 0, nElem = elements.length; iElem < nElem; iElem++) {
+    for (let iElem = 0, nElem = elements.length; iElem < nElem; iElem++) {
       var elem = elements[iElem]
       var v0 = elem.v0
       var v1 = elem.v1
@@ -393,7 +393,7 @@ var LDrawLoader = (function () {
       var controlArray0 = new Float32Array(elements.length * 3 * 2)
       var controlArray1 = new Float32Array(elements.length * 3 * 2)
       var directionArray = new Float32Array(elements.length * 3 * 2)
-      for (var i = 0, l = elements.length; i < l; i++) {
+      for (let i = 0, l = elements.length; i < l; i++) {
         var os = elements[i]
         var c0 = os.c0
         var c1 = os.c1
@@ -540,7 +540,7 @@ var LDrawLoader = (function () {
       var matLib = {}
 
       if (materials) {
-        for (var i = 0, n = materials.length; i < n; i++) {
+        for (let i = 0, n = materials.length; i < n; i++) {
           var material = materials[i]
           matLib[material.userData.code] = material
         }
@@ -615,7 +615,7 @@ var LDrawLoader = (function () {
         )
       }
 
-      for (var i = this.parseScopesStack.length - 1; i >= 0; i--) {
+      for (let i = this.parseScopesStack.length - 1; i >= 0; i--) {
         var material = this.parseScopesStack[i].lib[colourCode]
 
         if (material) {
@@ -1482,7 +1482,7 @@ var LDrawLoader = (function () {
           var conditionalSegments = parseScope.conditionalSegments
           var triangles = parseScope.triangles
 
-          for (var i = 0, l = lineSegments.length; i < l; i++) {
+          for (let i = 0, l = lineSegments.length; i < l; i++) {
             var ls = lineSegments[i]
 
             if (separateObjects) {
@@ -1493,7 +1493,7 @@ var LDrawLoader = (function () {
             parentLineSegments.push(ls)
           }
 
-          for (var i = 0, l = conditionalSegments.length; i < l; i++) {
+          for (let i = 0, l = conditionalSegments.length; i < l; i++) {
             var os = conditionalSegments[i]
 
             if (separateObjects) {
@@ -1506,7 +1506,7 @@ var LDrawLoader = (function () {
             parentConditionalSegments.push(os)
           }
 
-          for (var i = 0, l = triangles.length; i < l; i++) {
+          for (let i = 0, l = triangles.length; i < l; i++) {
             var tri = triangles[i]
 
             if (separateObjects) {

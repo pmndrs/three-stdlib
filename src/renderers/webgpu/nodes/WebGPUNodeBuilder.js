@@ -182,7 +182,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
     let snippet = ''
 
     if (shaderStage === 'vertex') {
-      for (const vary of this.varys) {
+      for (let vary of this.varys) {
         snippet += `${vary.name} = ${vary.snippet};`
       }
     }
@@ -198,7 +198,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
     let index = this.bindingsOffset[shaderStage]
 
-    for (const uniform of uniforms) {
+    for (let uniform of uniforms) {
       if (uniform.type === 'texture') {
         snippet += `layout(set = 0, binding = ${index++}) uniform sampler ${uniform.name}_sampler;`
         snippet += `layout(set = 0, binding = ${index++}) uniform texture2D ${uniform.name};`

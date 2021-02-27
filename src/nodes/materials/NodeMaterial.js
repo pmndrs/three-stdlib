@@ -71,7 +71,7 @@ NodeMaterial.prototype.getHash = function () {
 }
 
 NodeMaterial.prototype.updateFrame = function (frame) {
-  for (var i = 0; i < this.updaters.length; ++i) {
+  for (let i = 0; i < this.updaters.length; ++i) {
     frame.updateNode(this.updaters[i])
   }
 }
@@ -103,7 +103,7 @@ NodeMaterial.prototype.build = function (params) {
 NodeMaterial.prototype.copy = function (source) {
   var uuid = this.uuid
 
-  for (var name in source) {
+  for (let name in source) {
     this[name] = source[name]
   }
 

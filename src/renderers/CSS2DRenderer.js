@@ -97,7 +97,7 @@ var CSS2DRenderer = function () {
       object.onAfterRender(_this, scene, camera)
     }
 
-    for (var i = 0, l = object.children.length; i < l; i++) {
+    for (let i = 0, l = object.children.length; i < l; i++) {
       renderObject(object.children[i], scene, camera)
     }
   }
@@ -134,7 +134,7 @@ var CSS2DRenderer = function () {
 
     var zMax = sorted.length
 
-    for (var i = 0, l = sorted.length; i < l; i++) {
+    for (let i = 0, l = sorted.length; i < l; i++) {
       sorted[i].element.style.zIndex = zMax - i
     }
   }

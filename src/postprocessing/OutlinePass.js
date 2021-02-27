@@ -183,7 +183,7 @@ OutlinePass.prototype = Object.assign(Object.create(Pass.prototype), {
       }
     }
 
-    for (var i = 0; i < this.selectedObjects.length; i++) {
+    for (let i = 0; i < this.selectedObjects.length; i++) {
       var selectedObject = this.selectedObjects[i]
       selectedObject.traverse(gatherSelectedMeshesCallBack)
     }
@@ -197,7 +197,7 @@ OutlinePass.prototype = Object.assign(Object.create(Pass.prototype), {
       if (object.isMesh) selectedMeshes.push(object)
     }
 
-    for (var i = 0; i < this.selectedObjects.length; i++) {
+    for (let i = 0; i < this.selectedObjects.length; i++) {
       var selectedObject = this.selectedObjects[i]
       selectedObject.traverse(gatherSelectedMeshesCallBack)
     }
@@ -208,7 +208,7 @@ OutlinePass.prototype = Object.assign(Object.create(Pass.prototype), {
 
         var bFound = false
 
-        for (var i = 0; i < selectedMeshes.length; i++) {
+        for (let i = 0; i < selectedMeshes.length; i++) {
           var selectedObjectId = selectedMeshes[i].id
 
           if (selectedObjectId === object.id) {

@@ -48,7 +48,7 @@ MDDLoader.prototype = Object.assign(Object.create(Loader.prototype), {
     var times = new Float32Array(totalFrames)
     var values = new Float32Array(totalFrames * totalFrames).fill(0)
 
-    for (var i = 0; i < totalFrames; i++) {
+    for (let i = 0; i < totalFrames; i++) {
       times[i] = view.getFloat32(offset)
       offset += 4
       values[totalFrames * i + i] = 1
@@ -61,10 +61,10 @@ MDDLoader.prototype = Object.assign(Object.create(Loader.prototype), {
 
     var morphTargets = []
 
-    for (var i = 0; i < totalFrames; i++) {
+    for (let i = 0; i < totalFrames; i++) {
       var morphTarget = new Float32Array(totalPoints * 3)
 
-      for (var j = 0; j < totalPoints; j++) {
+      for (let j = 0; j < totalPoints; j++) {
         var stride = j * 3
 
         morphTarget[stride + 0] = view.getFloat32(offset)

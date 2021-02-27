@@ -41,7 +41,7 @@ function computeEdgeCollapseCost(u, v) {
     var minCurvature = 1
     face = u.faces[i]
 
-    for (var j = 0; j < sideFaces.length; j++) {
+    for (let j = 0; j < sideFaces.length; j++) {
       sideFace = sideFaces[j]
       // use dot product of face normals.
       var dotProd = face.normal.dot(sideFace.normal)
@@ -85,7 +85,7 @@ function computeEdgeCostAtVertex(v) {
   v.collapseNeighbor = null
 
   // search all neighboring edges for "least cost" edge
-  for (var i = 0; i < v.neighbors.length; i++) {
+  for (let i = 0; i < v.neighbors.length; i++) {
     var collapseCost = computeEdgeCollapseCost(v, v.neighbors[i])
 
     if (!v.collapseNeighbor) {
@@ -132,7 +132,7 @@ function removeFace(f, faces) {
   var vs = [f.v1, f.v2, f.v3]
   var v1, v2
 
-  for (var i = 0; i < 3; i++) {
+  for (let i = 0; i < 3; i++) {
     v1 = vs[i]
     v2 = vs[(i + 1) % 3]
 
@@ -186,7 +186,7 @@ function minimumCostEdge(vertices) {
 
   var least = vertices[0]
 
-  for (var i = 0; i < vertices.length; i++) {
+  for (let i = 0; i < vertices.length; i++) {
     if (vertices[i].collapseCost < least.collapseCost) {
       least = vertices[i]
     }
@@ -217,7 +217,7 @@ class Vertex {
 
     var offset = neighbors.indexOf(n)
     if (offset === -1) return
-    for (var i = 0; i < faces.length; i++) {
+    for (let i = 0; i < faces.length; i++) {
       if (faces[i].hasVertex(n)) return
     }
 
@@ -321,7 +321,7 @@ class SimplifyModifier {
 
     // this modifier can only process indexed and non-indexed geomtries with a position attribute
 
-    for (var name in attributes) {
+    for (let name in attributes) {
       if (name !== 'position') geometry.deleteAttribute(name)
     }
 
@@ -338,7 +338,7 @@ class SimplifyModifier {
 
     var positionAttribute = geometry.getAttribute('position')
 
-    for (var i = 0; i < positionAttribute.count; i++) {
+    for (let i = 0; i < positionAttribute.count; i++) {
       var v = new Vector3().fromBufferAttribute(positionAttribute, i)
 
       var vertex = new Vertex(v, i)
@@ -350,7 +350,7 @@ class SimplifyModifier {
     var index = geometry.getIndex()
 
     if (index !== null) {
-      for (var i = 0; i < index.count; i += 3) {
+      for (let i = 0; i < index.count; i += 3) {
         var a = index.getX(i)
         var b = index.getX(i + 1)
         var c = index.getX(i + 2)
@@ -359,7 +359,7 @@ class SimplifyModifier {
         faces.push(triangle)
       }
     } else {
-      for (var i = 0; i < positionAttribute.count; i += 3) {
+      for (let i = 0; i < positionAttribute.count; i += 3) {
         var a = i
         var b = i + 1
         var c = i + 2
@@ -371,7 +371,7 @@ class SimplifyModifier {
 
     // compute all edge collapse costs
 
-    for (var i = 0, il = vertices.length; i < il; i++) {
+    for (let i = 0, il = vertices.length; i < il; i++) {
       computeEdgeCostAtVertex(vertices[i])
     }
 
@@ -398,14 +398,14 @@ class SimplifyModifier {
 
     //
 
-    for (var i = 0; i < vertices.length; i++) {
+    for (let i = 0; i < vertices.length; i++) {
       var vertex = vertices[i].position
       position.push(vertex.x, vertex.y, vertex.z)
     }
 
     //
 
-    for (var i = 0; i < faces.length; i++) {
+    for (let i = 0; i < faces.length; i++) {
       var face = faces[i]
 
       var a = vertices.indexOf(face.v1)

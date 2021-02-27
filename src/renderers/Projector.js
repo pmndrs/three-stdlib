@@ -1,14 +1,4 @@
-import {
-  Box3,
-  Color,
-  DoubleSide,
-  Frustum,
-  Matrix3,
-  Matrix4,
-  Vector2,
-  Vector3,
-  Vector4,
-} from 'three'
+import { Box3, Color, DoubleSide, Frustum, Matrix3, Matrix4, Vector2, Vector3, Vector4 } from 'three'
 
 var RenderableObject = function () {
   this.id = 0
@@ -276,7 +266,7 @@ var Projector = function () {
         _face.normalModel.copy(_vector3)
         _face.normalModel.applyMatrix3(normalMatrix).normalize()
 
-        for (var i = 0; i < 3; i++) {
+        for (let i = 0; i < 3; i++) {
           var normal = _face.vertexNormalsModel[i]
           normal.fromArray(normals, arguments[i] * 3)
           normal.applyMatrix3(normalMatrix).normalize()
@@ -332,7 +322,7 @@ var Projector = function () {
 
     var children = object.children
 
-    for (var i = 0, l = children.length; i < l; i++) {
+    for (let i = 0, l = children.length; i < l; i++) {
       projectObject(children[i])
     }
   }
@@ -382,7 +372,7 @@ var Projector = function () {
 
     var objects = _renderData.objects
 
-    for (var o = 0, ol = objects.length; o < ol; o++) {
+    for (let o = 0, ol = objects.length; o < ol; o++) {
       var object = objects[o].object
       var geometry = object.geometry
 
@@ -405,7 +395,7 @@ var Projector = function () {
 
           var positions = attributes.position.array
 
-          for (var i = 0, l = positions.length; i < l; i += 3) {
+          for (let i = 0, l = positions.length; i < l; i += 3) {
             var x = positions[i]
             var y = positions[i + 1]
             var z = positions[i + 2]
@@ -415,7 +405,7 @@ var Projector = function () {
               var morphTargetsRelative = geometry.morphTargetsRelative
               var morphInfluences = object.morphTargetInfluences
 
-              for (var t = 0, tl = morphTargets.length; t < tl; t++) {
+              for (let t = 0, tl = morphTargets.length; t < tl; t++) {
                 var influence = morphInfluences[t]
 
                 if (influence === 0) continue
@@ -440,7 +430,7 @@ var Projector = function () {
           if (attributes.normal !== undefined) {
             var normals = attributes.normal.array
 
-            for (var i = 0, l = normals.length; i < l; i += 3) {
+            for (let i = 0, l = normals.length; i < l; i += 3) {
               renderList.pushNormal(normals[i], normals[i + 1], normals[i + 2])
             }
           }
@@ -448,7 +438,7 @@ var Projector = function () {
           if (attributes.color !== undefined) {
             var colors = attributes.color.array
 
-            for (var i = 0, l = colors.length; i < l; i += 3) {
+            for (let i = 0, l = colors.length; i < l; i += 3) {
               renderList.pushColor(colors[i], colors[i + 1], colors[i + 2])
             }
           }
@@ -456,7 +446,7 @@ var Projector = function () {
           if (attributes.uv !== undefined) {
             var uvs = attributes.uv.array
 
-            for (var i = 0, l = uvs.length; i < l; i += 2) {
+            for (let i = 0, l = uvs.length; i < l; i += 2) {
               renderList.pushUv(uvs[i], uvs[i + 1])
             }
           }
@@ -465,37 +455,37 @@ var Projector = function () {
             var indices = geometry.index.array
 
             if (groups.length > 0) {
-              for (var g = 0; g < groups.length; g++) {
+              for (let g = 0; g < groups.length; g++) {
                 var group = groups[g]
 
                 material = isMultiMaterial === true ? object.material[group.materialIndex] : object.material
 
                 if (material === undefined) continue
 
-                for (var i = group.start, l = group.start + group.count; i < l; i += 3) {
+                for (let i = group.start, l = group.start + group.count; i < l; i += 3) {
                   renderList.pushTriangle(indices[i], indices[i + 1], indices[i + 2], material)
                 }
               }
             } else {
-              for (var i = 0, l = indices.length; i < l; i += 3) {
+              for (let i = 0, l = indices.length; i < l; i += 3) {
                 renderList.pushTriangle(indices[i], indices[i + 1], indices[i + 2], material)
               }
             }
           } else {
             if (groups.length > 0) {
-              for (var g = 0; g < groups.length; g++) {
+              for (let g = 0; g < groups.length; g++) {
                 var group = groups[g]
 
                 material = isMultiMaterial === true ? object.material[group.materialIndex] : object.material
 
                 if (material === undefined) continue
 
-                for (var i = group.start, l = group.start + group.count; i < l; i += 3) {
+                for (let i = group.start, l = group.start + group.count; i < l; i += 3) {
                   renderList.pushTriangle(i, i + 1, i + 2, material)
                 }
               }
             } else {
-              for (var i = 0, l = positions.length / 3; i < l; i += 3) {
+              for (let i = 0, l = positions.length / 3; i < l; i += 3) {
                 renderList.pushTriangle(i, i + 1, i + 2, material)
               }
             }
@@ -513,14 +503,14 @@ var Projector = function () {
           if (attributes.position !== undefined) {
             var positions = attributes.position.array
 
-            for (var i = 0, l = positions.length; i < l; i += 3) {
+            for (let i = 0, l = positions.length; i < l; i += 3) {
               renderList.pushVertex(positions[i], positions[i + 1], positions[i + 2])
             }
 
             if (attributes.color !== undefined) {
               var colors = attributes.color.array
 
-              for (var i = 0, l = colors.length; i < l; i += 3) {
+              for (let i = 0, l = colors.length; i < l; i += 3) {
                 renderList.pushColor(colors[i], colors[i + 1], colors[i + 2])
               }
             }
@@ -528,13 +518,13 @@ var Projector = function () {
             if (geometry.index !== null) {
               var indices = geometry.index.array
 
-              for (var i = 0, l = indices.length; i < l; i += 2) {
+              for (let i = 0, l = indices.length; i < l; i += 2) {
                 renderList.pushLine(indices[i], indices[i + 1])
               }
             } else {
               var step = object.isLineSegments ? 2 : 1
 
-              for (var i = 0, l = positions.length / 3 - 1; i < l; i += step) {
+              for (let i = 0, l = positions.length / 3 - 1; i < l; i += step) {
                 renderList.pushLine(i, i + 1)
               }
             }
@@ -555,7 +545,7 @@ var Projector = function () {
           if (attributes.position !== undefined) {
             var positions = attributes.position.array
 
-            for (var i = 0, l = positions.length; i < l; i += 3) {
+            for (let i = 0, l = positions.length; i < l; i += 3) {
               _vector4.set(positions[i], positions[i + 1], positions[i + 2], 1)
               _vector4.applyMatrix4(_modelViewProjectionMatrix)
 

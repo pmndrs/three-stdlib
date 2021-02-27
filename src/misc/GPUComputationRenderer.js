@@ -168,7 +168,7 @@ var GPUComputationRenderer = function (sizeX, sizeY, renderer) {
       return 'No support for vertex shader textures.'
     }
 
-    for (var i = 0; i < this.variables.length; i++) {
+    for (let i = 0; i < this.variables.length; i++) {
       var variable = this.variables[i]
 
       // Creates rendertargets and initialize them with input texture
@@ -196,13 +196,13 @@ var GPUComputationRenderer = function (sizeX, sizeY, renderer) {
       var uniforms = material.uniforms
 
       if (variable.dependencies !== null) {
-        for (var d = 0; d < variable.dependencies.length; d++) {
+        for (let d = 0; d < variable.dependencies.length; d++) {
           var depVar = variable.dependencies[d]
 
           if (depVar.name !== variable.name) {
             // Checks if variable exists
             var found = false
-            for (var j = 0; j < this.variables.length; j++) {
+            for (let j = 0; j < this.variables.length; j++) {
               if (depVar.name === this.variables[j].name) {
                 found = true
                 break
@@ -230,13 +230,13 @@ var GPUComputationRenderer = function (sizeX, sizeY, renderer) {
     var currentTextureIndex = this.currentTextureIndex
     var nextTextureIndex = this.currentTextureIndex === 0 ? 1 : 0
 
-    for (var i = 0, il = this.variables.length; i < il; i++) {
+    for (let i = 0, il = this.variables.length; i < il; i++) {
       var variable = this.variables[i]
 
       // Sets texture dependencies uniforms
       if (variable.dependencies !== null) {
         var uniforms = variable.material.uniforms
-        for (var d = 0, dl = variable.dependencies.length; d < dl; d++) {
+        for (let d = 0, dl = variable.dependencies.length; d < dl; d++) {
           var depVar = variable.dependencies[d]
 
           uniforms[depVar.name].value = depVar.renderTargets[currentTextureIndex].texture

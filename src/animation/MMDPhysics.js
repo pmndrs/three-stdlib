@@ -968,14 +968,14 @@ const MMDPhysics = (() => {
       constraint.setAngularLowerLimit(all)
       constraint.setAngularUpperLimit(aul)
 
-      for (var i = 0; i < 3; i++) {
+      for (let i = 0; i < 3; i++) {
         if (params.springPosition[i] !== 0) {
           constraint.enableSpring(i, true)
           constraint.setStiffness(i, params.springPosition[i])
         }
       }
 
-      for (var i = 0; i < 3; i++) {
+      for (let i = 0; i < 3; i++) {
         if (params.springRotation[i] !== 0) {
           constraint.enableSpring(i + 3, true)
           constraint.setStiffness(i + 3, params.springRotation[i])
@@ -989,7 +989,7 @@ const MMDPhysics = (() => {
        * By setting this parameter, physics will be more like MMD's
        */
       if (constraint.setParam !== undefined) {
-        for (var i = 0; i < 6; i++) {
+        for (let i = 0; i < 6; i++) {
           // this parameter is from http://www20.atpages.jp/katwat/three.js_r58/examples/mytest37/mmd.three.js
           constraint.setParam(2, 0.475, i)
         }

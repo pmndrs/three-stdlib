@@ -129,7 +129,7 @@ class TiltLoader extends Loader {
       brushes[brush_index].push([positions, quaternions, brush_size, brush_color])
     }
 
-    for (const brush_index in brushes) {
+    for (let brush_index in brushes) {
       const geometry = new StrokeGeometry(brushes[brush_index])
       const material = getMaterial(metadata.BrushIndex[brush_index])
 
@@ -161,7 +161,7 @@ class StrokeGeometry extends BufferGeometry {
 
     // size = size / 2;
 
-    for (const k in strokes) {
+    for (let k in strokes) {
       const stroke = strokes[k]
       const positions = stroke[0]
       const quaternions = stroke[1]

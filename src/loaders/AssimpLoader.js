@@ -124,8 +124,8 @@ AssimpLoader.prototype = Object.assign(Object.create(Loader.prototype), {
 
         if (!this.fps) return
 
-        for (var j = 0; j < this.length * this.fps; j++) {
-          for (var i = 0; i < this.keys.length; i++) {
+        for (let j = 0; j < this.length * this.fps; j++) {
+          for (let i = 0; i < this.keys.length; i++) {
             if (this.keys[i].time == j) {
               this._accelTable[j] = i
               break
@@ -141,7 +141,7 @@ AssimpLoader.prototype = Object.assign(Object.create(Loader.prototype), {
         var fps = data.fps
         this.target = data.node
         var track = data.hierarchy[0].keys
-        for (var i = 0; i < track.length; i++) {
+        for (let i = 0; i < track.length; i++) {
           this.addKey(new Virtulous.KeyFrame(i / fps || track[i].time, track[i].targets[0].data))
         }
 
@@ -152,7 +152,7 @@ AssimpLoader.prototype = Object.assign(Object.create(Loader.prototype), {
         var track = data.keys
         var fps = this.fps
 
-        for (var i = 0; i < track.length; i++) {
+        for (let i = 0; i < track.length; i++) {
           this.addKey(new Virtulous.KeyFrame(i / fps || track[i].time, track[i].matrix))
         }
 
@@ -173,7 +173,7 @@ AssimpLoader.prototype = Object.assign(Object.create(Loader.prototype), {
         t.time = this.time
         t.length = this.length
 
-        for (var i = 0; i < this.keys.length; i++) {
+        for (let i = 0; i < this.keys.length; i++) {
           t.addKey(this.keys[i].clone())
         }
 
@@ -198,7 +198,7 @@ AssimpLoader.prototype = Object.assign(Object.create(Loader.prototype), {
         var key0 = null
         var key1 = null
 
-        for (var i = this.keySearchAccel(time); i < this.keys.length; i++) {
+        for (let i = this.keySearchAccel(time); i < this.keys.length; i++) {
           if (this.keys[i].time == time) {
             key0 = this.keys[i]
             key1 = this.keys[i]
@@ -235,7 +235,7 @@ AssimpLoader.prototype = Object.assign(Object.create(Loader.prototype), {
       function find(node, name) {
         if (node.name == name) return node
 
-        for (var i = 0; i < node.children.length; i++) {
+        for (let i = 0; i < node.children.length; i++) {
           var r = find(node.children[i], name)
           if (r) return r
         }
@@ -258,14 +258,14 @@ AssimpLoader.prototype = Object.assign(Object.create(Loader.prototype), {
       this.setTime = function (time) {
         this.time = time
 
-        for (var i = 0; i < this.tracks.length; i++) this.tracks[i].setTime(time)
+        for (let i = 0; i < this.tracks.length; i++) this.tracks[i].setTime(time)
       }
 
       this.clone = function (target, compareitor) {
         if (!compareitor) compareitor = Virtulous.TrackTargetNodeNameCompare
         var n = new Virtulous.Animation()
         n.target = target
-        for (var i = 0; i < this.tracks.length; i++) {
+        for (let i = 0; i < this.tracks.length; i++) {
           var track = this.tracks[i].clone()
           track.reTarget(target, compareitor)
           n.addTrack(track)
@@ -436,9 +436,9 @@ AssimpLoader.prototype = Object.assign(Object.create(Loader.prototype), {
     }
 
     function markBones(scene) {
-      for (var i in scene.mMeshes) {
+      for (let i in scene.mMeshes) {
         var mesh = scene.mMeshes[i]
-        for (var k in mesh.mBones) {
+        for (let k in mesh.mBones) {
           var boneNode = scene.findNode(mesh.mBones[k].mName)
           if (boneNode) boneNode.isBone = true
         }
@@ -457,7 +457,7 @@ AssimpLoader.prototype = Object.assign(Object.create(Loader.prototype), {
 
       if (!scene.nodeToBoneMap[root.name]) scene.nodeToBoneMap[root.name] = []
       scene.nodeToBoneMap[root.name].push(rootBone)
-      for (var i in root.children) {
+      for (let i in root.children) {
         var child = cloneTreeToBones(root.children[i], scene)
         rootBone.add(child)
       }
@@ -468,7 +468,7 @@ AssimpLoader.prototype = Object.assign(Object.create(Loader.prototype), {
     function sortWeights(indexes, weights) {
       var pairs = []
 
-      for (var i = 0; i < indexes.length; i++) {
+      for (let i = 0; i < indexes.length; i++) {
         pairs.push({
           i: indexes[i],
           w: weights[i],
@@ -489,13 +489,13 @@ AssimpLoader.prototype = Object.assign(Object.create(Loader.prototype), {
       if (pairs.length > 4) pairs.length = 4
       var sum = 0
 
-      for (var i = 0; i < 4; i++) {
+      for (let i = 0; i < 4; i++) {
         sum += pairs[i].w * pairs[i].w
       }
 
       sum = Math.sqrt(sum)
 
-      for (var i = 0; i < 4; i++) {
+      for (let i = 0; i < 4; i++) {
         pairs[i].w = pairs[i].w / sum
         indexes[i] = pairs[i].i
         weights[i] = pairs[i].w
@@ -505,7 +505,7 @@ AssimpLoader.prototype = Object.assign(Object.create(Loader.prototype), {
     function findMatchingBone(root, name) {
       if (root.name.indexOf('bone_' + name) == 0) return root
 
-      for (var i in root.children) {
+      for (let i in root.children) {
         var ret = findMatchingBone(root.children[i], name)
 
         if (ret) return ret
@@ -543,7 +543,7 @@ AssimpLoader.prototype = Object.assign(Object.create(Loader.prototype), {
         var threeSkeletonRootBone = cloneTreeToBones(threeSkeletonRoot, scene)
         this.threeNode.add(threeSkeletonRootBone)
 
-        for (var i = 0; i < this.mBones.length; i++) {
+        for (let i = 0; i < this.mBones.length; i++) {
           var bone = findMatchingBone(threeSkeletonRootBone, this.mBones[i].mName)
 
           if (bone) {
@@ -595,8 +595,8 @@ AssimpLoader.prototype = Object.assign(Object.create(Loader.prototype), {
           var weights = []
           var bones = []
 
-          for (var i = 0; i < this.mBones.length; i++) {
-            for (var j = 0; j < this.mBones[i].mWeights.length; j++) {
+          for (let i = 0; i < this.mBones.length; i++) {
+            for (let j = 0; j < this.mBones[i].mWeights.length; j++) {
               var weight = this.mBones[i].mWeights[j]
               if (weight) {
                 if (!weights[weight.mVertexId]) weights[weight.mVertexId] = []
@@ -607,15 +607,15 @@ AssimpLoader.prototype = Object.assign(Object.create(Loader.prototype), {
             }
           }
 
-          for (var i in bones) {
+          for (let i in bones) {
             sortWeights(bones[i], weights[i])
           }
 
           var _weights = []
           var _bones = []
 
-          for (var i = 0; i < weights.length; i++) {
-            for (var j = 0; j < 4; j++) {
+          for (let i = 0; i < weights.length; i++) {
+            for (let j = 0; j < 4; j++) {
               if (weights[i] && bones[i]) {
                 _weights.push(weights[i][j])
                 _bones.push(bones[i][j])
@@ -719,11 +719,11 @@ AssimpLoader.prototype = Object.assign(Object.create(Loader.prototype), {
         o.name = this.mName
         o.matrix = this.mTransformation.toTHREE()
 
-        for (var i = 0; i < this.mChildren.length; i++) {
+        for (let i = 0; i < this.mChildren.length; i++) {
           o.add(this.mChildren[i].toTHREE(scene))
         }
 
-        for (var i = 0; i < this.mMeshes.length; i++) {
+        for (let i = 0; i < this.mMeshes.length; i++) {
           o.add(scene.mMeshes[this.mMeshes[i]].toTHREE(scene))
         }
 
@@ -832,7 +832,7 @@ AssimpLoader.prototype = Object.assign(Object.create(Loader.prototype), {
       this.toTHREE = function () {
         var mat = new MeshPhongMaterial()
 
-        for (var i = 0; i < this.mProperties.length; i++) {
+        for (let i = 0; i < this.mProperties.length; i++) {
           if (nameTypeMapping[this.mProperties[i].mKey] == 'float')
             mat[namePropMapping[this.mProperties[i].mKey]] = this.mProperties[i].dataAsFloat()
           if (nameTypeMapping[this.mProperties[i].mKey] == 'color')
@@ -880,7 +880,7 @@ AssimpLoader.prototype = Object.assign(Object.create(Loader.prototype), {
       var key = null
       var nextKey = null
 
-      for (var i = 0; i < keys.length; i++) {
+      for (let i = 0; i < keys.length; i++) {
         var timeDist = Math.abs(keys[i].mTime - time)
 
         if (timeDist < dist && keys[i].mTime <= time) {
@@ -970,7 +970,7 @@ AssimpLoader.prototype = Object.assign(Object.create(Loader.prototype), {
         var length = this.getLength()
         var track = new Virtulous.KeyFrameTrack()
 
-        for (var i = 0; i < length; i += 0.05) {
+        for (let i = 0; i < length; i += 0.05) {
           var matrix = new Matrix4()
           var time = i
           var pos = sampleTrack(this.mPositionKeys, time, length, veclerp)
@@ -987,7 +987,7 @@ AssimpLoader.prototype = Object.assign(Object.create(Loader.prototype), {
         var tracks = [track]
 
         if (o.nodeToBoneMap[this.mNodeName]) {
-          for (var i = 0; i < o.nodeToBoneMap[this.mNodeName].length; i++) {
+          for (let i = 0; i < o.nodeToBoneMap[this.mNodeName].length; i++) {
             var t2 = track.clone()
             t2.target = o.nodeToBoneMap[this.mNodeName][i]
             tracks.push(t2)
@@ -1007,12 +1007,12 @@ AssimpLoader.prototype = Object.assign(Object.create(Loader.prototype), {
       this.toTHREE = function (root) {
         var animationHandle = new Virtulous.Animation()
 
-        for (var i in this.mChannels) {
+        for (let i in this.mChannels) {
           this.mChannels[i].init(this.mTicksPerSecond)
 
           var tracks = this.mChannels[i].toTHREE(root)
 
-          for (var j in tracks) {
+          for (let j in tracks) {
             tracks[j].init()
             animationHandle.addTrack(tracks[j])
           }
@@ -1087,7 +1087,7 @@ AssimpLoader.prototype = Object.assign(Object.create(Loader.prototype), {
           return root
         }
 
-        for (var i = 0; i < root.mChildren.length; i++) {
+        for (let i = 0; i < root.mChildren.length; i++) {
           var ret = this.findNode(name, root.mChildren[i])
           if (ret) return ret
         }
@@ -1102,7 +1102,7 @@ AssimpLoader.prototype = Object.assign(Object.create(Loader.prototype), {
 
         var o = this.mRootNode.toTHREE(this)
 
-        for (var i in this.mMeshes) this.mMeshes[i].hookupSkeletons(this)
+        for (let i in this.mMeshes) this.mMeshes[i].hookupSkeletons(this)
 
         if (this.mAnimations.length > 0) {
           var a = this.mAnimations[0].toTHREE(this)
@@ -1117,8 +1117,8 @@ AssimpLoader.prototype = Object.assign(Object.create(Loader.prototype), {
       this.toTHREE = function () {
         var m = new Matrix4()
 
-        for (var i = 0; i < 4; ++i) {
-          for (var i2 = 0; i2 < 4; ++i2) {
+        for (let i = 0; i < 4; ++i) {
+          for (let i2 = 0; i2 < 4; ++i2) {
             m.elements[i * 4 + i2] = this.elements[i2][i]
           }
         }
@@ -1207,8 +1207,8 @@ AssimpLoader.prototype = Object.assign(Object.create(Loader.prototype), {
     function Read_aiMatrix4x4(stream) {
       var m = new aiMatrix4()
 
-      for (var i = 0; i < 4; ++i) {
-        for (var i2 = 0; i2 < 4; ++i2) {
+      for (let i = 0; i < 4; ++i) {
+        for (let i2 = 0; i2 < 4; ++i2) {
           m.elements[i][i2] = readFloat(stream)
         }
       }
@@ -1231,15 +1231,15 @@ AssimpLoader.prototype = Object.assign(Object.create(Loader.prototype), {
     }
 
     function ReadArray_aiVertexWeight(stream, data, size) {
-      for (var i = 0; i < size; i++) data[i] = Read_aiVertexWeight(stream)
+      for (let i = 0; i < size; i++) data[i] = Read_aiVertexWeight(stream)
     }
 
     function ReadArray_aiVectorKey(stream, data, size) {
-      for (var i = 0; i < size; i++) data[i] = Read_aiVectorKey(stream)
+      for (let i = 0; i < size; i++) data[i] = Read_aiVectorKey(stream)
     }
 
     function ReadArray_aiQuatKey(stream, data, size) {
-      for (var i = 0; i < size; i++) data[i] = Read_aiQuatKey(stream)
+      for (let i = 0; i < size; i++) data[i] = Read_aiQuatKey(stream)
     }
 
     function ReadBounds(stream, T /*p*/, n) {
@@ -1267,7 +1267,7 @@ AssimpLoader.prototype = Object.assign(Object.create(Loader.prototype), {
       if (node.mNumMeshes) {
         node.mMeshes = []
 
-        for (var i = 0; i < node.mNumMeshes; ++i) {
+        for (let i = 0; i < node.mNumMeshes; ++i) {
           node.mMeshes[i] = Read_unsigned_int(stream)
         }
       }
@@ -1275,7 +1275,7 @@ AssimpLoader.prototype = Object.assign(Object.create(Loader.prototype), {
       if (node.mNumChildren) {
         node.mChildren = []
 
-        for (var i = 0; i < node.mNumChildren; ++i) {
+        for (let i = 0; i < node.mNumChildren; ++i) {
           var node2 = ReadBinaryNode(stream, node, depth++)
           node.mChildren[i] = node2
         }
@@ -1362,7 +1362,7 @@ AssimpLoader.prototype = Object.assign(Object.create(Loader.prototype), {
         }
       }
 
-      for (var n = 0; n < AI_MAX_NUMBER_OF_COLOR_SETS; ++n) {
+      for (let n = 0; n < AI_MAX_NUMBER_OF_COLOR_SETS; ++n) {
         if (!(c & ASSBIN_MESH_HAS_COLOR(n))) break
 
         if (shortened) {
@@ -1378,7 +1378,7 @@ AssimpLoader.prototype = Object.assign(Object.create(Loader.prototype), {
 
       mesh.mTexCoordsBuffers = []
 
-      for (var n = 0; n < AI_MAX_NUMBER_OF_TEXTURECOORDS; ++n) {
+      for (let n = 0; n < AI_MAX_NUMBER_OF_TEXTURECOORDS; ++n) {
         if (!(c & ASSBIN_MESH_HAS_TEXCOORD(n))) break
 
         // write number of UV components
@@ -1393,7 +1393,7 @@ AssimpLoader.prototype = Object.assign(Object.create(Loader.prototype), {
           //note that assbin always writes 3d texcoords
           mesh.mTexCoordsBuffers[n] = []
 
-          for (var uv = 0; uv < mesh.mNumVertices; uv++) {
+          for (let uv = 0; uv < mesh.mNumVertices; uv++) {
             mesh.mTexCoordsBuffers[n].push(readFloat(stream))
             mesh.mTexCoordsBuffers[n].push(readFloat(stream))
             readFloat(stream)
@@ -1414,13 +1414,13 @@ AssimpLoader.prototype = Object.assign(Object.create(Loader.prototype), {
         mesh.mFaces = []
         mesh.mIndexArray = []
 
-        for (var i = 0; i < mesh.mNumFaces; ++i) {
+        for (let i = 0; i < mesh.mNumFaces; ++i) {
           var f = (mesh.mFaces[i] = new aiFace())
           // BOOST_STATIC_ASSERT(AI_MAX_FACE_INDICES <= 0xffff);
           f.mNumIndices = Read_uint16_t(stream)
           f.mIndices = []
 
-          for (var a = 0; a < f.mNumIndices; ++a) {
+          for (let a = 0; a < f.mNumIndices; ++a) {
             if (mesh.mNumVertices < 1 << 16) {
               f.mIndices[a] = Read_uint16_t(stream)
             } else {
@@ -1449,7 +1449,7 @@ AssimpLoader.prototype = Object.assign(Object.create(Loader.prototype), {
       if (mesh.mNumBones) {
         mesh.mBones = []
 
-        for (var a = 0; a < mesh.mNumBones; ++a) {
+        for (let a = 0; a < mesh.mNumBones; ++a) {
           mesh.mBones[a] = new aiBone()
           ReadBinaryBone(stream, mesh.mBones[a])
         }
@@ -1486,7 +1486,7 @@ AssimpLoader.prototype = Object.assign(Object.create(Loader.prototype), {
 
         mat.mProperties = []
 
-        for (var i = 0; i < mat.mNumProperties; ++i) {
+        for (let i = 0; i < mat.mNumProperties; ++i) {
           mat.mProperties[i] = new aiMaterialProperty()
           ReadBinaryMaterialProperty(stream, mat.mProperties[i])
         }
@@ -1552,7 +1552,7 @@ AssimpLoader.prototype = Object.assign(Object.create(Loader.prototype), {
       if (anim.mNumChannels) {
         anim.mChannels = []
 
-        for (var a = 0; a < anim.mNumChannels; ++a) {
+        for (let a = 0; a < anim.mNumChannels; ++a) {
           anim.mChannels[a] = new aiNodeAnim()
           ReadBinaryNodeAnim(stream, anim.mChannels[a])
         }
@@ -1637,7 +1637,7 @@ AssimpLoader.prototype = Object.assign(Object.create(Loader.prototype), {
       if (scene.mNumMeshes) {
         scene.mMeshes = []
 
-        for (var i = 0; i < scene.mNumMeshes; ++i) {
+        for (let i = 0; i < scene.mNumMeshes; ++i) {
           scene.mMeshes[i] = new aiMesh()
           ReadBinaryMesh(stream, scene.mMeshes[i])
         }
@@ -1647,7 +1647,7 @@ AssimpLoader.prototype = Object.assign(Object.create(Loader.prototype), {
       if (scene.mNumMaterials) {
         scene.mMaterials = []
 
-        for (var i = 0; i < scene.mNumMaterials; ++i) {
+        for (let i = 0; i < scene.mNumMaterials; ++i) {
           scene.mMaterials[i] = new aiMaterial()
           ReadBinaryMaterial(stream, scene.mMaterials[i])
         }
@@ -1657,7 +1657,7 @@ AssimpLoader.prototype = Object.assign(Object.create(Loader.prototype), {
       if (scene.mNumAnimations) {
         scene.mAnimations = []
 
-        for (var i = 0; i < scene.mNumAnimations; ++i) {
+        for (let i = 0; i < scene.mNumAnimations; ++i) {
           scene.mAnimations[i] = new aiAnimation()
           ReadBinaryAnim(stream, scene.mAnimations[i])
         }
@@ -1667,7 +1667,7 @@ AssimpLoader.prototype = Object.assign(Object.create(Loader.prototype), {
       if (scene.mNumTextures) {
         scene.mTextures = []
 
-        for (var i = 0; i < scene.mNumTextures; ++i) {
+        for (let i = 0; i < scene.mNumTextures; ++i) {
           scene.mTextures[i] = new aiTexture()
           ReadBinaryTexture(stream, scene.mTextures[i])
         }
@@ -1677,7 +1677,7 @@ AssimpLoader.prototype = Object.assign(Object.create(Loader.prototype), {
       if (scene.mNumLights) {
         scene.mLights = []
 
-        for (var i = 0; i < scene.mNumLights; ++i) {
+        for (let i = 0; i < scene.mNumLights; ++i) {
           scene.mLights[i] = new aiLight()
           ReadBinaryLight(stream, scene.mLights[i])
         }
@@ -1687,7 +1687,7 @@ AssimpLoader.prototype = Object.assign(Object.create(Loader.prototype), {
       if (scene.mNumCameras) {
         scene.mCameras = []
 
-        for (var i = 0; i < scene.mNumCameras; ++i) {
+        for (let i = 0; i < scene.mNumCameras; ++i) {
           scene.mCameras[i] = new aiCamera()
           ReadBinaryCamera(stream, scene.mCameras[i])
         }
@@ -1711,7 +1711,7 @@ AssimpLoader.prototype = Object.assign(Object.create(Loader.prototype), {
 
       stream.ReadBytes = function (buff, size, n) {
         var bytes = size * n
-        for (var i = 0; i < bytes; i++) buff[i] = Read_uint8_t(this)
+        for (let i = 0; i < bytes; i++) buff[i] = Read_uint8_t(this)
       }
 
       stream.subArray32 = function (start, end) {

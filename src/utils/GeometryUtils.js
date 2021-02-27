@@ -130,10 +130,10 @@ const gosper = (size) => {
     var output
     var input = config.axiom
 
-    for (var i = 0, il = config.steps; 0 <= il ? i < il : i > il; 0 <= il ? i++ : i--) {
+    for (let i = 0, il = config.steps; 0 <= il ? i < il : i > il; 0 <= il ? i++ : i--) {
       output = ''
 
-      for (var j = 0, jl = input.length; j < jl; j++) {
+      for (let j = 0, jl = input.length; j < jl; j++) {
         var char = input[j]
 
         if (char in config.rules) {
@@ -156,7 +156,7 @@ const gosper = (size) => {
     var path = [0, 0, 0]
     var fractal = config.fractal
 
-    for (var i = 0, l = fractal.length; i < l; i++) {
+    for (let i = 0, l = fractal.length; i < l; i++) {
       var char = fractal[i]
 
       if (char === '+') {

@@ -76,8 +76,8 @@ DDSLoader.prototype = Object.assign(Object.create(CompressedTextureLoader.protot
       var byteArray = new Uint8Array(dataLength)
       var dst = 0
       var src = 0
-      for (var y = 0; y < height; y++) {
-        for (var x = 0; x < width; x++) {
+      for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
           var b = srcBuffer[src]
           src++
           var g = srcBuffer[src]
@@ -219,11 +219,11 @@ DDSLoader.prototype = Object.assign(Object.create(CompressedTextureLoader.protot
 
     var faces = dds.isCubemap ? 6 : 1
 
-    for (var face = 0; face < faces; face++) {
+    for (let face = 0; face < faces; face++) {
       var width = dds.width
       var height = dds.height
 
-      for (var i = 0; i < dds.mipmapCount; i++) {
+      for (let i = 0; i < dds.mipmapCount; i++) {
         if (isRGBAUncompressed) {
           var byteArray = loadARGBMip(buffer, dataOffset, width, height)
           var dataLength = byteArray.length

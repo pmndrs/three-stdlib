@@ -108,7 +108,7 @@ HDRCubeTextureLoader.prototype = Object.assign(Object.create(Loader.prototype), 
         )
     }
 
-    for (var i = 0; i < urls.length; i++) {
+    for (let i = 0; i < urls.length; i++) {
       loadHDRData(i, onLoad, onProgress, onError)
     }
 

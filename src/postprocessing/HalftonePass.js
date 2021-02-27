@@ -24,7 +24,7 @@ var HalftonePass = function (width, height, params) {
   this.uniforms.width.value = width
   this.uniforms.height.value = height
 
-  for (var key in params) {
+  for (let key in params) {
     if (params.hasOwnProperty(key) && this.uniforms.hasOwnProperty(key)) {
       this.uniforms[key].value = params[key]
     }

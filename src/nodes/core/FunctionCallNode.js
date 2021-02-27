@@ -30,7 +30,7 @@ FunctionCallNode.prototype.generate = function (builder, output) {
   var code = func.build(builder, output) + '( ',
     params = []
 
-  for (var i = 0; i < func.inputs.length; i++) {
+  for (let i = 0; i < func.inputs.length; i++) {
     var inpt = func.inputs[i],
       param = this.inputs[i] || this.inputs[inpt.name]
 
@@ -45,7 +45,7 @@ FunctionCallNode.prototype.generate = function (builder, output) {
 FunctionCallNode.prototype.copy = function (source) {
   TempNode.prototype.copy.call(this, source)
 
-  for (var prop in source.inputs) {
+  for (let prop in source.inputs) {
     this.inputs[prop] = source.inputs[prop]
   }
 
@@ -67,7 +67,7 @@ FunctionCallNode.prototype.toJSON = function (meta) {
     if (func.inputs.length) {
       data.inputs = {}
 
-      for (var i = 0; i < func.inputs.length; i++) {
+      for (let i = 0; i < func.inputs.length; i++) {
         var inpt = func.inputs[i],
           node = this.inputs[i] || this.inputs[inpt.name]
 

@@ -116,7 +116,7 @@ BasisTextureLoader.prototype = Object.assign(Object.create(Loader.prototype), {
 
     var buffers = new Set()
 
-    for (var i = 0; i < levels.length; i++) {
+    for (let i = 0; i < levels.length; i++) {
       buffers.add(levels[i].data.buffer)
     }
 
@@ -138,7 +138,7 @@ BasisTextureLoader.prototype = Object.assign(Object.create(Loader.prototype), {
     var taskConfig = config || {}
     var taskCost = 0
 
-    for (var i = 0; i < buffers.length; i++) {
+    for (let i = 0; i < buffers.length; i++) {
       taskCost += buffers[i].byteLength
     }
 
@@ -277,7 +277,7 @@ BasisTextureLoader.prototype = Object.assign(Object.create(Loader.prototype), {
   },
 
   dispose: function () {
-    for (var i = 0; i < this.workerPool.length; i++) {
+    for (let i = 0; i < this.workerPool.length; i++) {
       this.workerPool[i].terminate()
     }
 
@@ -356,7 +356,7 @@ BasisTextureLoader.BasisWorker = function () {
 
             var buffers = []
 
-            for (var i = 0; i < mipmaps.length; ++i) {
+            for (let i = 0; i < mipmaps.length; ++i) {
               buffers.push(mipmaps[i].data.buffer)
             }
 
@@ -422,7 +422,7 @@ BasisTextureLoader.BasisWorker = function () {
 
         assert(ok, 'THREE.BasisTextureLoader: decodeTables() failed.')
 
-        for (var i = 0; i < taskConfig.levels.length; i++) {
+        for (let i = 0; i < taskConfig.levels.length; i++) {
           var level = taskConfig.levels[i]
           var imageDesc = taskConfig.globalData.imageDescs[i]
 
@@ -458,7 +458,7 @@ BasisTextureLoader.BasisWorker = function () {
         transcoder.delete()
       }
     } else {
-      for (var i = 0; i < taskConfig.levels.length; i++) {
+      for (let i = 0; i < taskConfig.levels.length; i++) {
         var level = taskConfig.levels[i]
 
         var dstByteLength = getTranscodedImageByteLength(transcoderFormat, level.width, level.height)
@@ -522,7 +522,7 @@ BasisTextureLoader.BasisWorker = function () {
 
     var mipmaps = []
 
-    for (var mip = 0; mip < levels; mip++) {
+    for (let mip = 0; mip < levels; mip++) {
       var mipWidth = basisFile.getImageWidth(0, mip)
       var mipHeight = basisFile.getImageHeight(0, mip)
       var dst = new Uint8Array(basisFile.getImageTranscodedSizeInBytes(0, mip, transcoderFormat))
@@ -621,7 +621,7 @@ BasisTextureLoader.BasisWorker = function () {
 
     var options = basisFormat === BasisFormat.ETC1S ? ETC1S_OPTIONS : UASTC_OPTIONS
 
-    for (var i = 0; i < options.length; i++) {
+    for (let i = 0; i < options.length; i++) {
       var opt = options[i]
 
       if (!config[opt.if]) continue

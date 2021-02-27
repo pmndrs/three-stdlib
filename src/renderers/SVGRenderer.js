@@ -157,7 +157,7 @@ var SVGRenderer = function () {
     _currentPath = ''
     _currentStyle = ''
 
-    for (var e = 0, el = _elements.length; e < el; e++) {
+    for (let e = 0, el = _elements.length; e < el; e++) {
       var element = _elements[e]
       var material = element.material
 
@@ -240,7 +240,7 @@ var SVGRenderer = function () {
     _directionalLights.setRGB(0, 0, 0)
     _pointLights.setRGB(0, 0, 0)
 
-    for (var l = 0, ll = lights.length; l < ll; l++) {
+    for (let l = 0, ll = lights.length; l < ll; l++) {
       var light = lights[l]
       var lightColor = light.color
 
@@ -261,7 +261,7 @@ var SVGRenderer = function () {
   }
 
   function calculateLight(lights, position, normal, color) {
-    for (var l = 0, ll = lights.length; l < ll; l++) {
+    for (let l = 0, ll = lights.length; l < ll; l++) {
       var light = lights[l]
       var lightColor = light.color
 

@@ -213,7 +213,7 @@ var CSS3DRenderer = function () {
       object.onAfterRender(_this, scene, camera)
     }
 
-    for (var i = 0, l = object.children.length; i < l; i++) {
+    for (let i = 0, l = object.children.length; i < l; i++) {
       renderObject(object.children[i], scene, camera, cameraCSSMatrix)
     }
   }

@@ -1,12 +1,4 @@
-import {
-  BufferGeometry,
-  FileLoader,
-  Float32BufferAttribute,
-  Loader,
-  LoaderUtils,
-  Points,
-  PointsMaterial,
-} from 'three'
+import { BufferGeometry, FileLoader, Float32BufferAttribute, Loader, LoaderUtils, Points, PointsMaterial } from 'three'
 
 var PCDLoader = function (manager) {
   Loader.call(this, manager)
@@ -143,7 +135,7 @@ PCDLoader.prototype = Object.assign(Object.create(Loader.prototype), {
       } else {
         PCDheader.count = []
 
-        for (var i = 0, l = PCDheader.fields.length; i < l; i++) {
+        for (let i = 0, l = PCDheader.fields.length; i < l; i++) {
           PCDheader.count.push(1)
         }
       }
@@ -152,7 +144,7 @@ PCDLoader.prototype = Object.assign(Object.create(Loader.prototype), {
 
       var sizeSum = 0
 
-      for (var i = 0, l = PCDheader.fields.length; i < l; i++) {
+      for (let i = 0, l = PCDheader.fields.length; i < l; i++) {
         if (PCDheader.data === 'ascii') {
           PCDheader.offset[PCDheader.fields[i]] = i
         } else {
@@ -187,7 +179,7 @@ PCDLoader.prototype = Object.assign(Object.create(Loader.prototype), {
       var pcdData = textData.substr(PCDheader.headerLen)
       var lines = pcdData.split('\n')
 
-      for (var i = 0, l = lines.length; i < l; i++) {
+      for (let i = 0, l = lines.length; i < l; i++) {
         if (lines[i] === '') continue
 
         var line = lines[i].split(' ')
@@ -229,7 +221,7 @@ PCDLoader.prototype = Object.assign(Object.create(Loader.prototype), {
 
       var offset = PCDheader.offset
 
-      for (var i = 0; i < PCDheader.points; i++) {
+      for (let i = 0; i < PCDheader.points; i++) {
         if (offset.x !== undefined) {
           position.push(dataview.getFloat32(PCDheader.points * offset.x + PCDheader.size[0] * i, this.littleEndian))
           position.push(dataview.getFloat32(PCDheader.points * offset.y + PCDheader.size[1] * i, this.littleEndian))
@@ -262,7 +254,7 @@ PCDLoader.prototype = Object.assign(Object.create(Loader.prototype), {
       var dataview = new DataView(data, PCDheader.headerLen)
       var offset = PCDheader.offset
 
-      for (var i = 0, row = 0; i < PCDheader.points; i++, row += PCDheader.rowSize) {
+      for (let i = 0, row = 0; i < PCDheader.points; i++, row += PCDheader.rowSize) {
         if (offset.x !== undefined) {
           position.push(dataview.getFloat32(row + offset.x, this.littleEndian))
           position.push(dataview.getFloat32(row + offset.y, this.littleEndian))

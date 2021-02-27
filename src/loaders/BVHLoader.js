@@ -98,7 +98,7 @@ BVHLoader.prototype = Object.assign(Object.create(Loader.prototype), {
 
       // read frame data line by line
 
-      for (var i = 0; i < numFrames; i++) {
+      for (let i = 0; i < numFrames; i++) {
         tokens = nextLine(lines).split(/[\s]+/)
         readFrameData(tokens, i * frameTime, root)
       }
@@ -139,7 +139,7 @@ BVHLoader.prototype = Object.assign(Object.create(Loader.prototype), {
 
       // parse values for each channel in node
 
-      for (var i = 0; i < bone.channels.length; i++) {
+      for (let i = 0; i < bone.channels.length; i++) {
         switch (bone.channels[i]) {
           case 'Xposition':
             keyframe.position.x = parseFloat(data.shift().trim())
@@ -169,7 +169,7 @@ BVHLoader.prototype = Object.assign(Object.create(Loader.prototype), {
 
       // parse child nodes
 
-      for (var i = 0; i < bone.children.length; i++) {
+      for (let i = 0; i < bone.children.length; i++) {
         readFrameData(data, frameTime, bone.children[i])
       }
     }
@@ -266,7 +266,7 @@ BVHLoader.prototype = Object.assign(Object.create(Loader.prototype), {
       bone.name = source.name
 
       if (source.type !== 'ENDSITE') {
-        for (var i = 0; i < source.children.length; i++) {
+        for (let i = 0; i < source.children.length; i++) {
           bone.add(toTHREEBone(source.children[i], list))
         }
       }
@@ -286,7 +286,7 @@ BVHLoader.prototype = Object.assign(Object.create(Loader.prototype), {
 
       // create a position and quaternion animation track for each node
 
-      for (var i = 0; i < bones.length; i++) {
+      for (let i = 0; i < bones.length; i++) {
         var bone = bones[i]
 
         if (bone.type === 'ENDSITE') continue
@@ -297,7 +297,7 @@ BVHLoader.prototype = Object.assign(Object.create(Loader.prototype), {
         var positions = []
         var rotations = []
 
-        for (var j = 0; j < bone.frames.length; j++) {
+        for (let j = 0; j < bone.frames.length; j++) {
           var frame = bone.frames[j]
 
           times.push(frame.time)

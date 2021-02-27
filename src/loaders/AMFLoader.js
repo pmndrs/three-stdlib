@@ -84,7 +84,7 @@ AMFLoader.prototype = Object.assign(Object.create(Loader.prototype), {
           }
         }
 
-        for (var file in zip) {
+        for (let file in zip) {
           if (file.toLowerCase().substr(-4) === '.amf') {
             break
           }
@@ -136,7 +136,7 @@ AMFLoader.prototype = Object.assign(Object.create(Loader.prototype), {
 
       var loadedMaterial = null
 
-      for (var i = 0; i < node.childNodes.length; i++) {
+      for (let i = 0; i < node.childNodes.length; i++) {
         var matChildEl = node.childNodes[i]
 
         if (matChildEl.nodeName === 'metadata' && matChildEl.attributes.type !== undefined) {
@@ -165,7 +165,7 @@ AMFLoader.prototype = Object.assign(Object.create(Loader.prototype), {
     function loadColor(node) {
       var color = { r: 1.0, g: 1.0, b: 1.0, a: 1.0 }
 
-      for (var i = 0; i < node.childNodes.length; i++) {
+      for (let i = 0; i < node.childNodes.length; i++) {
         var matColor = node.childNodes[i]
 
         if (matColor.nodeName === 'r') {
@@ -334,7 +334,7 @@ AMFLoader.prototype = Object.assign(Object.create(Loader.prototype), {
     sceneObject.userData.author = amfAuthor
     sceneObject.userData.loader = 'AMF'
 
-    for (var id in amfObjects) {
+    for (let id in amfObjects) {
       var part = amfObjects[id]
       var meshes = part.meshes
       var newObject = new Group()

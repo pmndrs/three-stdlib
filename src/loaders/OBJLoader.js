@@ -132,7 +132,7 @@ var OBJLoader = (function () {
 
             // Ignore objects tail materials if no face declarations followed them before a new o/g started.
             if (end && this.materials.length > 1) {
-              for (var mi = this.materials.length - 1; mi >= 0; mi--) {
+              for (let mi = this.materials.length - 1; mi >= 0; mi--) {
                 if (this.materials[mi].groupCount <= 0) {
                   this.materials.splice(mi, 1)
                 }
@@ -319,7 +319,7 @@ var OBJLoader = (function () {
 
         var vLen = this.vertices.length
 
-        for (var vi = 0, l = vertices.length; vi < l; vi++) {
+        for (let vi = 0, l = vertices.length; vi < l; vi++) {
           var index = this.parseVertexIndex(vertices[vi], vLen)
 
           this.addVertexPoint(index)
@@ -333,11 +333,11 @@ var OBJLoader = (function () {
         var vLen = this.vertices.length
         var uvLen = this.uvs.length
 
-        for (var vi = 0, l = vertices.length; vi < l; vi++) {
+        for (let vi = 0, l = vertices.length; vi < l; vi++) {
           this.addVertexLine(this.parseVertexIndex(vertices[vi], vLen))
         }
 
-        for (var uvi = 0, l = uvs.length; uvi < l; uvi++) {
+        for (let uvi = 0, l = uvs.length; uvi < l; uvi++) {
           this.addUVLine(this.parseUVIndex(uvs[uvi], uvLen))
         }
       },
@@ -414,7 +414,7 @@ var OBJLoader = (function () {
       // Faster to just trim left side of the line. Use if available.
       var trimLeft = typeof ''.trimLeft === 'function'
 
-      for (var i = 0, l = lines.length; i < l; i++) {
+      for (let i = 0, l = lines.length; i < l; i++) {
         line = lines[i]
 
         line = trimLeft ? line.trimLeft() : line.trim()
@@ -457,7 +457,7 @@ var OBJLoader = (function () {
 
           // Parse the face vertex data into an easy to work with format
 
-          for (var j = 0, jl = vertexData.length; j < jl; j++) {
+          for (let j = 0, jl = vertexData.length; j < jl; j++) {
             var vertex = vertexData[j]
 
             if (vertex.length > 0) {
@@ -470,7 +470,7 @@ var OBJLoader = (function () {
 
           var v1 = faceVertices[0]
 
-          for (var j = 1, jl = faceVertices.length - 1; j < jl; j++) {
+          for (let j = 1, jl = faceVertices.length - 1; j < jl; j++) {
             var v2 = faceVertices[j]
             var v3 = faceVertices[j + 1]
 
@@ -484,7 +484,7 @@ var OBJLoader = (function () {
           if (line.indexOf('/') === -1) {
             lineVertices = lineParts
           } else {
-            for (var li = 0, llen = lineParts.length; li < llen; li++) {
+            for (let li = 0, llen = lineParts.length; li < llen; li++) {
               var parts = lineParts[li].split('/')
 
               if (parts[0] !== '') lineVertices.push(parts[0])
@@ -572,7 +572,7 @@ var OBJLoader = (function () {
       var hasPrimitives = !(state.objects.length === 1 && state.objects[0].geometry.vertices.length === 0)
 
       if (hasPrimitives === true) {
-        for (var i = 0, l = state.objects.length; i < l; i++) {
+        for (let i = 0, l = state.objects.length; i < l; i++) {
           var object = state.objects[i]
           var geometry = object.geometry
           var materials = object.materials
@@ -604,7 +604,7 @@ var OBJLoader = (function () {
 
           var createdMaterials = []
 
-          for (var mi = 0, miLen = materials.length; mi < miLen; mi++) {
+          for (let mi = 0, miLen = materials.length; mi < miLen; mi++) {
             var sourceMaterial = materials[mi]
             var materialHash = sourceMaterial.name + '_' + sourceMaterial.smooth + '_' + hasVertexColors
             var material = state.materials[materialHash]
@@ -657,7 +657,7 @@ var OBJLoader = (function () {
           var mesh
 
           if (createdMaterials.length > 1) {
-            for (var mi = 0, miLen = materials.length; mi < miLen; mi++) {
+            for (let mi = 0, miLen = materials.length; mi < miLen; mi++) {
               var sourceMaterial = materials[mi]
               buffergeometry.addGroup(sourceMaterial.groupStart, sourceMaterial.groupCount, mi)
             }

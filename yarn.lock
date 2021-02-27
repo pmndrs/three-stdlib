@@ -1195,6 +1195,11 @@
     "@webassemblyjs/wast-parser" "1.9.0"
     "@xtuc/long" "4.2.2"
 
+"@webgpu/glslang@^0.0.15":
+  version "0.0.15"
+  resolved "https://registry.yarnpkg.com/@webgpu/glslang/-/glslang-0.0.15.tgz#f5ccaf6015241e6175f4b90906b053f88483d1f2"
+  integrity sha512-niT+Prh3Aff8Uf1MVBVUsaNjFj9rJAKDXuoHIKiQbB+6IUP/3J3JIhBNyZ7lDhytvXxw6ppgnwKZdDJ08UMj4Q==
+
 "@webxr-input-profiles/motion-controllers@^1.0.0":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@webxr-input-profiles/motion-controllers/-/motion-controllers-1.0.0.tgz#0a84533288af39d85bfe1987721035925d69be47"
@@ -2309,6 +2314,11 @@ fastq@^1.6.0:
   integrity sha512-AWuv6Ery3pM+dY7LYS8YIaCiQvUaos9OB1RyNgaOWnaX+Tik7Onvcsf8x8c+YtDeT0maYLniBip2hox5KtEXXA==
   dependencies:
     reusify "^1.0.4"
+
+fflate@^0.6.4:
+  version "0.6.4"
+  resolved "https://registry.yarnpkg.com/fflate/-/fflate-0.6.4.tgz#09011d8ad6c2f180782bd0e32007d5307d43c8fd"
+  integrity sha512-YUO27Eim8e+i8dMZf9J6jKivfbGyb5BP1XJgBmtFb6qAcaD5kPLdapVVkfFyFlUa4crk7sCFUOQW77YxUvbtqQ==
 
 figgy-pudding@^3.5.1:
   version "3.5.2"

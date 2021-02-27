@@ -58,7 +58,7 @@ class XRHandPrimitiveModel {
         'pinky-finger-tip',
       ]
 
-      for (const jointName of joints) {
+      for (let jointName of joints) {
         var cube = new Mesh(geometry, jointName.indexOf('tip') !== -1 ? tipMaterial : jointMaterial)
         cube.castShadow = true
         cube.receiveShadow = true

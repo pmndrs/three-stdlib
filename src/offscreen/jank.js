@@ -23,7 +23,7 @@ function initJank() {
 function jank() {
   var number = 0
 
-  for (var i = 0; i < 10000000; i++) {
+  for (let i = 0; i < 10000000; i++) {
     number += Math.random()
   }
 

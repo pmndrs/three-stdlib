@@ -64,7 +64,7 @@ class NodeBuilder {
 
     // find attribute
 
-    for (const attribute of attributes) {
+    for (let attribute of attributes) {
       if (attribute.name === name) {
         return attribute
       }
@@ -191,7 +191,7 @@ class NodeBuilder {
 
     let code = ''
 
-    for (const name in defines) {
+    for (let name in defines) {
       code += `#define ${name} ${defines[name]}\n`
     }
 
@@ -226,12 +226,12 @@ class NodeBuilder {
     const shaderStages = ['vertex', 'fragment']
     const shaderData = {}
 
-    for (const shaderStage of shaderStages) {
+    for (let shaderStage of shaderStages) {
       this.shaderStage = shaderStage
 
       const slots = this.slots[shaderStage]
 
-      for (const slot of slots) {
+      for (let slot of slots) {
         const flowData = this.flowNode(slot.node, slot.output)
 
         this.define(shaderStage, `NODE_${slot.name}`, flowData.result)
@@ -240,7 +240,7 @@ class NodeBuilder {
 
     this.shaderStage = null
 
-    for (const shaderStage of shaderStages) {
+    for (let shaderStage of shaderStages) {
       this.define(shaderStage, 'NODE_HEADER_UNIFORMS', this.getUniformsHeaderSnippet(shaderStage))
       this.define(shaderStage, 'NODE_HEADER_ATTRIBUTES', this.getAttributesHeaderSnippet(shaderStage))
       this.define(shaderStage, 'NODE_HEADER_VARYS', this.getVarysHeaderSnippet(shaderStage))

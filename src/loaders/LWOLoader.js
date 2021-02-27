@@ -258,7 +258,7 @@ MaterialParser.prototype = {
     var materials = []
     this.textures = {}
 
-    for (var name in lwoTree.materials) {
+    for (let name in lwoTree.materials) {
       if (lwoTree.format === 'LWO3') {
         materials.push(this.parseMaterial(lwoTree.materials[name], name, lwoTree.textures))
       } else if (lwoTree.format === 'LWO2') {
@@ -357,7 +357,7 @@ MaterialParser.prototype = {
   },
 
   getNodeByRefName(refName, nodes) {
-    for (var name in nodes) {
+    for (let name in nodes) {
       if (nodes[name].refName === refName) return nodes[name]
     }
   },
@@ -365,7 +365,7 @@ MaterialParser.prototype = {
   parseTextureNodes(textureNodes) {
     var maps = {}
 
-    for (var name in textureNodes) {
+    for (let name in textureNodes) {
       var node = textureNodes[name]
       var path = node.fileName
 
@@ -423,7 +423,7 @@ MaterialParser.prototype = {
   // maps can also be defined on individual material attributes, parse those here
   // This occurs on Standard (Phong) surfaces
   parseAttributeImageMaps(attributes, textures, maps) {
-    for (var name in attributes) {
+    for (let name in attributes) {
       var attribute = attributes[name]
 
       if (attribute.maps) {
@@ -666,7 +666,7 @@ GeometryParser.prototype = {
     var i = 0
     polygonDimensions.forEach(function (dim) {
       if (dim < 4) {
-        for (var k = 0; k < dim; k++) remappedIndices.push(indices[i + k])
+        for (let k = 0; k < dim; k++) remappedIndices.push(indices[i + k])
       } else if (dim === 4) {
         remappedIndices.push(
           indices[i],
@@ -678,7 +678,7 @@ GeometryParser.prototype = {
           indices[i + 3],
         )
       } else if (dim > 4) {
-        for (var k = 1; k < dim - 1; k++) {
+        for (let k = 1; k < dim - 1; k++) {
           remappedIndices.push(indices[i], indices[i + k], indices[i + k + 1])
         }
 
@@ -710,7 +710,7 @@ GeometryParser.prototype = {
     var prevStart = 0
     var currentCount = 0
 
-    for (var i = 0; i < remappedIndices.length; i += 2) {
+    for (let i = 0; i < remappedIndices.length; i += 2) {
       var materialIndex = remappedIndices[i + 1]
 
       if (i === 0) matNames[indexNum] = tags[materialIndex]
@@ -767,7 +767,7 @@ GeometryParser.prototype = {
         remappedIndices.push(indices[i * 2], indices[i * 2 + 1], indices[i * 2], indices[i * 2 + 1])
       } else {
         // ignore > 4 for now
-        for (var k = 0; k < dim - 2; k++) {
+        for (let k = 0; k < dim - 2; k++) {
           remappedIndices.push(indices[i * 2], indices[i * 2 + 1])
         }
       }
@@ -791,7 +791,7 @@ GeometryParser.prototype = {
       return 0
     })
 
-    for (var name in layer.uvs) {
+    for (let name in layer.uvs) {
       var uvs = layer.uvs[name].uvs
       var uvIndices = layer.uvs[name].uvIndices
 
@@ -806,7 +806,7 @@ GeometryParser.prototype = {
 
   parseMorphTargets(geometry, layer) {
     var num = 0
-    for (var name in layer.morphTargets) {
+    for (let name in layer.morphTargets) {
       var remappedPoints = geometry.attributes.position.array.slice()
 
       if (!geometry.morphAttributes.position) geometry.morphAttributes.position = []

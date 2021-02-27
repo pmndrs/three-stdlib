@@ -1,12 +1,4 @@
-import {
-  Box3,
-  MathUtils,
-  MeshLambertMaterial,
-  Object3D,
-  TextureLoader,
-  UVMapping,
-  sRGBEncoding,
-} from 'three'
+import { Box3, MathUtils, MeshLambertMaterial, Object3D, TextureLoader, UVMapping, sRGBEncoding } from 'three'
 import { MD2Loader } from '../loaders/MD2Loader.js'
 import { MorphBlendMesh } from '../misc/MorphBlendMesh.js'
 
@@ -77,14 +69,14 @@ var MD2CharacterComplex = function () {
   // API
 
   this.enableShadows = function (enable) {
-    for (var i = 0; i < this.meshes.length; i++) {
+    for (let i = 0; i < this.meshes.length; i++) {
       this.meshes[i].castShadow = enable
       this.meshes[i].receiveShadow = enable
     }
   }
 
   this.setVisible = function (enable) {
-    for (var i = 0; i < this.meshes.length; i++) {
+    for (let i = 0; i < this.meshes.length; i++) {
       this.meshes[i].visible = enable
       this.meshes[i].visible = enable
     }
@@ -112,7 +104,7 @@ var MD2CharacterComplex = function () {
 
     // WEAPONS
 
-    for (var i = 0; i < original.weapons.length; i++) {
+    for (let i = 0; i < original.weapons.length; i++) {
       var meshWeapon = createPart(original.weapons[i].geometry, this.skinsWeapon[i])
       meshWeapon.scale.set(this.scale, this.scale, this.scale)
       meshWeapon.visible = false
@@ -136,7 +128,7 @@ var MD2CharacterComplex = function () {
     this.loadCounter = config.weapons.length * 2 + config.skins.length + 1
 
     var weaponsTextures = []
-    for (var i = 0; i < config.weapons.length; i++) weaponsTextures[i] = config.weapons[i][1]
+    for (let i = 0; i < config.weapons.length; i++) weaponsTextures[i] = config.weapons[i][1]
 
     // SKINS
 
@@ -184,7 +176,7 @@ var MD2CharacterComplex = function () {
       }
     }
 
-    for (var i = 0; i < config.weapons.length; i++) {
+    for (let i = 0; i < config.weapons.length; i++) {
       loader.load(config.baseUrl + config.weapons[i][0], generateCallback(i, config.weapons[i][0]))
     }
   }
@@ -212,7 +204,7 @@ var MD2CharacterComplex = function () {
   }
 
   this.setWeapon = function (index) {
-    for (var i = 0; i < this.weapons.length; i++) this.weapons[i].visible = false
+    for (let i = 0; i < this.weapons.length; i++) this.weapons[i].visible = false
 
     var activeWeapon = this.weapons[index]
 
@@ -423,7 +415,7 @@ var MD2CharacterComplex = function () {
     var textureLoader = new TextureLoader()
     var textures = []
 
-    for (var i = 0; i < textureUrls.length; i++) {
+    for (let i = 0; i < textureUrls.length; i++) {
       textures[i] = textureLoader.load(baseUrl + textureUrls[i], checkLoadingComplete)
       textures[i].mapping = UVMapping
       textures[i].name = textureUrls[i]

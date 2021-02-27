@@ -66,7 +66,7 @@ TAARenderPass.prototype = Object.assign(Object.create(SSAARenderPass.prototype),
 
       // render the scene multiple times, each slightly jitter offset from the last and accumulate the results.
       var numSamplesPerFrame = Math.pow(2, this.sampleLevel)
-      for (var i = 0; i < numSamplesPerFrame; i++) {
+      for (let i = 0; i < numSamplesPerFrame; i++) {
         var j = this.accumulateIndex
         var jitterOffset = jitterOffsets[j]
 

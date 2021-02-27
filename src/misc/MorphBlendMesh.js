@@ -60,7 +60,7 @@ MorphBlendMesh.prototype = Object.assign(Object.create(Mesh.prototype), {
 
     var i = 0
 
-    for (var key in this.morphTargetDictionary) {
+    for (let key in this.morphTargetDictionary) {
       var chunks = key.match(pattern)
 
       if (chunks && chunks.length > 1) {
@@ -79,7 +79,7 @@ MorphBlendMesh.prototype = Object.assign(Object.create(Mesh.prototype), {
       i++
     }
 
-    for (var name in frameRanges) {
+    for (let name in frameRanges) {
       var range = frameRanges[name]
       this.createAnimation(name, range.start, range.end, fps)
     }
@@ -183,7 +183,7 @@ MorphBlendMesh.prototype = Object.assign(Object.create(Mesh.prototype), {
   },
 
   update: function (delta) {
-    for (var i = 0, il = this.animationsList.length; i < il; i++) {
+    for (let i = 0, il = this.animationsList.length; i < il; i++) {
       var animation = this.animationsList[i]
 
       if (!animation.active) continue

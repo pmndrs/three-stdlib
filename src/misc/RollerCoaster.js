@@ -39,7 +39,7 @@ var RollerCoasterGeometry = function (curve, divisions) {
   var sides = 5
   var tube1 = []
 
-  for (var i = 0; i < sides; i++) {
+  for (let i = 0; i < sides; i++) {
     var angle = (i / sides) * PI2
     tube1.push(new Vector3(Math.sin(angle) * 0.06, Math.cos(angle) * 0.06, 0))
   }
@@ -47,7 +47,7 @@ var RollerCoasterGeometry = function (curve, divisions) {
   var sides = 6
   var tube2 = []
 
-  for (var i = 0; i < sides; i++) {
+  for (let i = 0; i < sides; i++) {
     var angle = (i / sides) * PI2
     tube2.push(new Vector3(Math.sin(angle) * 0.025, Math.cos(angle) * 0.025, 0))
   }
@@ -58,7 +58,7 @@ var RollerCoasterGeometry = function (curve, divisions) {
   function drawShape(shape, color) {
     normal.set(0, 0, -1).applyQuaternion(quaternion)
 
-    for (var j = 0; j < shape.length; j++) {
+    for (let j = 0; j < shape.length; j++) {
       vector.copy(shape[j])
       vector.applyQuaternion(quaternion)
       vector.add(point)
@@ -70,7 +70,7 @@ var RollerCoasterGeometry = function (curve, divisions) {
 
     normal.set(0, 0, 1).applyQuaternion(quaternion)
 
-    for (var j = shape.length - 1; j >= 0; j--) {
+    for (let j = shape.length - 1; j >= 0; j--) {
       vector.copy(shape[j])
       vector.applyQuaternion(quaternion)
       vector.add(point)
@@ -92,7 +92,7 @@ var RollerCoasterGeometry = function (curve, divisions) {
   var normal4 = new Vector3()
 
   function extrudeShape(shape, offset, color) {
-    for (var j = 0, jl = shape.length; j < jl; j++) {
+    for (let j = 0, jl = shape.length; j < jl; j++) {
       var point1 = shape[j]
       var point2 = shape[(j + 1) % jl]
 
@@ -158,7 +158,7 @@ var RollerCoasterGeometry = function (curve, divisions) {
 
   var offset = new Vector3()
 
-  for (var i = 1; i <= divisions; i++) {
+  for (let i = 1; i <= divisions; i++) {
     point.copy(curve.getPointAt(i / divisions))
 
     up.set(0, 1, 0)
@@ -224,7 +224,7 @@ var RollerCoasterLiftersGeometry = function (curve, divisions) {
   var normal4 = new Vector3()
 
   function extrudeShape(shape, fromPoint, toPoint) {
-    for (var j = 0, jl = shape.length; j < jl; j++) {
+    for (let j = 0, jl = shape.length; j < jl; j++) {
       var point1 = shape[j]
       var point2 = shape[(j + 1) % jl]
 
@@ -283,7 +283,7 @@ var RollerCoasterLiftersGeometry = function (curve, divisions) {
   var fromPoint = new Vector3()
   var toPoint = new Vector3()
 
-  for (var i = 1; i <= divisions; i++) {
+  for (let i = 1; i <= divisions; i++) {
     point.copy(curve.getPointAt(i / divisions))
     tangent.copy(curve.getTangentAt(i / divisions))
 
@@ -365,7 +365,7 @@ var RollerCoasterShadowGeometry = function (curve, divisions) {
   var vector3 = new Vector3()
   var vector4 = new Vector3()
 
-  for (var i = 1; i <= divisions; i++) {
+  for (let i = 1; i <= divisions; i++) {
     point.copy(curve.getPointAt(i / divisions))
     point.y = 0
 
@@ -413,7 +413,7 @@ var SkyGeometry = function () {
 
   var vertices = []
 
-  for (var i = 0; i < 100; i++) {
+  for (let i = 0; i < 100; i++) {
     var x = Math.random() * 800 - 400
     var y = Math.random() * 50 + 50
     var z = Math.random() * 800 - 400
@@ -443,7 +443,7 @@ var TreesGeometry = function (landscape) {
   var raycaster = new Raycaster()
   raycaster.ray.direction.set(0, -1, 0)
 
-  for (var i = 0; i < 2000; i++) {
+  for (let i = 0; i < 2000; i++) {
     var x = Math.random() * 500 - 250
     var z = Math.random() * 500 - 250
 
@@ -471,7 +471,7 @@ var TreesGeometry = function (landscape) {
 
     var random = Math.random() * 0.1
 
-    for (var j = 0; j < 6; j++) {
+    for (let j = 0; j < 6; j++) {
       colors.push(0.2 + random, 0.4 + random, 0)
     }
   }

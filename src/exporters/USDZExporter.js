@@ -1,4 +1,4 @@
-import { zipSync, strToU8 } from '../libs/fflate.module.min.js'
+import { zipSync, strToU8 } from 'fflate'
 
 class USDZExporter {
   async parse(scene) {
@@ -30,7 +30,7 @@ class USDZExporter {
 
     const files = { 'model.usda': strToU8(output) }
 
-    for (const uuid in textures) {
+    for (let uuid in textures) {
       const texture = textures[uuid]
       files[`textures/Texture_${texture.id}.jpg`] = await imgToU8(texture.image)
     }
@@ -40,7 +40,7 @@ class USDZExporter {
 
     let offset = 0
 
-    for (const filename in files) {
+    for (let filename in files) {
       const file = files[filename]
       const headerSize = 34 + filename.length
 
@@ -222,7 +222,7 @@ function buildVector2Array(attribute, count) {
 function buildMaterials(materials) {
   const array = []
 
-  for (const uuid in materials) {
+  for (let uuid in materials) {
     const material = materials[uuid]
 
     array.push(buildMaterial(material))
@@ -295,7 +295,7 @@ ${parameters.join('\n')}
 function buildTextures(textures) {
   const array = []
 
-  for (const uuid in textures) {
+  for (let uuid in textures) {
     const texture = textures[uuid]
 
     array.push(buildTexture(texture))

@@ -271,7 +271,7 @@ PDBLoader.prototype = Object.assign(Object.create(Loader.prototype), {
 
     var lines = text.split('\n')
 
-    for (var i = 0, l = lines.length; i < l; i++) {
+    for (let i = 0, l = lines.length; i < l; i++) {
       if (lines[i].substr(0, 4) === 'ATOM' || lines[i].substr(0, 6) === 'HETATM') {
         x = parseFloat(lines[i].substr(30, 7))
         y = parseFloat(lines[i].substr(38, 7))

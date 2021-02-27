@@ -54,7 +54,7 @@ TTFLoader.prototype = Object.assign(Object.create(Loader.prototype), {
       var glyphIndexMap = font.encoding.cmap.glyphIndexMap
       var unicodes = Object.keys(glyphIndexMap)
 
-      for (var i = 0; i < unicodes.length; i++) {
+      for (let i = 0; i < unicodes.length; i++) {
         var unicode = unicodes[i]
         var glyph = font.glyphs.glyphs[glyphIndexMap[unicode]]
 
@@ -136,7 +136,7 @@ TTFLoader.prototype = Object.assign(Object.create(Loader.prototype), {
 
         reversed.push(result)
 
-        for (var i = p.length - 1; i > 0; i--) {
+        for (let i = p.length - 1; i > 0; i--) {
           var command = p[i]
           var result = { type: command.type }
 

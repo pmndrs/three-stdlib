@@ -325,21 +325,21 @@ const OutlineEffect = function (renderer, parameters) {
     // clear originialMaterials
     keys = Object.keys(originalMaterials)
 
-    for (var i = 0, il = keys.length; i < il; i++) {
+    for (let i = 0, il = keys.length; i < il; i++) {
       originalMaterials[keys[i]] = undefined
     }
 
     // clear originalOnBeforeRenders
     keys = Object.keys(originalOnBeforeRenders)
 
-    for (var i = 0, il = keys.length; i < il; i++) {
+    for (let i = 0, il = keys.length; i < il; i++) {
       originalOnBeforeRenders[keys[i]] = undefined
     }
 
     // remove unused outlineMaterial from cache
     keys = Object.keys(cache)
 
-    for (var i = 0, il = keys.length; i < il; i++) {
+    for (let i = 0, il = keys.length; i < il; i++) {
       const key = keys[i]
 
       if (cache[key].used === false) {

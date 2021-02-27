@@ -149,7 +149,7 @@ Rhino3dmLoader.prototype = Object.assign(Object.create(Loader.prototype), {
     mat.color.b = material.color.b
     mat.type = material.type
 
-    for (var i = 0; i < this.materials.length; i++) {
+    for (let i = 0; i < this.materials.length; i++) {
       var m = this.materials[i]
       var _mat = {}
       _mat.name = m.name
@@ -201,7 +201,7 @@ Rhino3dmLoader.prototype = Object.assign(Object.create(Loader.prototype), {
 
     var textureLoader = new TextureLoader()
 
-    for (var i = 0; i < material.textures.length; i++) {
+    for (let i = 0; i < material.textures.length; i++) {
       var texture = material.textures[i]
 
       if (texture.image !== null) {
@@ -253,7 +253,7 @@ Rhino3dmLoader.prototype = Object.assign(Object.create(Loader.prototype), {
     var objects = data.objects
     var materials = data.materials
 
-    for (var i = 0; i < objects.length; i++) {
+    for (let i = 0; i < objects.length; i++) {
       var obj = objects[i]
       var attributes = obj.attributes
 
@@ -297,15 +297,15 @@ Rhino3dmLoader.prototype = Object.assign(Object.create(Loader.prototype), {
       }
     }
 
-    for (var i = 0; i < instanceDefinitions.length; i++) {
+    for (let i = 0; i < instanceDefinitions.length; i++) {
       var iDef = instanceDefinitions[i]
 
       var objects = []
 
-      for (var j = 0; j < iDef.attributes.objectIds.length; j++) {
+      for (let j = 0; j < iDef.attributes.objectIds.length; j++) {
         var objId = iDef.attributes.objectIds[j]
 
-        for (var p = 0; p < instanceDefinitionObjects.length; p++) {
+        for (let p = 0; p < instanceDefinitionObjects.length; p++) {
           var idoId = instanceDefinitionObjects[p].userData.attributes.id
 
           if (objId === idoId) {
@@ -316,7 +316,7 @@ Rhino3dmLoader.prototype = Object.assign(Object.create(Loader.prototype), {
 
       // Currently clones geometry and does not take advantage of instancing
 
-      for (var j = 0; j < instanceReferences.length; j++) {
+      for (let j = 0; j < instanceReferences.length; j++) {
         var iRef = instanceReferences[j]
 
         if (iRef.geometry.parentIdefId === iDef.attributes.id) {
@@ -345,7 +345,7 @@ Rhino3dmLoader.prototype = Object.assign(Object.create(Loader.prototype), {
 
           iRefObject.applyMatrix4(matrix)
 
-          for (var p = 0; p < objects.length; p++) {
+          for (let p = 0; p < objects.length; p++) {
             iRefObject.add(objects[p].clone(true))
           }
 
@@ -634,7 +634,7 @@ Rhino3dmLoader.prototype = Object.assign(Object.create(Loader.prototype), {
   },
 
   dispose: function () {
-    for (var i = 0; i < this.workerPool.length; ++i) {
+    for (let i = 0; i < this.workerPool.length; ++i) {
       this.workerPool[i].terminate()
     }
 
@@ -698,7 +698,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
     var objs = doc.objects()
     var cnt = objs.count
 
-    for (var i = 0; i < cnt; i++) {
+    for (let i = 0; i < cnt; i++) {
       var _object = objs.get(i)
 
       var object = extractObjectData(_object, doc)
@@ -713,7 +713,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
     // Handle instance definitions
     // console.log( `Instance Definitions Count: ${doc.instanceDefinitions().count()}` );
 
-    for (var i = 0; i < doc.instanceDefinitions().count(); i++) {
+    for (let i = 0; i < doc.instanceDefinitions().count(); i++) {
       var idef = doc.instanceDefinitions().get(i)
       var idefAttributes = extractProperties(idef)
       idefAttributes.objectIds = idef.getObjectIds()
@@ -759,7 +759,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
       rhino.TextureType.PBR_Displacement,
     ]
 
-    for (var i = 0; i < doc.materials().count(); i++) {
+    for (let i = 0; i < doc.materials().count(); i++) {
       var _material = doc.materials().get(i)
       var _pbrMaterial = _material.physicallyBased()
 
@@ -767,7 +767,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
       var textures = []
 
-      for (var j = 0; j < textureTypes.length; j++) {
+      for (let j = 0; j < textureTypes.length; j++) {
         var _texture = _material.getTexture(textureTypes[j])
         if (_texture) {
           var textureType = textureTypes[j].constructor.name
@@ -794,7 +794,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
       if (_pbrMaterial.supported) {
         console.log('pbr true')
 
-        for (var j = 0; j < pbrTextureTypes.length; j++) {
+        for (let j = 0; j < pbrTextureTypes.length; j++) {
           var _texture = _material.getTexture(textureTypes[j])
           if (_texture) {
             var image = doc.getEmbeddedFileAsBase64(_texture.fileName)
@@ -823,7 +823,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
     // Handle layers
 
-    for (var i = 0; i < doc.layers().count(); i++) {
+    for (let i = 0; i < doc.layers().count(); i++) {
       var _layer = doc.layers().get(i)
       var layer = extractProperties(_layer)
 
@@ -834,7 +834,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
     // Handle views
 
-    for (var i = 0; i < doc.views().count(); i++) {
+    for (let i = 0; i < doc.views().count(); i++) {
       var _view = doc.views().get(i)
       var view = extractProperties(_view)
 
@@ -845,7 +845,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
     // Handle named views
 
-    for (var i = 0; i < doc.namedViews().count(); i++) {
+    for (let i = 0; i < doc.namedViews().count(); i++) {
       var _namedView = doc.namedViews().get(i)
       var namedView = extractProperties(_namedView)
 
@@ -856,7 +856,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
     // Handle groups
 
-    for (var i = 0; i < doc.groups().count(); i++) {
+    for (let i = 0; i < doc.groups().count(); i++) {
       var _group = doc.groups().get(i)
       var group = extractProperties(_group)
 
@@ -923,7 +923,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
         position.type = 'Float32Array'
         position.array = []
 
-        for (var j = 0; j < pts.length; j++) {
+        for (let j = 0; j < pts.length; j++) {
           position.array.push(pts[j][0])
           position.array.push(pts[j][1])
           position.array.push(pts[j][2])
@@ -972,7 +972,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
         var faces = _geometry.faces()
         var mesh = new rhino.Mesh()
 
-        for (var faceIndex = 0; faceIndex < faces.count; faceIndex++) {
+        for (let faceIndex = 0; faceIndex < faces.count; faceIndex++) {
           var face = faces.get(faceIndex)
           var _mesh = face.getMesh(rhino.MeshType.Any)
 
@@ -1073,7 +1073,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
   function extractProperties(object) {
     var result = {}
 
-    for (var property in object) {
+    for (let property in object) {
       var value = object[property]
 
       if (typeof value !== 'function') {
@@ -1105,7 +1105,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
     if (curve instanceof rhino.PolylineCurve) {
       pointCount = curve.pointCount
-      for (var i = 0; i < pointCount; i++) {
+      for (let i = 0; i < pointCount; i++) {
         rc.push(curve.point(i))
       }
 
@@ -1115,7 +1115,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
     if (curve instanceof rhino.PolyCurve) {
       var segmentCount = curve.segmentCount
 
-      for (var i = 0; i < segmentCount; i++) {
+      for (let i = 0; i < segmentCount; i++) {
         var segment = curve.segmentCurve(i)
         var segmentArray = curveToPoints(segment, pointCount)
         rc = rc.concat(segmentArray)
@@ -1134,7 +1134,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
     if (curve instanceof rhino.NurbsCurve && curve.degree === 1) {
       const pLine = curve.tryGetPolyline()
 
-      for (var i = 0; i < pLine.count; i++) {
+      for (let i = 0; i < pLine.count; i++) {
         rc.push(pLine.get(i))
       }
 
@@ -1146,7 +1146,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
     var domain = curve.domain
     var divisions = pointCount - 1.0
 
-    for (var j = 0; j < pointCount; j++) {
+    for (let j = 0; j < pointCount; j++) {
       var t = domain[0] + (j / divisions) * (domain[1] - domain[0])
 
       if (t === domain[0] || t === domain[1]) {

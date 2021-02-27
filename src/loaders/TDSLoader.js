@@ -94,7 +94,7 @@ TDSLoader.prototype = Object.assign(Object.create(Loader.prototype), {
 
     this.readFile(arraybuffer, path)
 
-    for (var i = 0; i < this.meshes.length; i++) {
+    for (let i = 0; i < this.meshes.length; i++) {
       this.group.add(this.meshes[i])
     }
 
@@ -299,7 +299,7 @@ TDSLoader.prototype = Object.assign(Object.create(Loader.prototype), {
 
         var vertices = []
 
-        for (var i = 0; i < points; i++) {
+        for (let i = 0; i < points; i++) {
           vertices.push(this.readFloat(data))
           vertices.push(this.readFloat(data))
           vertices.push(this.readFloat(data))
@@ -318,7 +318,7 @@ TDSLoader.prototype = Object.assign(Object.create(Loader.prototype), {
 
         var uvs = []
 
-        for (var i = 0; i < texels; i++) {
+        for (let i = 0; i < texels; i++) {
           uvs.push(this.readFloat(data))
           uvs.push(this.readFloat(data))
         }
@@ -328,7 +328,7 @@ TDSLoader.prototype = Object.assign(Object.create(Loader.prototype), {
         this.debugMessage('   Tranformation Matrix (TODO)')
 
         var values = []
-        for (var i = 0; i < 12; i++) {
+        for (let i = 0; i < 12; i++) {
           values[i] = this.readFloat(data)
         }
 
@@ -394,7 +394,7 @@ TDSLoader.prototype = Object.assign(Object.create(Loader.prototype), {
 
     var index = []
 
-    for (var i = 0; i < faces; ++i) {
+    for (let i = 0; i < faces; ++i) {
       index.push(this.readWord(data), this.readWord(data), this.readWord(data))
 
       this.readWord(data) // visibility
@@ -504,7 +504,7 @@ TDSLoader.prototype = Object.assign(Object.create(Loader.prototype), {
     this.debugMessage('         Faces: ' + numFaces)
 
     var index = []
-    for (var i = 0; i < numFaces; ++i) {
+    for (let i = 0; i < numFaces; ++i) {
       index.push(this.readWord(data))
     }
 
@@ -701,7 +701,7 @@ TDSLoader.prototype = Object.assign(Object.create(Loader.prototype), {
   readString: function (data, maxLength) {
     var s = ''
 
-    for (var i = 0; i < maxLength; i++) {
+    for (let i = 0; i < maxLength; i++) {
       var c = this.readByte(data)
       if (!c) {
         break

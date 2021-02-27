@@ -119,8 +119,8 @@ NRRDLoader.prototype = Object.assign(Object.create(Loader.prototype), {
 
     function flipEndianness(array, chunkSize) {
       var u8 = new Uint8Array(array.buffer, array.byteOffset, array.byteLength)
-      for (var i = 0; i < array.byteLength; i += chunkSize) {
-        for (var j = i + chunkSize - 1, k = i; j > k; j--, k++) {
+      for (let i = 0; i < array.byteLength; i += chunkSize) {
+        for (let j = i + chunkSize - 1, k = i; j > k; j--, k++) {
           var tmp = u8[k]
           u8[k] = u8[j]
           u8[j] = tmp
@@ -196,7 +196,7 @@ NRRDLoader.prototype = Object.assign(Object.create(Loader.prototype), {
         parsingFunction = parseFloat
       }
 
-      for (var i = start; i < end; i++) {
+      for (let i = start; i < end; i++) {
         value = data[i]
         //if value is not a space
         if ((value < 9 || value > 13) && value !== 32) {
@@ -254,7 +254,7 @@ NRRDLoader.prototype = Object.assign(Object.create(Loader.prototype), {
       //we need to copy the array to create a new array buffer, else we retrieve the original arraybuffer with the header
       var _copy = new Uint8Array(_data.length)
 
-      for (var i = 0; i < _data.length; i++) {
+      for (let i = 0; i < _data.length; i++) {
         _copy[i] = _data[i]
       }
 

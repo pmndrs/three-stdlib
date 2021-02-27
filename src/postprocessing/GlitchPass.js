@@ -1,11 +1,4 @@
-import {
-  DataTexture,
-  FloatType,
-  MathUtils,
-  RGBFormat,
-  ShaderMaterial,
-  UniformsUtils,
-} from 'three'
+import { DataTexture, FloatType, MathUtils, RGBFormat, ShaderMaterial, UniformsUtils } from 'three'
 import { Pass } from '../postprocessing/Pass.js'
 import { DigitalGlitch } from '../shaders/DigitalGlitch.js'
 
@@ -82,7 +75,7 @@ GlitchPass.prototype = Object.assign(Object.create(Pass.prototype), {
     var data_arr = new Float32Array(dt_size * dt_size * 3)
     var length = dt_size * dt_size
 
-    for (var i = 0; i < length; i++) {
+    for (let i = 0; i < length; i++) {
       var val = MathUtils.randFloat(0, 1)
       data_arr[i * 3 + 0] = val
       data_arr[i * 3 + 1] = val

@@ -11,8 +11,7 @@ import WebGPURenderLists from './WebGPURenderLists.js'
 import WebGPUTextures from './WebGPUTextures.js'
 import WebGPUBackground from './WebGPUBackground.js'
 import WebGPUNodes from './nodes/WebGPUNodes.js'
-
-import glslang from '../../libs/glslang.js'
+import glslang from '@webgpu/glslang'
 
 import { Frustum, Matrix4, Vector3, Color } from 'three'
 
@@ -503,7 +502,7 @@ class WebGPURenderer {
     const cmdEncoder = device.createCommandEncoder({})
     const passEncoder = cmdEncoder.beginComputePass()
 
-    for (const param of computeParams) {
+    for (let param of computeParams) {
       // pipeline
 
       const pipeline = this._computePipelines.get(param)
@@ -707,7 +706,7 @@ class WebGPURenderer {
   _setupVertexBuffers(geometryAttributes, encoder, pipeline) {
     const shaderAttributes = this._renderPipelines.getShaderAttributes(pipeline)
 
-    for (const shaderAttribute of shaderAttributes) {
+    for (let shaderAttribute of shaderAttributes) {
       const name = shaderAttribute.name
       const slot = shaderAttribute.slot
 

@@ -270,7 +270,7 @@ var MMDLoader = (function () {
         .setRequestHeader(this.requestHeader)
         .setWithCredentials(this.withCredentials)
 
-      for (var i = 0, il = urls.length; i < il; i++) {
+      for (let i = 0, il = urls.length; i < il; i++) {
         this.loader.load(
           urls[i],
           function (buffer) {
@@ -496,43 +496,43 @@ var MMDLoader = (function () {
 
       // positions, normals, uvs, skinIndices, skinWeights
 
-      for (var i = 0; i < data.metadata.vertexCount; i++) {
+      for (let i = 0; i < data.metadata.vertexCount; i++) {
         var v = data.vertices[i]
 
-        for (var j = 0, jl = v.position.length; j < jl; j++) {
+        for (let j = 0, jl = v.position.length; j < jl; j++) {
           positions.push(v.position[j])
         }
 
-        for (var j = 0, jl = v.normal.length; j < jl; j++) {
+        for (let j = 0, jl = v.normal.length; j < jl; j++) {
           normals.push(v.normal[j])
         }
 
-        for (var j = 0, jl = v.uv.length; j < jl; j++) {
+        for (let j = 0, jl = v.uv.length; j < jl; j++) {
           uvs.push(v.uv[j])
         }
 
-        for (var j = 0; j < 4; j++) {
+        for (let j = 0; j < 4; j++) {
           skinIndices.push(v.skinIndices.length - 1 >= j ? v.skinIndices[j] : 0.0)
         }
 
-        for (var j = 0; j < 4; j++) {
+        for (let j = 0; j < 4; j++) {
           skinWeights.push(v.skinWeights.length - 1 >= j ? v.skinWeights[j] : 0.0)
         }
       }
 
       // indices
 
-      for (var i = 0; i < data.metadata.faceCount; i++) {
+      for (let i = 0; i < data.metadata.faceCount; i++) {
         var face = data.faces[i]
 
-        for (var j = 0, jl = face.indices.length; j < jl; j++) {
+        for (let j = 0, jl = face.indices.length; j < jl; j++) {
           indices.push(face.indices[j])
         }
       }
 
       // groups
 
-      for (var i = 0; i < data.metadata.materialCount; i++) {
+      for (let i = 0; i < data.metadata.materialCount; i++) {
         var material = data.materials[i]
 
         groups.push({
@@ -545,7 +545,7 @@ var MMDLoader = (function () {
 
       // bones
 
-      for (var i = 0; i < data.metadata.rigidBodyCount; i++) {
+      for (let i = 0; i < data.metadata.rigidBodyCount; i++) {
         var body = data.rigidBodies[i]
         var value = boneTypeTable[body.boneIndex]
 
@@ -555,7 +555,7 @@ var MMDLoader = (function () {
         boneTypeTable[body.boneIndex] = value
       }
 
-      for (var i = 0; i < data.metadata.boneCount; i++) {
+      for (let i = 0; i < data.metadata.boneCount; i++) {
         var boneData = data.bones[i]
 
         var bone = {
@@ -580,7 +580,7 @@ var MMDLoader = (function () {
 
       // TODO: remove duplicated codes between PMD and PMX
       if (data.metadata.format === 'pmd') {
-        for (var i = 0; i < data.metadata.ikCount; i++) {
+        for (let i = 0; i < data.metadata.ikCount; i++) {
           var ik = data.iks[i]
 
           var param = {
@@ -591,7 +591,7 @@ var MMDLoader = (function () {
             links: [],
           }
 
-          for (var j = 0, jl = ik.links.length; j < jl; j++) {
+          for (let j = 0, jl = ik.links.length; j < jl; j++) {
             var link = {}
             link.index = ik.links[j].index
             link.enabled = true
@@ -606,7 +606,7 @@ var MMDLoader = (function () {
           iks.push(param)
         }
       } else {
-        for (var i = 0; i < data.metadata.boneCount; i++) {
+        for (let i = 0; i < data.metadata.boneCount; i++) {
           var ik = data.bones[i].ik
 
           if (ik === undefined) continue
@@ -619,7 +619,7 @@ var MMDLoader = (function () {
             links: [],
           }
 
-          for (var j = 0, jl = ik.links.length; j < jl; j++) {
+          for (let j = 0, jl = ik.links.length; j < jl; j++) {
             var link = {}
             link.index = ik.links[j].index
             link.enabled = true
@@ -655,7 +655,7 @@ var MMDLoader = (function () {
       // grants
 
       if (data.metadata.format === 'pmx') {
-        for (var i = 0; i < data.metadata.boneCount; i++) {
+        for (let i = 0; i < data.metadata.boneCount; i++) {
           var boneData = data.bones[i]
           var grant = boneData.grant
 
@@ -682,7 +682,7 @@ var MMDLoader = (function () {
       // morph
 
       function updateAttributes(attribute, morph, ratio) {
-        for (var i = 0; i < morph.elementCount; i++) {
+        for (let i = 0; i < morph.elementCount; i++) {
           var element = morph.elements[i]
 
           var index
@@ -699,14 +699,14 @@ var MMDLoader = (function () {
         }
       }
 
-      for (var i = 0; i < data.metadata.morphCount; i++) {
+      for (let i = 0; i < data.metadata.morphCount; i++) {
         var morph = data.morphs[i]
         var params = { name: morph.name }
 
         var attribute = new Float32BufferAttribute(data.metadata.vertexCount * 3, 3)
         attribute.name = morph.name
 
-        for (var j = 0; j < data.metadata.vertexCount * 3; j++) {
+        for (let j = 0; j < data.metadata.vertexCount * 3; j++) {
           attribute.array[j] = positions[j]
         }
 
@@ -718,7 +718,7 @@ var MMDLoader = (function () {
           if (morph.type === 0) {
             // group
 
-            for (var j = 0; j < morph.elementCount; j++) {
+            for (let j = 0; j < morph.elementCount; j++) {
               var morph2 = data.morphs[morph.elements[j].index]
               var ratio = morph.elements[j].ratio
 
@@ -762,11 +762,11 @@ var MMDLoader = (function () {
 
       // rigid bodies from rigidBodies field.
 
-      for (var i = 0; i < data.metadata.rigidBodyCount; i++) {
+      for (let i = 0; i < data.metadata.rigidBodyCount; i++) {
         var rigidBody = data.rigidBodies[i]
         var params = {}
 
-        for (var key in rigidBody) {
+        for (let key in rigidBody) {
           params[key] = rigidBody[key]
         }
 
@@ -789,11 +789,11 @@ var MMDLoader = (function () {
 
       // constraints from constraints field.
 
-      for (var i = 0; i < data.metadata.constraintCount; i++) {
+      for (let i = 0; i < data.metadata.constraintCount; i++) {
         var constraint = data.constraints[i]
         var params = {}
 
-        for (var key in constraint) {
+        for (let key in constraint) {
           params[key] = constraint[key]
         }
 
@@ -825,7 +825,7 @@ var MMDLoader = (function () {
       geometry.setAttribute('skinWeight', new Float32BufferAttribute(skinWeights, 4))
       geometry.setIndex(indices)
 
-      for (var i = 0, il = groups.length; i < il; i++) {
+      for (let i = 0, il = groups.length; i < il; i++) {
         geometry.addGroup(groups[i].offset, groups[i].count, i)
       }
 
@@ -903,7 +903,7 @@ var MMDLoader = (function () {
 
       // materials
 
-      for (var i = 0; i < data.metadata.materialCount; i++) {
+      for (let i = 0; i < data.metadata.materialCount; i++) {
         var material = data.materials[i]
 
         var params = { userData: {} }
@@ -1042,7 +1042,7 @@ var MMDLoader = (function () {
         // set transparent true if alpha morph is defined.
 
         function checkAlphaMorph(elements, materials) {
-          for (var i = 0, il = elements.length; i < il; i++) {
+          for (let i = 0, il = elements.length; i < il; i++) {
             var element = elements[i]
 
             if (element.index === -1) continue
@@ -1055,12 +1055,12 @@ var MMDLoader = (function () {
           }
         }
 
-        for (var i = 0, il = data.morphs.length; i < il; i++) {
+        for (let i = 0, il = data.morphs.length; i < il; i++) {
           var morph = data.morphs[i]
           var elements = morph.elements
 
           if (morph.type === 0) {
-            for (var j = 0, jl = elements.length; j < jl; j++) {
+            for (let j = 0, jl = elements.length; j < jl; j++) {
               var morph2 = data.morphs[elements[j].index]
 
               if (morph2.type !== 8) continue
@@ -1149,7 +1149,7 @@ var MMDLoader = (function () {
           t.wrapS = RepeatWrapping
           t.wrapT = RepeatWrapping
 
-          for (var i = 0; i < texture.readyCallbacks.length; i++) {
+          for (let i = 0; i < texture.readyCallbacks.length; i++) {
             texture.readyCallbacks[i](texture)
           }
 
@@ -1208,10 +1208,10 @@ var MMDLoader = (function () {
 
           if (data.length / (width * height) !== 4) return false
 
-          for (var i = 0; i < indices.length; i += 3) {
+          for (let i = 0; i < indices.length; i += 3) {
             var centerUV = { x: 0.0, y: 0.0 }
 
-            for (var j = 0; j < 3; j++) {
+            for (let j = 0; j < 3; j++) {
               var index = indices[i * 3 + j]
               var uv = { x: uvs[index * 2 + 0], y: uvs[index * 2 + 1] }
 
@@ -1287,7 +1287,7 @@ var MMDLoader = (function () {
       var tracks = this.buildSkeletalAnimation(vmd, mesh).tracks
       var tracks2 = this.buildMorphAnimation(vmd, mesh).tracks
 
-      for (var i = 0, il = tracks2.length; i < il; i++) {
+      for (let i = 0, il = tracks2.length; i < il; i++) {
         tracks.push(tracks2[i])
       }
 
@@ -1313,11 +1313,11 @@ var MMDLoader = (function () {
       var bones = mesh.skeleton.bones
       var boneNameDictionary = {}
 
-      for (var i = 0, il = bones.length; i < il; i++) {
+      for (let i = 0, il = bones.length; i < il; i++) {
         boneNameDictionary[bones[i].name] = true
       }
 
-      for (var i = 0; i < vmd.metadata.motionCount; i++) {
+      for (let i = 0; i < vmd.metadata.motionCount; i++) {
         var motion = vmd.motions[i]
         var boneName = motion.boneName
 
@@ -1327,7 +1327,7 @@ var MMDLoader = (function () {
         motions[boneName].push(motion)
       }
 
-      for (var key in motions) {
+      for (let key in motions) {
         var array = motions[key]
 
         array.sort(function (a, b) {
@@ -1342,7 +1342,7 @@ var MMDLoader = (function () {
 
         var basePosition = mesh.skeleton.getBoneByName(key).position.toArray()
 
-        for (var i = 0, il = array.length; i < il; i++) {
+        for (let i = 0, il = array.length; i < il; i++) {
           var time = array[i].frameNum / 30
           var position = array[i].position
           var rotation = array[i].rotation
@@ -1350,9 +1350,9 @@ var MMDLoader = (function () {
 
           times.push(time)
 
-          for (var j = 0; j < 3; j++) positions.push(basePosition[j] + position[j])
-          for (var j = 0; j < 4; j++) rotations.push(rotation[j])
-          for (var j = 0; j < 3; j++) pushInterpolation(pInterpolations, interpolation, j)
+          for (let j = 0; j < 3; j++) positions.push(basePosition[j] + position[j])
+          for (let j = 0; j < 4; j++) rotations.push(rotation[j])
+          for (let j = 0; j < 3; j++) pushInterpolation(pInterpolations, interpolation, j)
 
           pushInterpolation(rInterpolations, interpolation, 3)
         }
@@ -1379,7 +1379,7 @@ var MMDLoader = (function () {
       var morphs = {}
       var morphTargetDictionary = mesh.morphTargetDictionary
 
-      for (var i = 0; i < vmd.metadata.morphCount; i++) {
+      for (let i = 0; i < vmd.metadata.morphCount; i++) {
         var morph = vmd.morphs[i]
         var morphName = morph.morphName
 
@@ -1389,7 +1389,7 @@ var MMDLoader = (function () {
         morphs[morphName].push(morph)
       }
 
-      for (var key in morphs) {
+      for (let key in morphs) {
         var array = morphs[key]
 
         array.sort(function (a, b) {
@@ -1399,7 +1399,7 @@ var MMDLoader = (function () {
         var times = []
         var values = []
 
-        for (var i = 0, il = array.length; i < il; i++) {
+        for (let i = 0, il = array.length; i < il; i++) {
           times.push(array[i].frameNum / 30)
           values.push(array[i].weight)
         }
@@ -1461,7 +1461,7 @@ var MMDLoader = (function () {
       var position = new Vector3()
       var center = new Vector3()
 
-      for (var i = 0, il = cameras.length; i < il; i++) {
+      for (let i = 0, il = cameras.length; i < il; i++) {
         var motion = cameras[i]
 
         var time = motion.frameNum / 30
@@ -1488,14 +1488,14 @@ var MMDLoader = (function () {
 
         fovs.push(fov)
 
-        for (var j = 0; j < 3; j++) {
+        for (let j = 0; j < 3; j++) {
           pushInterpolation(cInterpolations, interpolation, j)
         }
 
         pushInterpolation(qInterpolations, interpolation, 3)
 
         // use the same parameter for x, y, z axis.
-        for (var j = 0; j < 3; j++) {
+        for (let j = 0; j < 3; j++) {
           pushInterpolation(pInterpolations, interpolation, 4)
         }
 
@@ -1532,8 +1532,8 @@ var MMDLoader = (function () {
 
         var index = 1
 
-        for (var aheadIndex = 2, endIndex = times.length; aheadIndex < endIndex; aheadIndex++) {
-          for (var i = 0; i < stride; i++) {
+        for (let aheadIndex = 2, endIndex = times.length; aheadIndex < endIndex; aheadIndex++) {
+          for (let i = 0; i < stride; i++) {
             if (
               values[index * stride + i] !== values[(index - 1) * stride + i] ||
               values[index * stride + i] !== values[aheadIndex * stride + i]
@@ -1546,11 +1546,11 @@ var MMDLoader = (function () {
           if (aheadIndex > index) {
             times[index] = times[aheadIndex]
 
-            for (var i = 0; i < stride; i++) {
+            for (let i = 0; i < stride; i++) {
               values[index * stride + i] = values[aheadIndex * stride + i]
             }
 
-            for (var i = 0; i < interpolateStride; i++) {
+            for (let i = 0; i < interpolateStride; i++) {
               interpolations[index * interpolateStride + i] = interpolations[aheadIndex * interpolateStride + i]
             }
           }
@@ -1616,7 +1616,7 @@ var MMDLoader = (function () {
       } else if (stride === 3) {
         // Vector3
 
-        for (var i = 0; i !== stride; ++i) {
+        for (let i = 0; i !== stride; ++i) {
           var x1 = params[i1 * 12 + i * 4 + 0]
           var x2 = params[i1 * 12 + i * 4 + 1]
           var y1 = params[i1 * 12 + i * 4 + 2]
@@ -1689,7 +1689,7 @@ var MMDLoader = (function () {
 
       var sst3, stt3, ttt
 
-      for (var i = 0; i < loop; i++) {
+      for (let i = 0; i < loop; i++) {
         sst3 = 3.0 * s * s * t
         stt3 = 3.0 * s * t * t
         ttt = t * t * t

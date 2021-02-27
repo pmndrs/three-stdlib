@@ -38,7 +38,7 @@ LineSegments2.prototype = Object.assign(Object.create(Mesh.prototype), {
       var instanceEnd = geometry.attributes.instanceEnd
       var lineDistances = new Float32Array(2 * instanceStart.data.count)
 
-      for (var i = 0, j = 0, l = instanceStart.data.count; i < l; i++, j += 2) {
+      for (let i = 0, j = 0, l = instanceStart.data.count; i < l; i++, j += 2) {
         start.fromBufferAttribute(instanceStart, i)
         end.fromBufferAttribute(instanceEnd, i)
 
@@ -108,7 +108,7 @@ LineSegments2.prototype = Object.assign(Object.create(Mesh.prototype), {
       var matrixWorld = this.matrixWorld
       mvMatrix.multiplyMatrices(camera.matrixWorldInverse, matrixWorld)
 
-      for (var i = 0, l = instanceStart.count; i < l; i++) {
+      for (let i = 0, l = instanceStart.count; i < l; i++) {
         start.fromBufferAttribute(instanceStart, i)
         end.fromBufferAttribute(instanceEnd, i)
 
