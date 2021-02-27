@@ -21,12 +21,10 @@ import {
   WebGLRenderTarget,
   ZeroFactor,
 } from 'three'
-import { Pass } from '../postprocessing/Pass.js'
-import { SimplexNoise } from '../math/SimplexNoise.js'
-import { SSAOShader } from '../shaders/SSAOShader.js'
-import { SSAOBlurShader } from '../shaders/SSAOShader.js'
-import { SSAODepthShader } from '../shaders/SSAOShader.js'
-import { CopyShader } from '../shaders/CopyShader.js'
+import { Pass } from '../postprocessing/Pass'
+import { SimplexNoise } from '../math/SimplexNoise'
+import { SSAOBlurShader, SSAODepthShader, SSAOShader } from '../shaders/SSAOShader'
+import { CopyShader } from '../shaders/CopyShader'
 
 var SSAOPass = function (scene, camera, width, height) {
   Pass.call(this)
