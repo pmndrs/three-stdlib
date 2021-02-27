@@ -803,13 +803,13 @@ var GLTFLoader = (function () {
     var attributeNormalizedMap = {}
     var attributeTypeMap = {}
 
-    for (let attributeName in gltfAttributeMap) {
+    for (const attributeName in gltfAttributeMap) {
       var threeAttributeName = ATTRIBUTES[attributeName] || attributeName.toLowerCase()
 
       threeAttributeMap[threeAttributeName] = gltfAttributeMap[attributeName]
     }
 
-    for (attributeName in primitive.attributes) {
+    for (const attributeName in primitive.attributes) {
       var threeAttributeName = ATTRIBUTES[attributeName] || attributeName.toLowerCase()
 
       if (gltfAttributeMap[attributeName] !== undefined) {
@@ -826,7 +826,7 @@ var GLTFLoader = (function () {
         dracoLoader.decodeDracoFile(
           bufferView,
           function (geometry) {
-            for (let attributeName in geometry.attributes) {
+            for (const attributeName in geometry.attributes) {
               var attribute = geometry.attributes[attributeName]
               var normalized = attributeNormalizedMap[attributeName]
 
