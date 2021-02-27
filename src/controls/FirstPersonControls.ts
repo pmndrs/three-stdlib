@@ -30,20 +30,27 @@ class FirstPersonControls extends EventDispatcher {
   moveBackward: boolean
   moveLeft: boolean
   moveRight: boolean
+  moveUp: boolean
+  moveDown: boolean
   viewHalfX: number
   viewHalfY: number
 
-  // handleResize: () => void
+  handleResize: () => void
   dispose: () => void
-  lookAt: (x: number | Vector3, y: number, z: number) => any
-  onMouseDown: (event: KeyboardEvent) => void
+  onMouseMove: (event: MouseEvent) => void
+  onMouseDown: (event: MouseEvent) => void
+  onMouseUp: (event: MouseEvent) => void
+  onKeyDown: (event: KeyboardEvent) => void
+  onKeyUp: (event: KeyboardEvent) => void
+  lookAt: (x: Vector3 | number, y: number, z: number) => any
+  update: (delta: number) => void
 
   constructor(object: Camera, domElement: HTMLElement) {
     super()
 
     if (domElement === undefined) {
       console.warn('THREE.FirstPersonControls: The second parameter "domElement" is now mandatory.')
-      domElement = document
+      domElement = document as any
     }
 
     this.object = object
@@ -83,6 +90,8 @@ class FirstPersonControls extends EventDispatcher {
     this.moveBackward = false
     this.moveLeft = false
     this.moveRight = false
+    this.moveUp = false
+    this.moveDown = false
 
     this.viewHalfX = 0
     this.viewHalfY = 0
@@ -98,14 +107,24 @@ class FirstPersonControls extends EventDispatcher {
 
     //
 
-    if ((this.domElement as any) === document) {
-      this.domElement.setAttribute('tabindex', -1)
+    if (this.domElement !== (document as any)) {
+      this.domElement.setAttribute('tabindex', '-1')
     }
 
     //
 
-    this.onMouseDown = (event) => {
-      if ((this.domElement as any) === document) {
+    this.handleResize = () => {
+      if (this.domElement === (document as any)) {
+        this.viewHalfX = window.innerWidth / 2
+        this.viewHalfY = window.innerHeight / 2
+      } else {
+        this.viewHalfX = this.domElement.offsetWidth / 2
+        this.viewHalfY = this.domElement.offsetHeight / 2
+      }
+    }
+
+    this.onMouseDown = function (event) {
+      if (this.domElement !== document) {
         this.domElement.focus()
       }
 
@@ -125,7 +144,7 @@ class FirstPersonControls extends EventDispatcher {
       this.mouseDragOn = true
     }
 
-    this.onMouseUp = (event) => {
+    this.onMouseUp = function (event) {
       event.preventDefault()
 
       if (this.activeLook) {
@@ -142,8 +161,8 @@ class FirstPersonControls extends EventDispatcher {
       this.mouseDragOn = false
     }
 
-    this.onMouseMove = (event) => {
-      if ((this.domElement as any) === document) {
+    this.onMouseMove = function (event) {
+      if (this.domElement === document) {
         this.mouseX = event.pageX - this.viewHalfX
         this.mouseY = event.pageY - this.viewHalfY
       } else {
@@ -152,7 +171,7 @@ class FirstPersonControls extends EventDispatcher {
       }
     }
 
-    this.onKeyDown = (event) => {
+    this.onKeyDown = function (event) {
       //event.preventDefault();
 
       switch (event.code) {
@@ -185,7 +204,7 @@ class FirstPersonControls extends EventDispatcher {
       }
     }
 
-    this.onKeyUp = (event) => {
+    this.onKeyUp = function (event) {
       switch (event.code) {
         case 'ArrowUp':
         case 'KeyW':
@@ -233,7 +252,7 @@ class FirstPersonControls extends EventDispatcher {
     this.update = (() => {
       const targetPosition = new Vector3()
 
-      return function update(delta) {
+      return (delta: number) => {
         if (this.enabled === false) return
 
         if (this.heightSpeed) {
@@ -290,12 +309,12 @@ class FirstPersonControls extends EventDispatcher {
       }
     })()
 
-    // function contextmenu(event) {
-    //   event.preventDefault()
-    // }
+    function contextmenu(event: Event) {
+      event.preventDefault()
+    }
 
-    this.dispose = () => {
-      this.domElement.removeEventListener('contextmenu', this.contextmenu)
+    this.dispose = function () {
+      this.domElement.removeEventListener('contextmenu', contextmenu)
       this.domElement.removeEventListener('mousedown', _onMouseDown)
       this.domElement.removeEventListener('mousemove', _onMouseMove)
       this.domElement.removeEventListener('mouseup', _onMouseUp)
@@ -310,7 +329,7 @@ class FirstPersonControls extends EventDispatcher {
     var _onKeyDown = bind(this, this.onKeyDown)
     var _onKeyUp = bind(this, this.onKeyUp)
 
-    this.domElement.addEventListener('contextmenu', this.contextmenu)
+    this.domElement.addEventListener('contextmenu', contextmenu)
     this.domElement.addEventListener('mousemove', _onMouseMove)
     this.domElement.addEventListener('mousedown', _onMouseDown)
     this.domElement.addEventListener('mouseup', _onMouseUp)
@@ -318,13 +337,13 @@ class FirstPersonControls extends EventDispatcher {
     window.addEventListener('keydown', _onKeyDown)
     window.addEventListener('keyup', _onKeyUp)
 
-    function bind(scope, fn) {
+    function bind(scope: FirstPersonControls, fn: Function) {
       return function () {
         fn.apply(scope, arguments)
       }
     }
 
-    function setOrientation(controls) {
+    function setOrientation(controls: FirstPersonControls) {
       const quaternion = controls.object.quaternion
 
       lookDirection.set(0, 0, -1).applyQuaternion(quaternion)
@@ -336,20 +355,6 @@ class FirstPersonControls extends EventDispatcher {
     this.handleResize()
 
     setOrientation(this)
-  }
-
-  handleResize = () => {
-    if ((this.domElement as any) === document) {
-      this.viewHalfX = window.innerWidth / 2
-      this.viewHalfY = window.innerHeight / 2
-    } else {
-      this.viewHalfX = this.domElement.offsetWidth / 2
-      this.viewHalfY = this.domElement.offsetHeight / 2
-    }
-  }
-
-  contextmenu = (event: Event) => {
-    event.preventDefault()
   }
 }
 
