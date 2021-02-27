@@ -16,7 +16,7 @@ Our main goals are:
 - Real, npm/node conform esm modules with marked dependencies
 - Class based, optimized for tree-shaking, no global pollution, exports instead of collections
 - A build system for esm and cjs
-- Flatbundle
+- Single flatbundle as well as individual transpiles
 - Typesafety with simple annotation-like types
 - CI, tests, linting, formatting (prettier)
 
