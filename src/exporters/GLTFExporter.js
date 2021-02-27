@@ -1223,7 +1223,7 @@ const GLTFExporter = (() => {
       const materials = isMultiMaterial ? mesh.material : [mesh.material]
       const groups = isMultiMaterial ? geometry.groups : [{ materialIndex: 0, start: undefined, count: undefined }]
 
-      for (const i = 0, il = groups.length; i < il; i++) {
+      for (let i = 0, il = groups.length; i < il; i++) {
         const primitive = {
           mode,
           attributes,
