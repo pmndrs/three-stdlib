@@ -564,7 +564,7 @@ const MMDAnimationHelper = (() => {
 
         if (mixer === undefined) continue
 
-        for (const j = 0, jl = mixer._actions.length; j < jl; j++) {
+        for (let j = 0, jl = mixer._actions.length; j < jl; j++) {
           mixer._actions[j]._clip.duration = max
         }
       }
