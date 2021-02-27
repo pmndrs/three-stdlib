@@ -111,7 +111,7 @@ class OrbitControls extends EventDispatcher {
 
     this.getAzimuthalAngle = () => spherical.theta
 
-    this.listenToKeyEvents = function (domElement) {
+    this.listenToKeyEvents = (domElement) => {
       domElement.addEventListener('keydown', onKeyDown)
       this._domElementKeyEvents = domElement
     }
