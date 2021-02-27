@@ -2,7 +2,7 @@ import { MathUtils, Spherical, Vector3, EventDispatcher, Camera } from 'three'
 
 class FirstPersonControls extends EventDispatcher {
   object: Camera
-  domElement: HTMLElement
+  domElement: HTMLElement | Document
 
   enabled: boolean
 
@@ -44,12 +44,12 @@ class FirstPersonControls extends EventDispatcher {
 
   dispose: () => void
 
-  constructor(object: Camera, domElement: HTMLElement) {
+  constructor(object: Camera, domElement: HTMLElement | Document) {
     super()
 
     if (domElement === undefined) {
       console.warn('THREE.FirstPersonControls: The second parameter "domElement" is now mandatory.')
-      domElement = document as any
+      domElement = document
     }
 
     this.object = object
@@ -106,7 +106,7 @@ class FirstPersonControls extends EventDispatcher {
 
     //
 
-    if (this.domElement !== (document as any)) {
+    if (this.domElement instanceof HTMLElement) {
       this.domElement.setAttribute('tabindex', '-1')
     }
 
@@ -146,7 +146,7 @@ class FirstPersonControls extends EventDispatcher {
   }
 
   handleResize = () => {
-    if (this.domElement === (document as any)) {
+    if (this.domElement instanceof Document) {
       this.viewHalfX = window.innerWidth / 2
       this.viewHalfY = window.innerHeight / 2
     } else {
@@ -156,7 +156,7 @@ class FirstPersonControls extends EventDispatcher {
   }
 
   onMouseDown = (event: MouseEvent) => {
-    if ((this.domElement as any) !== document) {
+    if (this.domElement instanceof HTMLElement) {
       this.domElement.focus()
     }
 
@@ -194,7 +194,7 @@ class FirstPersonControls extends EventDispatcher {
   }
 
   onMouseMove = (event: MouseEvent) => {
-    if ((this.domElement as any) === document) {
+    if (this.domElement instanceof Document) {
       this.mouseX = event.pageX - this.viewHalfX
       this.mouseY = event.pageY - this.viewHalfY
     } else {
@@ -269,7 +269,6 @@ class FirstPersonControls extends EventDispatcher {
 
   lookAt = (x: Vector3 | number, y?: number, z?: number) => {
     if (x instanceof Vector3) {
-      x.isVector3
       this.target.copy(x)
     } else if (y && z) {
       this.target.set(x, y, z)
