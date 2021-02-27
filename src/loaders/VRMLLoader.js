@@ -34,17 +34,9 @@ import {
   Vector2,
   Vector3,
 } from 'three'
-import { chevrotain } from '../libs/chevrotain.module.min.js'
+import { Lexer, Parser, createToken } from 'chevrotain'
 
 var VRMLLoader = (function () {
-  // dependency check
-
-  if (typeof chevrotain === 'undefined') {
-    // eslint-disable-line no-undef
-
-    throw Error('THREE.VRMLLoader: External library chevrotain.min.js required.')
-  }
-
   // class definitions
 
   function VRMLLoader(manager) {
@@ -118,8 +110,6 @@ var VRMLLoader = (function () {
       }
 
       function createTokens() {
-        var createToken = chevrotain.createToken // eslint-disable-line no-undef
-
         // from http://gun.teipir.gr/VRML-amgem/spec/part1/concepts.html#SyntaxBasics
 
         var RouteIdentifier = createToken({
@@ -256,7 +246,7 @@ var VRMLLoader = (function () {
         var Comment = createToken({
           name: 'Comment',
           pattern: /#.*/,
-          group: chevrotain.Lexer.SKIPPED, // eslint-disable-line no-undef
+          group: Lexer.SKIPPED, // eslint-disable-line no-undef
         })
 
         // commas, blanks, tabs, newlines and carriage returns are whitespace characters wherever they appear outside of string fields
@@ -264,7 +254,7 @@ var VRMLLoader = (function () {
         var WhiteSpace = createToken({
           name: 'WhiteSpace',
           pattern: /[ ,\s]/,
-          group: chevrotain.Lexer.SKIPPED, // eslint-disable-line no-undef
+          group: Lexer.SKIPPED, // eslint-disable-line no-undef
         })
 
         var tokens = [
@@ -2769,7 +2759,7 @@ var VRMLLoader = (function () {
   })
 
   function VRMLLexer(tokens) {
-    this.lexer = new chevrotain.Lexer(tokens) // eslint-disable-line no-undef
+    this.lexer = new Lexer(tokens) // eslint-disable-line no-undef
   }
 
   VRMLLexer.prototype = {
@@ -2789,7 +2779,7 @@ var VRMLLoader = (function () {
   }
 
   function VRMLParser(tokenVocabulary) {
-    chevrotain.Parser.call(this, tokenVocabulary) // eslint-disable-line no-undef
+    Parser.call(this, tokenVocabulary) // eslint-disable-line no-undef
 
     var $ = this
 
@@ -2984,7 +2974,7 @@ var VRMLLoader = (function () {
     this.performSelfAnalysis()
   }
 
-  VRMLParser.prototype = Object.create(chevrotain.Parser.prototype) // eslint-disable-line no-undef
+  VRMLParser.prototype = Object.create(Parser.prototype) // eslint-disable-line no-undef
   VRMLParser.prototype.constructor = VRMLParser
 
   function Face(a, b, c) {

@@ -12,7 +12,7 @@ import {
   Quaternion,
   Vector3,
 } from 'three'
-import { unzipSync, strFromU8 } from '../libs/fflate.module.min.js'
+import { unzipSync, strFromU8 } from 'fflate'
 
 class TiltLoader extends Loader {
   load(url, onLoad, onProgress, onError) {

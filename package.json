@@ -63,8 +63,12 @@
   "dependencies": {
     "@webgpu/glslang": "^0.0.15",
     "@webxr-input-profiles/motion-controllers": "^1.0.0",
+    "chevrotain": "^7.1.2",
     "fflate": "^0.6.4",
-    "mmd-parser": "^1.0.3"
+    "ktx-parse": "^0.0.5",
+    "mmd-parser": "^1.0.3",
+    "opentype.js": "^1.3.3",
+    "zstddec": "^0.0.2"
   },
   "peerDependencies": {
     "three": ">=0.125.0"

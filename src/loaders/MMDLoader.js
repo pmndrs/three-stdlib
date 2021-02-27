@@ -31,7 +31,7 @@ import {
   VectorKeyframeTrack,
 } from 'three'
 import { TGALoader } from '../loaders/TGALoader.js'
-import { MMDParser } from '../libs/mmdparser.module.js'
+import { Parser } from 'mmd-parser'
 
 /**
  * Dependencies
@@ -321,11 +321,7 @@ var MMDLoader = (function () {
 
     _getParser: function () {
       if (this.parser === null) {
-        if (typeof MMDParser === 'undefined') {
-          throw new Error('THREE.MMDLoader: Import MMDParser https://github.com/takahirox/mmd-parser')
-        }
-
-        this.parser = new MMDParser.Parser() // eslint-disable-line no-undef
+        this.parser = new Parser() // eslint-disable-line no-undef
       }
 
       return this.parser
