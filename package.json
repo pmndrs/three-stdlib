@@ -1,6 +1,6 @@
 {
   "name": "three-stdlib",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "private": true,
   "description": "",
   "main": "index.cjs.js",
