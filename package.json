@@ -57,12 +57,15 @@
     "rollup-plugin-json": "^4.0.0",
     "rollup-plugin-multi-input": "^1.1.1",
     "rollup-plugin-node-resolve": "^5.2.0",
-    "rollup-plugin-size-snapshot": "^0.12.0"
+    "rollup-plugin-size-snapshot": "^0.12.0",
+    "three": "^0.126.0"
   },
   "dependencies": {
     "@webgpu/glslang": "^0.0.15",
     "@webxr-input-profiles/motion-controllers": "^1.0.0",
-    "fflate": "^0.6.4",
-    "three": "^0.126.0"
+    "fflate": "^0.6.4"
+  },
+  "peerDependencies": {
+    "three": ">=0.125.0"
   }
 }
