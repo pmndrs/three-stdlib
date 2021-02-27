@@ -42,7 +42,7 @@ import {
   VectorKeyframeTrack,
   sRGBEncoding,
 } from 'three'
-import * as fflate from '../libs/fflate.module.min.js'
+import { unzlibSync } from 'fflate'
 import { NURBSCurve } from '../curves/NURBSCurve.js'
 
 /**
@@ -2866,11 +2866,7 @@ var FBXLoader = (function () {
             }
           }
 
-          if (typeof fflate === 'undefined') {
-            console.error('THREE.FBXLoader: External library fflate.min.js required.')
-          }
-
-          var data = fflate.unzlibSync(new Uint8Array(reader.getArrayBuffer(compressedLength))) // eslint-disable-line no-undef
+          var data = unzlibSync(new Uint8Array(reader.getArrayBuffer(compressedLength))) // eslint-disable-line no-undef
           var reader2 = new BinaryReader(data.buffer)
 
           switch (type) {

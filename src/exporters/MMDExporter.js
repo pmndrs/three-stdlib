@@ -1,5 +1,5 @@
 import { Matrix4, Quaternion, Vector3 } from 'three'
-import { MMDParser } from '../libs/mmdparser.module.js'
+import { CharsetEncoder } from 'mmd-parser'
 
 /**
  * Dependencies
@@ -12,7 +12,7 @@ const MMDExporter = function () {
 
   function unicodeToShiftjis(str) {
     if (u2sTable === undefined) {
-      const encoder = new MMDParser.CharsetEncoder() // eslint-disable-line no-undef
+      const encoder = new CharsetEncoder() // eslint-disable-line no-undef
       const table = encoder.s2uTable
       u2sTable = {}
 

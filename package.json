@@ -63,7 +63,8 @@
   "dependencies": {
     "@webgpu/glslang": "^0.0.15",
     "@webxr-input-profiles/motion-controllers": "^1.0.0",
-    "fflate": "^0.6.4"
+    "fflate": "^0.6.4",
+    "mmd-parser": "^1.0.3"
   },
   "peerDependencies": {
     "three": ">=0.125.0"

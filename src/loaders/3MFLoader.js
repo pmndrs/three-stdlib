@@ -20,7 +20,7 @@ import {
   TextureLoader,
   sRGBEncoding,
 } from 'three'
-import * as fflate from '../libs/fflate.module.min.js'
+import { unzipSync } from 'fflate'
 
 /**
  *
@@ -99,7 +99,7 @@ ThreeMFLoader.prototype = Object.assign(Object.create(Loader.prototype), {
       var otherParts = {}
 
       try {
-        zip = fflate.unzipSync(new Uint8Array(data)) // eslint-disable-line no-undef
+        zip = unzipSync(new Uint8Array(data)) // eslint-disable-line no-undef
       } catch (e) {
         if (e instanceof ReferenceError) {
           console.error('THREE.3MFLoader: fflate missing and file is compressed.')

@@ -12,7 +12,7 @@ import {
   RGBFormat,
   UnsignedByteType,
 } from 'three'
-import * as fflate from '../libs/fflate.module.min.js'
+import { unzlibSync } from 'fflate'
 
 /**
  * OpenEXR loader currently supports uncompressed, ZIP(S), RLE, PIZ and DWA/B compression.
@@ -1065,12 +1065,7 @@ EXRLoader.prototype = Object.assign(Object.create(DataTextureLoader.prototype), 
 
     function uncompressZIP(info) {
       var compressed = info.array.slice(info.offset.value, info.offset.value + info.size)
-
-      if (typeof fflate === 'undefined') {
-        console.error('THREE.EXRLoader: External library fflate.min.js required.')
-      }
-
-      var rawBuffer = fflate.unzlibSync(compressed) // eslint-disable-line no-undef
+      var rawBuffer = unzlibSync(compressed) // eslint-disable-line no-undef
       var tmpBuffer = new Uint8Array(rawBuffer.length)
 
       predictor(rawBuffer) // revert predictor

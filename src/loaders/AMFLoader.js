@@ -9,7 +9,7 @@ import {
   Mesh,
   MeshPhongMaterial,
 } from 'three'
-import * as fflate from '../libs/fflate.module.min.js'
+import { unzipSync } from 'fflate'
 
 /**
  * Description: Early release of an AMF Loader following the pattern of the
@@ -76,7 +76,7 @@ AMFLoader.prototype = Object.assign(Object.create(Loader.prototype), {
         console.log('THREE.AMFLoader: Loading Zip')
 
         try {
-          zip = fflate.unzipSync(new Uint8Array(data)) // eslint-disable-line no-undef
+          zip = unzipSync(new Uint8Array(data)) // eslint-disable-line no-undef
         } catch (e) {
           if (e instanceof ReferenceError) {
             console.log('THREE.AMFLoader: fflate missing and file is compressed.')

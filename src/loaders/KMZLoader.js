@@ -1,6 +1,6 @@
 import { FileLoader, Group, Loader, LoadingManager } from 'three'
 import { ColladaLoader } from '../loaders/ColladaLoader.js'
-import * as fflate from '../libs/fflate.module.min.js'
+import { unzipSync } from 'fflate'
 
 var KMZLoader = function (manager) {
   Loader.call(this, manager)
@@ -64,7 +64,7 @@ KMZLoader.prototype = Object.assign(Object.create(Loader.prototype), {
 
     //
 
-    var zip = fflate.unzipSync(new Uint8Array(data)) // eslint-disable-line no-undef
+    var zip = unzipSync(new Uint8Array(data)) // eslint-disable-line no-undef
 
     if (zip['doc.kml']) {
       var xml = new DOMParser().parseFromString(fflate.strFromU8(zip['doc.kml']), 'application/xml') // eslint-disable-line no-undef

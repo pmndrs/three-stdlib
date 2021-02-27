@@ -1,5 +1,5 @@
 import { FileLoader, Loader, Matrix4, Vector3 } from 'three'
-import * as fflate from '../libs/fflate.module.min.js'
+import { gunzipSync } from 'fflate'
 import { Volume } from '../misc/Volume.js'
 
 var NRRDLoader = function (manager) {
@@ -242,7 +242,7 @@ NRRDLoader.prototype = Object.assign(Object.create(Loader.prototype), {
     if (headerObject.encoding.substring(0, 2) === 'gz') {
       // we need to decompress the datastream
       // here we start the unzipping and get a typed Uint8Array back
-      _data = fflate.gunzipSync(new Uint8Array(_data)) // eslint-disable-line no-undef
+      _data = gunzipSync(new Uint8Array(_data)) // eslint-disable-line no-undef
     } else if (
       headerObject.encoding === 'ascii' ||
       headerObject.encoding === 'text' ||

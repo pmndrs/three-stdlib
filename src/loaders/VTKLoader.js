@@ -1,5 +1,5 @@
 import { BufferAttribute, BufferGeometry, FileLoader, Float32BufferAttribute, Loader, LoaderUtils } from 'three'
-import * as fflate from '../libs/fflate.module.min.js'
+import { unzlibSync } from 'fflate'
 
 var VTKLoader = function (manager) {
   Loader.call(this, manager)
@@ -624,7 +624,7 @@ VTKLoader.prototype = Object.assign(Object.create(Loader.prototype), {
           }
 
           for (let i = 0; i < dataOffsets.length - 1; i++) {
-            var data = fflate.unzlibSync(byteData.slice(dataOffsets[i], dataOffsets[i + 1])) // eslint-disable-line no-undef
+            var data = unzlibSync(byteData.slice(dataOffsets[i], dataOffsets[i + 1])) // eslint-disable-line no-undef
             content = data.buffer
 
             if (ele.attributes.type === 'Float32') {
