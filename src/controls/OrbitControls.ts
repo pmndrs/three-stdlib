@@ -759,12 +759,12 @@ class OrbitControls extends EventDispatcher {
       scope.domElement.ownerDocument.removeEventListener('pointerup', onPointerUp)
 
       if (scope.enabled === false) return
-      handleMouseUp(event)
+      handleMouseUp()
       scope.dispatchEvent(endEvent)
       state = STATE.NONE
     }
 
-    function onMouseWheel(event: MouseEvent) {
+    function onMouseWheel(event: WheelEvent) {
       if (scope.enabled === false || scope.enableZoom === false || (state !== STATE.NONE && state !== STATE.ROTATE)) {
         return
       }
@@ -876,12 +876,12 @@ class OrbitControls extends EventDispatcher {
     function onTouchEnd(event: TouchEvent) {
       if (scope.enabled === false) return
 
-      handleTouchEnd(event)
+      handleTouchEnd()
       scope.dispatchEvent(endEvent)
       state = STATE.NONE
     }
 
-    function onContextMenu(event) {
+    function onContextMenu(event: Event) {
       if (scope.enabled === false) return
       event.preventDefault()
     }
