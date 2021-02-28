@@ -9,7 +9,7 @@
     "prebuild": "rimraf dist",
     "build": "rollup -c && npm run copy",
     "prepare": "npm run build",
-    "types": "tsc",
+    "types": "tsc --noEmit --emitDeclarationOnly false",
     "eslint": "eslint --cache --fix src/**/*.{ts,tsx}",
     "eslint:ci": "eslint src/**/*.{ts,tsx}",
     "copy": "copyfiles package.json readme.md LICENSE dist && json -I -f dist/package.json -e \"this.private=false; this.devDependencies=undefined; this.optionalDependencies=undefined; this.scripts=undefined; this.husky=undefined; this.prettier=undefined; this.jest=undefined; this['lint-staged']=undefined;\"",
@@ -27,7 +27,7 @@
       "eslint --fix"
     ],
     "*.{ts,tsx}": [
-      "tsc"
+      "tsc --noEmit --emitDeclarationOnly false"
     ]
   },
   "repository": {
