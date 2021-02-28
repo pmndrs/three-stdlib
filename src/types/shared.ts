@@ -1,3 +1,5 @@
+import { Color } from 'three'
+
 export type TUniform<TValue = any> = {
   type?: string
   value: TValue
@@ -13,3 +15,5 @@ export type GenericShader<TShaderUniforms = GenericUniforms> = {
   fragmentShader: string
   vertexShader: string
 }
+
+export type ColorOptions = Color | string | number
