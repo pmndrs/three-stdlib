@@ -21,10 +21,6 @@ class DragControls extends EventDispatcher {
   private _selected: any
   private _hovered: any
 
-  activate: () => void
-  deactivate: () => void
-  dispose: () => void
-
   constructor(_objects: any, _camera: Camera, _domElement: HTMLElement) {
     super()
 
@@ -44,43 +40,38 @@ class DragControls extends EventDispatcher {
     this._selected = null
     this._hovered = null
 
-    function activate() {
-      _domElement.addEventListener('pointermove', this.onPointerMove)
-      _domElement.addEventListener('pointerdown', this.onPointerDown)
-      _domElement.addEventListener('pointerup', this.onPointerCancel)
-      _domElement.addEventListener('pointerleave', this.onPointerCancel)
-      _domElement.addEventListener('touchmove', this.onTouchMove)
-      _domElement.addEventListener('touchstart', this.onTouchStart)
-      _domElement.addEventListener('touchend', this.onTouchEnd)
-    }
-
-    function deactivate() {
-      _domElement.removeEventListener('pointermove', this.onPointerMove)
-      _domElement.removeEventListener('pointerdown', this.onPointerDown)
-      _domElement.removeEventListener('pointerup', this.onPointerCancel)
-      _domElement.removeEventListener('pointerleave', this.onPointerCancel)
-      _domElement.removeEventListener('touchmove', this.onTouchMove)
-      _domElement.removeEventListener('touchstart', this.onTouchStart)
-      _domElement.removeEventListener('touchend', this.onTouchEnd)
-
-      _domElement.style.cursor = ''
-    }
-
-    function dispose() {
-      deactivate()
-    }
-
-    activate()
+    this.activate()
 
     // API
 
     this.enabled = true
     this.transformGroup = false
-
-    this.activate = activate
-    this.deactivate = deactivate
-    this.dispose = dispose
   }
+
+  activate = () => {
+    this._domElement.addEventListener('pointermove', this.onPointerMove)
+    this._domElement.addEventListener('pointerdown', this.onPointerDown)
+    this._domElement.addEventListener('pointerup', this.onPointerCancel)
+    this._domElement.addEventListener('pointerleave', this.onPointerCancel)
+    this._domElement.addEventListener('touchmove', this.onTouchMove)
+    this._domElement.addEventListener('touchstart', this.onTouchStart)
+    this._domElement.addEventListener('touchend', this.onTouchEnd)
+  }
+
+  deactivate = () => {
+    this._domElement.removeEventListener('pointermove', this.onPointerMove)
+    this._domElement.removeEventListener('pointerdown', this.onPointerDown)
+    this._domElement.removeEventListener('pointerup', this.onPointerCancel)
+    this._domElement.removeEventListener('pointerleave', this.onPointerCancel)
+    this._domElement.removeEventListener('touchmove', this.onTouchMove)
+    this._domElement.removeEventListener('touchstart', this.onTouchStart)
+    this._domElement.removeEventListener('touchend', this.onTouchEnd)
+
+    this._domElement.style.cursor = ''
+  }
+
+  // TODO: confirm if this can be removed?
+  dispose = () => this.deactivate()
 
   getObjects = () => this._objects
 
