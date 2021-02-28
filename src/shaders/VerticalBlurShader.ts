@@ -8,7 +8,17 @@
  * - "h" and "v" parameters should be set to "1 / width" and "1 / height"
  */
 
-var VerticalBlurShader = {
+import { Texture } from 'three'
+import { TUniform, GenericShader } from 'types/shared'
+
+export interface VerticalBlurShaderUniforms {
+  tDiffuse: TUniform<Texture | null>
+  v: TUniform<number>
+}
+
+export type VerticalBlurShaderImpl = GenericShader<VerticalBlurShaderUniforms>
+
+const VerticalBlurShader: VerticalBlurShaderImpl = {
   uniforms: {
     tDiffuse: { value: null },
     v: { value: 1.0 / 512.0 },
