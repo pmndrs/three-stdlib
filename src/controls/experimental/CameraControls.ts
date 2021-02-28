@@ -1037,12 +1037,13 @@ class CameraControls extends EventDispatcher {
   }
 }
 
-// OrbitControls maintains the "up" direction, camera.up (+Y by default).
-//
-//    Orbit - left mouse / touch: one-finger move
-//    Zoom - middle mouse, or mousewheel / touch: two-finger spread or squish
-//    Pan - right mouse, or left mouse + ctrl/meta/shiftKey, or arrow keys / touch: two-finger move
-
+/**
+ * OrbitControls maintains the "up" direction, camera.up (+Y by default).
+ *
+ * @event Orbit - left mouse / touch: one-finger move
+ * @event Zoom - middle mouse, or mousewheel / touch: two-finger spread or squish
+ * @event Pan - right mouse, or left mouse + ctrl/meta/shiftKey, or arrow keys / touch: two-finger move
+ */
 class OrbitControlsExp extends EventDispatcher {
   constructor(object, domElement) {
     super()
@@ -1057,12 +1058,13 @@ class OrbitControlsExp extends EventDispatcher {
   }
 }
 
-// MapControls maintains the "up" direction, camera.up (+Y by default)
-//
-//    Orbit - right mouse, or left mouse + ctrl/meta/shiftKey / touch: two-finger rotate
-//    Zoom - middle mouse, or mousewheel / touch: two-finger spread or squish
-//    Pan - left mouse, or left right + ctrl/meta/shiftKey, or arrow keys / touch: one-finger move
-
+/**
+ * MapControls maintains the "up" direction, camera.up (+Y by default)
+ *
+ * @event Orbit - right mouse, or left mouse + ctrl/meta/shiftKey / touch: two-finger rotate
+ * @event Zoom - middle mouse, or mousewheel / touch: two-finger spread or squish
+ * @event Pan - left mouse, or left right + ctrl/meta/shiftKey, or arrow keys / touch: one-finger move
+ */
 class MapControlsExp extends EventDispatcher {
   constructor(object, domElement) {
     super()
@@ -1077,12 +1079,13 @@ class MapControlsExp extends EventDispatcher {
   }
 }
 
-// TrackballControls allows the camera to rotate over the polls and does not maintain camera.up
-//
-//    Orbit - left mouse / touch: one-finger move
-//    Zoom - middle mouse, or mousewheel / touch: two-finger spread or squish
-//    Pan - right mouse, or left mouse + ctrl/meta/shiftKey, or arrow keys / touch: two-finger move
-
+/**
+ * TrackballControls allows the camera to rotate over the polls and does not maintain camera.up
+ *
+ * @event Orbit - left mouse / touch: one-finger move
+ * @event Zoom - middle mouse, or mousewheel / touch: two-finger spread or squish
+ * @event Pan - right mouse, or left mouse + ctrl/meta/shiftKey, or arrow keys / touch: two-finger move
+ */
 class TrackballControlsExp extends EventDispatcher {
   trackball: boolean
   screenSpacePanning: boolean
