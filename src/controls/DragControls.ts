@@ -1,7 +1,7 @@
-import { Camera, EventDispatcher, Matrix4, Plane, Raycaster, Vector2, Vector3 } from 'three'
+import { Camera, EventDispatcher, Intersection, Matrix4, Object3D, Plane, Raycaster, Vector2, Vector3 } from 'three'
 
 class DragControls extends EventDispatcher {
-  _objects: any
+  _objects: Object3D[]
   _camera: Camera
   _domElement: HTMLElement
 
@@ -16,12 +16,12 @@ class DragControls extends EventDispatcher {
   private _intersection: Vector3
   private _worldPosition: Vector3
   private _inverseMatrix: Matrix4
-  private _intersections: any
+  private _intersections: Intersection[]
 
-  private _selected: any
-  private _hovered: any
+  private _selected: Object3D | null
+  private _hovered: Object3D | null
 
-  constructor(_objects: any, _camera: Camera, _domElement: HTMLElement) {
+  constructor(_objects: Object3D[], _camera: Camera, _domElement: HTMLElement) {
     super()
 
     this._objects = _objects
