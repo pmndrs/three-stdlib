@@ -1,12 +1,12 @@
 import { Camera, EventDispatcher, Intersection, Matrix4, Object3D, Plane, Raycaster, Vector2, Vector3 } from 'three'
 
 class DragControls extends EventDispatcher {
-  _objects: Object3D[]
-  _camera: Camera
-  _domElement: HTMLElement
-
   enabled: boolean
   transformGroup: boolean
+
+  private _objects: Object3D[]
+  private _camera: Camera
+  private _domElement: HTMLElement
 
   private _plane: Plane
   private _raycaster: Raycaster
@@ -75,19 +75,6 @@ class DragControls extends EventDispatcher {
 
   getObjects = () => this._objects
 
-  onPointerMove = (event: PointerEvent) => {
-    event.preventDefault()
-
-    switch (event.pointerType) {
-      case 'mouse':
-      case 'pen':
-        this.onMouseMove(event)
-        break
-
-      // TODO touch
-    }
-  }
-
   onMouseMove = (event: MouseEvent) => {
     const rect = this._domElement.getBoundingClientRect()
 
@@ -135,19 +122,6 @@ class DragControls extends EventDispatcher {
     }
   }
 
-  onPointerDown = (event: PointerEvent) => {
-    event.preventDefault()
-
-    switch (event.pointerType) {
-      case 'mouse':
-      case 'pen':
-        this.onMouseDown(event)
-        break
-
-      // TODO touch
-    }
-  }
-
   onMouseDown = (event: MouseEvent) => {
     event.preventDefault()
 
@@ -170,6 +144,44 @@ class DragControls extends EventDispatcher {
     }
   }
 
+  onMouseCancel = (event: MouseEvent) => {
+    event.preventDefault()
+
+    if (this._selected) {
+      this.dispatchEvent({ type: 'dragend', object: this._selected })
+
+      this._selected = null
+    }
+
+    this._domElement.style.cursor = this._hovered ? 'pointer' : 'auto'
+  }
+
+  onPointerMove = (event: PointerEvent) => {
+    event.preventDefault()
+
+    switch (event.pointerType) {
+      case 'mouse':
+      case 'pen':
+        this.onMouseMove(event)
+        break
+
+      // TODO touch
+    }
+  }
+
+  onPointerDown = (event: PointerEvent) => {
+    event.preventDefault()
+
+    switch (event.pointerType) {
+      case 'mouse':
+      case 'pen':
+        this.onMouseDown(event)
+        break
+
+      // TODO touch
+    }
+  }
+
   onPointerCancel = (event: PointerEvent) => {
     event.preventDefault()
 
@@ -181,18 +193,6 @@ class DragControls extends EventDispatcher {
 
       // TODO touch
     }
-  }
-
-  onMouseCancel = (event: MouseEvent) => {
-    event.preventDefault()
-
-    if (this._selected) {
-      this.dispatchEvent({ type: 'dragend', object: this._selected })
-
-      this._selected = null
-    }
-
-    this._domElement.style.cursor = this._hovered ? 'pointer' : 'auto'
   }
 
   onTouchMove = (event: TouchEvent) => {
