@@ -1,17 +1,17 @@
-import { ShaderLib, ShaderMaterial, UniformsLib, UniformsUtils, Vector2 } from 'three'
+import { ShaderLib, ShaderMaterial, ShaderMaterialParameters, UniformsLib, UniformsUtils, Vector2 } from 'three'
 
-/**
- * parameters = {
- *  color: <hex>,
- *  linewidth: <float>,
- *  dashed: <boolean>,
- *  dashScale: <float>,
- *  dashSize: <float>,
- *  dashOffset: <float>,
- *  gapSize: <float>,
- *  resolution: <Vector2>, // to be set by renderer
- * }
- */
+import { ColorOptions } from '../types/shared'
+
+export type LineMaterialParameters = ShaderMaterialParameters & {
+  color?: ColorOptions
+  linewidth?: number
+  dashed?: boolean
+  dashScale?: number
+  dashSize?: number
+  dashOffset?: number
+  gapSize?: number
+  resolution?: Vector2
+}
 
 UniformsLib.line = {
   linewidth: { value: 1 },
@@ -26,7 +26,7 @@ UniformsLib.line = {
 ShaderLib['line'] = {
   uniforms: UniformsUtils.merge([UniformsLib.common, UniformsLib.fog, UniformsLib.line]),
 
-  vertexShader: `
+  vertexShader: /* glsl */ `
 		#include <common>
 		#include <color_pars_vertex>
 		#include <fog_pars_vertex>
@@ -172,7 +172,7 @@ ShaderLib['line'] = {
 		}
 		`,
 
-  fragmentShader: `
+  fragmentShader: /* glsl */ `
 		uniform vec3 diffuse;
 		uniform float opacity;
 
@@ -232,124 +232,110 @@ ShaderLib['line'] = {
 		`,
 }
 
-var LineMaterial = function (parameters) {
-  ShaderMaterial.call(this, {
-    type: 'LineMaterial',
+class LineMaterial extends ShaderMaterial {
+  dashed: boolean
 
-    uniforms: UniformsUtils.clone(ShaderLib['line'].uniforms),
+  isLineMaterial = true
 
-    vertexShader: ShaderLib['line'].vertexShader,
-    fragmentShader: ShaderLib['line'].fragmentShader,
+  get color(): any {
+    return this.uniforms.diffuse.value
+  }
 
-    clipping: true, // required for clipping support
-  })
+  set color(value: any) {
+    this.uniforms.diffuse.value = value
+  }
 
-  this.dashed = false
+  get dashScale(): number {
+    return this.uniforms.dashScale.value
+  }
 
-  Object.defineProperties(this, {
-    color: {
-      enumerable: true,
+  set dashScale(value: number) {
+    this.uniforms.dashScale.value = value
+  }
 
-      get: function () {
-        return this.uniforms.diffuse.value
+  get dashSize(): number {
+    return this.uniforms.dashSize.value
+  }
+
+  set dashSize(value: number) {
+    this.uniforms.dashSize.value = value
+  }
+
+  get dashOffset(): number {
+    return this.uniforms.dashOffset.value
+  }
+
+  set dashOffset(value: number) {
+    this.uniforms.dashOffset.value = value
+  }
+
+  get gapSize(): number {
+    return this.uniforms.gapSize.value
+  }
+
+  set gapSize(value: number) {
+    this.uniforms.gapSize.value = value
+  }
+
+  get resolution(): Vector2 {
+    return this.uniforms.gapSize.value
+  }
+
+  set resolution(value: Vector2) {
+    this.uniforms.gapSize.value = value
+  }
+
+  constructor(parameters: LineMaterialParameters = {}) {
+    super({
+      uniforms: UniformsUtils.clone(ShaderLib['line'].uniforms),
+      vertexShader: ShaderLib['line'].vertexShader,
+      fragmentShader: ShaderLib['line'].fragmentShader,
+      clipping: true, // required for clipping support
+    })
+
+    this.dashed = false
+
+    Object.defineProperties(this, {
+      color: {
+        enumerable: true,
       },
-
-      set: function (value) {
-        this.uniforms.diffuse.value = value
+      linewidth: {
+        enumerable: true,
+        get: function (): number {
+          return this.uniforms.linewidth.value
+        },
+        set: function (value: number) {
+          this.uniforms.linewidth.value = value
+        },
       },
-    },
-
-    linewidth: {
-      enumerable: true,
-
-      get: function () {
-        return this.uniforms.linewidth.value
+      dashScale: {
+        enumerable: true,
       },
-
-      set: function (value) {
-        this.uniforms.linewidth.value = value
+      dashSize: {
+        enumerable: true,
       },
-    },
-
-    dashScale: {
-      enumerable: true,
-
-      get: function () {
-        return this.uniforms.dashScale.value
+      dashOffset: {
+        enumerable: true,
       },
-
-      set: function (value) {
-        this.uniforms.dashScale.value = value
+      gapSize: {
+        enumerable: true,
       },
-    },
-
-    dashSize: {
-      enumerable: true,
-
-      get: function () {
-        return this.uniforms.dashSize.value
+      opacity: {
+        enumerable: true,
+        get: function (): number {
+          return this.uniforms.opacity.value
+        },
+        set: function (value: number) {
+          this.uniforms.opacity.value = value
+        },
       },
-
-      set: function (value) {
-        this.uniforms.dashSize.value = value
+      resolution: {
+        enumerable: true,
       },
-    },
+    })
 
-    dashOffset: {
-      enumerable: true,
-
-      get: function () {
-        return this.uniforms.dashOffset.value
-      },
-
-      set: function (value) {
-        this.uniforms.dashOffset.value = value
-      },
-    },
-
-    gapSize: {
-      enumerable: true,
-
-      get: function () {
-        return this.uniforms.gapSize.value
-      },
-
-      set: function (value) {
-        this.uniforms.gapSize.value = value
-      },
-    },
-
-    opacity: {
-      enumerable: true,
-
-      get: function () {
-        return this.uniforms.opacity.value
-      },
-
-      set: function (value) {
-        this.uniforms.opacity.value = value
-      },
-    },
-
-    resolution: {
-      enumerable: true,
-
-      get: function () {
-        return this.uniforms.resolution.value
-      },
-
-      set: function (value) {
-        this.uniforms.resolution.value.copy(value)
-      },
-    },
-  })
-
-  this.setValues(parameters)
+    this.setValues(parameters)
+  }
 }
-
-LineMaterial.prototype = Object.create(ShaderMaterial.prototype)
-LineMaterial.prototype.constructor = LineMaterial
-
-LineMaterial.prototype.isLineMaterial = true
 
 export { LineMaterial }
