@@ -1,8 +1,19 @@
-import { EventDispatcher, Matrix4, MOUSE, Quaternion, Spherical, TOUCH, Vector2, Vector3 } from 'three'
+import {
+  Camera,
+  EventDispatcher,
+  MOUSE,
+  Matrix4,
+  Object3D,
+  Quaternion,
+  Spherical,
+  TOUCH,
+  Vector2,
+  Vector3,
+} from 'three'
 
 class CameraControls extends EventDispatcher {
-  object: any
-  domElement: HTMLElement | Document
+  object: Camera
+  domElement: HTMLElement
 
   /** Set to false to disable this control */
   enabled: boolean
@@ -86,16 +97,17 @@ class CameraControls extends EventDispatcher {
   update: () => boolean
   dispose: () => void
 
-  constructor(object, domElement: HTMLElement | Document) {
+  constructor(object: Camera, domElement: HTMLElement | Document) {
     super()
 
     if (domElement === undefined) {
       console.warn('THREE.CameraControls: The second parameter "domElement" is now mandatory.')
     }
-    if (domElement === document) {
+    if (domElement instanceof Document) {
       console.error(
         'THREE.CameraControls: "document" should not be used as the target "domElement". Please use "renderer.domElement" instead.',
       )
+      throw new Error()
     }
 
     this.object = object
@@ -1045,16 +1057,28 @@ class CameraControls extends EventDispatcher {
  * @event Pan - right mouse, or left mouse + ctrl/meta/shiftKey, or arrow keys / touch: two-finger move
  */
 class OrbitControlsExp extends EventDispatcher {
-  constructor(object, domElement) {
+  mouseButtons: {
+    LEFT: MOUSE
+    RIGHT: MOUSE
+  }
+  touches: {
+    ONE: TOUCH
+    TWO: TOUCH
+  }
+
+  constructor(object: Object3D, domElement: HTMLElement) {
     super()
 
     CameraControls.call(this, object, domElement)
 
-    this.mouseButtons.LEFT = MOUSE.ROTATE
-    this.mouseButtons.RIGHT = MOUSE.PAN
-
-    this.touches.ONE = TOUCH.ROTATE
-    this.touches.TWO = TOUCH.DOLLY_PAN
+    this.mouseButtons = {
+      LEFT: MOUSE.ROTATE,
+      RIGHT: MOUSE.PAN,
+    }
+    this.touches = {
+      ONE: TOUCH.ROTATE,
+      TWO: TOUCH.DOLLY_PAN,
+    }
   }
 }
 
@@ -1066,16 +1090,28 @@ class OrbitControlsExp extends EventDispatcher {
  * @event Pan - left mouse, or left right + ctrl/meta/shiftKey, or arrow keys / touch: one-finger move
  */
 class MapControlsExp extends EventDispatcher {
-  constructor(object, domElement) {
+  mouseButtons: {
+    LEFT: MOUSE
+    RIGHT: MOUSE
+  }
+  touches: {
+    ONE: TOUCH
+    TWO: TOUCH
+  }
+
+  constructor(object: Object3D, domElement: HTMLElement) {
     super()
 
     CameraControls.call(this, object, domElement)
 
-    this.mouseButtons.LEFT = MOUSE.PAN
-    this.mouseButtons.RIGHT = MOUSE.ROTATE
-
-    this.touches.ONE = TOUCH.PAN
-    this.touches.TWO = TOUCH.DOLLY_ROTATE
+    this.mouseButtons = {
+      LEFT: MOUSE.PAN,
+      RIGHT: MOUSE.ROTATE,
+    }
+    this.touches = {
+      ONE: TOUCH.PAN,
+      TWO: TOUCH.DOLLY_ROTATE,
+    }
   }
 }
 
@@ -1090,8 +1126,16 @@ class TrackballControlsExp extends EventDispatcher {
   trackball: boolean
   screenSpacePanning: boolean
   autoRotate: boolean
+  mouseButtons: {
+    LEFT: MOUSE
+    RIGHT: MOUSE
+  }
+  touches: {
+    ONE: TOUCH
+    TWO: TOUCH
+  }
 
-  constructor(object, domElement) {
+  constructor(object: Object3D, domElement: HTMLElement) {
     super()
 
     CameraControls.call(this, object, domElement)
@@ -1100,11 +1144,15 @@ class TrackballControlsExp extends EventDispatcher {
     this.screenSpacePanning = true
     this.autoRotate = false
 
-    this.mouseButtons.LEFT = MOUSE.ROTATE
-    this.mouseButtons.RIGHT = MOUSE.PAN
+    this.mouseButtons = {
+      LEFT: MOUSE.ROTATE,
+      RIGHT: MOUSE.PAN,
+    }
 
-    this.touches.ONE = TOUCH.ROTATE
-    this.touches.TWO = TOUCH.DOLLY_PAN
+    this.touches = {
+      ONE: TOUCH.ROTATE,
+      TWO: TOUCH.DOLLY_PAN,
+    }
   }
 }
 
