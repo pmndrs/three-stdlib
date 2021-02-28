@@ -1,5 +1,5 @@
 import { FileLoader, Loader } from 'three'
-import { parse } from 'opentype'
+import { parse } from 'opentype.js'
 
 /**
  * Requires opentype.js to be included in the project.
