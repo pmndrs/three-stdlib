@@ -262,520 +262,16 @@ class CameraControls extends EventDispatcher {
     this.dollyEnd = new Vector2()
     this.dollyDelta = new Vector2()
 
-    //
-    // event callbacks - update the object state
-    //
+    this.domElement.addEventListener('contextmenu', this.onContextMenu, false)
 
-    function handleMouseDownRotate(event: MouseEvent) {
-      rotateStart.set(event.clientX, event.clientY)
-    }
+    this.domElement.addEventListener('mousedown', this.onMouseDown, false)
+    this.domElement.addEventListener('wheel', this.onMouseWheel, false)
 
-    function handleMouseDownDolly(event: MouseEvent) {
-      dollyStart.set(event.clientX, event.clientY)
-    }
+    this.domElement.addEventListener('touchstart', this.onTouchStart, false)
+    this.domElement.addEventListener('touchend', this.onTouchEnd, false)
+    this.domElement.addEventListener('touchmove', this.onTouchMove, false)
 
-    function handleMouseDownPan(event: MouseEvent) {
-      panStart.set(event.clientX, event.clientY)
-    }
-
-    function handleMouseMoveRotate(event: MouseEvent) {
-      rotateEnd.set(event.clientX, event.clientY)
-
-      rotateDelta.subVectors(rotateEnd, rotateStart).multiplyScalar(this.rotateSpeed)
-
-      const element = this.domElement
-
-      rotateLeft((2 * Math.PI * rotateDelta.x) / element.clientHeight) // yes, height
-
-      rotateUp((2 * Math.PI * rotateDelta.y) / element.clientHeight)
-
-      rotateStart.copy(rotateEnd)
-
-      this.update()
-    }
-
-    function handleMouseMoveDolly(event: MouseEvent) {
-      dollyEnd.set(event.clientX, event.clientY)
-
-      dollyDelta.subVectors(dollyEnd, dollyStart)
-
-      if (dollyDelta.y > 0) {
-        dollyIn(getZoomScale())
-      } else if (dollyDelta.y < 0) {
-        dollyOut(getZoomScale())
-      }
-
-      dollyStart.copy(dollyEnd)
-
-      this.update()
-    }
-
-    function handleMouseMovePan(event: MouseEvent) {
-      panEnd.set(event.clientX, event.clientY)
-
-      panDelta.subVectors(panEnd, panStart).multiplyScalar(this.panSpeed)
-
-      pan(panDelta.x, panDelta.y)
-
-      panStart.copy(panEnd)
-
-      this.update()
-    }
-
-    function handleMouseUp(/*event*/) {
-      // no-op
-    }
-
-    function handleMouseWheel(event: WheelEvent) {
-      if (event.deltaY < 0) {
-        dollyOut(getZoomScale())
-      } else if (event.deltaY > 0) {
-        dollyIn(getZoomScale())
-      }
-
-      this.update()
-    }
-
-    function handleKeyDown(event: KeyboardEvent) {
-      let needsUpdate = false
-
-      switch (event.keyCode) {
-        case this.keys.UP:
-          pan(0, this.keyPanSpeed)
-          needsUpdate = true
-          break
-
-        case this.keys.BOTTOM:
-          pan(0, -this.keyPanSpeed)
-          needsUpdate = true
-          break
-
-        case this.keys.LEFT:
-          pan(this.keyPanSpeed, 0)
-          needsUpdate = true
-          break
-
-        case this.keys.RIGHT:
-          pan(-this.keyPanSpeed, 0)
-          needsUpdate = true
-          break
-      }
-
-      if (needsUpdate) {
-        // prevent the browser from scrolling on cursor keys
-        event.preventDefault()
-
-        this.update()
-      }
-    }
-
-    function handleTouchStartRotate(event: TouchEvent) {
-      if (event.touches.length == 1) {
-        rotateStart.set(event.touches[0].pageX, event.touches[0].pageY)
-      } else {
-        const x = 0.5 * (event.touches[0].pageX + event.touches[1].pageX)
-        const y = 0.5 * (event.touches[0].pageY + event.touches[1].pageY)
-
-        rotateStart.set(x, y)
-      }
-    }
-
-    function handleTouchStartPan(event: TouchEvent) {
-      if (event.touches.length == 1) {
-        panStart.set(event.touches[0].pageX, event.touches[0].pageY)
-      } else {
-        const x = 0.5 * (event.touches[0].pageX + event.touches[1].pageX)
-        const y = 0.5 * (event.touches[0].pageY + event.touches[1].pageY)
-
-        panStart.set(x, y)
-      }
-    }
-
-    function handleTouchStartDolly(event: TouchEvent) {
-      const dx = event.touches[0].pageX - event.touches[1].pageX
-      const dy = event.touches[0].pageY - event.touches[1].pageY
-
-      const distance = Math.sqrt(dx * dx + dy * dy)
-
-      dollyStart.set(0, distance)
-    }
-
-    function handleTouchStartDollyPan(event: TouchEvent) {
-      if (this.enableZoom) handleTouchStartDolly(event)
-
-      if (this.enablePan) handleTouchStartPan(event)
-    }
-
-    function handleTouchStartDollyRotate(event: TouchEvent) {
-      if (this.enableZoom) handleTouchStartDolly(event)
-
-      if (this.enableRotate) handleTouchStartRotate(event)
-    }
-
-    function handleTouchMoveRotate(event: TouchEvent) {
-      if (event.touches.length == 1) {
-        rotateEnd.set(event.touches[0].pageX, event.touches[0].pageY)
-      } else {
-        const x = 0.5 * (event.touches[0].pageX + event.touches[1].pageX)
-        const y = 0.5 * (event.touches[0].pageY + event.touches[1].pageY)
-
-        rotateEnd.set(x, y)
-      }
-
-      rotateDelta.subVectors(rotateEnd, rotateStart).multiplyScalar(this.rotateSpeed)
-
-      const element = this.domElement
-
-      rotateLeft((2 * Math.PI * rotateDelta.x) / element.clientHeight) // yes, height
-
-      rotateUp((2 * Math.PI * rotateDelta.y) / element.clientHeight)
-
-      rotateStart.copy(rotateEnd)
-    }
-
-    function handleTouchMovePan(event: TouchEvent) {
-      if (event.touches.length == 1) {
-        panEnd.set(event.touches[0].pageX, event.touches[0].pageY)
-      } else {
-        const x = 0.5 * (event.touches[0].pageX + event.touches[1].pageX)
-        const y = 0.5 * (event.touches[0].pageY + event.touches[1].pageY)
-
-        panEnd.set(x, y)
-      }
-
-      panDelta.subVectors(panEnd, panStart).multiplyScalar(this.panSpeed)
-
-      pan(panDelta.x, panDelta.y)
-
-      panStart.copy(panEnd)
-    }
-
-    function handleTouchMoveDolly(event: TouchEvent) {
-      const dx = event.touches[0].pageX - event.touches[1].pageX
-      const dy = event.touches[0].pageY - event.touches[1].pageY
-
-      const distance = Math.sqrt(dx * dx + dy * dy)
-
-      dollyEnd.set(0, distance)
-
-      dollyDelta.set(0, Math.pow(dollyEnd.y / dollyStart.y, this.zoomSpeed))
-
-      dollyIn(dollyDelta.y)
-
-      dollyStart.copy(dollyEnd)
-    }
-
-    function handleTouchMoveDollyPan(event: TouchEvent) {
-      if (this.enableZoom) handleTouchMoveDolly(event)
-
-      if (this.enablePan) handleTouchMovePan(event)
-    }
-
-    function handleTouchMoveDollyRotate(event: TouchEvent) {
-      if (this.enableZoom) handleTouchMoveDolly(event)
-
-      if (this.enableRotate) handleTouchMoveRotate(event)
-    }
-
-    function handleTouchEnd(/*event*/) {
-      // no-op
-    }
-
-    //
-    // event handlers - FSM: listen for events and reset state
-    //
-
-    function onMouseDown(event: MouseEvent) {
-      if (this.enabled === false) return
-
-      // Prevent the browser from scrolling.
-
-      event.preventDefault()
-
-      // Manually set the focus since calling preventDefault above
-      // prevents the browser from setting it automatically.
-
-      this.domElement.focus ? this.domElement.focus() : window.focus()
-
-      let mouseAction
-
-      switch (event.button) {
-        case 0:
-          mouseAction = this.mouseButtons.LEFT
-          break
-
-        case 1:
-          mouseAction = this.mouseButtons.MIDDLE
-          break
-
-        case 2:
-          mouseAction = this.mouseButtons.RIGHT
-          break
-
-        default:
-          mouseAction = -1
-      }
-
-      switch (mouseAction) {
-        case MOUSE.DOLLY:
-          if (this.enableZoom === false) return
-
-          handleMouseDownDolly(event)
-
-          state = STATE.DOLLY
-
-          break
-
-        case MOUSE.ROTATE:
-          if (event.ctrlKey || event.metaKey || event.shiftKey) {
-            if (this.enablePan === false) return
-
-            handleMouseDownPan(event)
-
-            state = STATE.PAN
-          } else {
-            if (this.enableRotate === false) return
-
-            handleMouseDownRotate(event)
-
-            state = STATE.ROTATE
-          }
-
-          break
-
-        case MOUSE.PAN:
-          if (event.ctrlKey || event.metaKey || event.shiftKey) {
-            if (this.enableRotate === false) return
-
-            handleMouseDownRotate(event)
-
-            state = STATE.ROTATE
-          } else {
-            if (this.enablePan === false) return
-
-            handleMouseDownPan(event)
-
-            state = STATE.PAN
-          }
-
-          break
-
-        default:
-          state = STATE.NONE
-      }
-
-      if (state !== STATE.NONE) {
-        document.addEventListener('mousemove', onMouseMove, false)
-        document.addEventListener('mouseup', onMouseUp, false)
-
-        this.dispatchEvent(startEvent)
-      }
-    }
-
-    function onMouseMove(event: MouseEvent) {
-      if (this.enabled === false) return
-
-      event.preventDefault()
-
-      switch (state) {
-        case STATE.ROTATE:
-          if (this.enableRotate === false) return
-
-          handleMouseMoveRotate(event)
-
-          break
-
-        case STATE.DOLLY:
-          if (this.enableZoom === false) return
-
-          handleMouseMoveDolly(event)
-
-          break
-
-        case STATE.PAN:
-          if (this.enablePan === false) return
-
-          handleMouseMovePan(event)
-
-          break
-      }
-    }
-
-    function onMouseUp(event: MouseEvent) {
-      if (this.enabled === false) return
-
-      handleMouseUp(event)
-
-      document.removeEventListener('mousemove', onMouseMove, false)
-      document.removeEventListener('mouseup', onMouseUp, false)
-
-      this.dispatchEvent(endEvent)
-
-      state = STATE.NONE
-    }
-
-    function onMouseWheel(event: WheelEvent) {
-      if (this.enabled === false || this.enableZoom === false || (state !== STATE.NONE && state !== STATE.ROTATE)) {
-        return
-      }
-
-      event.preventDefault()
-
-      this.dispatchEvent(startEvent)
-
-      handleMouseWheel(event)
-
-      this.dispatchEvent(endEvent)
-    }
-
-    function onKeyDown(event: KeyboardEvent) {
-      if (this.enabled === false || this.enableKeys === false || this.enablePan === false) return
-
-      handleKeyDown(event)
-    }
-
-    function onTouchStart(event: TouchEvent) {
-      if (this.enabled === false) return
-
-      event.preventDefault()
-
-      switch (event.touches.length) {
-        case 1:
-          switch (this.touches.ONE) {
-            case TOUCH.ROTATE:
-              if (this.enableRotate === false) return
-
-              handleTouchStartRotate(event)
-
-              state = STATE.TOUCH_ROTATE
-
-              break
-
-            case TOUCH.PAN:
-              if (this.enablePan === false) return
-
-              handleTouchStartPan(event)
-
-              state = STATE.TOUCH_PAN
-
-              break
-
-            default:
-              state = STATE.NONE
-          }
-
-          break
-
-        case 2:
-          switch (this.touches.TWO) {
-            case TOUCH.DOLLY_PAN:
-              if (this.enableZoom === false && this.enablePan === false) return
-
-              handleTouchStartDollyPan(event)
-
-              state = STATE.TOUCH_DOLLY_PAN
-
-              break
-
-            case TOUCH.DOLLY_ROTATE:
-              if (this.enableZoom === false && this.enableRotate === false) return
-
-              handleTouchStartDollyRotate(event)
-
-              state = STATE.TOUCH_DOLLY_ROTATE
-
-              break
-
-            default:
-              state = STATE.NONE
-          }
-
-          break
-
-        default:
-          state = STATE.NONE
-      }
-
-      if (state !== STATE.NONE) {
-        this.dispatchEvent(startEvent)
-      }
-    }
-
-    function onTouchMove(event: TouchEvent) {
-      if (this.enabled === false) return
-
-      event.preventDefault()
-
-      switch (state) {
-        case STATE.TOUCH_ROTATE:
-          if (this.enableRotate === false) return
-
-          handleTouchMoveRotate(event)
-
-          this.update()
-
-          break
-
-        case STATE.TOUCH_PAN:
-          if (this.enablePan === false) return
-
-          handleTouchMovePan(event)
-
-          this.update()
-
-          break
-
-        case STATE.TOUCH_DOLLY_PAN:
-          if (this.enableZoom === false && this.enablePan === false) return
-
-          handleTouchMoveDollyPan(event)
-
-          this.update()
-
-          break
-
-        case STATE.TOUCH_DOLLY_ROTATE:
-          if (this.enableZoom === false && this.enableRotate === false) return
-
-          handleTouchMoveDollyRotate(event)
-
-          this.update()
-
-          break
-
-        default:
-          state = STATE.NONE
-      }
-    }
-
-    function onTouchEnd(event: TouchEvent) {
-      if (this.enabled === false) return
-
-      handleTouchEnd(event)
-
-      this.dispatchEvent(endEvent)
-
-      state = STATE.NONE
-    }
-
-    function onContextMenu(event: Event) {
-      if (this.enabled === false) return
-
-      event.preventDefault()
-    }
-
-    //
-
-    this.domElement.addEventListener('contextmenu', onContextMenu, false)
-
-    this.domElement.addEventListener('mousedown', onMouseDown, false)
-    this.domElement.addEventListener('wheel', onMouseWheel, false)
-
-    this.domElement.addEventListener('touchstart', onTouchStart, false)
-    this.domElement.addEventListener('touchend', onTouchEnd, false)
-    this.domElement.addEventListener('touchmove', onTouchMove, false)
-
-    this.domElement.addEventListener('keydown', onKeyDown, false)
+    this.domElement.addEventListener('keydown', this.onKeyDown, false)
 
     // make sure element can receive keys.
 
@@ -812,7 +308,7 @@ class CameraControls extends EventDispatcher {
     this.object.zoom = this.zoom0
 
     this.object.updateProjectionMatrix()
-    this.dispatchEvent(changeEvent)
+    this.dispatchEvent(this.changeEvent)
 
     this.update()
 
@@ -1072,6 +568,510 @@ class CameraControls extends EventDispatcher {
   }
 
   // event callbacks - update the object state
+
+  private handleMouseDownRotate = (event: MouseEvent) => {
+    this.rotateStart.set(event.clientX, event.clientY)
+  }
+
+  // TODO: confirm if worthwhile to return the Vector2 instead of void
+  private handleMouseDownDolly = (event: MouseEvent) => {
+    this.dollyStart.set(event.clientX, event.clientY)
+  }
+
+  private handleMouseDownPan = (event: MouseEvent) => {
+    this.panStart.set(event.clientX, event.clientY)
+  }
+
+  private handleMouseMoveRotate = (event: MouseEvent) => {
+    this.rotateEnd.set(event.clientX, event.clientY)
+
+    this.rotateDelta.subVectors(this.rotateEnd, this.rotateStart).multiplyScalar(this.rotateSpeed)
+
+    const element = this.domElement
+
+    this.rotateLeft((2 * Math.PI * this.rotateDelta.x) / element.clientHeight) // yes, height
+
+    this.rotateUp((2 * Math.PI * this.rotateDelta.y) / element.clientHeight)
+
+    this.rotateStart.copy(this.rotateEnd)
+
+    this.update()
+  }
+
+  private handleMouseMoveDolly = (event: MouseEvent) => {
+    this.dollyEnd.set(event.clientX, event.clientY)
+
+    this.dollyDelta.subVectors(this.dollyEnd, this.dollyStart)
+
+    if (this.dollyDelta.y > 0) {
+      this.dollyIn(this.getZoomScale())
+    } else if (this.dollyDelta.y < 0) {
+      this.dollyOut(this.getZoomScale())
+    }
+
+    this.dollyStart.copy(this.dollyEnd)
+
+    this.update()
+  }
+
+  private handleMouseMovePan = (event: MouseEvent) => {
+    this.panEnd.set(event.clientX, event.clientY)
+
+    this.panDelta.subVectors(this.panEnd, this.panStart).multiplyScalar(this.panSpeed)
+
+    this.pan(this.panDelta.x, this.panDelta.y)
+
+    this.panStart.copy(this.panEnd)
+
+    this.update()
+  }
+
+  private handleMouseUp(/*event*/) {
+    // no-op
+  }
+
+  private handleMouseWheel = (event: WheelEvent) => {
+    if (event.deltaY < 0) {
+      this.dollyOut(this.getZoomScale())
+    } else if (event.deltaY > 0) {
+      this.dollyIn(this.getZoomScale())
+    }
+
+    this.update()
+  }
+
+  private handleKeyDown = (event: KeyboardEvent) => {
+    let needsUpdate = false
+
+    // TODO: keyCode deprecated?
+    switch (event.keyCode) {
+      case this.keys.UP:
+        this.pan(0, this.keyPanSpeed)
+        needsUpdate = true
+        break
+
+      case this.keys.BOTTOM:
+        this.pan(0, -this.keyPanSpeed)
+        needsUpdate = true
+        break
+
+      case this.keys.LEFT:
+        this.pan(this.keyPanSpeed, 0)
+        needsUpdate = true
+        break
+
+      case this.keys.RIGHT:
+        this.pan(-this.keyPanSpeed, 0)
+        needsUpdate = true
+        break
+    }
+
+    if (needsUpdate) {
+      // prevent the browser from scrolling on cursor keys
+      event.preventDefault()
+
+      this.update()
+    }
+  }
+
+  private handleTouchStartRotate = (event: TouchEvent) => {
+    if (event.touches.length == 1) {
+      this.rotateStart.set(event.touches[0].pageX, event.touches[0].pageY)
+    } else {
+      const x = 0.5 * (event.touches[0].pageX + event.touches[1].pageX)
+      const y = 0.5 * (event.touches[0].pageY + event.touches[1].pageY)
+
+      this.rotateStart.set(x, y)
+    }
+  }
+
+  private handleTouchStartPan = (event: TouchEvent) => {
+    if (event.touches.length == 1) {
+      this.panStart.set(event.touches[0].pageX, event.touches[0].pageY)
+    } else {
+      const x = 0.5 * (event.touches[0].pageX + event.touches[1].pageX)
+      const y = 0.5 * (event.touches[0].pageY + event.touches[1].pageY)
+
+      this.panStart.set(x, y)
+    }
+  }
+
+  private handleTouchStartDolly = (event: TouchEvent) => {
+    const dx = event.touches[0].pageX - event.touches[1].pageX
+    const dy = event.touches[0].pageY - event.touches[1].pageY
+
+    const distance = Math.sqrt(dx * dx + dy * dy)
+
+    this.dollyStart.set(0, distance)
+  }
+
+  private handleTouchStartDollyPan = (event: TouchEvent) => {
+    if (this.enableZoom) this.handleTouchStartDolly(event)
+
+    if (this.enablePan) this.handleTouchStartPan(event)
+  }
+
+  private handleTouchStartDollyRotate = (event: TouchEvent) => {
+    if (this.enableZoom) this.handleTouchStartDolly(event)
+
+    if (this.enableRotate) this.handleTouchStartRotate(event)
+  }
+
+  private handleTouchMoveRotate = (event: TouchEvent) => {
+    if (event.touches.length == 1) {
+      this.rotateEnd.set(event.touches[0].pageX, event.touches[0].pageY)
+    } else {
+      const x = 0.5 * (event.touches[0].pageX + event.touches[1].pageX)
+      const y = 0.5 * (event.touches[0].pageY + event.touches[1].pageY)
+
+      this.rotateEnd.set(x, y)
+    }
+
+    this.rotateDelta.subVectors(this.rotateEnd, this.rotateStart).multiplyScalar(this.rotateSpeed)
+
+    const element = this.domElement
+
+    this.rotateLeft((2 * Math.PI * this.rotateDelta.x) / element.clientHeight) // yes, height
+
+    this.rotateUp((2 * Math.PI * this.rotateDelta.y) / element.clientHeight)
+
+    this.rotateStart.copy(this.rotateEnd)
+  }
+
+  private handleTouchMovePan = (event: TouchEvent) => {
+    if (event.touches.length == 1) {
+      this.panEnd.set(event.touches[0].pageX, event.touches[0].pageY)
+    } else {
+      const x = 0.5 * (event.touches[0].pageX + event.touches[1].pageX)
+      const y = 0.5 * (event.touches[0].pageY + event.touches[1].pageY)
+
+      this.panEnd.set(x, y)
+    }
+
+    this.panDelta.subVectors(this.panEnd, this.panStart).multiplyScalar(this.panSpeed)
+
+    this.pan(this.panDelta.x, this.panDelta.y)
+
+    this.panStart.copy(this.panEnd)
+  }
+
+  private handleTouchMoveDolly = (event: TouchEvent) => {
+    const dx = event.touches[0].pageX - event.touches[1].pageX
+    const dy = event.touches[0].pageY - event.touches[1].pageY
+
+    const distance = Math.sqrt(dx * dx + dy * dy)
+
+    this.dollyEnd.set(0, distance)
+
+    this.dollyDelta.set(0, Math.pow(this.dollyEnd.y / this.dollyStart.y, this.zoomSpeed))
+
+    this.dollyIn(this.dollyDelta.y)
+
+    this.dollyStart.copy(this.dollyEnd)
+  }
+
+  private handleTouchMoveDollyPan = (event: TouchEvent) => {
+    if (this.enableZoom) this.handleTouchMoveDolly(event)
+
+    if (this.enablePan) this.handleTouchMovePan(event)
+  }
+
+  private handleTouchMoveDollyRotate = (event: TouchEvent) => {
+    if (this.enableZoom) this.handleTouchMoveDolly(event)
+
+    if (this.enableRotate) this.handleTouchMoveRotate(event)
+  }
+
+  private handleTouchEnd(/*event*/) {
+    // no-op
+  }
+
+  //
+  // event handlers - FSM: listen for events and reset state
+  //
+
+  private onMouseDown = (event: MouseEvent) => {
+    if (this.enabled === false) return
+
+    // Prevent the browser from scrolling.
+
+    event.preventDefault()
+
+    // Manually set the focus since calling preventDefault above
+    // prevents the browser from setting it automatically.
+
+    this.domElement.focus ? this.domElement.focus() : window.focus()
+
+    let mouseAction
+
+    switch (event.button) {
+      case 0:
+        mouseAction = this.mouseButtons.LEFT
+        break
+
+      case 1:
+        mouseAction = this.mouseButtons.MIDDLE
+        break
+
+      case 2:
+        mouseAction = this.mouseButtons.RIGHT
+        break
+
+      default:
+        mouseAction = -1
+    }
+
+    switch (mouseAction) {
+      case MOUSE.DOLLY:
+        if (this.enableZoom === false) return
+
+        this.handleMouseDownDolly(event)
+
+        this.state = STATE.DOLLY
+
+        break
+
+      case MOUSE.ROTATE:
+        if (event.ctrlKey || event.metaKey || event.shiftKey) {
+          if (this.enablePan === false) return
+
+          this.handleMouseDownPan(event)
+
+          this.state = STATE.PAN
+        } else {
+          if (this.enableRotate === false) return
+
+          this.handleMouseDownRotate(event)
+
+          this.state = STATE.ROTATE
+        }
+
+        break
+
+      case MOUSE.PAN:
+        if (event.ctrlKey || event.metaKey || event.shiftKey) {
+          if (this.enableRotate === false) return
+
+          this.handleMouseDownRotate(event)
+
+          this.state = STATE.ROTATE
+        } else {
+          if (this.enablePan === false) return
+
+          this.handleMouseDownPan(event)
+
+          this.state = STATE.PAN
+        }
+
+        break
+
+      default:
+        this.state = STATE.NONE
+    }
+
+    if (this.state !== STATE.NONE) {
+      document.addEventListener('mousemove', this.onMouseMove, false)
+      document.addEventListener('mouseup', this.onMouseUp, false)
+
+      this.dispatchEvent(this.startEvent)
+    }
+  }
+
+  private onMouseMove = (event: MouseEvent) => {
+    if (this.enabled === false) return
+
+    event.preventDefault()
+
+    switch (this.state) {
+      case STATE.ROTATE:
+        if (this.enableRotate === false) return
+
+        this.handleMouseMoveRotate(event)
+
+        break
+
+      case STATE.DOLLY:
+        if (this.enableZoom === false) return
+
+        this.handleMouseMoveDolly(event)
+
+        break
+
+      case STATE.PAN:
+        if (this.enablePan === false) return
+
+        this.handleMouseMovePan(event)
+
+        break
+    }
+  }
+
+  private onMouseUp = (event: MouseEvent) => {
+    if (this.enabled === false) return
+
+    // this.handleMouseUp()
+
+    document.removeEventListener('mousemove', this.onMouseMove, false)
+    document.removeEventListener('mouseup', this.onMouseUp, false)
+
+    this.dispatchEvent(this.endEvent)
+
+    this.state = STATE.NONE
+  }
+
+  private onMouseWheel = (event: WheelEvent) => {
+    if (
+      this.enabled === false ||
+      this.enableZoom === false ||
+      (this.state !== STATE.NONE && this.state !== STATE.ROTATE)
+    ) {
+      return
+    }
+
+    event.preventDefault()
+
+    this.dispatchEvent(this.startEvent)
+
+    this.handleMouseWheel(event)
+
+    this.dispatchEvent(this.endEvent)
+  }
+
+  private onKeyDown = (event: KeyboardEvent) => {
+    if (this.enabled === false || this.enableKeys === false || this.enablePan === false) return
+
+    this.handleKeyDown(event)
+  }
+
+  private onTouchStart = (event: TouchEvent) => {
+    if (this.enabled === false) return
+
+    event.preventDefault()
+
+    switch (event.touches.length) {
+      case 1:
+        switch (this.touches.ONE) {
+          case TOUCH.ROTATE:
+            if (this.enableRotate === false) return
+
+            this.handleTouchStartRotate(event)
+
+            this.state = STATE.TOUCH_ROTATE
+
+            break
+
+          case TOUCH.PAN:
+            if (this.enablePan === false) return
+
+            this.handleTouchStartPan(event)
+
+            this.state = STATE.TOUCH_PAN
+
+            break
+
+          default:
+            this.state = STATE.NONE
+        }
+
+        break
+
+      case 2:
+        switch (this.touches.TWO) {
+          case TOUCH.DOLLY_PAN:
+            if (this.enableZoom === false && this.enablePan === false) return
+
+            this.handleTouchStartDollyPan(event)
+
+            this.state = STATE.TOUCH_DOLLY_PAN
+
+            break
+
+          case TOUCH.DOLLY_ROTATE:
+            if (this.enableZoom === false && this.enableRotate === false) return
+
+            this.handleTouchStartDollyRotate(event)
+
+            this.state = STATE.TOUCH_DOLLY_ROTATE
+
+            break
+
+          default:
+            this.state = STATE.NONE
+        }
+
+        break
+
+      default:
+        this.state = STATE.NONE
+    }
+
+    if (this.state !== STATE.NONE) {
+      this.dispatchEvent(this.startEvent)
+    }
+  }
+
+  private onTouchMove = (event: TouchEvent) => {
+    if (this.enabled === false) return
+
+    event.preventDefault()
+
+    switch (this.state) {
+      case STATE.TOUCH_ROTATE:
+        if (this.enableRotate === false) return
+
+        this.handleTouchMoveRotate(event)
+
+        this.update()
+
+        break
+
+      case STATE.TOUCH_PAN:
+        if (this.enablePan === false) return
+
+        this.handleTouchMovePan(event)
+
+        this.update()
+
+        break
+
+      case STATE.TOUCH_DOLLY_PAN:
+        if (this.enableZoom === false && this.enablePan === false) return
+
+        this.handleTouchMoveDollyPan(event)
+
+        this.update()
+
+        break
+
+      case STATE.TOUCH_DOLLY_ROTATE:
+        if (this.enableZoom === false && this.enableRotate === false) return
+
+        this.handleTouchMoveDollyRotate(event)
+
+        this.update()
+
+        break
+
+      default:
+        this.state = STATE.NONE
+    }
+  }
+
+  private onTouchEnd = (event: TouchEvent) => {
+    if (this.enabled === false) return
+
+    // this.handleTouchEnd()
+
+    this.dispatchEvent(this.endEvent)
+
+    this.state = STATE.NONE
+  }
+
+  private onContextMenu = (event: Event) => {
+    if (this.enabled === false) return
+
+    event.preventDefault()
+  }
 }
 
 /**
