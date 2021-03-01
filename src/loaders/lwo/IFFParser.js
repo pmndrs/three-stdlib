@@ -33,8 +33,8 @@
  **/
 
 import { LoaderUtils } from 'three'
-import { LWO2Parser } from './LWO2Parser.js'
-import { LWO3Parser } from './LWO3Parser.js'
+import { LWO2Parser } from './LWO2Parser'
+import { LWO3Parser } from './LWO3Parser'
 
 function IFFParser() {
   this.debugger = new Debugger()

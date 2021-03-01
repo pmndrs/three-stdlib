@@ -1,5 +1,5 @@
-import { TempNode } from '../core/TempNode.js'
-import { ResolutionNode } from './ResolutionNode.js'
+import { TempNode } from '../core/TempNode'
+import { ResolutionNode } from './ResolutionNode'
 
 function ScreenUVNode(resolution) {
   TempNode.call(this, 'v2')

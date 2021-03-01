@@ -9,8 +9,8 @@ import {
   WebGLRenderTarget,
 } from 'three'
 
-import { NodeMaterial } from '../materials/NodeMaterial.js'
-import { ScreenNode } from '../inputs/ScreenNode.js'
+import { NodeMaterial } from '../materials/NodeMaterial'
+import { ScreenNode } from '../inputs/ScreenNode'
 
 function NodePostProcessing(renderer, renderTarget) {
   if (renderTarget === undefined) {

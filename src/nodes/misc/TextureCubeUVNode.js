@@ -1,13 +1,13 @@
-import { TempNode } from '../core/TempNode.js'
-import { ConstNode } from '../core/ConstNode.js'
-import { StructNode } from '../core/StructNode.js'
-import { FunctionNode } from '../core/FunctionNode.js'
-import { FunctionCallNode } from '../core/FunctionCallNode.js'
-import { ExpressionNode } from '../core/ExpressionNode.js'
-import { FloatNode } from '../inputs/FloatNode.js'
-import { OperatorNode } from '../math/OperatorNode.js'
-import { MathNode } from '../math/MathNode.js'
-import { ColorSpaceNode } from '../utils/ColorSpaceNode.js'
+import { TempNode } from '../core/TempNode'
+import { ConstNode } from '../core/ConstNode'
+import { StructNode } from '../core/StructNode'
+import { FunctionNode } from '../core/FunctionNode'
+import { FunctionCallNode } from '../core/FunctionCallNode'
+import { ExpressionNode } from '../core/ExpressionNode'
+import { FloatNode } from '../inputs/FloatNode'
+import { OperatorNode } from '../math/OperatorNode'
+import { MathNode } from '../math/MathNode'
+import { ColorSpaceNode } from '../utils/ColorSpaceNode'
 
 function TextureCubeUVNode(value, uv, bias) {
   TempNode.call(this, 'v4')

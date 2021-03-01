@@ -1,14 +1,6 @@
-import {
-  Vector2,
-  Vector3,
-  DirectionalLight,
-  MathUtils,
-  ShaderChunk,
-  Matrix4,
-  Box3,
-} from 'three'
-import Frustum from './Frustum.js'
-import Shader from './Shader.js'
+import { Vector2, Vector3, DirectionalLight, MathUtils, ShaderChunk, Matrix4, Box3 } from 'three'
+import Frustum from './Frustum'
+import Shader from './Shader'
 
 const _cameraToLightMatrix = new Matrix4()
 const _lightSpaceFrustum = new Frustum()

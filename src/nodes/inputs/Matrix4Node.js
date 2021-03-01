@@ -1,6 +1,6 @@
 import { Matrix4 } from 'three'
 
-import { InputNode } from '../core/InputNode.js'
+import { InputNode } from '../core/InputNode'
 
 function Matrix4Node(matrix) {
   InputNode.call(this, 'm4')

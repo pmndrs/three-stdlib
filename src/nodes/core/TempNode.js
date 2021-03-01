@@ -1,5 +1,5 @@
 import { MathUtils } from 'three'
-import { Node } from './Node.js'
+import { Node } from './Node'
 
 function TempNode(type, params) {
   Node.call(this, type)

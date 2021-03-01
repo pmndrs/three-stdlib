@@ -1,12 +1,6 @@
-import {
-  LinearFilter,
-  RGBFormat,
-  ShaderMaterial,
-  UniformsUtils,
-  WebGLRenderTarget,
-} from 'three'
-import { Pass } from '../postprocessing/Pass.js'
-import { CopyShader } from '../shaders/CopyShader.js'
+import { LinearFilter, RGBFormat, ShaderMaterial, UniformsUtils, WebGLRenderTarget } from 'three'
+import { Pass } from '../postprocessing/Pass'
+import { CopyShader } from '../shaders/CopyShader'
 
 var SavePass = function (renderTarget) {
   Pass.call(this)

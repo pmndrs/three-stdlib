@@ -1,5 +1,5 @@
-import { TempNode } from '../core/TempNode.js'
-import { NodeLib } from '../core/NodeLib.js'
+import { TempNode } from '../core/TempNode'
+import { NodeLib } from '../core/NodeLib'
 
 function PositionNode(scope) {
   TempNode.call(this, 'v3')

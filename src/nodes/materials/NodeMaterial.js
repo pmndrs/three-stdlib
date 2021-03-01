@@ -1,9 +1,9 @@
 import { FrontSide, LessEqualDepth, NoColors, NormalBlending, ShaderMaterial } from 'three'
 
-import { NodeBuilder } from '../core/NodeBuilder.js'
-import { ColorNode } from '../inputs/ColorNode.js'
-import { PositionNode } from '../accessors/PositionNode.js'
-import { RawNode } from './nodes/RawNode.js'
+import { NodeBuilder } from '../core/NodeBuilder'
+import { ColorNode } from '../inputs/ColorNode'
+import { PositionNode } from '../accessors/PositionNode'
+import { RawNode } from './nodes/RawNode'
 
 function NodeMaterial(vertex, fragment) {
   ShaderMaterial.call(this)

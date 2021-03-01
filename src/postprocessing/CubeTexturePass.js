@@ -1,14 +1,5 @@
-import {
-  BackSide,
-  BoxGeometry,
-  Mesh,
-  PerspectiveCamera,
-  Scene,
-  ShaderLib,
-  ShaderMaterial,
-  UniformsUtils,
-} from 'three'
-import { Pass } from '../postprocessing/Pass.js'
+import { BackSide, BoxGeometry, Mesh, PerspectiveCamera, Scene, ShaderLib, ShaderMaterial, UniformsUtils } from 'three'
+import { Pass } from '../postprocessing/Pass'
 
 var CubeTexturePass = function (camera, envMap, opacity) {
   Pass.call(this)

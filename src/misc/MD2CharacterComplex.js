@@ -1,6 +1,6 @@
 import { Box3, MathUtils, MeshLambertMaterial, Object3D, TextureLoader, UVMapping, sRGBEncoding } from 'three'
-import { MD2Loader } from '../loaders/MD2Loader.js'
-import { MorphBlendMesh } from '../misc/MorphBlendMesh.js'
+import { MD2Loader } from '../loaders/MD2Loader'
+import { MorphBlendMesh } from '../misc/MorphBlendMesh'
 
 var MD2CharacterComplex = function () {
   var scope = this

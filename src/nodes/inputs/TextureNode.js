@@ -1,7 +1,7 @@
-import { InputNode } from '../core/InputNode.js'
-import { UVNode } from '../accessors/UVNode.js'
-import { ColorSpaceNode } from '../utils/ColorSpaceNode.js'
-import { ExpressionNode } from '../core/ExpressionNode.js'
+import { InputNode } from '../core/InputNode'
+import { UVNode } from '../accessors/UVNode'
+import { ColorSpaceNode } from '../utils/ColorSpaceNode'
+import { ExpressionNode } from '../core/ExpressionNode'
 
 function TextureNode(value, uv, bias, project) {
   InputNode.call(this, 'v4', { shared: true })

@@ -1,10 +1,10 @@
 import { Color, Vector2 } from 'three'
 
-import { StandardNode } from './StandardNode.js'
-import { PropertyNode } from '../../inputs/PropertyNode.js'
-import { OperatorNode } from '../../math/OperatorNode.js'
-import { SwitchNode } from '../../utils/SwitchNode.js'
-import { NormalMapNode } from '../../misc/NormalMapNode.js'
+import { StandardNode } from './StandardNode'
+import { PropertyNode } from '../../inputs/PropertyNode'
+import { OperatorNode } from '../../math/OperatorNode'
+import { SwitchNode } from '../../utils/SwitchNode'
+import { NormalMapNode } from '../../misc/NormalMapNode'
 
 function MeshStandardNode() {
   StandardNode.call(this)

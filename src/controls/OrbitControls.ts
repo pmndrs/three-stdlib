@@ -914,7 +914,6 @@ class OrbitControls extends EventDispatcher {
 class MapControls extends OrbitControls {
   constructor(object: Camera, domElement: HTMLElement) {
     super(object, domElement)
-    OrbitControls.call(this, object, domElement)
 
     this.screenSpacePanning = false // pan orthogonal to world-space direction camera.up
 

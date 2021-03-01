@@ -1,6 +1,6 @@
 import { Vector2 } from 'three'
 
-import { Vector2Node } from '../inputs/Vector2Node.js'
+import { Vector2Node } from '../inputs/Vector2Node'
 
 function ResolutionNode() {
   Vector2Node.call(this)

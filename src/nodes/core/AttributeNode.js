@@ -1,4 +1,4 @@
-import { Node } from './Node.js'
+import { Node } from './Node'
 
 function AttributeNode(name, type) {
   Node.call(this, type)

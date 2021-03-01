@@ -1,10 +1,10 @@
 import { UniformsLib, UniformsUtils } from 'three'
 
-import { Node } from '../../core/Node.js'
-import { ExpressionNode } from '../../core/ExpressionNode.js'
-import { ColorNode } from '../../inputs/ColorNode.js'
-import { FloatNode } from '../../inputs/FloatNode.js'
-import { SpecularMIPLevelNode } from '../../utils/SpecularMIPLevelNode.js'
+import { Node } from '../../core/Node'
+import { ExpressionNode } from '../../core/ExpressionNode'
+import { ColorNode } from '../../inputs/ColorNode'
+import { FloatNode } from '../../inputs/FloatNode'
+import { SpecularMIPLevelNode } from '../../utils/SpecularMIPLevelNode'
 
 function StandardNode() {
   Node.call(this)

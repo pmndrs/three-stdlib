@@ -1,4 +1,4 @@
-import Node from './Node.js'
+import Node from './Node'
 
 class AttributeNode extends Node {
   constructor(name, type) {

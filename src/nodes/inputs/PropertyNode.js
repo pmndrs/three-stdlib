@@ -1,4 +1,4 @@
-import { InputNode } from '../core/InputNode.js'
+import { InputNode } from '../core/InputNode'
 
 function PropertyNode(object, property, type) {
   InputNode.call(this, type)

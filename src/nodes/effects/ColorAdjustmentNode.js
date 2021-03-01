@@ -1,6 +1,6 @@
-import { TempNode } from '../core/TempNode.js'
-import { FunctionNode } from '../core/FunctionNode.js'
-import { LuminanceNode } from './LuminanceNode.js'
+import { TempNode } from '../core/TempNode'
+import { FunctionNode } from '../core/FunctionNode'
+import { LuminanceNode } from './LuminanceNode'
 
 function ColorAdjustmentNode(rgb, adjustment, method) {
   TempNode.call(this, 'v3')

@@ -1,7 +1,7 @@
 import { UniformsLib, UniformsUtils } from 'three'
 
-import { Node } from '../../core/Node.js'
-import { ColorNode } from '../../inputs/ColorNode.js'
+import { Node } from '../../core/Node'
+import { ColorNode } from '../../inputs/ColorNode'
 
 function SpriteNode() {
   Node.call(this)

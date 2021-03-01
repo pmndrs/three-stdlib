@@ -1,4 +1,4 @@
-import { FloatNode } from '../inputs/FloatNode.js'
+import { FloatNode } from '../inputs/FloatNode'
 
 function MaxMIPLevelNode(texture) {
   FloatNode.call(this)

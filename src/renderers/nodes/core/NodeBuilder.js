@@ -1,7 +1,7 @@
-import NodeUniform from './NodeUniform.js'
-import NodeAttribute from './NodeAttribute.js'
-import NodeVary from './NodeVary.js'
-import { NodeUpdateType } from './constants.js'
+import NodeUniform from './NodeUniform'
+import NodeAttribute from './NodeAttribute'
+import NodeVary from './NodeVary'
+import { NodeUpdateType } from './constants'
 
 class NodeBuilder {
   constructor(material, renderer) {

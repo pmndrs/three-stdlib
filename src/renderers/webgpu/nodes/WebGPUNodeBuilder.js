@@ -1,4 +1,4 @@
-import WebGPUNodeUniformsGroup from './WebGPUNodeUniformsGroup.js'
+import WebGPUNodeUniformsGroup from './WebGPUNodeUniformsGroup'
 import {
   FloatNodeUniform,
   Vector2NodeUniform,
@@ -7,15 +7,15 @@ import {
   ColorNodeUniform,
   Matrix3NodeUniform,
   Matrix4NodeUniform,
-} from './WebGPUNodeUniform.js'
-import WebGPUSampler from '../WebGPUSampler.js'
-import { WebGPUSampledTexture } from '../WebGPUSampledTexture.js'
+} from './WebGPUNodeUniform'
+import WebGPUSampler from '../WebGPUSampler'
+import { WebGPUSampledTexture } from '../WebGPUSampledTexture'
 
-import NodeSlot from '../../nodes/core/NodeSlot.js'
-import NodeBuilder from '../../nodes/core/NodeBuilder.js'
-import ModelViewProjectionNode from '../../nodes/accessors/ModelViewProjectionNode.js'
+import NodeSlot from '../../nodes/core/NodeSlot'
+import NodeBuilder from '../../nodes/core/NodeBuilder'
+import ModelViewProjectionNode from '../../nodes/accessors/ModelViewProjectionNode'
 
-import ShaderLib from './ShaderLib.js'
+import ShaderLib from './ShaderLib'
 
 class WebGPUNodeBuilder extends NodeBuilder {
   constructor(material, renderer) {

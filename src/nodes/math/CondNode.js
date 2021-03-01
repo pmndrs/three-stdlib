@@ -1,4 +1,4 @@
-import { TempNode } from '../core/TempNode.js'
+import { TempNode } from '../core/TempNode'
 
 function CondNode(a, b, op, ifNode, elseNode) {
   TempNode.call(this)

@@ -8,10 +8,10 @@ import {
   UniformsUtils,
   WebGLRenderTarget,
 } from 'three'
-import { Pass } from '../postprocessing/Pass.js'
-import { SMAAEdgesShader } from '../shaders/SMAAShader.js'
-import { SMAAWeightsShader } from '../shaders/SMAAShader.js'
-import { SMAABlendShader } from '../shaders/SMAAShader.js'
+import { Pass } from '../postprocessing/Pass'
+import { SMAAEdgesShader } from '../shaders/SMAAShader'
+import { SMAAWeightsShader } from '../shaders/SMAAShader'
+import { SMAABlendShader } from '../shaders/SMAAShader'
 
 var SMAAPass = function (width, height) {
   Pass.call(this)

@@ -39,7 +39,7 @@ import {
   Vector2,
 } from 'three'
 
-import { IFFParser } from './lwo/IFFParser.js'
+import { IFFParser } from './lwo/IFFParser'
 
 var lwoTree
 
@@ -611,7 +611,7 @@ MaterialParser.prototype = {
   getWrappingType(num) {
     switch (num) {
       case 0:
-        console.warn('LWOLoader: "Reset" texture wrapping type is not supported in three.js')
+        console.warn('LWOLoader: "Reset" texture wrapping type is not supported in three')
         return ClampToEdgeWrapping
       case 1:
         return RepeatWrapping

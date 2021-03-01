@@ -1,11 +1,4 @@
-import {
-  BufferGeometry,
-  Float32BufferAttribute,
-  LineSegments,
-  LineBasicMaterial,
-  Matrix3,
-  Vector3,
-} from 'three'
+import { BufferGeometry, Float32BufferAttribute, LineSegments, LineBasicMaterial, Matrix3, Vector3 } from 'three'
 
 const _v1 = new Vector3()
 const _v2 = new Vector3()
@@ -13,13 +6,14 @@ const _normalMatrix = new Matrix3()
 
 class VertexNormalsHelper extends LineSegments {
   constructor(object, size, hex) {
+    const geometry = new BufferGeometry()
+    const color = hex !== undefined ? hex : 0xff0000
+
+    super(geometry, new LineBasicMaterial({ color, toneMapped: false }))
+
     this.object = object
 
     this.size = size !== undefined ? size : 0.1
-
-    const color = hex !== undefined ? hex : 0xff0000
-
-    //
 
     let nNormals = 0
 
@@ -34,13 +28,9 @@ class VertexNormalsHelper extends LineSegments {
 
     //
 
-    const geometry = new BufferGeometry()
-
     const positions = new Float32BufferAttribute(nNormals * 2 * 3, 3)
 
     geometry.setAttribute('position', positions)
-
-    super(geometry, new LineBasicMaterial({ color, toneMapped: false }))
 
     this.type = 'VertexNormalsHelper'
 
