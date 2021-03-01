@@ -3,6 +3,8 @@ import {
   EventDispatcher,
   MOUSE,
   Matrix4,
+  OrthographicCamera,
+  PerspectiveCamera,
   Object3D,
   Quaternion,
   Spherical,
@@ -27,7 +29,7 @@ enum STATE {
 }
 
 class CameraControls extends EventDispatcher {
-  object: Camera
+  object: PerspectiveCamera | OrthographicCamera
   domElement: HTMLElement
 
   /** Set to false to disable this control */
@@ -132,7 +134,7 @@ class CameraControls extends EventDispatcher {
   private dollyEnd: Vector2
   private dollyDelta: Vector2
 
-  constructor(object: Camera, domElement: HTMLElement) {
+  constructor(object: PerspectiveCamera | OrthographicCamera, domElement: HTMLElement) {
     super()
 
     if (domElement === undefined) {
@@ -528,9 +530,11 @@ class CameraControls extends EventDispatcher {
   })()
 
   private dollyIn = (dollyScale: number) => {
-    if (this.object.isPerspectiveCamera) {
+    // TODO: replace w/.isPerspectiveCamera ?
+    if (this.object instanceof PerspectiveCamera) {
       this.scale /= dollyScale
-    } else if (this.object.isOrthographicCamera) {
+      // TODO: replace w/.isOrthographicCamera ?
+    } else if (this.object instanceof OrthographicCamera) {
       this.object.zoom = Math.max(this.minZoom, Math.min(this.maxZoom, this.object.zoom * dollyScale))
       this.object.updateProjectionMatrix()
       this.zoomChanged = true
@@ -541,9 +545,11 @@ class CameraControls extends EventDispatcher {
   }
 
   private dollyOut = (dollyScale: number) => {
-    if (this.object.isPerspectiveCamera) {
+    // TODO: replace w/.isPerspectiveCamera ?
+    if (this.object instanceof PerspectiveCamera) {
       this.scale *= dollyScale
-    } else if (this.object.isOrthographicCamera) {
+      // TODO: replace w/.isOrthographicCamera ?
+    } else if (this.object instanceof OrthographicCamera) {
       this.object.zoom = Math.max(this.minZoom, Math.min(this.maxZoom, this.object.zoom / dollyScale))
       this.object.updateProjectionMatrix()
       this.zoomChanged = true
