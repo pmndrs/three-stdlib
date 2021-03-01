@@ -262,105 +262,6 @@ class CameraControls extends EventDispatcher {
     this.dollyEnd = new Vector2()
     this.dollyDelta = new Vector2()
 
-    function rotateLeft(angle: number) {
-      sphericalDelta.theta -= angle
-    }
-
-    function rotateUp(angle: number) {
-      sphericalDelta.phi -= angle
-    }
-
-    const panLeft = (() => {
-      const v = new Vector3()
-
-      return function panLeft(distance: number, objectMatrix: Matrix4) {
-        v.setFromMatrixColumn(objectMatrix, 0) // get X column of objectMatrix
-        v.multiplyScalar(-distance)
-
-        panOffset.add(v)
-      }
-    })()
-
-    const panUp = (() => {
-      const v = new Vector3()
-
-      return function panUp(distance: number, objectMatrix: Matrix4) {
-        if (this.screenSpacePanning === true) {
-          v.setFromMatrixColumn(objectMatrix, 1)
-        } else {
-          v.setFromMatrixColumn(objectMatrix, 0)
-          v.crossVectors(this.object.up, v)
-        }
-
-        v.multiplyScalar(distance)
-
-        this.panOffset.add(v)
-      }
-    })()
-
-    // deltaX and deltaY are in pixels; right and down are positive
-    const pan = (() => {
-      const offset = new Vector3()
-
-      return function pan(deltaX: number, deltaY: number) {
-        const element = this.domElement
-
-        if (this.object.isPerspectiveCamera && element instanceof HTMLElement) {
-          // perspective
-          const position = this.object.position
-          offset.copy(position).sub(this.target)
-          let targetDistance = offset.length()
-
-          // half of the fov is center to top of screen
-          targetDistance *= Math.tan(((this.object.fov / 2) * Math.PI) / 180.0)
-
-          // we use only clientHeight here so aspect ratio does not distort speed
-          panLeft((2 * deltaX * targetDistance) / element.clientHeight, this.object.matrix)
-          panUp((2 * deltaY * targetDistance) / element.clientHeight, this.object.matrix)
-        } else if (this.object.isOrthographicCamera) {
-          // orthographic
-          panLeft(
-            (deltaX * (this.object.right - this.object.left)) / this.object.zoom / element.clientWidth,
-            this.object.matrix,
-          )
-          panUp(
-            (deltaY * (this.object.top - this.object.bottom)) / this.object.zoom / element.clientHeight,
-            this.object.matrix,
-          )
-        } else {
-          // camera neither orthographic nor perspective
-          console.warn('WARNING: CameraControls.js encountered an unknown camera type - pan disabled.')
-          this.enablePan = false
-        }
-      }
-    })()
-
-    function dollyIn(dollyScale: number) {
-      if (this.object.isPerspectiveCamera) {
-        scale /= dollyScale
-      } else if (this.object.isOrthographicCamera) {
-        this.object.zoom = Math.max(this.minZoom, Math.min(this.maxZoom, this.object.zoom * dollyScale))
-        this.object.updateProjectionMatrix()
-        zoomChanged = true
-      } else {
-        console.warn('WARNING: CameraControls.js encountered an unknown camera type - dolly/zoom disabled.')
-        this.enableZoom = false
-      }
-    }
-
-    function dollyOut(dollyScale: number) {
-      if (this.object.isPerspectiveCamera) {
-        scale *= dollyScale
-      } else if (this.object.isOrthographicCamera) {
-        this.object.zoom = Math.max(this.minZoom, Math.min(this.maxZoom, this.object.zoom / dollyScale))
-        this.object.updateProjectionMatrix()
-        zoomChanged = true
-      } else {
-        console.warn('WARNING: CameraControls.js encountered an unknown camera type - dolly/zoom disabled.')
-        this.enableZoom = false
-      }
-    }
-
     //
     // event callbacks - update the object state
     //
@@ -935,6 +836,8 @@ class CameraControls extends EventDispatcher {
     //this.dispatchEvent( { type: 'dispose' } ); // should this be added here?
   }
 
+  // Internal methods
+
   private update = (() => {
     const offset = new Vector3()
 
@@ -1071,6 +974,104 @@ class CameraControls extends EventDispatcher {
   private getAutoRotationAngle = () => ((2 * Math.PI) / 60 / 60) * this.autoRotateSpeed
 
   private getZoomScale = () => Math.pow(0.95, this.zoomSpeed)
+
+  private rotateLeft = (angle: number) => (this.sphericalDelta.theta -= angle)
+
+  private rotateUp = (angle: number) => (this.sphericalDelta.phi -= angle)
+
+  private panLeft = (() => {
+    const v = new Vector3()
+
+    return function panLeft(distance: number, objectMatrix: Matrix4) {
+      v.setFromMatrixColumn(objectMatrix, 0) // get X column of objectMatrix
+      v.multiplyScalar(-distance)
+
+      this.panOffset.add(v)
+    }
+  })()
+
+  private panUp = (() => {
+    const v = new Vector3()
+
+    return function panUp(distance: number, objectMatrix: Matrix4) {
+      if (this.screenSpacePanning === true) {
+        v.setFromMatrixColumn(objectMatrix, 1)
+      } else {
+        v.setFromMatrixColumn(objectMatrix, 0)
+        v.crossVectors(this.object.up, v)
+      }
+
+      v.multiplyScalar(distance)
+
+      this.panOffset.add(v)
+    }
+  })()
+
+  // deltaX and deltaY are in pixels; right and down are positive
+  private pan = (() => {
+    const offset = new Vector3()
+
+    return function pan(deltaX: number, deltaY: number) {
+      const element = this.domElement
+
+      // TODO: this looks wrong...
+      if (this.object.isPerspectiveCamera && element instanceof HTMLElement) {
+        // perspective
+        const position = this.object.position
+        offset.copy(position).sub(this.target)
+        let targetDistance = offset.length()
+
+        // half of the fov is center to top of screen
+        targetDistance *= Math.tan(((this.object.fov / 2) * Math.PI) / 180.0)
+
+        // we use only clientHeight here so aspect ratio does not distort speed
+        this.panLeft((2 * deltaX * targetDistance) / element.clientHeight, this.object.matrix)
+        this.panUp((2 * deltaY * targetDistance) / element.clientHeight, this.object.matrix)
+      } else if (this.object.isOrthographicCamera) {
+        // orthographic
+        this.panLeft(
+          (deltaX * (this.object.right - this.object.left)) / this.object.zoom / element.clientWidth,
+          this.object.matrix,
+        )
+        this.panUp(
+          (deltaY * (this.object.top - this.object.bottom)) / this.object.zoom / element.clientHeight,
+          this.object.matrix,
+        )
+      } else {
+        // camera neither orthographic nor perspective
+        console.warn('WARNING: CameraControls.js encountered an unknown camera type - pan disabled.')
+        this.enablePan = false
+      }
+    }
+  })()
+
+  private dollyIn = (dollyScale: number) => {
+    if (this.object.isPerspectiveCamera) {
+      this.scale /= dollyScale
+    } else if (this.object.isOrthographicCamera) {
+      this.object.zoom = Math.max(this.minZoom, Math.min(this.maxZoom, this.object.zoom * dollyScale))
+      this.object.updateProjectionMatrix()
+      this.zoomChanged = true
+    } else {
+      console.warn('WARNING: CameraControls.js encountered an unknown camera type - dolly/zoom disabled.')
+      this.enableZoom = false
+    }
+  }
+
+  private dollyOut = (dollyScale: number) => {
+    if (this.object.isPerspectiveCamera) {
+      this.scale *= dollyScale
+    } else if (this.object.isOrthographicCamera) {
+      this.object.zoom = Math.max(this.minZoom, Math.min(this.maxZoom, this.object.zoom / dollyScale))
+      this.object.updateProjectionMatrix()
+      this.zoomChanged = true
+    } else {
+      console.warn('WARNING: CameraControls.js encountered an unknown camera type - dolly/zoom disabled.')
+      this.enableZoom = false
+    }
+  }
+
+  // event callbacks - update the object state
 }
 
 /**
