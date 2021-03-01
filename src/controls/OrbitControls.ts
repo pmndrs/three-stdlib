@@ -89,6 +89,7 @@ class OrbitControls extends EventDispatcher {
     super()
 
     this.object = object
+    this.domElement = (null as unknown) as HTMLElement
     // for reset
     this.target0 = this.target.clone()
     this.position0 = this.object.position.clone()
@@ -244,6 +245,7 @@ class OrbitControls extends EventDispatcher {
       }
     })()
 
+    // https://github.com/mrdoob/three.js/issues/20575
     this.connect = (domElement: HTMLElement) => {
       if ((domElement as any) === document) {
         console.error(
