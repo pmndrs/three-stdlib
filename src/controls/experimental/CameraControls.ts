@@ -11,6 +11,21 @@ import {
   Vector3,
 } from 'three'
 
+type CHANGE_EVENT = {
+  type: 'change' | 'start' | 'end'
+}
+
+enum STATE {
+  NONE = -1,
+  ROTATE = 0,
+  DOLLY = 1,
+  PAN = 2,
+  TOUCH_ROTATE = 3,
+  TOUCH_PAN = 4,
+  TOUCH_DOLLY_PAN = 5,
+  TOUCH_DOLLY_ROTATE = 6,
+}
+
 class CameraControls extends EventDispatcher {
   object: Camera
   domElement: HTMLElement
@@ -71,6 +86,7 @@ class CameraControls extends EventDispatcher {
   // Set to false to disable use of the keys
   enableKeys: boolean
 
+  // TODO: don't hardcode
   // The four arrow keys
   keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40 }
 
@@ -90,12 +106,32 @@ class CameraControls extends EventDispatcher {
   quaternion0: Quaternion
   zoom0: number
 
-  getPolarAngle: () => number
-  getAzimuthalAngle: () => number
-  saveState: () => void
-  reset: () => void
-  update: () => boolean
-  dispose: () => void
+  // current position in spherical coordinates
+  spherical: Spherical
+  sphericalDelta: Spherical
+
+  private changeEvent: { type: 'change' }
+  private startEvent: { type: 'start' }
+  private endEvent: { type: 'end' }
+  private state: STATE
+
+  private EPS: number
+
+  private scale: number
+  private panOffset: Vector3
+  private zoomChanged: boolean
+
+  private rotateStart: Vector2
+  private rotateEnd: Vector2
+  private rotateDelta: Vector2
+
+  private panStart: Vector2
+  private panEnd: Vector2
+  private panDelta: Vector2
+
+  private dollyStart: Vector2
+  private dollyEnd: Vector2
+  private dollyDelta: Vector2
 
   constructor(object: Camera, domElement: HTMLElement | Document) {
     super()
@@ -107,6 +143,8 @@ class CameraControls extends EventDispatcher {
       console.error(
         'THREE.CameraControls: "document" should not be used as the target "domElement". Please use "renderer.domElement" instead.',
       )
+
+      // TODO: should we just continue or not even allow Document's as a parameter type?
       throw new Error()
     }
 
@@ -192,234 +230,37 @@ class CameraControls extends EventDispatcher {
     // public methods
     //
 
-    this.getPolarAngle = () => spherical.phi
-
-    this.getAzimuthalAngle = () => spherical.theta
-
-    this.saveState = () => {
-      scope.target0.copy(scope.target)
-      scope.position0.copy(scope.object.position)
-      scope.quaternion0.copy(scope.object.quaternion)
-      scope.zoom0 = scope.object.zoom
-    }
-
-    this.reset = () => {
-      scope.target.copy(scope.target0)
-      scope.object.position.copy(scope.position0)
-      scope.object.quaternion.copy(scope.quaternion0)
-      scope.object.zoom = scope.zoom0
-
-      scope.object.updateProjectionMatrix()
-      scope.dispatchEvent(changeEvent)
-
-      scope.update()
-
-      state = STATE.NONE
-    }
-
-    // this method is exposed, but perhaps it would be better if we can make it private...
-    this.update = (() => {
-      const offset = new Vector3()
-
-      // so camera.up is the orbit axis
-      const quat = new Quaternion().setFromUnitVectors(object.up, new Vector3(0, 1, 0))
-      const quatInverse = quat.clone().invert()
-
-      const lastPosition = new Vector3()
-      const lastQuaternion = new Quaternion()
-
-      const q = new Quaternion()
-      const vec = new Vector3()
-
-      return function update() {
-        const position = scope.object.position
-
-        offset.copy(position).sub(scope.target)
-
-        if (scope.trackball) {
-          // rotate around screen-space y-axis
-
-          if (sphericalDelta.theta) {
-            vec.set(0, 1, 0).applyQuaternion(scope.object.quaternion)
-
-            var factor = scope.enableDamping ? scope.dampingFactor : 1
-
-            q.setFromAxisAngle(vec, sphericalDelta.theta * factor)
-
-            scope.object.quaternion.premultiply(q)
-            offset.applyQuaternion(q)
-          }
-
-          // rotate around screen-space x-axis
-
-          if (sphericalDelta.phi) {
-            vec.set(1, 0, 0).applyQuaternion(scope.object.quaternion)
-
-            var factor = scope.enableDamping ? scope.dampingFactor : 1
-
-            q.setFromAxisAngle(vec, sphericalDelta.phi * factor)
-
-            scope.object.quaternion.premultiply(q)
-            offset.applyQuaternion(q)
-          }
-
-          offset.multiplyScalar(scale)
-          offset.clampLength(scope.minDistance, scope.maxDistance)
-        } else {
-          // rotate offset to "y-axis-is-up" space
-          offset.applyQuaternion(quat)
-
-          if (scope.autoRotate && state === STATE.NONE) {
-            rotateLeft(getAutoRotationAngle())
-          }
-
-          spherical.setFromVector3(offset)
-
-          if (scope.enableDamping) {
-            spherical.theta += sphericalDelta.theta * scope.dampingFactor
-            spherical.phi += sphericalDelta.phi * scope.dampingFactor
-          } else {
-            spherical.theta += sphericalDelta.theta
-            spherical.phi += sphericalDelta.phi
-          }
-
-          // restrict theta to be between desired limits
-          spherical.theta = Math.max(scope.minAzimuthAngle, Math.min(scope.maxAzimuthAngle, spherical.theta))
-
-          // restrict phi to be between desired limits
-          spherical.phi = Math.max(scope.minPolarAngle, Math.min(scope.maxPolarAngle, spherical.phi))
-
-          spherical.makeSafe()
-
-          spherical.radius *= scale
-
-          // restrict radius to be between desired limits
-          spherical.radius = Math.max(scope.minDistance, Math.min(scope.maxDistance, spherical.radius))
-
-          offset.setFromSpherical(spherical)
-
-          // rotate offset back to "camera-up-vector-is-up" space
-          offset.applyQuaternion(quatInverse)
-        }
-
-        // move target to panned location
-
-        if (scope.enableDamping === true) {
-          scope.target.addScaledVector(panOffset, scope.dampingFactor)
-        } else {
-          scope.target.add(panOffset)
-        }
-
-        position.copy(scope.target).add(offset)
-
-        if (scope.trackball === false) {
-          scope.object.lookAt(scope.target)
-        }
-
-        if (scope.enableDamping === true) {
-          sphericalDelta.theta *= 1 - scope.dampingFactor
-          sphericalDelta.phi *= 1 - scope.dampingFactor
-
-          panOffset.multiplyScalar(1 - scope.dampingFactor)
-        } else {
-          sphericalDelta.set(0, 0, 0)
-
-          panOffset.set(0, 0, 0)
-        }
-
-        scale = 1
-
-        // update condition is:
-        // min(camera displacement, camera rotation in radians)^2 > EPS
-        // using small-angle approximation cos(x/2) = 1 - x^2 / 8
-
-        if (
-          zoomChanged ||
-          lastPosition.distanceToSquared(scope.object.position) > EPS ||
-          8 * (1 - lastQuaternion.dot(scope.object.quaternion)) > EPS
-        ) {
-          scope.dispatchEvent(changeEvent)
-
-          lastPosition.copy(scope.object.position)
-          lastQuaternion.copy(scope.object.quaternion)
-          zoomChanged = false
-
-          return true
-        }
-
-        return false
-      }
-    })()
-
-    this.dispose = () => {
-      scope.domElement.removeEventListener('contextmenu', onContextMenu, false)
-      scope.domElement.removeEventListener('mousedown', onMouseDown, false)
-      scope.domElement.removeEventListener('wheel', onMouseWheel, false)
-
-      scope.domElement.removeEventListener('touchstart', onTouchStart, false)
-      scope.domElement.removeEventListener('touchend', onTouchEnd, false)
-      scope.domElement.removeEventListener('touchmove', onTouchMove, false)
-
-      document.removeEventListener('mousemove', onMouseMove, false)
-      document.removeEventListener('mouseup', onMouseUp, false)
-
-      scope.domElement.removeEventListener('keydown', onKeyDown, false)
-
-      //scope.dispatchEvent( { type: 'dispose' } ); // should this be added here?
-    }
-
     //
     // internals
     //
 
-    var scope = this
+    this.changeEvent = { type: 'change' }
+    this.startEvent = { type: 'start' }
+    this.endEvent = { type: 'end' }
 
-    var changeEvent = { type: 'change' }
-    const startEvent = { type: 'start' }
-    const endEvent = { type: 'end' }
+    this.state = STATE.NONE
 
-    var STATE = {
-      NONE: -1,
-      ROTATE: 0,
-      DOLLY: 1,
-      PAN: 2,
-      TOUCH_ROTATE: 3,
-      TOUCH_PAN: 4,
-      TOUCH_DOLLY_PAN: 5,
-      TOUCH_DOLLY_ROTATE: 6,
-    }
-
-    var state = STATE.NONE
-
-    var EPS = 0.000001
+    this.EPS = 0.000001
 
     // current position in spherical coordinates
-    var spherical = new Spherical()
-    var sphericalDelta = new Spherical()
+    this.spherical = new Spherical()
+    this.sphericalDelta = new Spherical()
 
-    var scale = 1
-    var panOffset = new Vector3()
-    var zoomChanged = false
+    this.scale = 1
+    this.panOffset = new Vector3()
+    this.zoomChanged = false
 
-    const rotateStart = new Vector2()
-    const rotateEnd = new Vector2()
-    const rotateDelta = new Vector2()
+    this.rotateStart = new Vector2()
+    this.rotateEnd = new Vector2()
+    this.rotateDelta = new Vector2()
 
-    const panStart = new Vector2()
-    const panEnd = new Vector2()
-    const panDelta = new Vector2()
+    this.panStart = new Vector2()
+    this.panEnd = new Vector2()
+    this.panDelta = new Vector2()
 
-    const dollyStart = new Vector2()
-    const dollyEnd = new Vector2()
-    const dollyDelta = new Vector2()
-
-    function getAutoRotationAngle() {
-      return ((2 * Math.PI) / 60 / 60) * scope.autoRotateSpeed
-    }
-
-    function getZoomScale() {
-      return Math.pow(0.95, scope.zoomSpeed)
-    }
+    this.dollyStart = new Vector2()
+    this.dollyEnd = new Vector2()
+    this.dollyDelta = new Vector2()
 
     function rotateLeft(angle: number) {
       sphericalDelta.theta -= angle
@@ -444,16 +285,16 @@ class CameraControls extends EventDispatcher {
       const v = new Vector3()
 
       return function panUp(distance: number, objectMatrix: Matrix4) {
-        if (scope.screenSpacePanning === true) {
+        if (this.screenSpacePanning === true) {
           v.setFromMatrixColumn(objectMatrix, 1)
         } else {
           v.setFromMatrixColumn(objectMatrix, 0)
-          v.crossVectors(scope.object.up, v)
+          v.crossVectors(this.object.up, v)
         }
 
         v.multiplyScalar(distance)
 
-        panOffset.add(v)
+        this.panOffset.add(v)
       }
     })()
 
@@ -462,61 +303,61 @@ class CameraControls extends EventDispatcher {
       const offset = new Vector3()
 
       return function pan(deltaX: number, deltaY: number) {
-        const element = scope.domElement
+        const element = this.domElement
 
-        if (scope.object.isPerspectiveCamera && element instanceof HTMLElement) {
+        if (this.object.isPerspectiveCamera && element instanceof HTMLElement) {
           // perspective
-          const position = scope.object.position
-          offset.copy(position).sub(scope.target)
+          const position = this.object.position
+          offset.copy(position).sub(this.target)
           let targetDistance = offset.length()
 
           // half of the fov is center to top of screen
-          targetDistance *= Math.tan(((scope.object.fov / 2) * Math.PI) / 180.0)
+          targetDistance *= Math.tan(((this.object.fov / 2) * Math.PI) / 180.0)
 
           // we use only clientHeight here so aspect ratio does not distort speed
-          panLeft((2 * deltaX * targetDistance) / element.clientHeight, scope.object.matrix)
-          panUp((2 * deltaY * targetDistance) / element.clientHeight, scope.object.matrix)
-        } else if (scope.object.isOrthographicCamera) {
+          panLeft((2 * deltaX * targetDistance) / element.clientHeight, this.object.matrix)
+          panUp((2 * deltaY * targetDistance) / element.clientHeight, this.object.matrix)
+        } else if (this.object.isOrthographicCamera) {
           // orthographic
           panLeft(
-            (deltaX * (scope.object.right - scope.object.left)) / scope.object.zoom / element.clientWidth,
-            scope.object.matrix,
+            (deltaX * (this.object.right - this.object.left)) / this.object.zoom / element.clientWidth,
+            this.object.matrix,
           )
           panUp(
-            (deltaY * (scope.object.top - scope.object.bottom)) / scope.object.zoom / element.clientHeight,
-            scope.object.matrix,
+            (deltaY * (this.object.top - this.object.bottom)) / this.object.zoom / element.clientHeight,
+            this.object.matrix,
           )
         } else {
           // camera neither orthographic nor perspective
           console.warn('WARNING: CameraControls.js encountered an unknown camera type - pan disabled.')
-          scope.enablePan = false
+          this.enablePan = false
         }
       }
     })()
 
     function dollyIn(dollyScale: number) {
-      if (scope.object.isPerspectiveCamera) {
+      if (this.object.isPerspectiveCamera) {
         scale /= dollyScale
-      } else if (scope.object.isOrthographicCamera) {
-        scope.object.zoom = Math.max(scope.minZoom, Math.min(scope.maxZoom, scope.object.zoom * dollyScale))
-        scope.object.updateProjectionMatrix()
+      } else if (this.object.isOrthographicCamera) {
+        this.object.zoom = Math.max(this.minZoom, Math.min(this.maxZoom, this.object.zoom * dollyScale))
+        this.object.updateProjectionMatrix()
         zoomChanged = true
       } else {
         console.warn('WARNING: CameraControls.js encountered an unknown camera type - dolly/zoom disabled.')
-        scope.enableZoom = false
+        this.enableZoom = false
       }
     }
 
     function dollyOut(dollyScale: number) {
-      if (scope.object.isPerspectiveCamera) {
+      if (this.object.isPerspectiveCamera) {
         scale *= dollyScale
-      } else if (scope.object.isOrthographicCamera) {
-        scope.object.zoom = Math.max(scope.minZoom, Math.min(scope.maxZoom, scope.object.zoom / dollyScale))
-        scope.object.updateProjectionMatrix()
+      } else if (this.object.isOrthographicCamera) {
+        this.object.zoom = Math.max(this.minZoom, Math.min(this.maxZoom, this.object.zoom / dollyScale))
+        this.object.updateProjectionMatrix()
         zoomChanged = true
       } else {
         console.warn('WARNING: CameraControls.js encountered an unknown camera type - dolly/zoom disabled.')
-        scope.enableZoom = false
+        this.enableZoom = false
       }
     }
 
@@ -539,9 +380,9 @@ class CameraControls extends EventDispatcher {
     function handleMouseMoveRotate(event: MouseEvent) {
       rotateEnd.set(event.clientX, event.clientY)
 
-      rotateDelta.subVectors(rotateEnd, rotateStart).multiplyScalar(scope.rotateSpeed)
+      rotateDelta.subVectors(rotateEnd, rotateStart).multiplyScalar(this.rotateSpeed)
 
-      const element = scope.domElement
+      const element = this.domElement
 
       rotateLeft((2 * Math.PI * rotateDelta.x) / element.clientHeight) // yes, height
 
@@ -549,7 +390,7 @@ class CameraControls extends EventDispatcher {
 
       rotateStart.copy(rotateEnd)
 
-      scope.update()
+      this.update()
     }
 
     function handleMouseMoveDolly(event: MouseEvent) {
@@ -565,19 +406,19 @@ class CameraControls extends EventDispatcher {
 
       dollyStart.copy(dollyEnd)
 
-      scope.update()
+      this.update()
     }
 
     function handleMouseMovePan(event: MouseEvent) {
       panEnd.set(event.clientX, event.clientY)
 
-      panDelta.subVectors(panEnd, panStart).multiplyScalar(scope.panSpeed)
+      panDelta.subVectors(panEnd, panStart).multiplyScalar(this.panSpeed)
 
       pan(panDelta.x, panDelta.y)
 
       panStart.copy(panEnd)
 
-      scope.update()
+      this.update()
     }
 
     function handleMouseUp(/*event*/) {
@@ -591,30 +432,30 @@ class CameraControls extends EventDispatcher {
         dollyIn(getZoomScale())
       }
 
-      scope.update()
+      this.update()
     }
 
     function handleKeyDown(event: KeyboardEvent) {
       let needsUpdate = false
 
       switch (event.keyCode) {
-        case scope.keys.UP:
-          pan(0, scope.keyPanSpeed)
+        case this.keys.UP:
+          pan(0, this.keyPanSpeed)
           needsUpdate = true
           break
 
-        case scope.keys.BOTTOM:
-          pan(0, -scope.keyPanSpeed)
+        case this.keys.BOTTOM:
+          pan(0, -this.keyPanSpeed)
           needsUpdate = true
           break
 
-        case scope.keys.LEFT:
-          pan(scope.keyPanSpeed, 0)
+        case this.keys.LEFT:
+          pan(this.keyPanSpeed, 0)
           needsUpdate = true
           break
 
-        case scope.keys.RIGHT:
-          pan(-scope.keyPanSpeed, 0)
+        case this.keys.RIGHT:
+          pan(-this.keyPanSpeed, 0)
           needsUpdate = true
           break
       }
@@ -623,7 +464,7 @@ class CameraControls extends EventDispatcher {
         // prevent the browser from scrolling on cursor keys
         event.preventDefault()
 
-        scope.update()
+        this.update()
       }
     }
 
@@ -659,15 +500,15 @@ class CameraControls extends EventDispatcher {
     }
 
     function handleTouchStartDollyPan(event: TouchEvent) {
-      if (scope.enableZoom) handleTouchStartDolly(event)
+      if (this.enableZoom) handleTouchStartDolly(event)
 
-      if (scope.enablePan) handleTouchStartPan(event)
+      if (this.enablePan) handleTouchStartPan(event)
     }
 
     function handleTouchStartDollyRotate(event: TouchEvent) {
-      if (scope.enableZoom) handleTouchStartDolly(event)
+      if (this.enableZoom) handleTouchStartDolly(event)
 
-      if (scope.enableRotate) handleTouchStartRotate(event)
+      if (this.enableRotate) handleTouchStartRotate(event)
     }
 
     function handleTouchMoveRotate(event: TouchEvent) {
@@ -680,9 +521,9 @@ class CameraControls extends EventDispatcher {
         rotateEnd.set(x, y)
       }
 
-      rotateDelta.subVectors(rotateEnd, rotateStart).multiplyScalar(scope.rotateSpeed)
+      rotateDelta.subVectors(rotateEnd, rotateStart).multiplyScalar(this.rotateSpeed)
 
-      const element = scope.domElement
+      const element = this.domElement
 
       rotateLeft((2 * Math.PI * rotateDelta.x) / element.clientHeight) // yes, height
 
@@ -701,7 +542,7 @@ class CameraControls extends EventDispatcher {
         panEnd.set(x, y)
       }
 
-      panDelta.subVectors(panEnd, panStart).multiplyScalar(scope.panSpeed)
+      panDelta.subVectors(panEnd, panStart).multiplyScalar(this.panSpeed)
 
       pan(panDelta.x, panDelta.y)
 
@@ -716,7 +557,7 @@ class CameraControls extends EventDispatcher {
 
       dollyEnd.set(0, distance)
 
-      dollyDelta.set(0, Math.pow(dollyEnd.y / dollyStart.y, scope.zoomSpeed))
+      dollyDelta.set(0, Math.pow(dollyEnd.y / dollyStart.y, this.zoomSpeed))
 
       dollyIn(dollyDelta.y)
 
@@ -724,15 +565,15 @@ class CameraControls extends EventDispatcher {
     }
 
     function handleTouchMoveDollyPan(event: TouchEvent) {
-      if (scope.enableZoom) handleTouchMoveDolly(event)
+      if (this.enableZoom) handleTouchMoveDolly(event)
 
-      if (scope.enablePan) handleTouchMovePan(event)
+      if (this.enablePan) handleTouchMovePan(event)
     }
 
     function handleTouchMoveDollyRotate(event: TouchEvent) {
-      if (scope.enableZoom) handleTouchMoveDolly(event)
+      if (this.enableZoom) handleTouchMoveDolly(event)
 
-      if (scope.enableRotate) handleTouchMoveRotate(event)
+      if (this.enableRotate) handleTouchMoveRotate(event)
     }
 
     function handleTouchEnd(/*event*/) {
@@ -744,7 +585,7 @@ class CameraControls extends EventDispatcher {
     //
 
     function onMouseDown(event: MouseEvent) {
-      if (scope.enabled === false) return
+      if (this.enabled === false) return
 
       // Prevent the browser from scrolling.
 
@@ -753,21 +594,21 @@ class CameraControls extends EventDispatcher {
       // Manually set the focus since calling preventDefault above
       // prevents the browser from setting it automatically.
 
-      scope.domElement.focus ? scope.domElement.focus() : window.focus()
+      this.domElement.focus ? this.domElement.focus() : window.focus()
 
       let mouseAction
 
       switch (event.button) {
         case 0:
-          mouseAction = scope.mouseButtons.LEFT
+          mouseAction = this.mouseButtons.LEFT
           break
 
         case 1:
-          mouseAction = scope.mouseButtons.MIDDLE
+          mouseAction = this.mouseButtons.MIDDLE
           break
 
         case 2:
-          mouseAction = scope.mouseButtons.RIGHT
+          mouseAction = this.mouseButtons.RIGHT
           break
 
         default:
@@ -776,7 +617,7 @@ class CameraControls extends EventDispatcher {
 
       switch (mouseAction) {
         case MOUSE.DOLLY:
-          if (scope.enableZoom === false) return
+          if (this.enableZoom === false) return
 
           handleMouseDownDolly(event)
 
@@ -786,13 +627,13 @@ class CameraControls extends EventDispatcher {
 
         case MOUSE.ROTATE:
           if (event.ctrlKey || event.metaKey || event.shiftKey) {
-            if (scope.enablePan === false) return
+            if (this.enablePan === false) return
 
             handleMouseDownPan(event)
 
             state = STATE.PAN
           } else {
-            if (scope.enableRotate === false) return
+            if (this.enableRotate === false) return
 
             handleMouseDownRotate(event)
 
@@ -803,13 +644,13 @@ class CameraControls extends EventDispatcher {
 
         case MOUSE.PAN:
           if (event.ctrlKey || event.metaKey || event.shiftKey) {
-            if (scope.enableRotate === false) return
+            if (this.enableRotate === false) return
 
             handleMouseDownRotate(event)
 
             state = STATE.ROTATE
           } else {
-            if (scope.enablePan === false) return
+            if (this.enablePan === false) return
 
             handleMouseDownPan(event)
 
@@ -826,32 +667,32 @@ class CameraControls extends EventDispatcher {
         document.addEventListener('mousemove', onMouseMove, false)
         document.addEventListener('mouseup', onMouseUp, false)
 
-        scope.dispatchEvent(startEvent)
+        this.dispatchEvent(startEvent)
       }
     }
 
     function onMouseMove(event: MouseEvent) {
-      if (scope.enabled === false) return
+      if (this.enabled === false) return
 
       event.preventDefault()
 
       switch (state) {
         case STATE.ROTATE:
-          if (scope.enableRotate === false) return
+          if (this.enableRotate === false) return
 
           handleMouseMoveRotate(event)
 
           break
 
         case STATE.DOLLY:
-          if (scope.enableZoom === false) return
+          if (this.enableZoom === false) return
 
           handleMouseMoveDolly(event)
 
           break
 
         case STATE.PAN:
-          if (scope.enablePan === false) return
+          if (this.enablePan === false) return
 
           handleMouseMovePan(event)
 
@@ -860,48 +701,48 @@ class CameraControls extends EventDispatcher {
     }
 
     function onMouseUp(event: MouseEvent) {
-      if (scope.enabled === false) return
+      if (this.enabled === false) return
 
       handleMouseUp(event)
 
       document.removeEventListener('mousemove', onMouseMove, false)
       document.removeEventListener('mouseup', onMouseUp, false)
 
-      scope.dispatchEvent(endEvent)
+      this.dispatchEvent(endEvent)
 
       state = STATE.NONE
     }
 
     function onMouseWheel(event: WheelEvent) {
-      if (scope.enabled === false || scope.enableZoom === false || (state !== STATE.NONE && state !== STATE.ROTATE)) {
+      if (this.enabled === false || this.enableZoom === false || (state !== STATE.NONE && state !== STATE.ROTATE)) {
         return
       }
 
       event.preventDefault()
 
-      scope.dispatchEvent(startEvent)
+      this.dispatchEvent(startEvent)
 
       handleMouseWheel(event)
 
-      scope.dispatchEvent(endEvent)
+      this.dispatchEvent(endEvent)
     }
 
     function onKeyDown(event: KeyboardEvent) {
-      if (scope.enabled === false || scope.enableKeys === false || scope.enablePan === false) return
+      if (this.enabled === false || this.enableKeys === false || this.enablePan === false) return
 
       handleKeyDown(event)
     }
 
     function onTouchStart(event: TouchEvent) {
-      if (scope.enabled === false) return
+      if (this.enabled === false) return
 
       event.preventDefault()
 
       switch (event.touches.length) {
         case 1:
-          switch (scope.touches.ONE) {
+          switch (this.touches.ONE) {
             case TOUCH.ROTATE:
-              if (scope.enableRotate === false) return
+              if (this.enableRotate === false) return
 
               handleTouchStartRotate(event)
 
@@ -910,7 +751,7 @@ class CameraControls extends EventDispatcher {
               break
 
             case TOUCH.PAN:
-              if (scope.enablePan === false) return
+              if (this.enablePan === false) return
 
               handleTouchStartPan(event)
 
@@ -925,9 +766,9 @@ class CameraControls extends EventDispatcher {
           break
 
         case 2:
-          switch (scope.touches.TWO) {
+          switch (this.touches.TWO) {
             case TOUCH.DOLLY_PAN:
-              if (scope.enableZoom === false && scope.enablePan === false) return
+              if (this.enableZoom === false && this.enablePan === false) return
 
               handleTouchStartDollyPan(event)
 
@@ -936,7 +777,7 @@ class CameraControls extends EventDispatcher {
               break
 
             case TOUCH.DOLLY_ROTATE:
-              if (scope.enableZoom === false && scope.enableRotate === false) return
+              if (this.enableZoom === false && this.enableRotate === false) return
 
               handleTouchStartDollyRotate(event)
 
@@ -955,49 +796,49 @@ class CameraControls extends EventDispatcher {
       }
 
       if (state !== STATE.NONE) {
-        scope.dispatchEvent(startEvent)
+        this.dispatchEvent(startEvent)
       }
     }
 
     function onTouchMove(event: TouchEvent) {
-      if (scope.enabled === false) return
+      if (this.enabled === false) return
 
       event.preventDefault()
 
       switch (state) {
         case STATE.TOUCH_ROTATE:
-          if (scope.enableRotate === false) return
+          if (this.enableRotate === false) return
 
           handleTouchMoveRotate(event)
 
-          scope.update()
+          this.update()
 
           break
 
         case STATE.TOUCH_PAN:
-          if (scope.enablePan === false) return
+          if (this.enablePan === false) return
 
           handleTouchMovePan(event)
 
-          scope.update()
+          this.update()
 
           break
 
         case STATE.TOUCH_DOLLY_PAN:
-          if (scope.enableZoom === false && scope.enablePan === false) return
+          if (this.enableZoom === false && this.enablePan === false) return
 
           handleTouchMoveDollyPan(event)
 
-          scope.update()
+          this.update()
 
           break
 
         case STATE.TOUCH_DOLLY_ROTATE:
-          if (scope.enableZoom === false && scope.enableRotate === false) return
+          if (this.enableZoom === false && this.enableRotate === false) return
 
           handleTouchMoveDollyRotate(event)
 
-          scope.update()
+          this.update()
 
           break
 
@@ -1007,46 +848,229 @@ class CameraControls extends EventDispatcher {
     }
 
     function onTouchEnd(event: TouchEvent) {
-      if (scope.enabled === false) return
+      if (this.enabled === false) return
 
       handleTouchEnd(event)
 
-      scope.dispatchEvent(endEvent)
+      this.dispatchEvent(endEvent)
 
       state = STATE.NONE
     }
 
     function onContextMenu(event: Event) {
-      if (scope.enabled === false) return
+      if (this.enabled === false) return
 
       event.preventDefault()
     }
 
     //
 
-    scope.domElement.addEventListener('contextmenu', onContextMenu, false)
+    this.domElement.addEventListener('contextmenu', onContextMenu, false)
 
-    scope.domElement.addEventListener('mousedown', onMouseDown, false)
-    scope.domElement.addEventListener('wheel', onMouseWheel, false)
+    this.domElement.addEventListener('mousedown', onMouseDown, false)
+    this.domElement.addEventListener('wheel', onMouseWheel, false)
 
-    scope.domElement.addEventListener('touchstart', onTouchStart, false)
-    scope.domElement.addEventListener('touchend', onTouchEnd, false)
-    scope.domElement.addEventListener('touchmove', onTouchMove, false)
+    this.domElement.addEventListener('touchstart', onTouchStart, false)
+    this.domElement.addEventListener('touchend', onTouchEnd, false)
+    this.domElement.addEventListener('touchmove', onTouchMove, false)
 
-    scope.domElement.addEventListener('keydown', onKeyDown, false)
+    this.domElement.addEventListener('keydown', onKeyDown, false)
 
     // make sure element can receive keys.
 
-    if (scope.domElement.tabIndex === -1) {
-      scope.domElement.tabIndex = 0
+    if (this.domElement.tabIndex === -1) {
+      this.domElement.tabIndex = 0
     }
 
     // force an update at start
 
-    this.object.lookAt(scope.target)
+    this.object.lookAt(this.target)
     this.update()
     this.saveState()
   }
+
+  //
+  // public methods
+  //
+
+  getPolarAngle = () => this.spherical.phi
+
+  getAzimuthalAngle = () => this.spherical.theta
+
+  saveState = () => {
+    this.target0.copy(this.target)
+    this.position0.copy(this.object.position)
+    this.quaternion0.copy(this.object.quaternion)
+    this.zoom0 = this.object.zoom
+  }
+
+  reset = () => {
+    this.target.copy(this.target0)
+    this.object.position.copy(this.position0)
+    this.object.quaternion.copy(this.quaternion0)
+    this.object.zoom = this.zoom0
+
+    this.object.updateProjectionMatrix()
+    this.dispatchEvent(changeEvent)
+
+    this.update()
+
+    this.state = STATE.NONE
+  }
+
+  dispose = () => {
+    this.domElement.removeEventListener('contextmenu', this.onContextMenu, false)
+    this.domElement.removeEventListener('mousedown', this.onMouseDown, false)
+    this.domElement.removeEventListener('wheel', this.onMouseWheel, false)
+
+    this.domElement.removeEventListener('touchstart', this.onTouchStart, false)
+    this.domElement.removeEventListener('touchend', this.onTouchEnd, false)
+    this.domElement.removeEventListener('touchmove', this.onTouchMove, false)
+
+    document.removeEventListener('mousemove', this.onMouseMove, false)
+    document.removeEventListener('mouseup', this.onMouseUp, false)
+
+    this.domElement.removeEventListener('keydown', this.onKeyDown, false)
+
+    //this.dispatchEvent( { type: 'dispose' } ); // should this be added here?
+  }
+
+  private update = (() => {
+    const offset = new Vector3()
+
+    // so camera.up is the orbit axis
+    const quat = new Quaternion().setFromUnitVectors(this.object.up, new Vector3(0, 1, 0))
+    const quatInverse = quat.clone().invert()
+
+    const lastPosition = new Vector3()
+    const lastQuaternion = new Quaternion()
+
+    const q = new Quaternion()
+    const vec = new Vector3()
+
+    return () => {
+      const position = this.object.position
+
+      offset.copy(position).sub(this.target)
+
+      if (this.trackball) {
+        // rotate around screen-space y-axis
+
+        if (this.sphericalDelta.theta) {
+          vec.set(0, 1, 0).applyQuaternion(this.object.quaternion)
+
+          var factor = this.enableDamping ? this.dampingFactor : 1
+
+          q.setFromAxisAngle(vec, this.sphericalDelta.theta * factor)
+
+          this.object.quaternion.premultiply(q)
+          offset.applyQuaternion(q)
+        }
+
+        // rotate around screen-space x-axis
+
+        if (this.sphericalDelta.phi) {
+          vec.set(1, 0, 0).applyQuaternion(this.object.quaternion)
+
+          var factor = this.enableDamping ? this.dampingFactor : 1
+
+          q.setFromAxisAngle(vec, this.sphericalDelta.phi * factor)
+
+          this.object.quaternion.premultiply(q)
+          offset.applyQuaternion(q)
+        }
+
+        offset.multiplyScalar(this.scale)
+        offset.clampLength(this.minDistance, this.maxDistance)
+      } else {
+        // rotate offset to "y-axis-is-up" space
+        offset.applyQuaternion(quat)
+
+        if (this.autoRotate && this.state === STATE.NONE) {
+          this.rotateLeft(this.getAutoRotationAngle())
+        }
+
+        this.spherical.setFromVector3(offset)
+
+        if (this.enableDamping) {
+          this.spherical.theta += this.sphericalDelta.theta * this.dampingFactor
+          this.spherical.phi += this.sphericalDelta.phi * this.dampingFactor
+        } else {
+          this.spherical.theta += this.sphericalDelta.theta
+          this.spherical.phi += this.sphericalDelta.phi
+        }
+
+        // restrict theta to be between desired limits
+        this.spherical.theta = Math.max(this.minAzimuthAngle, Math.min(this.maxAzimuthAngle, this.spherical.theta))
+
+        // restrict phi to be between desired limits
+        this.spherical.phi = Math.max(this.minPolarAngle, Math.min(this.maxPolarAngle, this.spherical.phi))
+
+        this.spherical.makeSafe()
+
+        this.spherical.radius *= this.scale
+
+        // restrict radius to be between desired limits
+        this.spherical.radius = Math.max(this.minDistance, Math.min(this.maxDistance, this.spherical.radius))
+
+        offset.setFromSpherical(this.spherical)
+
+        // rotate offset back to "camera-up-vector-is-up" space
+        offset.applyQuaternion(quatInverse)
+      }
+
+      // move target to panned location
+
+      if (this.enableDamping === true) {
+        this.target.addScaledVector(this.panOffset, this.dampingFactor)
+      } else {
+        this.target.add(this.panOffset)
+      }
+
+      position.copy(this.target).add(offset)
+
+      if (this.trackball === false) {
+        this.object.lookAt(this.target)
+      }
+
+      if (this.enableDamping === true) {
+        this.sphericalDelta.theta *= 1 - this.dampingFactor
+        this.sphericalDelta.phi *= 1 - this.dampingFactor
+
+        this.panOffset.multiplyScalar(1 - this.dampingFactor)
+      } else {
+        this.sphericalDelta.set(0, 0, 0)
+
+        this.panOffset.set(0, 0, 0)
+      }
+
+      this.scale = 1
+
+      // update condition is:
+      // min(camera displacement, camera rotation in radians)^2 > EPS
+      // using small-angle approximation cos(x/2) = 1 - x^2 / 8
+
+      if (
+        this.zoomChanged ||
+        lastPosition.distanceToSquared(this.object.position) > this.EPS ||
+        8 * (1 - lastQuaternion.dot(this.object.quaternion)) > this.EPS
+      ) {
+        this.dispatchEvent(this.changeEvent)
+
+        lastPosition.copy(this.object.position)
+        lastQuaternion.copy(this.object.quaternion)
+        this.zoomChanged = false
+
+        return true
+      }
+
+      return false
+    }
+  })()
+
+  private getAutoRotationAngle = () => ((2 * Math.PI) / 60 / 60) * this.autoRotateSpeed
+
+  private getZoomScale = () => Math.pow(0.95, this.zoomSpeed)
 }
 
 /**
