@@ -82,22 +82,13 @@ class OrbitControls extends EventDispatcher {
   saveState: () => void
   reset: () => void
   update: () => void
+  connect: (domElement: HTMLElement) => void
   dispose: () => void
 
-  constructor(object: Camera, domElement: HTMLElement) {
+  constructor(object: Camera, domElement?: HTMLElement) {
     super()
 
-    if (domElement === undefined) {
-      console.warn('THREE.OrbitControls: The second parameter "domElement" is now mandatory.')
-    }
-    if ((domElement as any) === document) {
-      console.error(
-        'THREE.OrbitControls: "document" should not be used as the target "domElement". Please use "renderer.domElement" instead.',
-      )
-    }
-
     this.object = object
-    this.domElement = domElement
     // for reset
     this.target0 = this.target.clone()
     this.position0 = this.object.position.clone()
@@ -253,23 +244,33 @@ class OrbitControls extends EventDispatcher {
       }
     })()
 
+    this.connect = (domElement: HTMLElement) => {
+      if ((domElement as any) === document) {
+        console.error(
+          'THREE.OrbitControls: "document" should not be used as the target "domElement". Please use "renderer.domElement" instead.',
+        )
+      }
+      scope.domElement = domElement
+      scope.domElement.addEventListener('contextmenu', onContextMenu)
+      scope.domElement.addEventListener('pointerdown', onPointerDown)
+      scope.domElement.addEventListener('wheel', onMouseWheel)
+      scope.domElement.addEventListener('touchstart', onTouchStart)
+      scope.domElement.addEventListener('touchend', onTouchEnd)
+      scope.domElement.addEventListener('touchmove', onTouchMove)
+    }
+
     this.dispose = () => {
       scope.domElement.removeEventListener('contextmenu', onContextMenu)
-
       scope.domElement.removeEventListener('pointerdown', onPointerDown)
       scope.domElement.removeEventListener('wheel', onMouseWheel)
-
       scope.domElement.removeEventListener('touchstart', onTouchStart)
       scope.domElement.removeEventListener('touchend', onTouchEnd)
       scope.domElement.removeEventListener('touchmove', onTouchMove)
-
       scope.domElement.ownerDocument.removeEventListener('pointermove', onPointerMove)
       scope.domElement.ownerDocument.removeEventListener('pointerup', onPointerUp)
-
       if (scope._domElementKeyEvents !== null) {
         scope._domElementKeyEvents.removeEventListener('keydown', onKeyDown)
       }
-
       //scope.dispatchEvent( { type: 'dispose' } ); // should this be added here?
     }
 
@@ -886,19 +887,9 @@ class OrbitControls extends EventDispatcher {
       event.preventDefault()
     }
 
-    //
-
-    scope.domElement.addEventListener('contextmenu', onContextMenu)
-
-    scope.domElement.addEventListener('pointerdown', onPointerDown)
-    scope.domElement.addEventListener('wheel', onMouseWheel)
-
-    scope.domElement.addEventListener('touchstart', onTouchStart)
-    scope.domElement.addEventListener('touchend', onTouchEnd)
-    scope.domElement.addEventListener('touchmove', onTouchMove)
-
+    // connect events
+    if (domElement !== undefined) this.connect(domElement)
     // force an update at start
-
     this.update()
   }
 }
