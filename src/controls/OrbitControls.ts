@@ -21,7 +21,7 @@ import {
 
 class OrbitControls extends EventDispatcher {
   object: Camera
-  domElement: HTMLElement
+  domElement: HTMLElement | undefined
   // Set to false to disable this control
   enabled = true
   // "target" sets the location of focus, where the object orbits around
@@ -89,7 +89,7 @@ class OrbitControls extends EventDispatcher {
     super()
 
     this.object = object
-    this.domElement = (null as unknown) as HTMLElement
+    this.domElement = domElement
     // for reset
     this.target0 = this.target.clone()
     this.position0 = this.object.position.clone()
@@ -262,14 +262,14 @@ class OrbitControls extends EventDispatcher {
     }
 
     this.dispose = () => {
-      scope.domElement.removeEventListener('contextmenu', onContextMenu)
-      scope.domElement.removeEventListener('pointerdown', onPointerDown)
-      scope.domElement.removeEventListener('wheel', onMouseWheel)
-      scope.domElement.removeEventListener('touchstart', onTouchStart)
-      scope.domElement.removeEventListener('touchend', onTouchEnd)
-      scope.domElement.removeEventListener('touchmove', onTouchMove)
-      scope.domElement.ownerDocument.removeEventListener('pointermove', onPointerMove)
-      scope.domElement.ownerDocument.removeEventListener('pointerup', onPointerUp)
+      scope.domElement?.removeEventListener('contextmenu', onContextMenu)
+      scope.domElement?.removeEventListener('pointerdown', onPointerDown)
+      scope.domElement?.removeEventListener('wheel', onMouseWheel)
+      scope.domElement?.removeEventListener('touchstart', onTouchStart)
+      scope.domElement?.removeEventListener('touchend', onTouchEnd)
+      scope.domElement?.removeEventListener('touchmove', onTouchMove)
+      scope.domElement?.ownerDocument.removeEventListener('pointermove', onPointerMove)
+      scope.domElement?.ownerDocument.removeEventListener('pointerup', onPointerUp)
       if (scope._domElementKeyEvents !== null) {
         scope._domElementKeyEvents.removeEventListener('keydown', onKeyDown)
       }
@@ -372,7 +372,7 @@ class OrbitControls extends EventDispatcher {
       return function pan(deltaX: number, deltaY: number) {
         const element = scope.domElement
 
-        if (scope.object instanceof PerspectiveCamera && scope.object.isPerspectiveCamera) {
+        if (element && scope.object instanceof PerspectiveCamera && scope.object.isPerspectiveCamera) {
           // perspective
           const position = scope.object.position
           offset.copy(position).sub(scope.target)
@@ -384,7 +384,7 @@ class OrbitControls extends EventDispatcher {
           // we use only clientHeight here so aspect ratio does not distort speed
           panLeft((2 * deltaX * targetDistance) / element.clientHeight, scope.object.matrix)
           panUp((2 * deltaY * targetDistance) / element.clientHeight, scope.object.matrix)
-        } else if (scope.object instanceof OrthographicCamera && scope.object.isOrthographicCamera) {
+        } else if (element && scope.object instanceof OrthographicCamera && scope.object.isOrthographicCamera) {
           // orthographic
           panLeft(
             (deltaX * (scope.object.right - scope.object.left)) / scope.object.zoom / element.clientWidth,
@@ -450,8 +450,10 @@ class OrbitControls extends EventDispatcher {
 
       const element = scope.domElement
 
-      rotateLeft((2 * Math.PI * rotateDelta.x) / element.clientHeight) // yes, height
-      rotateUp((2 * Math.PI * rotateDelta.y) / element.clientHeight)
+      if (element) {
+        rotateLeft((2 * Math.PI * rotateDelta.x) / element.clientHeight) // yes, height
+        rotateUp((2 * Math.PI * rotateDelta.y) / element.clientHeight)
+      }
       rotateStart.copy(rotateEnd)
       scope.update()
     }
@@ -578,8 +580,10 @@ class OrbitControls extends EventDispatcher {
 
       const element = scope.domElement
 
-      rotateLeft((2 * Math.PI * rotateDelta.x) / element.clientHeight) // yes, height
-      rotateUp((2 * Math.PI * rotateDelta.y) / element.clientHeight)
+      if (element) {
+        rotateLeft((2 * Math.PI * rotateDelta.x) / element.clientHeight) // yes, height
+        rotateUp((2 * Math.PI * rotateDelta.y) / element.clientHeight)
+      }
       rotateStart.copy(rotateEnd)
     }
 
@@ -671,7 +675,7 @@ class OrbitControls extends EventDispatcher {
       // Manually set the focus since calling preventDefault above
       // prevents the browser from setting it automatically.
 
-      scope.domElement.focus ? scope.domElement.focus() : window.focus()
+      scope.domElement?.focus ? scope.domElement.focus() : window.focus()
 
       let mouseAction
 
@@ -728,8 +732,8 @@ class OrbitControls extends EventDispatcher {
       }
 
       if (state !== STATE.NONE) {
-        scope.domElement.ownerDocument.addEventListener('pointermove', onPointerMove)
-        scope.domElement.ownerDocument.addEventListener('pointerup', onPointerUp)
+        scope.domElement?.ownerDocument.addEventListener('pointermove', onPointerMove)
+        scope.domElement?.ownerDocument.addEventListener('pointerup', onPointerUp)
         scope.dispatchEvent(startEvent)
       }
     }
@@ -758,8 +762,8 @@ class OrbitControls extends EventDispatcher {
     }
 
     function onMouseUp(event: MouseEvent) {
-      scope.domElement.ownerDocument.removeEventListener('pointermove', onPointerMove)
-      scope.domElement.ownerDocument.removeEventListener('pointerup', onPointerUp)
+      scope.domElement?.ownerDocument.removeEventListener('pointermove', onPointerMove)
+      scope.domElement?.ownerDocument.removeEventListener('pointerup', onPointerUp)
 
       if (scope.enabled === false) return
       handleMouseUp()
