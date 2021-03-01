@@ -1086,6 +1086,9 @@ class OrbitControlsExp extends EventDispatcher {
   constructor(object: Object3D, domElement: HTMLElement) {
     super()
 
+    // FIXME:
+    // Argument of type 'this' is not assignable to parameter of type 'CameraControls'.
+    // Type 'OrbitControlsExp' is missing the following properties from type 'CameraControls': object, domElement, enabled, target, and 90 more.
     CameraControls.call(this, object, domElement)
 
     this.mouseButtons = {
@@ -1119,6 +1122,9 @@ class MapControlsExp extends EventDispatcher {
   constructor(object: Object3D, domElement: HTMLElement) {
     super()
 
+    // FIXME:
+    // Argument of type 'this' is not assignable to parameter of type 'CameraControls'.
+    // Type 'MapControlsExp' is missing the following properties from type 'CameraControls': object, domElement, enabled, target, and 90 more.
     CameraControls.call(this, object, domElement)
 
     this.mouseButtons = {
@@ -1155,6 +1161,9 @@ class TrackballControlsExp extends EventDispatcher {
   constructor(object: Object3D, domElement: HTMLElement) {
     super()
 
+    // FIXME:
+    // Argument of type 'this' is not assignable to parameter of type 'CameraControls'.
+    // Type 'TrackballControlsExp' is missing the following properties from type 'CameraControls': object, domElement, enabled, target, and 87 more.
     CameraControls.call(this, object, domElement)
 
     this.trackball = true
