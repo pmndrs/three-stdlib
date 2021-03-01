@@ -86,15 +86,14 @@ class CameraControls extends EventDispatcher {
   // Set to false to disable use of the keys
   enableKeys: boolean
 
-  // TODO: don't hardcode
   // The four arrow keys
-  keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40 }
+  keys: { LEFT: number; UP: number; RIGHT: number; BOTTOM: number }
 
   // Mouse buttons
-  mouseButtons = {
-    LEFT: MOUSE.ROTATE,
-    MIDDLE: MOUSE.DOLLY,
-    RIGHT: MOUSE.PAN,
+  mouseButtons: {
+    LEFT: MOUSE
+    MIDDLE: MOUSE
+    RIGHT: MOUSE
   }
 
   // Touch fingers
@@ -133,7 +132,7 @@ class CameraControls extends EventDispatcher {
   private dollyEnd: Vector2
   private dollyDelta: Vector2
 
-  constructor(object: Camera, domElement: HTMLElement | Document) {
+  constructor(object: Camera, domElement: HTMLElement) {
     super()
 
     if (domElement === undefined) {
@@ -143,9 +142,6 @@ class CameraControls extends EventDispatcher {
       console.error(
         'THREE.CameraControls: "document" should not be used as the target "domElement". Please use "renderer.domElement" instead.',
       )
-
-      // TODO: should we just continue or not even allow Document's as a parameter type?
-      throw new Error()
     }
 
     this.object = object
@@ -227,10 +223,6 @@ class CameraControls extends EventDispatcher {
     this.zoom0 = this.object.zoom
 
     //
-    // public methods
-    //
-
-    //
     // internals
     //
 
@@ -286,10 +278,6 @@ class CameraControls extends EventDispatcher {
     this.saveState()
   }
 
-  //
-  // public methods
-  //
-
   getPolarAngle = () => this.spherical.phi
 
   getAzimuthalAngle = () => this.spherical.theta
@@ -331,8 +319,6 @@ class CameraControls extends EventDispatcher {
 
     //this.dispatchEvent( { type: 'dispose' } ); // should this be added here?
   }
-
-  // Internal methods
 
   private update = (() => {
     const offset = new Vector3()
