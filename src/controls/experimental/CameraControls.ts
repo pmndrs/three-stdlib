@@ -31,69 +31,69 @@ class CameraControls extends EventDispatcher {
   domElement: HTMLElement
 
   /** Set to false to disable this control */
-  enabled: boolean
+  enabled = true
 
   /** "target" sets the location of focus, where the object orbits around */
-  target: Vector3
+  target = new Vector3()
 
-  // Set to true to enable trackball behavior
-  trackball: boolean
+  /** Set to true to enable trackball behavior */
+  trackball = false
 
   // How far you can dolly in and out ( PerspectiveCamera only )
-  minDistance: number
-  maxDistance: number
+  minDistance = 0
+  maxDistance = Infinity
 
   // How far you can zoom in and out ( OrthographicCamera only )
-  minZoom: number
-  maxZoom: number
+  minZoom = 0
+  maxZoom = Infinity
 
   // How far you can orbit vertically, upper and lower limits.
   // Range is 0 to Math.PI radians.
-  minPolarAngle: number // radians
-  maxPolarAngle: number // radians
+  minPolarAngle = 0 // radians
+  maxPolarAngle = Math.PI // radians
 
   // How far you can orbit horizontally, upper and lower limits.
   // If set, must be a sub-interval of the interval [ - Math.PI, Math.PI ].
-  minAzimuthAngle: number // radians
-  maxAzimuthAngle: number // radians
+  minAzimuthAngle = -Infinity // radians
+  maxAzimuthAngle = Infinity // radians
 
   // Set to true to enable damping (inertia)
   // If damping is enabled, you must call controls.update() in your animation loop
-  enableDamping: boolean
-  dampingFactor: number
+  enableDamping = false
+  dampingFactor = 0.05
 
   // This option enables dollying in and out; property named as "zoom" for backwards compatibility
   // Set to false to disable zooming
-  enableZoom: boolean
-  zoomSpeed: number
+  enableZoom = true
+  zoomSpeed = 1.0
 
   // Set to false to disable rotating
-  enableRotate: boolean
-  rotateSpeed: number
+  enableRotate = true
+  rotateSpeed = 1.0
 
   // Set to false to disable panning
-  enablePan: boolean
-  panSpeed: number
-  screenSpacePanning: boolean // if true, pan in screen-space
-  keyPanSpeed: number // pixels moved per arrow key push
+  enablePan = true
+  panSpeed = 1.0
+  screenSpacePanning = false // if true, pan in screen-space
+  keyPanSpeed = 7.0 // pixels moved per arrow key push
 
   // Set to true to automatically rotate around the target
   // If auto-rotate is enabled, you must call controls.update() in your animation loop
   // auto-rotate is not supported for trackball behavior
-  autoRotate: boolean
-  autoRotateSpeed: number // 30 seconds per round when fps is 60
+  autoRotate = false
+  autoRotateSpeed = 2.0 // 30 seconds per round when fps is 60
 
   // Set to false to disable use of the keys
-  enableKeys: boolean
+  enableKeys = true
 
   // The four arrow keys
-  keys: { LEFT: number; UP: number; RIGHT: number; BOTTOM: number }
+  keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40 }
 
   // Mouse buttons
-  mouseButtons: {
-    LEFT: MOUSE
-    MIDDLE?: MOUSE
-    RIGHT: MOUSE
+  mouseButtons = {
+    LEFT: MOUSE.ROTATE,
+    MIDDLE: MOUSE.DOLLY,
+    RIGHT: MOUSE.PAN,
   }
 
   // Touch fingers
@@ -106,40 +106,43 @@ class CameraControls extends EventDispatcher {
   zoom0: number
 
   // current position in spherical coordinates
-  spherical: Spherical
-  sphericalDelta: Spherical
+  spherical = new Spherical()
+  sphericalDelta = new Spherical()
 
-  private changeEvent: { type: 'change' }
-  private startEvent: { type: 'start' }
-  private endEvent: { type: 'end' }
-  private state: STATE
+  private changeEvent = { type: 'change' }
+  private startEvent = { type: 'start' }
+  private endEvent = { type: 'end' }
+  private state = STATE.NONE
 
-  private EPS: number
+  private EPS = 0.000001
 
-  private scale: number
-  private panOffset: Vector3
-  private zoomChanged: boolean
+  private scale = 1
+  private panOffset = new Vector3()
+  private zoomChanged = false
 
-  private rotateStart: Vector2
-  private rotateEnd: Vector2
-  private rotateDelta: Vector2
+  private rotateStart = new Vector2()
+  private rotateEnd = new Vector2()
+  private rotateDelta = new Vector2()
 
-  private panStart: Vector2
-  private panEnd: Vector2
-  private panDelta: Vector2
+  private panStart = new Vector2()
+  private panEnd = new Vector2()
+  private panDelta = new Vector2()
 
-  private dollyStart: Vector2
-  private dollyEnd: Vector2
-  private dollyDelta: Vector2
+  private dollyStart = new Vector2()
+  private dollyEnd = new Vector2()
+  private dollyDelta = new Vector2()
 
-  private offset: Vector3
+  private offset = new Vector3()
+
+  private lastPosition = new Vector3()
+  private lastQuaternion = new Quaternion()
+
+  private q = new Quaternion()
+  private v = new Vector3()
+  private vec = new Vector3()
+
   private quat: Quaternion
   private quatInverse: Quaternion
-  private lastPosition: Vector3
-  private lastQuaternion: Quaternion
-  private q: Quaternion
-  private v: Vector3
-  private vec: Vector3
 
   constructor(object: PerspectiveCamera | OrthographicCamera, domElement: HTMLElement) {
     super()
@@ -156,75 +159,6 @@ class CameraControls extends EventDispatcher {
     this.object = object
     this.domElement = domElement
 
-    // Set to false to disable this control
-    this.enabled = true
-
-    // "target" sets the location of focus, where the object orbits around
-    this.target = new Vector3()
-
-    // Set to true to enable trackball behavior
-    this.trackball = false
-
-    // How far you can dolly in and out ( PerspectiveCamera only )
-    this.minDistance = 0
-    this.maxDistance = Infinity
-
-    // How far you can zoom in and out ( OrthographicCamera only )
-    this.minZoom = 0
-    this.maxZoom = Infinity
-
-    // How far you can orbit vertically, upper and lower limits.
-    // Range is 0 to Math.PI radians.
-    this.minPolarAngle = 0 // radians
-    this.maxPolarAngle = Math.PI // radians
-
-    // How far you can orbit horizontally, upper and lower limits.
-    // If set, must be a sub-interval of the interval [ - Math.PI, Math.PI ].
-    this.minAzimuthAngle = -Infinity // radians
-    this.maxAzimuthAngle = Infinity // radians
-
-    // Set to true to enable damping (inertia)
-    // If damping is enabled, you must call controls.update() in your animation loop
-    this.enableDamping = false
-    this.dampingFactor = 0.05
-
-    // This option enables dollying in and out; property named as "zoom" for backwards compatibility
-    // Set to false to disable zooming
-    this.enableZoom = true
-    this.zoomSpeed = 1.0
-
-    // Set to false to disable rotating
-    this.enableRotate = true
-    this.rotateSpeed = 1.0
-
-    // Set to false to disable panning
-    this.enablePan = true
-    this.panSpeed = 1.0
-    this.screenSpacePanning = false // if true, pan in screen-space
-    this.keyPanSpeed = 7.0 // pixels moved per arrow key push
-
-    // Set to true to automatically rotate around the target
-    // If auto-rotate is enabled, you must call controls.update() in your animation loop
-    // auto-rotate is not supported for trackball behavior
-    this.autoRotate = false
-    this.autoRotateSpeed = 2.0 // 30 seconds per round when fps is 60
-
-    // Set to false to disable use of the keys
-    this.enableKeys = true
-
-    // The four arrow keys
-    this.keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40 }
-
-    // Mouse buttons
-    this.mouseButtons = {
-      LEFT: MOUSE.ROTATE,
-      MIDDLE: MOUSE.DOLLY,
-      RIGHT: MOUSE.PAN,
-    }
-
-    // Touch fingers
-    this.touches = { ONE: TOUCH.ROTATE, TWO: TOUCH.DOLLY_PAN }
-
     // for reset
     this.target0 = this.target.clone()
     this.position0 = this.object.position.clone()
@@ -235,46 +169,12 @@ class CameraControls extends EventDispatcher {
     // internals
     //
 
-    this.changeEvent = { type: 'change' }
-    this.startEvent = { type: 'start' }
-    this.endEvent = { type: 'end' }
-
-    this.state = STATE.NONE
-
-    this.EPS = 0.000001
-
-    // current position in spherical coordinates
-    this.spherical = new Spherical()
-    this.sphericalDelta = new Spherical()
-
-    this.scale = 1
-    this.panOffset = new Vector3()
-    this.zoomChanged = false
-
-    this.rotateStart = new Vector2()
-    this.rotateEnd = new Vector2()
-    this.rotateDelta = new Vector2()
-
-    this.panStart = new Vector2()
-    this.panEnd = new Vector2()
-    this.panDelta = new Vector2()
-
-    this.dollyStart = new Vector2()
-    this.dollyEnd = new Vector2()
-    this.dollyDelta = new Vector2()
-
-    this.offset = new Vector3()
-
     // so camera.up is the orbit axis
     this.quat = new Quaternion().setFromUnitVectors(this.object.up, new Vector3(0, 1, 0))
     this.quatInverse = this.quat.clone().invert()
 
     this.lastPosition = new Vector3()
     this.lastQuaternion = new Quaternion()
-
-    this.q = new Quaternion()
-    this.v = new Vector3()
-    this.vec = new Vector3()
 
     this.domElement.addEventListener('contextmenu', this.onContextMenu, false)
 
