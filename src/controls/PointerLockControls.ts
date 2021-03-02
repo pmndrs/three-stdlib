@@ -32,10 +32,6 @@ class PointerLockControls extends EventDispatcher {
     this.domElement = domElement
     this.camera = camera
 
-    //
-    // internals
-    //
-
     this.connect()
   }
 
@@ -93,11 +89,8 @@ class PointerLockControls extends EventDispatcher {
     // retaining this method for backward compatibility
     this.camera
 
-  getDirection = (() => {
-    const direction = new Vector3(0, 0, -1)
-
-    return (v: Vector3) => v.copy(direction).applyQuaternion(this.camera.quaternion)
-  })()
+  private direction = new Vector3(0, 0, -1)
+  getDirection = (v: Vector3) => v.copy(this.direction).applyQuaternion(this.camera.quaternion)
 
   moveForward = (distance: number) => {
     // move forward parallel to the xz-plane
