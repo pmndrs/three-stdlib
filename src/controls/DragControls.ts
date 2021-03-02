@@ -1,25 +1,24 @@
 import { Camera, EventDispatcher, Intersection, Matrix4, Object3D, Plane, Raycaster, Vector2, Vector3 } from 'three'
 
 class DragControls extends EventDispatcher {
-  enabled: boolean
-  transformGroup: boolean
+  enabled = true
+  transformGroup = false
 
   private _objects: Object3D[]
   private _camera: Camera
   private _domElement: HTMLElement
 
-  private _plane: Plane
-  private _raycaster: Raycaster
+  private _plane = new Plane()
+  private _raycaster = new Raycaster()
 
-  private _mouse: Vector2
-  private _offset: Vector3
-  private _intersection: Vector3
-  private _worldPosition: Vector3
-  private _inverseMatrix: Matrix4
-  private _intersections: Intersection[]
-
-  private _selected: Object3D | null
-  private _hovered: Object3D | null
+  private _mouse = new Vector2()
+  private _offset = new Vector3()
+  private _intersection = new Vector3()
+  private _worldPosition = new Vector3()
+  private _inverseMatrix = new Matrix4()
+  private _intersections: Intersection[] = []
+  private _selected: Object3D | null = null
+  private _hovered: Object3D | null = null
 
   constructor(_objects: Object3D[], _camera: Camera, _domElement: HTMLElement) {
     super()
@@ -28,24 +27,7 @@ class DragControls extends EventDispatcher {
     this._camera = _camera
     this._domElement = _domElement
 
-    this._plane = new Plane()
-    this._raycaster = new Raycaster()
-
-    this._mouse = new Vector2()
-    this._offset = new Vector3()
-    this._intersection = new Vector3()
-    this._worldPosition = new Vector3()
-    this._inverseMatrix = new Matrix4()
-    this._intersections = []
-    this._selected = null
-    this._hovered = null
-
     this.activate()
-
-    // API
-
-    this.enabled = true
-    this.transformGroup = false
   }
 
   activate = () => {
@@ -133,7 +115,7 @@ class DragControls extends EventDispatcher {
     if (this._intersections.length > 0) {
       this._selected = this.transformGroup === true ? this._objects[0] : this._intersections[0].object
 
-      if (this._raycaster.ray.intersectPlane(this._plane, this._intersection)) {
+      if (this._raycaster.ray.intersectPlane(this._plane, this._intersection) && this._selected.parent) {
         this._inverseMatrix.copy(this._selected.parent.matrixWorld).invert()
         this._offset.copy(this._intersection).sub(this._worldPosition.setFromMatrixPosition(this._selected.matrixWorld))
       }
@@ -239,7 +221,7 @@ class DragControls extends EventDispatcher {
         this._worldPosition.setFromMatrixPosition(this._selected.matrixWorld),
       )
 
-      if (this._raycaster.ray.intersectPlane(this._plane, this._intersection)) {
+      if (this._raycaster.ray.intersectPlane(this._plane, this._intersection) && this._selected.parent) {
         this._inverseMatrix.copy(this._selected.parent.matrixWorld).invert()
         this._offset.copy(this._intersection).sub(this._worldPosition.setFromMatrixPosition(this._selected.matrixWorld))
       }
