@@ -39,8 +39,9 @@ class CameraControls extends EventDispatcher {
   /** Set to true to enable trackball behavior */
   trackball = false
 
-  // How far you can dolly in and out ( PerspectiveCamera only )
+  /** How far you can dolly in ( PerspectiveCamera only ) */
   minDistance = 0
+  /** How far you can dolly out ( PerspectiveCamera only ) */
   maxDistance = Infinity
 
   // How far you can zoom in and out ( OrthographicCamera only )
@@ -49,8 +50,8 @@ class CameraControls extends EventDispatcher {
 
   // How far you can orbit vertically, upper and lower limits.
   // Range is 0 to Math.PI radians.
-  minPolarAngle = 0 // radians
-  maxPolarAngle = Math.PI // radians
+  minPolarAngle = 0
+  maxPolarAngle = Math.PI
 
   // How far you can orbit horizontally, upper and lower limits.
   // If set, must be a sub-interval of the interval [ - Math.PI, Math.PI ].
@@ -62,44 +63,49 @@ class CameraControls extends EventDispatcher {
   enableDamping = false
   dampingFactor = 0.05
 
-  // This option enables dollying in and out; property named as "zoom" for backwards compatibility
-  // Set to false to disable zooming
+  /**
+   * This option enables dollying in and out; property named as "zoom" for backwards compatibility
+   * Set to false to disable zooming
+   */
   enableZoom = true
   zoomSpeed = 1.0
 
-  // Set to false to disable rotating
+  /** Set to false to disable rotating */
   enableRotate = true
   rotateSpeed = 1.0
 
-  // Set to false to disable panning
+  /** Set to false to disable panning */
   enablePan = true
   panSpeed = 1.0
-  screenSpacePanning = false // if true, pan in screen-space
-  keyPanSpeed = 7.0 // pixels moved per arrow key push
+  /** if true, pan in screen-space */
+  screenSpacePanning = false
+  /** pixels moved per arrow key push */
+  keyPanSpeed = 7.0
 
-  // Set to true to automatically rotate around the target
-  // If auto-rotate is enabled, you must call controls.update() in your animation loop
-  // auto-rotate is not supported for trackball behavior
+  /**
+   * Set to true to automatically rotate around the target
+   * If auto-rotate is enabled, you must call controls.update() in your animation loop
+   * auto-rotate is not supported for trackball behavior
+   */
   autoRotate = false
   autoRotateSpeed = 2.0 // 30 seconds per round when fps is 60
 
-  // Set to false to disable use of the keys
+  /** Set to false to disable use of the keys */
   enableKeys = true
 
-  // The four arrow keys
+  /** The four arrow keys */
   keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40 }
 
-  // Mouse buttons
-  mouseButtons = {
-    LEFT: MOUSE.ROTATE,
-    MIDDLE: MOUSE.DOLLY,
-    RIGHT: MOUSE.PAN,
+  mouseButtons: {
+    LEFT: MOUSE
+    MIDDLE?: MOUSE
+    RIGHT: MOUSE
   }
 
-  // Touch fingers
+  /** Touch fingers */
   touches = { ONE: TOUCH.ROTATE, TWO: TOUCH.DOLLY_PAN }
 
-  // // for reset
+  // for reset
   target0: Vector3
   position0: Vector3
   quaternion0: Quaternion
@@ -158,6 +164,12 @@ class CameraControls extends EventDispatcher {
 
     this.object = object
     this.domElement = domElement
+
+    this.mouseButtons = {
+      LEFT: MOUSE.ROTATE,
+      MIDDLE: MOUSE.DOLLY,
+      RIGHT: MOUSE.PAN,
+    }
 
     // for reset
     this.target0 = this.target.clone()
