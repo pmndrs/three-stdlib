@@ -1,11 +1,9 @@
 import {
-  Camera,
   EventDispatcher,
   MOUSE,
   Matrix4,
   OrthographicCamera,
   PerspectiveCamera,
-  Object3D,
   Quaternion,
   Spherical,
   TOUCH,
@@ -134,6 +132,14 @@ class CameraControls extends EventDispatcher {
   private dollyEnd: Vector2
   private dollyDelta: Vector2
 
+  private offset: Vector3
+  private quat: Quaternion
+  private quatInverse: Quaternion
+  private lastPosition: Vector3
+  private lastQuaternion: Quaternion
+  private q: Quaternion
+  private vec: Vector3
+
   constructor(object: PerspectiveCamera | OrthographicCamera, domElement: HTMLElement) {
     super()
 
@@ -256,6 +262,18 @@ class CameraControls extends EventDispatcher {
     this.dollyEnd = new Vector2()
     this.dollyDelta = new Vector2()
 
+    this.offset = new Vector3()
+
+    // so camera.up is the orbit axis
+    this.quat = new Quaternion().setFromUnitVectors(this.object.up, new Vector3(0, 1, 0))
+    this.quatInverse = this.quat.clone().invert()
+
+    this.lastPosition = new Vector3()
+    this.lastQuaternion = new Quaternion()
+
+    this.q = new Quaternion()
+    this.vec = new Vector3()
+
     this.domElement.addEventListener('contextmenu', this.onContextMenu, false)
 
     this.domElement.addEventListener('mousedown', this.onMouseDown, false)
@@ -322,138 +340,124 @@ class CameraControls extends EventDispatcher {
     //this.dispatchEvent( { type: 'dispose' } ); // should this be added here?
   }
 
-  private update = (() => {
-    const offset = new Vector3()
+  private update = () => {
+    const position = this.object.position
 
-    // so camera.up is the orbit axis
-    const quat = new Quaternion().setFromUnitVectors(this.object.up, new Vector3(0, 1, 0))
-    const quatInverse = quat.clone().invert()
+    this.offset.copy(position).sub(this.target)
 
-    const lastPosition = new Vector3()
-    const lastQuaternion = new Quaternion()
+    if (this.trackball) {
+      // rotate around screen-space y-axis
 
-    const q = new Quaternion()
-    const vec = new Vector3()
+      if (this.sphericalDelta.theta) {
+        this.vec.set(0, 1, 0).applyQuaternion(this.object.quaternion)
 
-    return () => {
-      const position = this.object.position
+        const factor = this.enableDamping ? this.dampingFactor : 1
 
-      offset.copy(position).sub(this.target)
+        this.q.setFromAxisAngle(this.vec, this.sphericalDelta.theta * factor)
 
-      if (this.trackball) {
-        // rotate around screen-space y-axis
+        this.object.quaternion.premultiply(this.q)
+        this.offset.applyQuaternion(this.q)
+      }
 
-        if (this.sphericalDelta.theta) {
-          vec.set(0, 1, 0).applyQuaternion(this.object.quaternion)
+      // rotate around screen-space x-axis
 
-          var factor = this.enableDamping ? this.dampingFactor : 1
+      if (this.sphericalDelta.phi) {
+        this.vec.set(1, 0, 0).applyQuaternion(this.object.quaternion)
 
-          q.setFromAxisAngle(vec, this.sphericalDelta.theta * factor)
+        const factor = this.enableDamping ? this.dampingFactor : 1
 
-          this.object.quaternion.premultiply(q)
-          offset.applyQuaternion(q)
-        }
+        this.q.setFromAxisAngle(this.vec, this.sphericalDelta.phi * factor)
 
-        // rotate around screen-space x-axis
+        this.object.quaternion.premultiply(this.q)
+        this.offset.applyQuaternion(this.q)
+      }
 
-        if (this.sphericalDelta.phi) {
-          vec.set(1, 0, 0).applyQuaternion(this.object.quaternion)
+      this.offset.multiplyScalar(this.scale)
+      this.offset.clampLength(this.minDistance, this.maxDistance)
+    } else {
+      // rotate offset to "y-axis-is-up" space
+      this.offset.applyQuaternion(this.quat)
 
-          var factor = this.enableDamping ? this.dampingFactor : 1
+      if (this.autoRotate && this.state === STATE.NONE) {
+        this.rotateLeft(this.getAutoRotationAngle())
+      }
 
-          q.setFromAxisAngle(vec, this.sphericalDelta.phi * factor)
+      this.spherical.setFromVector3(this.offset)
 
-          this.object.quaternion.premultiply(q)
-          offset.applyQuaternion(q)
-        }
-
-        offset.multiplyScalar(this.scale)
-        offset.clampLength(this.minDistance, this.maxDistance)
+      if (this.enableDamping) {
+        this.spherical.theta += this.sphericalDelta.theta * this.dampingFactor
+        this.spherical.phi += this.sphericalDelta.phi * this.dampingFactor
       } else {
-        // rotate offset to "y-axis-is-up" space
-        offset.applyQuaternion(quat)
-
-        if (this.autoRotate && this.state === STATE.NONE) {
-          this.rotateLeft(this.getAutoRotationAngle())
-        }
-
-        this.spherical.setFromVector3(offset)
-
-        if (this.enableDamping) {
-          this.spherical.theta += this.sphericalDelta.theta * this.dampingFactor
-          this.spherical.phi += this.sphericalDelta.phi * this.dampingFactor
-        } else {
-          this.spherical.theta += this.sphericalDelta.theta
-          this.spherical.phi += this.sphericalDelta.phi
-        }
-
-        // restrict theta to be between desired limits
-        this.spherical.theta = Math.max(this.minAzimuthAngle, Math.min(this.maxAzimuthAngle, this.spherical.theta))
-
-        // restrict phi to be between desired limits
-        this.spherical.phi = Math.max(this.minPolarAngle, Math.min(this.maxPolarAngle, this.spherical.phi))
-
-        this.spherical.makeSafe()
-
-        this.spherical.radius *= this.scale
-
-        // restrict radius to be between desired limits
-        this.spherical.radius = Math.max(this.minDistance, Math.min(this.maxDistance, this.spherical.radius))
-
-        offset.setFromSpherical(this.spherical)
-
-        // rotate offset back to "camera-up-vector-is-up" space
-        offset.applyQuaternion(quatInverse)
+        this.spherical.theta += this.sphericalDelta.theta
+        this.spherical.phi += this.sphericalDelta.phi
       }
 
-      // move target to panned location
+      // restrict theta to be between desired limits
+      this.spherical.theta = Math.max(this.minAzimuthAngle, Math.min(this.maxAzimuthAngle, this.spherical.theta))
 
-      if (this.enableDamping === true) {
-        this.target.addScaledVector(this.panOffset, this.dampingFactor)
-      } else {
-        this.target.add(this.panOffset)
-      }
+      // restrict phi to be between desired limits
+      this.spherical.phi = Math.max(this.minPolarAngle, Math.min(this.maxPolarAngle, this.spherical.phi))
 
-      position.copy(this.target).add(offset)
+      this.spherical.makeSafe()
 
-      if (this.trackball === false) {
-        this.object.lookAt(this.target)
-      }
+      this.spherical.radius *= this.scale
 
-      if (this.enableDamping === true) {
-        this.sphericalDelta.theta *= 1 - this.dampingFactor
-        this.sphericalDelta.phi *= 1 - this.dampingFactor
+      // restrict radius to be between desired limits
+      this.spherical.radius = Math.max(this.minDistance, Math.min(this.maxDistance, this.spherical.radius))
 
-        this.panOffset.multiplyScalar(1 - this.dampingFactor)
-      } else {
-        this.sphericalDelta.set(0, 0, 0)
+      this.offset.setFromSpherical(this.spherical)
 
-        this.panOffset.set(0, 0, 0)
-      }
-
-      this.scale = 1
-
-      // update condition is:
-      // min(camera displacement, camera rotation in radians)^2 > EPS
-      // using small-angle approximation cos(x/2) = 1 - x^2 / 8
-
-      if (
-        this.zoomChanged ||
-        lastPosition.distanceToSquared(this.object.position) > this.EPS ||
-        8 * (1 - lastQuaternion.dot(this.object.quaternion)) > this.EPS
-      ) {
-        this.dispatchEvent(this.changeEvent)
-
-        lastPosition.copy(this.object.position)
-        lastQuaternion.copy(this.object.quaternion)
-        this.zoomChanged = false
-
-        return true
-      }
-
-      return false
+      // rotate offset back to "camera-up-vector-is-up" space
+      this.offset.applyQuaternion(this.quatInverse)
     }
-  })()
+
+    // move target to panned location
+
+    if (this.enableDamping === true) {
+      this.target.addScaledVector(this.panOffset, this.dampingFactor)
+    } else {
+      this.target.add(this.panOffset)
+    }
+
+    position.copy(this.target).add(this.offset)
+
+    if (this.trackball === false) {
+      this.object.lookAt(this.target)
+    }
+
+    if (this.enableDamping === true) {
+      this.sphericalDelta.theta *= 1 - this.dampingFactor
+      this.sphericalDelta.phi *= 1 - this.dampingFactor
+
+      this.panOffset.multiplyScalar(1 - this.dampingFactor)
+    } else {
+      this.sphericalDelta.set(0, 0, 0)
+
+      this.panOffset.set(0, 0, 0)
+    }
+
+    this.scale = 1
+
+    // update condition is:
+    // min(camera displacement, camera rotation in radians)^2 > EPS
+    // using small-angle approximation cos(x/2) = 1 - x^2 / 8
+
+    if (
+      this.zoomChanged ||
+      this.lastPosition.distanceToSquared(this.object.position) > this.EPS ||
+      8 * (1 - this.lastQuaternion.dot(this.object.quaternion)) > this.EPS
+    ) {
+      this.dispatchEvent(this.changeEvent)
+
+      this.lastPosition.copy(this.object.position)
+      this.lastQuaternion.copy(this.object.quaternion)
+      this.zoomChanged = false
+
+      return true
+    }
+
+    return false
+  }
 
   private getAutoRotationAngle = () => ((2 * Math.PI) / 60 / 60) * this.autoRotateSpeed
 
