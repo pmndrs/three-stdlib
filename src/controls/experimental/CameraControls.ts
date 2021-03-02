@@ -138,6 +138,7 @@ class CameraControls extends EventDispatcher {
   private lastPosition: Vector3
   private lastQuaternion: Quaternion
   private q: Quaternion
+  private v: Vector3
   private vec: Vector3
 
   constructor(object: PerspectiveCamera | OrthographicCamera, domElement: HTMLElement) {
@@ -272,6 +273,7 @@ class CameraControls extends EventDispatcher {
     this.lastQuaternion = new Quaternion()
 
     this.q = new Quaternion()
+    this.v = new Vector3()
     this.vec = new Vector3()
 
     this.domElement.addEventListener('contextmenu', this.onContextMenu, false)
@@ -467,71 +469,58 @@ class CameraControls extends EventDispatcher {
 
   private rotateUp = (angle: number) => (this.sphericalDelta.phi -= angle)
 
-  private panLeft = (() => {
-    const v = new Vector3()
+  private panLeft = (distance: number, objectMatrix: Matrix4) => {
+    this.v.setFromMatrixColumn(objectMatrix, 0) // get X column of objectMatrix
+    this.v.multiplyScalar(-distance)
 
-    return function panLeft(distance: number, objectMatrix: Matrix4) {
-      v.setFromMatrixColumn(objectMatrix, 0) // get X column of objectMatrix
-      v.multiplyScalar(-distance)
+    this.panOffset.add(this.v)
+  }
 
-      this.panOffset.add(v)
+  private panUp = (distance: number, objectMatrix: Matrix4) => {
+    if (this.screenSpacePanning === true) {
+      this.v.setFromMatrixColumn(objectMatrix, 1)
+    } else {
+      this.v.setFromMatrixColumn(objectMatrix, 0)
+      this.v.crossVectors(this.object.up, this.v)
     }
-  })()
 
-  private panUp = (() => {
-    const v = new Vector3()
+    this.v.multiplyScalar(distance)
 
-    return function panUp(distance: number, objectMatrix: Matrix4) {
-      if (this.screenSpacePanning === true) {
-        v.setFromMatrixColumn(objectMatrix, 1)
-      } else {
-        v.setFromMatrixColumn(objectMatrix, 0)
-        v.crossVectors(this.object.up, v)
-      }
-
-      v.multiplyScalar(distance)
-
-      this.panOffset.add(v)
-    }
-  })()
+    this.panOffset.add(this.v)
+  }
 
   // deltaX and deltaY are in pixels; right and down are positive
-  private pan = (() => {
-    const offset = new Vector3()
+  private pan = (deltaX: number, deltaY: number) => {
+    const element = this.domElement
 
-    return function pan(deltaX: number, deltaY: number) {
-      const element = this.domElement
+    if (this.object instanceof PerspectiveCamera) {
+      // perspective
+      const position = this.object.position
+      this.offset.copy(position).sub(this.target)
+      let targetDistance = this.offset.length()
 
-      // TODO: this looks wrong...
-      if (this.object.isPerspectiveCamera && element instanceof HTMLElement) {
-        // perspective
-        const position = this.object.position
-        offset.copy(position).sub(this.target)
-        let targetDistance = offset.length()
+      // half of the fov is center to top of screen
+      targetDistance *= Math.tan(((this.object.fov / 2) * Math.PI) / 180.0)
 
-        // half of the fov is center to top of screen
-        targetDistance *= Math.tan(((this.object.fov / 2) * Math.PI) / 180.0)
-
-        // we use only clientHeight here so aspect ratio does not distort speed
-        this.panLeft((2 * deltaX * targetDistance) / element.clientHeight, this.object.matrix)
-        this.panUp((2 * deltaY * targetDistance) / element.clientHeight, this.object.matrix)
-      } else if (this.object.isOrthographicCamera) {
-        // orthographic
-        this.panLeft(
-          (deltaX * (this.object.right - this.object.left)) / this.object.zoom / element.clientWidth,
-          this.object.matrix,
-        )
-        this.panUp(
-          (deltaY * (this.object.top - this.object.bottom)) / this.object.zoom / element.clientHeight,
-          this.object.matrix,
-        )
-      } else {
-        // camera neither orthographic nor perspective
-        console.warn('WARNING: CameraControls.js encountered an unknown camera type - pan disabled.')
-        this.enablePan = false
-      }
+      // we use only clientHeight here so aspect ratio does not distort speed
+      this.panLeft((2 * deltaX * targetDistance) / element.clientHeight, this.object.matrix)
+      this.panUp((2 * deltaY * targetDistance) / element.clientHeight, this.object.matrix)
+    } else if (this.object.isOrthographicCamera) {
+      // orthographic
+      this.panLeft(
+        (deltaX * (this.object.right - this.object.left)) / this.object.zoom / element.clientWidth,
+        this.object.matrix,
+      )
+      this.panUp(
+        (deltaY * (this.object.top - this.object.bottom)) / this.object.zoom / element.clientHeight,
+        this.object.matrix,
+      )
+    } else {
+      // camera neither orthographic nor perspective
+      console.warn('WARNING: CameraControls.js encountered an unknown camera type - pan disabled.')
+      this.enablePan = false
     }
-  })()
+  }
 
   private dollyIn = (dollyScale: number) => {
     // TODO: replace w/.isPerspectiveCamera ?
