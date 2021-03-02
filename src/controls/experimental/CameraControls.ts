@@ -92,7 +92,7 @@ class CameraControls extends EventDispatcher {
   // Mouse buttons
   mouseButtons: {
     LEFT: MOUSE
-    MIDDLE: MOUSE
+    MIDDLE?: MOUSE
     RIGHT: MOUSE
   }
 
