@@ -1073,7 +1073,7 @@ class CameraControls extends EventDispatcher {
  * @event Zoom - middle mouse, or mousewheel / touch: two-finger spread or squish
  * @event Pan - right mouse, or left mouse + ctrl/meta/shiftKey, or arrow keys / touch: two-finger move
  */
-class OrbitControlsExp extends EventDispatcher {
+class OrbitControlsExp extends CameraControls {
   mouseButtons: {
     LEFT: MOUSE
     RIGHT: MOUSE
@@ -1083,13 +1083,8 @@ class OrbitControlsExp extends EventDispatcher {
     TWO: TOUCH
   }
 
-  constructor(object: Object3D, domElement: HTMLElement) {
-    super()
-
-    // FIXME:
-    // Argument of type 'this' is not assignable to parameter of type 'CameraControls'.
-    // Type 'OrbitControlsExp' is missing the following properties from type 'CameraControls': object, domElement, enabled, target, and 90 more.
-    CameraControls.call(this, object, domElement)
+  constructor(object: PerspectiveCamera | OrthographicCamera, domElement: HTMLElement) {
+    super(object, domElement)
 
     this.mouseButtons = {
       LEFT: MOUSE.ROTATE,
@@ -1109,7 +1104,7 @@ class OrbitControlsExp extends EventDispatcher {
  * @event Zoom - middle mouse, or mousewheel / touch: two-finger spread or squish
  * @event Pan - left mouse, or left right + ctrl/meta/shiftKey, or arrow keys / touch: one-finger move
  */
-class MapControlsExp extends EventDispatcher {
+class MapControlsExp extends CameraControls {
   mouseButtons: {
     LEFT: MOUSE
     RIGHT: MOUSE
@@ -1119,13 +1114,8 @@ class MapControlsExp extends EventDispatcher {
     TWO: TOUCH
   }
 
-  constructor(object: Object3D, domElement: HTMLElement) {
-    super()
-
-    // FIXME:
-    // Argument of type 'this' is not assignable to parameter of type 'CameraControls'.
-    // Type 'MapControlsExp' is missing the following properties from type 'CameraControls': object, domElement, enabled, target, and 90 more.
-    CameraControls.call(this, object, domElement)
+  constructor(object: PerspectiveCamera | OrthographicCamera, domElement: HTMLElement) {
+    super(object, domElement)
 
     this.mouseButtons = {
       LEFT: MOUSE.PAN,
@@ -1145,7 +1135,7 @@ class MapControlsExp extends EventDispatcher {
  * @event Zoom - middle mouse, or mousewheel / touch: two-finger spread or squish
  * @event Pan - right mouse, or left mouse + ctrl/meta/shiftKey, or arrow keys / touch: two-finger move
  */
-class TrackballControlsExp extends EventDispatcher {
+class TrackballControlsExp extends CameraControls {
   trackball: boolean
   screenSpacePanning: boolean
   autoRotate: boolean
@@ -1158,13 +1148,8 @@ class TrackballControlsExp extends EventDispatcher {
     TWO: TOUCH
   }
 
-  constructor(object: Object3D, domElement: HTMLElement) {
-    super()
-
-    // FIXME:
-    // Argument of type 'this' is not assignable to parameter of type 'CameraControls'.
-    // Type 'TrackballControlsExp' is missing the following properties from type 'CameraControls': object, domElement, enabled, target, and 87 more.
-    CameraControls.call(this, object, domElement)
+  constructor(object: PerspectiveCamera | OrthographicCamera, domElement: HTMLElement) {
+    super(object, domElement)
 
     this.trackball = true
     this.screenSpacePanning = true
