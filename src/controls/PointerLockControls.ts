@@ -1,7 +1,7 @@
 import { Camera, Euler, EventDispatcher, Vector3 } from 'three'
 
 class PointerLockControls extends EventDispatcher {
-  camera: Camera
+  private camera: Camera
   domElement: HTMLElement
 
   isLocked = false
@@ -11,15 +11,15 @@ class PointerLockControls extends EventDispatcher {
   minPolarAngle = 0 // radians
   maxPolarAngle = Math.PI // radians
 
-  changeEvent = { type: 'change' }
-  lockEvent = { type: 'lock' }
-  unlockEvent = { type: 'unlock' }
+  private changeEvent = { type: 'change' }
+  private lockEvent = { type: 'lock' }
+  private unlockEvent = { type: 'unlock' }
 
-  euler = new Euler(0, 0, 0, 'YXZ')
+  private euler = new Euler(0, 0, 0, 'YXZ')
 
-  PI_2 = Math.PI / 2
+  private PI_2 = Math.PI / 2
 
-  vec = new Vector3()
+  private vec = new Vector3()
 
   constructor(camera: Camera, domElement: HTMLElement) {
     super()
@@ -35,7 +35,7 @@ class PointerLockControls extends EventDispatcher {
     this.connect()
   }
 
-  onMouseMove = (event: MouseEvent) => {
+  private onMouseMove = (event: MouseEvent) => {
     if (this.isLocked === false) return
 
     const movementX = event.movementX || (event as any).mozMovementX || (event as any).webkitMovementX || 0
@@ -53,7 +53,7 @@ class PointerLockControls extends EventDispatcher {
     this.dispatchEvent(this.changeEvent)
   }
 
-  onPointerlockChange = () => {
+  private onPointerlockChange = () => {
     if (this.domElement.ownerDocument.pointerLockElement === this.domElement) {
       this.dispatchEvent(this.lockEvent)
 
@@ -65,7 +65,7 @@ class PointerLockControls extends EventDispatcher {
     }
   }
 
-  onPointerlockError = () => {
+  private onPointerlockError = () => {
     console.error('THREE.PointerLockControls: Unable to use Pointer Lock API')
   }
 
@@ -85,7 +85,7 @@ class PointerLockControls extends EventDispatcher {
     this.disconnect()
   }
 
-  getObject = () =>
+  private getObject = () =>
     // retaining this method for backward compatibility
     this.camera
 
