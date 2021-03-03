@@ -8,42 +8,44 @@ import {
   TriangleStripDrawMode,
   TrianglesDrawMode,
   Vector3,
+  TypedArray,
+  Mesh,
+  Line,
+  Points,
+  Material,
+  SkinnedMesh,
+  MeshStandardMaterial,
 } from 'three'
 
-export function computeTangents(geometry) {
-  geometry.computeTangents()
-  console.warn(
-    'THREE.BufferGeometryUtils: .computeTangents() has been removed. Use BufferGeometry.computeTangents() instead.',
-  )
-}
+import { getWithKey } from '../types/helpers'
+import { TypedArrayConstructors } from '../types/shared'
 
 /**
  * @param  {Array<BufferGeometry>} geometries
  * @param  {Boolean} useGroups
  * @return {BufferGeometry}
  */
-export function mergeBufferGeometries(geometries, useGroups) {
-  var isIndexed = geometries[0].index !== null
+export const mergeBufferGeometries = (geometries: BufferGeometry[], useGroups?: boolean): BufferGeometry | null => {
+  const isIndexed = geometries[0].index !== null
 
-  var attributesUsed = new Set(Object.keys(geometries[0].attributes))
-  var morphAttributesUsed = new Set(Object.keys(geometries[0].morphAttributes))
+  const attributesUsed = new Set(Object.keys(geometries[0].attributes))
+  const morphAttributesUsed = new Set(Object.keys(geometries[0].morphAttributes))
 
-  var attributes = {}
-  var morphAttributes = {}
+  const attributes: { [key: string]: Array<InterleavedBufferAttribute | BufferAttribute> } = {}
+  const morphAttributes: { [key: string]: Array<BufferAttribute | InterleavedBufferAttribute>[] } = {}
 
-  var morphTargetsRelative = geometries[0].morphTargetsRelative
+  const morphTargetsRelative = geometries[0].morphTargetsRelative
 
-  var mergedGeometry = new BufferGeometry()
+  const mergedGeometry = new BufferGeometry()
 
-  var offset = 0
+  let offset = 0
 
-  for (let i = 0; i < geometries.length; ++i) {
-    var geometry = geometries[i]
-    var attributesCount = 0
+  geometries.forEach((geom, i) => {
+    let attributesCount = 0
 
     // ensure that all geometries are indexed, or none
 
-    if (isIndexed !== (geometry.index !== null)) {
+    if (isIndexed !== (geom.index !== null)) {
       console.error(
         'THREE.BufferGeometryUtils: .mergeBufferGeometries() failed with geometry at index ' +
           i +
@@ -54,7 +56,7 @@ export function mergeBufferGeometries(geometries, useGroups) {
 
     // gather attributes, exit early if they're different
 
-    for (let name in geometry.attributes) {
+    for (let name in geom.attributes) {
       if (!attributesUsed.has(name)) {
         console.error(
           'THREE.BufferGeometryUtils: .mergeBufferGeometries() failed with geometry at index ' +
@@ -66,9 +68,11 @@ export function mergeBufferGeometries(geometries, useGroups) {
         return null
       }
 
-      if (attributes[name] === undefined) attributes[name] = []
+      if (attributes[name] === undefined) {
+        attributes[name] = []
+      }
 
-      attributes[name].push(geometry.attributes[name])
+      attributes[name].push(geom.attributes[name])
 
       attributesCount++
     }
@@ -86,7 +90,7 @@ export function mergeBufferGeometries(geometries, useGroups) {
 
     // gather morph attributes, exit early if they're different
 
-    if (morphTargetsRelative !== geometry.morphTargetsRelative) {
+    if (morphTargetsRelative !== geom.morphTargetsRelative) {
       console.error(
         'THREE.BufferGeometryUtils: .mergeBufferGeometries() failed with geometry at index ' +
           i +
@@ -95,7 +99,7 @@ export function mergeBufferGeometries(geometries, useGroups) {
       return null
     }
 
-    for (let name in geometry.morphAttributes) {
+    for (let name in geom.morphAttributes) {
       if (!morphAttributesUsed.has(name)) {
         console.error(
           'THREE.BufferGeometryUtils: .mergeBufferGeometries() failed with geometry at index ' +
@@ -107,21 +111,21 @@ export function mergeBufferGeometries(geometries, useGroups) {
 
       if (morphAttributes[name] === undefined) morphAttributes[name] = []
 
-      morphAttributes[name].push(geometry.morphAttributes[name])
+      morphAttributes[name].push(geom.morphAttributes[name])
     }
 
     // gather .userData
 
     mergedGeometry.userData.mergedUserData = mergedGeometry.userData.mergedUserData || []
-    mergedGeometry.userData.mergedUserData.push(geometry.userData)
+    mergedGeometry.userData.mergedUserData.push(geom.userData)
 
     if (useGroups) {
-      var count
+      let count
 
-      if (isIndexed) {
-        count = geometry.index.count
-      } else if (geometry.attributes.position !== undefined) {
-        count = geometry.attributes.position.count
+      if (geom.index) {
+        count = geom.index.count
+      } else if (geom.attributes.position !== undefined) {
+        count = geom.attributes.position.count
       } else {
         console.error(
           'THREE.BufferGeometryUtils: .mergeBufferGeometries() failed with geometry at index ' +
@@ -135,23 +139,23 @@ export function mergeBufferGeometries(geometries, useGroups) {
 
       offset += count
     }
-  }
+  })
 
   // merge indices
 
   if (isIndexed) {
-    var indexOffset = 0
-    var mergedIndex = []
+    let indexOffset = 0
+    const mergedIndex: number[] = []
 
-    for (let i = 0; i < geometries.length; ++i) {
-      var index = geometries[i].index
+    geometries.forEach((geom) => {
+      const index = geom.index as BufferAttribute
 
       for (let j = 0; j < index.count; ++j) {
         mergedIndex.push(index.getX(j) + indexOffset)
       }
 
-      indexOffset += geometries[i].attributes.position.count
-    }
+      indexOffset += geom.attributes.position.count
+    })
 
     mergedGeometry.setIndex(mergedIndex)
   }
@@ -159,7 +163,7 @@ export function mergeBufferGeometries(geometries, useGroups) {
   // merge attributes
 
   for (let name in attributes) {
-    var mergedAttribute = this.mergeBufferAttributes(attributes[name])
+    const mergedAttribute = mergeBufferAttributes(attributes[name] as BufferAttribute[])
 
     if (!mergedAttribute) {
       console.error(
@@ -174,7 +178,7 @@ export function mergeBufferGeometries(geometries, useGroups) {
   // merge morph attributes
 
   for (let name in morphAttributes) {
-    var numMorphTargets = morphAttributes[name][0].length
+    const numMorphTargets = morphAttributes[name][0].length
 
     if (numMorphTargets === 0) break
 
@@ -182,13 +186,13 @@ export function mergeBufferGeometries(geometries, useGroups) {
     mergedGeometry.morphAttributes[name] = []
 
     for (let i = 0; i < numMorphTargets; ++i) {
-      var morphAttributesToMerge = []
+      const morphAttributesToMerge = []
 
       for (let j = 0; j < morphAttributes[name].length; ++j) {
         morphAttributesToMerge.push(morphAttributes[name][j][i])
       }
 
-      var mergedMorphAttribute = this.mergeBufferAttributes(morphAttributesToMerge)
+      const mergedMorphAttribute = mergeBufferAttributes(morphAttributesToMerge as BufferAttribute[])
 
       if (!mergedMorphAttribute) {
         console.error(
@@ -210,75 +214,70 @@ export function mergeBufferGeometries(geometries, useGroups) {
  * @param {Array<BufferAttribute>} attributes
  * @return {BufferAttribute}
  */
-export function mergeBufferAttributes(attributes) {
-  var TypedArray
-  var itemSize
-  var normalized
-  var arrayLength = 0
+export const mergeBufferAttributes = (attributes: BufferAttribute[]): BufferAttribute | null | undefined => {
+  let TypedArray: TypedArrayConstructors | undefined = undefined
+  let itemSize: number | undefined = undefined
+  let normalized: boolean | undefined = undefined
+  let arrayLength = 0
 
-  for (let i = 0; i < attributes.length; ++i) {
-    var attribute = attributes[i]
-
-    if (attribute.isInterleavedBufferAttribute) {
-      console.error(
-        'THREE.BufferGeometryUtils: .mergeBufferAttributes() failed. InterleavedBufferAttributes are not supported.',
-      )
-      return null
+  attributes.forEach((attr) => {
+    if (TypedArray === undefined) {
+      TypedArray = attr.array.constructor
     }
-
-    if (TypedArray === undefined) TypedArray = attribute.array.constructor
-    if (TypedArray !== attribute.array.constructor) {
+    if (TypedArray !== attr.array.constructor) {
       console.error(
         'THREE.BufferGeometryUtils: .mergeBufferAttributes() failed. BufferAttribute.array must be of consistent array types across matching attributes.',
       )
       return null
     }
 
-    if (itemSize === undefined) itemSize = attribute.itemSize
-    if (itemSize !== attribute.itemSize) {
+    if (itemSize === undefined) itemSize = attr.itemSize
+    if (itemSize !== attr.itemSize) {
       console.error(
         'THREE.BufferGeometryUtils: .mergeBufferAttributes() failed. BufferAttribute.itemSize must be consistent across matching attributes.',
       )
       return null
     }
 
-    if (normalized === undefined) normalized = attribute.normalized
-    if (normalized !== attribute.normalized) {
+    if (normalized === undefined) normalized = attr.normalized
+    if (normalized !== attr.normalized) {
       console.error(
         'THREE.BufferGeometryUtils: .mergeBufferAttributes() failed. BufferAttribute.normalized must be consistent across matching attributes.',
       )
       return null
     }
 
-    arrayLength += attribute.array.length
+    arrayLength += attr.array.length
+  })
+
+  if (TypedArray && itemSize) {
+    // @ts-expect-error this works in JS and TS is complaining but it's such a tiny thing I can live with the guilt
+    const array = new TypedArray(arrayLength)
+    let offset = 0
+
+    attributes.forEach((attr) => {
+      array.set(attr.array, offset)
+      offset += attr.array.length
+    })
+
+    return new BufferAttribute(array, itemSize, normalized)
   }
-
-  var array = new TypedArray(arrayLength)
-  var offset = 0
-
-  for (let i = 0; i < attributes.length; ++i) {
-    array.set(attributes[i].array, offset)
-
-    offset += attributes[i].array.length
-  }
-
-  return new BufferAttribute(array, itemSize, normalized)
 }
 
 /**
  * @param {Array<BufferAttribute>} attributes
  * @return {Array<InterleavedBufferAttribute>}
  */
-export function interleaveAttributes(attributes) {
+export const interleaveAttributes = (attributes: BufferAttribute[]): InterleavedBufferAttribute[] | null => {
   // Interleaves the provided attributes into an InterleavedBuffer and returns
   // a set of InterleavedBufferAttributes for each attribute
-  var TypedArray
-  var arrayLength = 0
-  var stride = 0
+  let TypedArray: TypedArrayConstructors | undefined = undefined
+  let arrayLength = 0
+  let stride = 0
 
   // calculate the the length and type of the interleavedBuffer
   for (let i = 0, l = attributes.length; i < l; ++i) {
-    var attribute = attributes[i]
+    const attribute = attributes[i]
 
     if (TypedArray === undefined) TypedArray = attribute.array.constructor
     if (TypedArray !== attribute.array.constructor) {
@@ -291,17 +290,18 @@ export function interleaveAttributes(attributes) {
   }
 
   // Create the set of buffer attributes
-  var interleavedBuffer = new InterleavedBuffer(new TypedArray(arrayLength), stride)
-  var offset = 0
-  var res = []
-  var getters = ['getX', 'getY', 'getZ', 'getW']
-  var setters = ['setX', 'setY', 'setZ', 'setW']
+  // @ts-expect-error this works in JS and TS is complaining but it's such a tiny thing I can live with the guilt
+  const interleavedBuffer = new InterleavedBuffer(new TypedArray(arrayLength), stride)
+  let offset = 0
+  const res = []
+  const getters = ['getX', 'getY', 'getZ', 'getW']
+  const setters = ['setX', 'setY', 'setZ', 'setW']
 
   for (let j = 0, l = attributes.length; j < l; j++) {
-    var attribute = attributes[j]
-    var itemSize = attribute.itemSize
-    var count = attribute.count
-    var iba = new InterleavedBufferAttribute(interleavedBuffer, itemSize, offset, attribute.normalized)
+    const attribute = attributes[j]
+    const itemSize = attribute.itemSize
+    const count = attribute.count
+    const iba = new InterleavedBufferAttribute(interleavedBuffer, itemSize, offset, attribute.normalized)
     res.push(iba)
 
     offset += itemSize
@@ -310,7 +310,17 @@ export function interleaveAttributes(attributes) {
     // at the appropriate offset
     for (let c = 0; c < count; c++) {
       for (let k = 0; k < itemSize; k++) {
-        iba[setters[k]](c, attribute[getters[k]](c))
+        const set = getWithKey(iba, setters[k] as keyof InterleavedBufferAttribute) as InterleavedBufferAttribute[
+          | 'setX'
+          | 'setY'
+          | 'setZ'
+          | 'setW']
+        const get = getWithKey(attribute, getters[k] as keyof BufferAttribute) as BufferAttribute[
+          | 'getX'
+          | 'getY'
+          | 'getZ'
+          | 'getW']
+        set(c, get(c))
       }
     }
   }
@@ -322,18 +332,18 @@ export function interleaveAttributes(attributes) {
  * @param {Array<BufferGeometry>} geometry
  * @return {number}
  */
-export function estimateBytesUsed(geometry) {
+export function estimateBytesUsed(geometry: BufferGeometry): number {
   // Return the estimated memory used by this geometry in bytes
   // Calculate using itemSize, count, and BYTES_PER_ELEMENT to account
   // for InterleavedBufferAttributes.
-  var mem = 0
+  let mem = 0
   for (let name in geometry.attributes) {
-    var attr = geometry.getAttribute(name)
-    mem += attr.count * attr.itemSize * attr.array.BYTES_PER_ELEMENT
+    const attr = geometry.getAttribute(name)
+    mem += attr.count * attr.itemSize * (attr.array as TypedArray).BYTES_PER_ELEMENT
   }
 
-  var indices = geometry.getIndex()
-  mem += indices ? indices.count * indices.itemSize * indices.array.BYTES_PER_ELEMENT : 0
+  const indices = geometry.getIndex()
+  mem += indices ? indices.count * indices.itemSize * (indices.array as TypedArray).BYTES_PER_ELEMENT : 0
   return mem
 }
 
@@ -342,53 +352,60 @@ export function estimateBytesUsed(geometry) {
  * @param {number} tolerance
  * @return {BufferGeometry>}
  */
-export function mergeVertices(geometry, tolerance = 1e-4) {
+export function mergeVertices(geometry: BufferGeometry, tolerance = 1e-4): BufferGeometry {
   tolerance = Math.max(tolerance, Number.EPSILON)
 
   // Generate an index buffer if the geometry doesn't have one, or optimize it
   // if it's already available.
-  var hashToIndex = {}
-  var indices = geometry.getIndex()
-  var positions = geometry.getAttribute('position')
-  var vertexCount = indices ? indices.count : positions.count
+  const hashToIndex: {
+    [key: string]: number
+  } = {}
+  const indices = geometry.getIndex()
+  const positions = geometry.getAttribute('position')
+  const vertexCount = indices ? indices.count : positions.count
 
   // next value for triangle indices
-  var nextIndex = 0
+  let nextIndex = 0
 
   // attributes and new attribute arrays
-  var attributeNames = Object.keys(geometry.attributes)
-  var attrArrays = {}
-  var morphAttrsArrays = {}
-  var newIndices = []
-  var getters = ['getX', 'getY', 'getZ', 'getW']
+  const attributeNames = Object.keys(geometry.attributes)
+  const attrArrays: {
+    [key: string]: []
+  } = {}
+  const morphAttrsArrays: {
+    [key: string]: Array<Array<BufferAttribute | InterleavedBufferAttribute>>
+  } = {}
+  const newIndices = []
+  const getters = ['getX', 'getY', 'getZ', 'getW']
 
   // initialize the arrays
   for (let i = 0, l = attributeNames.length; i < l; i++) {
-    var name = attributeNames[i]
+    const name = attributeNames[i]
 
     attrArrays[name] = []
 
-    var morphAttr = geometry.morphAttributes[name]
+    const morphAttr = geometry.morphAttributes[name]
     if (morphAttr) {
-      morphAttrsArrays[name] = new Array(morphAttr.length).fill().map(() => [])
+      morphAttrsArrays[name] = new Array(morphAttr.length).fill(0).map(() => [])
     }
   }
 
   // convert the error tolerance to an amount of decimal places to truncate to
-  var decimalShift = Math.log10(1 / tolerance)
-  var shiftMultiplier = Math.pow(10, decimalShift)
+  const decimalShift = Math.log10(1 / tolerance)
+  const shiftMultiplier = Math.pow(10, decimalShift)
   for (let i = 0; i < vertexCount; i++) {
-    var index = indices ? indices.getX(i) : i
+    const index = indices ? indices.getX(i) : i
 
     // Generate a hash for the vertex attributes at the current index 'i'
-    var hash = ''
+    let hash = ''
     for (let j = 0, l = attributeNames.length; j < l; j++) {
-      var name = attributeNames[j]
-      var attribute = geometry.getAttribute(name)
-      var itemSize = attribute.itemSize
+      const name = attributeNames[j]
+      const attribute = geometry.getAttribute(name)
+      const itemSize = attribute.itemSize
 
       for (let k = 0; k < itemSize; k++) {
         // double tilde truncates the decimal value
+        // @ts-ignore no
         hash += `${~~(attribute[getters[k]](index) * shiftMultiplier)},`
       }
     }
@@ -400,19 +417,21 @@ export function mergeVertices(geometry, tolerance = 1e-4) {
     } else {
       // copy data to the new index in the attribute arrays
       for (let j = 0, l = attributeNames.length; j < l; j++) {
-        var name = attributeNames[j]
-        var attribute = geometry.getAttribute(name)
-        var morphAttr = geometry.morphAttributes[name]
-        var itemSize = attribute.itemSize
-        var newarray = attrArrays[name]
-        var newMorphArrays = morphAttrsArrays[name]
+        const name = attributeNames[j]
+        const attribute = geometry.getAttribute(name)
+        const morphAttr = geometry.morphAttributes[name]
+        const itemSize = attribute.itemSize
+        const newarray = attrArrays[name]
+        const newMorphArrays = morphAttrsArrays[name]
 
         for (let k = 0; k < itemSize; k++) {
-          var getterFunc = getters[k]
+          const getterFunc = getters[k]
+          // @ts-ignore
           newarray.push(attribute[getterFunc](index))
 
           if (morphAttr) {
             for (let m = 0, ml = morphAttr.length; m < ml; m++) {
+              // @ts-ignore
               newMorphArrays[m].push(morphAttr[m][getterFunc](index))
             }
           }
@@ -429,21 +448,22 @@ export function mergeVertices(geometry, tolerance = 1e-4) {
   // the attributeBuffers
   const result = geometry.clone()
   for (let i = 0, l = attributeNames.length; i < l; i++) {
-    var name = attributeNames[i]
-    var oldAttribute = geometry.getAttribute(name)
+    const name = attributeNames[i]
+    const oldAttribute = geometry.getAttribute(name)
 
-    var buffer = new oldAttribute.array.constructor(attrArrays[name])
-    var attribute = new BufferAttribute(buffer, oldAttribute.itemSize, oldAttribute.normalized)
+    // @ts-expect-error it does exist, console.log(Float32Array.constructor) in browser devtools gives a function
+    const buffer = new (oldAttribute.array as TypedArray).constructor(attrArrays[name])
+    const attribute = new BufferAttribute(buffer, oldAttribute.itemSize, oldAttribute.normalized)
 
     result.setAttribute(name, attribute)
 
     // Update the attribute arrays
     if (name in morphAttrsArrays) {
       for (let j = 0; j < morphAttrsArrays[name].length; j++) {
-        var oldMorphAttribute = geometry.morphAttributes[name][j]
-
-        var buffer = new oldMorphAttribute.array.constructor(morphAttrsArrays[name][j])
-        var morphAttribute = new BufferAttribute(buffer, oldMorphAttribute.itemSize, oldMorphAttribute.normalized)
+        const oldMorphAttribute = geometry.morphAttributes[name][j]
+        // @ts-expect-error it does exist, console.log(Float32Array.constructor) in browser devtools gives a function
+        const buffer = new (oldMorphAttribute.array as TypedArray).constructor(morphAttrsArrays[name][j])
+        const morphAttribute = new BufferAttribute(buffer, oldMorphAttribute.itemSize, oldMorphAttribute.normalized)
         result.morphAttributes[name][j] = morphAttribute
       }
     }
@@ -459,23 +479,23 @@ export function mergeVertices(geometry, tolerance = 1e-4) {
 /**
  * @param {BufferGeometry} geometry
  * @param {number} drawMode
- * @return {BufferGeometry>}
+ * @return {BufferGeometry}
  */
-export function toTrianglesDrawMode(geometry, drawMode) {
+export function toTrianglesDrawMode(geometry: BufferGeometry, drawMode: number): BufferGeometry {
   if (drawMode === TrianglesDrawMode) {
     console.warn('THREE.BufferGeometryUtils.toTrianglesDrawMode(): Geometry already defined as triangles.')
     return geometry
   }
 
   if (drawMode === TriangleFanDrawMode || drawMode === TriangleStripDrawMode) {
-    var index = geometry.getIndex()
+    let index = geometry.getIndex()
 
     // generate index if not present
 
     if (index === null) {
-      var indices = []
+      const indices = []
 
-      var position = geometry.getAttribute('position')
+      const position = geometry.getAttribute('position')
 
       if (position !== undefined) {
         for (let i = 0; i < position.count; i++) {
@@ -494,29 +514,31 @@ export function toTrianglesDrawMode(geometry, drawMode) {
 
     //
 
-    var numberOfTriangles = index.count - 2
-    var newIndices = []
+    const numberOfTriangles = (index as BufferAttribute).count - 2
+    const newIndices = []
 
-    if (drawMode === TriangleFanDrawMode) {
-      // gl.TRIANGLE_FAN
+    if (index) {
+      if (drawMode === TriangleFanDrawMode) {
+        // gl.TRIANGLE_FAN
 
-      for (let i = 1; i <= numberOfTriangles; i++) {
-        newIndices.push(index.getX(0))
-        newIndices.push(index.getX(i))
-        newIndices.push(index.getX(i + 1))
-      }
-    } else {
-      // gl.TRIANGLE_STRIP
-
-      for (let i = 0; i < numberOfTriangles; i++) {
-        if (i % 2 === 0) {
+        for (let i = 1; i <= numberOfTriangles; i++) {
+          newIndices.push(index.getX(0))
           newIndices.push(index.getX(i))
           newIndices.push(index.getX(i + 1))
-          newIndices.push(index.getX(i + 2))
-        } else {
-          newIndices.push(index.getX(i + 2))
-          newIndices.push(index.getX(i + 1))
-          newIndices.push(index.getX(i))
+        }
+      } else {
+        // gl.TRIANGLE_STRIP
+
+        for (let i = 0; i < numberOfTriangles; i++) {
+          if (i % 2 === 0) {
+            newIndices.push(index.getX(i))
+            newIndices.push(index.getX(i + 1))
+            newIndices.push(index.getX(i + 2))
+          } else {
+            newIndices.push(index.getX(i + 2))
+            newIndices.push(index.getX(i + 1))
+            newIndices.push(index.getX(i))
+          }
         }
       }
     }
@@ -527,7 +549,7 @@ export function toTrianglesDrawMode(geometry, drawMode) {
 
     // build final geometry
 
-    var newGeometry = geometry.clone()
+    const newGeometry = geometry.clone()
     newGeometry.setIndex(newIndices)
     newGeometry.clearGroups()
 
@@ -544,49 +566,56 @@ export function toTrianglesDrawMode(geometry, drawMode) {
  * @param {Mesh | Line | Points} object An instance of Mesh, Line or Points.
  * @return {Object} An Object with original position/normal attributes and morphed ones.
  */
-export function computeMorphedAttributes(object) {
+export type ComputedMorphedAttribute = {
+  positionAttribute: BufferAttribute | InterleavedBufferAttribute
+  normalAttribute: BufferAttribute | InterleavedBufferAttribute
+  morphedPositionAttribute: Float32BufferAttribute
+  morphedNormalAttribute: Float32BufferAttribute
+}
+
+export function computeMorphedAttributes(object: Mesh | Line | Points): ComputedMorphedAttribute | null {
   if (object.geometry.isBufferGeometry !== true) {
     console.error('THREE.BufferGeometryUtils: Geometry is not of type BufferGeometry.')
     return null
   }
 
-  var _vA = new Vector3()
-  var _vB = new Vector3()
-  var _vC = new Vector3()
+  const _vA = new Vector3()
+  const _vB = new Vector3()
+  const _vC = new Vector3()
 
-  var _tempA = new Vector3()
-  var _tempB = new Vector3()
-  var _tempC = new Vector3()
+  const _tempA = new Vector3()
+  const _tempB = new Vector3()
+  const _tempC = new Vector3()
 
-  var _morphA = new Vector3()
-  var _morphB = new Vector3()
-  var _morphC = new Vector3()
+  const _morphA = new Vector3()
+  const _morphB = new Vector3()
+  const _morphC = new Vector3()
 
   function _calculateMorphedAttributeData(
-    object,
-    material,
-    attribute,
-    morphAttribute,
-    morphTargetsRelative,
-    a,
-    b,
-    c,
-    modifiedAttributeArray,
+    object: Mesh | Line | Points,
+    material: Material,
+    attribute: BufferAttribute | InterleavedBufferAttribute,
+    morphAttribute: (BufferAttribute | InterleavedBufferAttribute)[],
+    morphTargetsRelative: boolean,
+    a: number,
+    b: number,
+    c: number,
+    modifiedAttributeArray: Float32Array,
   ) {
     _vA.fromBufferAttribute(attribute, a)
     _vB.fromBufferAttribute(attribute, b)
     _vC.fromBufferAttribute(attribute, c)
 
-    var morphInfluences = object.morphTargetInfluences
+    const morphInfluences = object.morphTargetInfluences
 
-    if (material.morphTargets && morphAttribute && morphInfluences) {
+    if ((material as MeshStandardMaterial).morphTargets && morphAttribute && morphInfluences) {
       _morphA.set(0, 0, 0)
       _morphB.set(0, 0, 0)
       _morphC.set(0, 0, 0)
 
       for (let i = 0, il = morphAttribute.length; i < il; i++) {
-        var influence = morphInfluences[i]
-        var morph = morphAttribute[i]
+        const influence = morphInfluences[i]
+        const morph = morphAttribute[i]
 
         if (influence === 0) continue
 
@@ -610,9 +639,12 @@ export function computeMorphedAttributes(object) {
       _vC.add(_morphC)
     }
 
-    if (object.isSkinnedMesh) {
+    if ((object as SkinnedMesh).isSkinnedMesh) {
+      // @ts-expect-error – https://github.com/three-types/three-ts-types/issues/37
       object.boneTransform(a, _vA)
+      // @ts-expect-error – https://github.com/three-types/three-ts-types/issues/37
       object.boneTransform(b, _vB)
+      // @ts-expect-error – https://github.com/three-types/three-ts-types/issues/37
       object.boneTransform(c, _vC)
     }
 
@@ -627,25 +659,25 @@ export function computeMorphedAttributes(object) {
     modifiedAttributeArray[c * 3 + 2] = _vC.z
   }
 
-  var geometry = object.geometry
-  var material = object.material
+  const geometry = object.geometry
+  const material = object.material
 
-  var a, b, c
-  var index = geometry.index
-  var positionAttribute = geometry.attributes.position
-  var morphPosition = geometry.morphAttributes.position
-  var morphTargetsRelative = geometry.morphTargetsRelative
-  var normalAttribute = geometry.attributes.normal
-  var morphNormal = geometry.morphAttributes.position
+  let a, b, c
+  const index = geometry.index
+  const positionAttribute = geometry.attributes.position
+  const morphPosition = geometry.morphAttributes.position
+  const morphTargetsRelative = geometry.morphTargetsRelative
+  const normalAttribute = geometry.attributes.normal
+  const morphNormal = geometry.morphAttributes.position
 
-  var groups = geometry.groups
-  var drawRange = geometry.drawRange
-  var i, j, il, jl
-  var group, groupMaterial
-  var start, end
+  const groups = geometry.groups
+  const drawRange = geometry.drawRange
+  let i, j, il, jl
+  let group, groupMaterial
+  let start, end
 
-  var modifiedPosition = new Float32Array(positionAttribute.count * positionAttribute.itemSize)
-  var modifiedNormal = new Float32Array(normalAttribute.count * normalAttribute.itemSize)
+  const modifiedPosition = new Float32Array(positionAttribute.count * positionAttribute.itemSize)
+  const modifiedNormal = new Float32Array(normalAttribute.count * normalAttribute.itemSize)
 
   if (index !== null) {
     // indexed buffer geometry
@@ -653,7 +685,7 @@ export function computeMorphedAttributes(object) {
     if (Array.isArray(material)) {
       for (i = 0, il = groups.length; i < il; i++) {
         group = groups[i]
-        groupMaterial = material[group.materialIndex]
+        groupMaterial = material[group.materialIndex as number]
 
         start = Math.max(group.start, drawRange.start)
         end = Math.min(group.start + group.count, drawRange.start + drawRange.count)
@@ -728,7 +760,7 @@ export function computeMorphedAttributes(object) {
     if (Array.isArray(material)) {
       for (i = 0, il = groups.length; i < il; i++) {
         group = groups[i]
-        groupMaterial = material[group.materialIndex]
+        groupMaterial = material[group.materialIndex as number]
 
         start = Math.max(group.start, drawRange.start)
         end = Math.min(group.start + group.count, drawRange.start + drawRange.count)
@@ -799,8 +831,8 @@ export function computeMorphedAttributes(object) {
     }
   }
 
-  var morphedPositionAttribute = new Float32BufferAttribute(modifiedPosition, 3)
-  var morphedNormalAttribute = new Float32BufferAttribute(modifiedNormal, 3)
+  const morphedPositionAttribute = new Float32BufferAttribute(modifiedPosition, 3)
+  const morphedNormalAttribute = new Float32BufferAttribute(modifiedNormal, 3)
 
   return {
     positionAttribute: positionAttribute,
