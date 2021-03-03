@@ -57,7 +57,7 @@ class DragControls extends EventDispatcher {
 
   getObjects = () => this._objects
 
-  onMouseMove = (event: MouseEvent) => {
+  private onMouseMove = (event: MouseEvent) => {
     const rect = this._domElement.getBoundingClientRect()
 
     this._mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1
@@ -104,7 +104,7 @@ class DragControls extends EventDispatcher {
     }
   }
 
-  onMouseDown = (event: MouseEvent) => {
+  private onMouseDown = (event: MouseEvent) => {
     event.preventDefault()
 
     this._intersections.length = 0
@@ -126,7 +126,7 @@ class DragControls extends EventDispatcher {
     }
   }
 
-  onMouseCancel = (event: MouseEvent) => {
+  private onMouseCancel = (event: MouseEvent) => {
     event.preventDefault()
 
     if (this._selected) {
@@ -138,7 +138,7 @@ class DragControls extends EventDispatcher {
     this._domElement.style.cursor = this._hovered ? 'pointer' : 'auto'
   }
 
-  onPointerMove = (event: PointerEvent) => {
+  private onPointerMove = (event: PointerEvent) => {
     event.preventDefault()
 
     switch (event.pointerType) {
@@ -151,7 +151,7 @@ class DragControls extends EventDispatcher {
     }
   }
 
-  onPointerDown = (event: PointerEvent) => {
+  private onPointerDown = (event: PointerEvent) => {
     event.preventDefault()
 
     switch (event.pointerType) {
@@ -164,7 +164,7 @@ class DragControls extends EventDispatcher {
     }
   }
 
-  onPointerCancel = (event: PointerEvent) => {
+  private onPointerCancel = (event: PointerEvent) => {
     event.preventDefault()
 
     switch (event.pointerType) {
@@ -177,7 +177,7 @@ class DragControls extends EventDispatcher {
     }
   }
 
-  onTouchMove = (event: TouchEvent) => {
+  private onTouchMove = (event: TouchEvent) => {
     event.preventDefault()
     const newEvent = event.changedTouches[0]
 
@@ -199,7 +199,7 @@ class DragControls extends EventDispatcher {
     }
   }
 
-  onTouchStart = (event: TouchEvent) => {
+  private onTouchStart = (event: TouchEvent) => {
     event.preventDefault()
     const newEvent = event.changedTouches[0]
 
@@ -232,7 +232,7 @@ class DragControls extends EventDispatcher {
     }
   }
 
-  onTouchEnd = (event: TouchEvent) => {
+  private onTouchEnd = (event: TouchEvent) => {
     event.preventDefault()
 
     if (this._selected) {

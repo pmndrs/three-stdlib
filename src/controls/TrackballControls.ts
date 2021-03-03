@@ -19,7 +19,7 @@ class TrackballControls extends EventDispatcher {
   minDistance = 0
   maxDistance = Infinity
 
-  keys = [65 /*A*/, 83 /*S*/, 68 /*D*/]
+  keys: [number, number, number] = [65 /*A*/, 83 /*S*/, 68 /*D*/]
 
   mouseButtons = {
     LEFT: MOUSE.ROTATE,

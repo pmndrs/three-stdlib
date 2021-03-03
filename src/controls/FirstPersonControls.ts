@@ -27,20 +27,20 @@ class FirstPersonControls extends EventDispatcher {
 
   // internals
 
-  autoSpeedFactor = 0.0
+  private autoSpeedFactor = 0.0
 
-  mouseX = 0
-  mouseY = 0
+  private mouseX = 0
+  private mouseY = 0
 
-  moveForward = false
-  moveBackward = false
-  moveLeft = false
-  moveRight = false
-  moveUp = false
-  moveDown = false
+  private moveForward = false
+  private moveBackward = false
+  private moveLeft = false
+  private moveRight = false
+  private moveUp = false
+  private moveDown = false
 
-  viewHalfX = 0
-  viewHalfY = 0
+  private viewHalfX = 0
+  private viewHalfY = 0
 
   private lat = 0
   private lon = 0
@@ -97,7 +97,7 @@ class FirstPersonControls extends EventDispatcher {
     }
   }
 
-  onMouseDown = (event: MouseEvent) => {
+  private onMouseDown = (event: MouseEvent) => {
     if (this.domElement instanceof HTMLElement) {
       this.domElement.focus()
     }
@@ -118,7 +118,7 @@ class FirstPersonControls extends EventDispatcher {
     this.mouseDragOn = true
   }
 
-  onMouseUp = (event: MouseEvent) => {
+  private onMouseUp = (event: MouseEvent) => {
     event.preventDefault()
 
     if (this.activeLook) {
@@ -135,7 +135,7 @@ class FirstPersonControls extends EventDispatcher {
     this.mouseDragOn = false
   }
 
-  onMouseMove = (event: MouseEvent) => {
+  private onMouseMove = (event: MouseEvent) => {
     if (this.domElement instanceof Document) {
       this.mouseX = event.pageX - this.viewHalfX
       this.mouseY = event.pageY - this.viewHalfY
@@ -145,7 +145,7 @@ class FirstPersonControls extends EventDispatcher {
     }
   }
 
-  onKeyDown = (event: KeyboardEvent) => {
+  private onKeyDown = (event: KeyboardEvent) => {
     //event.preventDefault();
 
     switch (event.code) {
@@ -178,7 +178,7 @@ class FirstPersonControls extends EventDispatcher {
     }
   }
 
-  onKeyUp = (event: KeyboardEvent) => {
+  private onKeyUp = (event: KeyboardEvent) => {
     switch (event.code) {
       case 'ArrowUp':
       case 'KeyW':
@@ -280,9 +280,9 @@ class FirstPersonControls extends EventDispatcher {
     this.object.lookAt(this.targetPosition)
   }
 
-  contextmenu = (event: Event) => event.preventDefault()
+  private contextmenu = (event: Event) => event.preventDefault()
 
-  setOrientation = (controls: FirstPersonControls) => {
+  private setOrientation = (controls: FirstPersonControls) => {
     const quaternion = controls.object.quaternion
 
     this.lookDirection.set(0, 0, -1).applyQuaternion(quaternion)
