@@ -1,5 +1,5 @@
 import { FileLoader, Group, Loader, LoadingManager } from 'three'
-import { ColladaLoader } from '../loaders/ColladaLoader.js'
+import { ColladaLoader } from '../loaders/ColladaLoader'
 import { unzipSync } from 'fflate'
 
 var KMZLoader = function (manager) {

@@ -1,6 +1,6 @@
 import { DefaultLoadingManager, FileLoader } from 'three'
 
-import * as Nodes from '../nodes/Nodes.js'
+import * as Nodes from '../nodes/Nodes'
 
 var NodeMaterialLoader = function (manager, library) {
   this.manager = manager !== undefined ? manager : DefaultLoadingManager

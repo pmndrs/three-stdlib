@@ -1,7 +1,7 @@
-import Node from '../core/Node.js'
-import Vector3Node from '../inputs/Vector3Node.js'
-import Matrix4Node from '../inputs/Matrix4Node.js'
-import { NodeUpdateType } from '../core/constants.js'
+import Node from '../core/Node'
+import Vector3Node from '../inputs/Vector3Node'
+import Matrix4Node from '../inputs/Matrix4Node'
+import { NodeUpdateType } from '../core/constants'
 
 class CameraNode extends Node {
   static POSITION = 'position'

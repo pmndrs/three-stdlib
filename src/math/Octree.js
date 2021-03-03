@@ -1,5 +1,5 @@
 import { Box3, Line3, Plane, Sphere, Triangle, Vector3 } from 'three'
-import { Capsule } from '../math/Capsule.js'
+import { Capsule } from '../math/Capsule'
 
 var Octree = (function () {
   var _v1 = new Vector3()

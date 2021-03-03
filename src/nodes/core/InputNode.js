@@ -1,4 +1,4 @@
-import { TempNode } from './TempNode.js'
+import { TempNode } from './TempNode'
 
 function InputNode(type, params) {
   params = params || {}

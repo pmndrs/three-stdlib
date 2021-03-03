@@ -1,4 +1,4 @@
-import { NodeUpdateType } from './constants.js'
+import { NodeUpdateType } from './constants'
 
 class Node {
   constructor(type = null) {

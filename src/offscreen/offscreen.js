@@ -1,4 +1,4 @@
-import init from './scene.js'
+import init from './scene'
 
 self.onmessage = function (message) {
   var data = message.data

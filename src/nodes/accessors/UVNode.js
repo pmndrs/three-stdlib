@@ -1,5 +1,5 @@
-import { TempNode } from '../core/TempNode.js'
-import { NodeLib } from '../core/NodeLib.js'
+import { TempNode } from '../core/TempNode'
+import { NodeLib } from '../core/NodeLib'
 
 function UVNode(index) {
   TempNode.call(this, 'v2', { shared: false })

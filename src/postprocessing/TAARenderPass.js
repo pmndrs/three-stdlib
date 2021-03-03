@@ -1,5 +1,5 @@
 import { WebGLRenderTarget } from 'three'
-import { SSAARenderPass } from '../postprocessing/SSAARenderPass.js'
+import { SSAARenderPass } from '../postprocessing/SSAARenderPass'
 
 /**
  *

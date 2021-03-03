@@ -1,5 +1,5 @@
 import { Loader } from 'three'
-import { GLTFLoader } from '../loaders/GLTFLoader.js'
+import { GLTFLoader } from '../loaders/GLTFLoader'
 
 // VRM Specification: https://dwango.github.io/vrm/vrm_spec/
 //

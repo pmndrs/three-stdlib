@@ -1,4 +1,4 @@
-import InputNode from '../core/InputNode.js'
+import InputNode from '../core/InputNode'
 import { Matrix3 } from 'three'
 
 class Matrix3Node extends InputNode {

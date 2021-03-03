@@ -1,8 +1,8 @@
 import { Box2, Camera, Color, Matrix3, Matrix4, Object3D, Vector3 } from 'three'
-import { Projector } from '../renderers/Projector.js'
-import { RenderableFace } from '../renderers/Projector.js'
-import { RenderableLine } from '../renderers/Projector.js'
-import { RenderableSprite } from '../renderers/Projector.js'
+import { Projector } from '../renderers/Projector'
+import { RenderableFace } from '../renderers/Projector'
+import { RenderableLine } from '../renderers/Projector'
+import { RenderableSprite } from '../renderers/Projector'
 
 var SVGObject = function (node) {
   Object3D.call(this)

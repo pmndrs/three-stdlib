@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import { GPUIndexFormat, GPUFilterMode, GPUPrimitiveTopology } from './constants.js'
+import { GPUIndexFormat, GPUFilterMode, GPUPrimitiveTopology } from './constants'
 
 // ported from https://github.com/toji/web-texture-tool/blob/master/src/webgpu-mipmap-generator.js
 

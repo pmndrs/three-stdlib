@@ -1,4 +1,4 @@
-import AttributeNode from '../core/AttributeNode.js'
+import AttributeNode from '../core/AttributeNode'
 
 class UVNode extends AttributeNode {
   constructor(index = 0) {

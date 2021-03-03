@@ -1,5 +1,5 @@
-import { InputNode } from '../core/InputNode.js'
-import { TextureNode } from './TextureNode.js'
+import { InputNode } from '../core/InputNode'
+import { TextureNode } from './TextureNode'
 
 function ScreenNode(uv) {
   TextureNode.call(this, undefined, uv)

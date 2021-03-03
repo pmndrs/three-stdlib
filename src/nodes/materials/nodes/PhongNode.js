@@ -1,8 +1,8 @@
 import { UniformsLib, UniformsUtils } from 'three'
 
-import { Node } from '../../core/Node.js'
-import { ColorNode } from '../../inputs/ColorNode.js'
-import { FloatNode } from '../../inputs/FloatNode.js'
+import { Node } from '../../core/Node'
+import { ColorNode } from '../../inputs/ColorNode'
+import { FloatNode } from '../../inputs/FloatNode'
 
 function PhongNode() {
   Node.call(this)

@@ -1,6 +1,6 @@
-import { TempNode } from '../core/TempNode.js'
-import { FunctionNode } from '../core/FunctionNode.js'
-import { UVNode } from '../accessors/UVNode.js'
+import { TempNode } from '../core/TempNode'
+import { FunctionNode } from '../core/FunctionNode'
+import { UVNode } from '../accessors/UVNode'
 
 function CheckerNode(uv) {
   TempNode.call(this, 'f')

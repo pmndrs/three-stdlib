@@ -1,6 +1,6 @@
-import { StandardNode } from './nodes/StandardNode.js'
-import { NodeMaterial } from './NodeMaterial.js'
-import { NodeUtils } from '../core/NodeUtils.js'
+import { StandardNode } from './nodes/StandardNode'
+import { NodeMaterial } from './NodeMaterial'
+import { NodeUtils } from '../core/NodeUtils'
 
 function StandardNodeMaterial() {
   var node = new StandardNode()

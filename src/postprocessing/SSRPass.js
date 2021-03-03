@@ -17,11 +17,11 @@ import {
   WebGLRenderTarget,
   HalfFloatType,
 } from 'three'
-import { Pass } from '../postprocessing/Pass.js'
-import { SSRShader } from '../shaders/SSRShader.js'
-import { SSRBlurShader } from '../shaders/SSRShader.js'
-import { SSRDepthShader } from '../shaders/SSRShader.js'
-import { CopyShader } from '../shaders/CopyShader.js'
+import { Pass } from '../postprocessing/Pass'
+import { SSRShader } from '../shaders/SSRShader'
+import { SSRBlurShader } from '../shaders/SSRShader'
+import { SSRDepthShader } from '../shaders/SSRShader'
+import { CopyShader } from '../shaders/CopyShader'
 
 var SSRPass = function ({
   renderer,

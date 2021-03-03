@@ -1,8 +1,8 @@
 import { Object3D } from 'three'
 
-import { XRHandPrimitiveModel } from './XRHandPrimitiveModel.js'
+import { XRHandPrimitiveModel } from './XRHandPrimitiveModel'
 
-import { XRHandOculusMeshModel } from './XRHandOculusMeshModel.js'
+import { XRHandOculusMeshModel } from './XRHandOculusMeshModel'
 
 function XRHandModel(controller) {
   Object3D.call(this)

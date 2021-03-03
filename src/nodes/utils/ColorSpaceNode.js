@@ -8,11 +8,11 @@ import {
   sRGBEncoding,
 } from 'three'
 
-import { TempNode } from '../core/TempNode.js'
-import { ConstNode } from '../core/ConstNode.js'
-import { FloatNode } from '../inputs/FloatNode.js'
-import { FunctionNode } from '../core/FunctionNode.js'
-import { ExpressionNode } from '../core/ExpressionNode.js'
+import { TempNode } from '../core/TempNode'
+import { ConstNode } from '../core/ConstNode'
+import { FloatNode } from '../inputs/FloatNode'
+import { FunctionNode } from '../core/FunctionNode'
+import { ExpressionNode } from '../core/ExpressionNode'
 
 function ColorSpaceNode(input, method) {
   TempNode.call(this, 'v4')

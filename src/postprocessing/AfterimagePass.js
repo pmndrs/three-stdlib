@@ -7,8 +7,8 @@ import {
   UniformsUtils,
   WebGLRenderTarget,
 } from 'three'
-import { Pass } from '../postprocessing/Pass.js'
-import { AfterimageShader } from '../shaders/AfterimageShader.js'
+import { Pass } from '../postprocessing/Pass'
+import { AfterimageShader } from '../shaders/AfterimageShader'
 
 var AfterimagePass = function (damp) {
   Pass.call(this)

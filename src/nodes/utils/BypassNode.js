@@ -1,4 +1,4 @@
-import { Node } from '../core/Node.js'
+import { Node } from '../core/Node'
 
 function BypassNode(code, value) {
   Node.call(this)

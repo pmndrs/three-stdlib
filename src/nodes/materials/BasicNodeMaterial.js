@@ -1,6 +1,6 @@
-import { BasicNode } from './nodes/BasicNode.js'
-import { NodeMaterial } from './NodeMaterial.js'
-import { NodeUtils } from '../core/NodeUtils.js'
+import { BasicNode } from './nodes/BasicNode'
+import { NodeMaterial } from './NodeMaterial'
+import { NodeUtils } from '../core/NodeUtils'
 
 function BasicNodeMaterial() {
   var node = new BasicNode()

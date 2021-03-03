@@ -1,4 +1,4 @@
-import { TempNode } from './TempNode.js'
+import { TempNode } from './TempNode'
 
 var declarationRegexp = /^([a-z_0-9]+)\s([a-z_0-9]+)\s?\=?\s?(.*?)(\;|$)/i
 

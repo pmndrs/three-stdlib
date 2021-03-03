@@ -1,5 +1,5 @@
-import FloatNode from '../inputs/FloatNode.js'
-import { NodeUpdateType } from '../core/constants.js'
+import FloatNode from '../inputs/FloatNode'
+import { NodeUpdateType } from '../core/constants'
 
 class TimerNode extends FloatNode {
   constructor() {

@@ -34,19 +34,22 @@ class DeviceOrientationControls extends EventDispatcher {
 
   // The angles alpha, beta and gamma form a set of intrinsic Tait-Bryan angles of type Z-X'-Y''
 
-  private setObjectQuaternion = (() => {
-    const zee = new Vector3(0, 0, 1)
-    const euler = new Euler()
-    const q0 = new Quaternion()
-    const q1 = new Quaternion(-Math.sqrt(0.5), 0, 0, Math.sqrt(0.5)) // - PI/2 around the x-axis
-
-    return (quaternion: Quaternion, alpha: number, beta: number, gamma: number, orient: number) => {
-      euler.set(beta, alpha, -gamma, 'YXZ') // 'ZXY' for the device, but 'YXZ' for us
-      quaternion.setFromEuler(euler) // orient the device
-      quaternion.multiply(q1) // camera looks out the back of the device, not the top
-      quaternion.multiply(q0.setFromAxisAngle(zee, -orient)) // adjust for screen orientation
-    }
-  })()
+  private zee = new Vector3(0, 0, 1)
+  private euler = new Euler()
+  private q0 = new Quaternion()
+  private q1 = new Quaternion(-Math.sqrt(0.5), 0, 0, Math.sqrt(0.5)) // - PI/2 around the x-axis
+  private setObjectQuaternion = (
+    quaternion: Quaternion,
+    alpha: number,
+    beta: number,
+    gamma: number,
+    orient: number,
+  ) => {
+    this.euler.set(beta, alpha, -gamma, 'YXZ') // 'ZXY' for the device, but 'YXZ' for us
+    quaternion.setFromEuler(this.euler) // orient the device
+    quaternion.multiply(this.q1) // camera looks out the back of the device, not the top
+    quaternion.multiply(this.q0.setFromAxisAngle(this.zee, -orient)) // adjust for screen orientation
+  }
 
   connect = () => {
     this.onScreenOrientationChangeEvent() // run once on load
@@ -82,29 +85,26 @@ class DeviceOrientationControls extends EventDispatcher {
     this.enabled = false
   }
 
-  update = (() => {
-    const lastQuaternion = new Quaternion()
+  private lastQuaternion = new Quaternion()
+  update = () => {
+    if (this.enabled === false) return
 
-    return () => {
-      if (this.enabled === false) return
+    const device = this.deviceOrientation
 
-      const device = this.deviceOrientation
+    if (device) {
+      const alpha = device.alpha ? MathUtils.degToRad(device.alpha) + this.alphaOffset : 0 // Z
+      const beta = device.beta ? MathUtils.degToRad(device.beta) : 0 // X'
+      const gamma = device.gamma ? MathUtils.degToRad(device.gamma) : 0 // Y''
+      const orient = this.screenOrientation ? MathUtils.degToRad(this.screenOrientation as number) : 0 // O
 
-      if (device) {
-        const alpha = device.alpha ? MathUtils.degToRad(device.alpha) + this.alphaOffset : 0 // Z
-        const beta = device.beta ? MathUtils.degToRad(device.beta) : 0 // X'
-        const gamma = device.gamma ? MathUtils.degToRad(device.gamma) : 0 // Y''
-        const orient = this.screenOrientation ? MathUtils.degToRad(this.screenOrientation as number) : 0 // O
+      this.setObjectQuaternion(this.object.quaternion, alpha, beta, gamma, orient)
 
-        this.setObjectQuaternion(this.object.quaternion, alpha, beta, gamma, orient)
-
-        if (8 * (1 - lastQuaternion.dot(this.object.quaternion)) > this.EPS) {
-          lastQuaternion.copy(this.object.quaternion)
-          this.dispatchEvent(this.changeEvent)
-        }
+      if (8 * (1 - this.lastQuaternion.dot(this.object.quaternion)) > this.EPS) {
+        this.lastQuaternion.copy(this.object.quaternion)
+        this.dispatchEvent(this.changeEvent)
       }
     }
-  })()
+  }
 
   dispose = () => this.disconnect()
 }

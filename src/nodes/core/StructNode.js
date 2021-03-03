@@ -1,4 +1,4 @@
-import { TempNode } from './TempNode.js'
+import { TempNode } from './TempNode'
 
 var declarationRegexp = /^struct\s*([a-z_0-9]+)\s*{\s*((.|\n)*?)}/gim,
   propertiesRegexp = /\s*(\w*?)\s*(\w*?)(\=|\;)/gim

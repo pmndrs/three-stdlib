@@ -1,10 +1,10 @@
 import { Vector2 } from 'three'
 
-import { TempNode } from '../core/TempNode.js'
-import { FunctionNode } from '../core/FunctionNode.js'
-import { FloatNode } from '../inputs/FloatNode.js'
-import { Vector2Node } from '../inputs/Vector2Node.js'
-import { UVNode } from '../accessors/UVNode.js'
+import { TempNode } from '../core/TempNode'
+import { FunctionNode } from '../core/FunctionNode'
+import { FloatNode } from '../inputs/FloatNode'
+import { Vector2Node } from '../inputs/Vector2Node'
+import { UVNode } from '../accessors/UVNode'
 
 function BlurNode(value, uv, radius, size) {
   TempNode.call(this, 'v4')

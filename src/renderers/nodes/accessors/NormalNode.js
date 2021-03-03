@@ -1,10 +1,10 @@
-import Node from '../core/Node.js'
-import AttributeNode from '../core/AttributeNode.js'
-import VaryNode from '../core/VaryNode.js'
-import ModelNode from '../accessors/ModelNode.js'
-import CameraNode from '../accessors/CameraNode.js'
-import OperatorNode from '../math/OperatorNode.js'
-import MathNode from '../math/MathNode.js'
+import Node from '../core/Node'
+import AttributeNode from '../core/AttributeNode'
+import VaryNode from '../core/VaryNode'
+import ModelNode from '../accessors/ModelNode'
+import CameraNode from '../accessors/CameraNode'
+import OperatorNode from '../math/OperatorNode'
+import MathNode from '../math/MathNode'
 
 class NormalNode extends Node {
   static LOCAL = 'local'

@@ -1,5 +1,5 @@
-import { Node } from '../../core/Node.js'
-import { ColorNode } from '../../inputs/ColorNode.js'
+import { Node } from '../../core/Node'
+import { ColorNode } from '../../inputs/ColorNode'
 
 function BasicNode() {
   Node.call(this)

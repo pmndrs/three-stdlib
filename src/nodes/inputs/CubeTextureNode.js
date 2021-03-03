@@ -1,7 +1,7 @@
-import { InputNode } from '../core/InputNode.js'
-import { ReflectNode } from '../accessors/ReflectNode.js'
-import { ColorSpaceNode } from '../utils/ColorSpaceNode.js'
-import { ExpressionNode } from '../core/ExpressionNode.js'
+import { InputNode } from '../core/InputNode'
+import { ReflectNode } from '../accessors/ReflectNode'
+import { ColorSpaceNode } from '../utils/ColorSpaceNode'
+import { ExpressionNode } from '../core/ExpressionNode'
 
 function CubeTextureNode(value, uv, bias) {
   InputNode.call(this, 'v4', { shared: true })

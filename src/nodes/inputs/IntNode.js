@@ -1,4 +1,4 @@
-import { InputNode } from '../core/InputNode.js'
+import { InputNode } from '../core/InputNode'
 
 function IntNode(value) {
   InputNode.call(this, 'i')

@@ -1,6 +1,6 @@
 {
   "name": "three-stdlib",
-  "version": "0.0.11",
+  "version": "0.0.15",
   "private": true,
   "description": "",
   "main": "index.cjs.js",
@@ -9,7 +9,7 @@
     "prebuild": "rimraf dist",
     "build": "rollup -c && npm run copy",
     "prepare": "npm run build",
-    "types": "tsc",
+    "types": "tsc --noEmit --emitDeclarationOnly false",
     "eslint": "eslint --cache --fix src/**/*.{ts,tsx}",
     "eslint:ci": "eslint src/**/*.{ts,tsx}",
     "copy": "copyfiles package.json readme.md LICENSE dist && json -I -f dist/package.json -e \"this.private=false; this.devDependencies=undefined; this.optionalDependencies=undefined; this.scripts=undefined; this.husky=undefined; this.prettier=undefined; this.jest=undefined; this['lint-staged']=undefined;\"",
@@ -27,7 +27,7 @@
       "eslint --fix"
     ],
     "*.{ts,tsx}": [
-      "tsc"
+      "tsc --noEmit --emitDeclarationOnly false"
     ]
   },
   "repository": {
@@ -79,7 +79,7 @@
     "rollup-plugin-size-snapshot": "^0.12.0",
     "three": "^0.126.0",
     "tslib": "^2.1.0",
-    "typescript": "4.1.5"
+    "typescript": "<4.2.0"
   },
   "dependencies": {
     "@webgpu/glslang": "^0.0.15",

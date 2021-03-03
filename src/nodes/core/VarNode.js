@@ -1,4 +1,4 @@
-import { Node } from './Node.js'
+import { Node } from './Node'
 
 function VarNode(type, value) {
   Node.call(this, type)

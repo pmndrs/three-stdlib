@@ -43,7 +43,7 @@ import {
   sRGBEncoding,
 } from 'three'
 import { unzlibSync } from 'fflate'
-import { NURBSCurve } from '../curves/NURBSCurve.js'
+import { NURBSCurve } from '../curves/NURBSCurve'
 
 /**
  * Loader loads FBX file and generates Group representing FBX scene.

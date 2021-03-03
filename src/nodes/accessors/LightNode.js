@@ -1,4 +1,4 @@
-import { TempNode } from '../core/TempNode.js'
+import { TempNode } from '../core/TempNode'
 
 function LightNode(scope) {
   TempNode.call(this, 'v3', { shared: false })

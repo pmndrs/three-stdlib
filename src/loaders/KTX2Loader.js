@@ -16,7 +16,7 @@
 
 import { CompressedTexture, CompressedTextureLoader, FileLoader, LinearEncoding, sRGBEncoding } from 'three'
 
-import { BasisTextureLoader } from './BasisTextureLoader.js'
+import { BasisTextureLoader } from './BasisTextureLoader'
 import { ZSTDDecoder } from 'zstddec'
 import { read as readKTX } from 'ktx-parse'
 

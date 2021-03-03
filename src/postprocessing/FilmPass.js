@@ -1,6 +1,6 @@
 import { ShaderMaterial, UniformsUtils } from 'three'
-import { Pass } from '../postprocessing/Pass.js'
-import { FilmShader } from '../shaders/FilmShader.js'
+import { Pass } from '../postprocessing/Pass'
+import { FilmShader } from '../shaders/FilmShader'
 
 var FilmPass = function (noiseIntensity, scanlinesIntensity, scanlinesCount, grayscale) {
   Pass.call(this)

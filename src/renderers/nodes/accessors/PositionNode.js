@@ -1,5 +1,5 @@
-import Node from '../core/Node.js'
-import AttributeNode from '../core/AttributeNode.js'
+import Node from '../core/Node'
+import AttributeNode from '../core/AttributeNode'
 
 class PositionNode extends Node {
   static LOCAL = 'local'

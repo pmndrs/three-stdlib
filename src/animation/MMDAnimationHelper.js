@@ -1,6 +1,6 @@
 import { AnimationMixer, Object3D, Quaternion, Vector3 } from 'three'
-import { CCDIKSolver } from '../animation/CCDIKSolver.js'
-import { MMDPhysics } from '../animation/MMDPhysics.js'
+import { CCDIKSolver } from '../animation/CCDIKSolver'
+import { MMDPhysics } from '../animation/MMDPhysics'
 
 /**
  * MMDAnimationHelper handles animation of MMD assets loaded by MMDLoader

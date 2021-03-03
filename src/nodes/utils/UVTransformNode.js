@@ -1,6 +1,6 @@
-import { ExpressionNode } from '../core/ExpressionNode.js'
-import { Matrix3Node } from '../inputs/Matrix3Node.js'
-import { UVNode } from '../accessors/UVNode.js'
+import { ExpressionNode } from '../core/ExpressionNode'
+import { Matrix3Node } from '../inputs/Matrix3Node'
+import { UVNode } from '../accessors/UVNode'
 
 function UVTransformNode(uv, position) {
   ExpressionNode.call(this, '( uvTransform * vec3( uvNode, 1 ) ).xy', 'vec2')

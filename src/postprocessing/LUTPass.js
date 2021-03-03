@@ -1,4 +1,4 @@
-import { ShaderPass } from './ShaderPass.js'
+import { ShaderPass } from './ShaderPass'
 
 const LUTShader = {
   defines: {

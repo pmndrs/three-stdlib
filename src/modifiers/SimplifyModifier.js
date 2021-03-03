@@ -1,5 +1,5 @@
 import { BufferGeometry, Float32BufferAttribute, Vector3 } from 'three'
-import * as BufferGeometryUtils from '../utils/BufferGeometryUtils.js'
+import * as BufferGeometryUtils from '../utils/BufferGeometryUtils'
 
 var cb = new Vector3(),
   ab = new Vector3()

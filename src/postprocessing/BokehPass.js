@@ -8,8 +8,8 @@ import {
   UniformsUtils,
   WebGLRenderTarget,
 } from 'three'
-import { Pass } from '../postprocessing/Pass.js'
-import { BokehShader } from '../shaders/BokehShader.js'
+import { Pass } from '../postprocessing/Pass'
+import { BokehShader } from '../shaders/BokehShader'
 
 /**
  * Depth-of-field post-process with bokeh shader

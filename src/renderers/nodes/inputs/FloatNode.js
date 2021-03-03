@@ -1,4 +1,4 @@
-import InputNode from '../core/InputNode.js'
+import InputNode from '../core/InputNode'
 
 class FloatNode extends InputNode {
   constructor(value = 0) {

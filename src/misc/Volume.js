@@ -1,5 +1,5 @@
 import { Matrix3, Matrix4, Vector3 } from 'three'
-import { VolumeSlice } from '../misc/VolumeSlice.js'
+import { VolumeSlice } from '../misc/VolumeSlice'
 
 /**
  * This class had been written to handle the output of the NRRD loader.

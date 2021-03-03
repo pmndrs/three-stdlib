@@ -7,18 +7,18 @@ import {
   GammaEncoding,
 } from 'three'
 
-import { NodeUniform } from './NodeUniform.js'
-import { NodeUtils } from './NodeUtils.js'
-import { NodeLib } from './NodeLib.js'
-import { FunctionNode } from './FunctionNode.js'
-import { ConstNode } from './ConstNode.js'
-import { StructNode } from './StructNode.js'
-import { Vector2Node } from '../inputs/Vector2Node.js'
-import { Vector3Node } from '../inputs/Vector3Node.js'
-import { Vector4Node } from '../inputs/Vector4Node.js'
-import { TextureNode } from '../inputs/TextureNode.js'
-import { CubeTextureNode } from '../inputs/CubeTextureNode.js'
-import { TextureCubeNode } from '../misc/TextureCubeNode.js'
+import { NodeUniform } from './NodeUniform'
+import { NodeUtils } from './NodeUtils'
+import { NodeLib } from './NodeLib'
+import { FunctionNode } from './FunctionNode'
+import { ConstNode } from './ConstNode'
+import { StructNode } from './StructNode'
+import { Vector2Node } from '../inputs/Vector2Node'
+import { Vector3Node } from '../inputs/Vector3Node'
+import { Vector4Node } from '../inputs/Vector4Node'
+import { TextureNode } from '../inputs/TextureNode'
+import { CubeTextureNode } from '../inputs/CubeTextureNode'
+import { TextureCubeNode } from '../misc/TextureCubeNode'
 
 var elements = NodeUtils.elements,
   constructors = ['float', 'vec2', 'vec3', 'vec4'],

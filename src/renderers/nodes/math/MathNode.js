@@ -1,4 +1,4 @@
-import Node from '../core/Node.js'
+import Node from '../core/Node'
 
 class MathNode extends Node {
   static NORMALIZE = 'normalize'
