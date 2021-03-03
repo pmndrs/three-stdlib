@@ -1,21 +1,19 @@
-import { LineSegmentsGeometry } from '../lines/LineSegmentsGeometry'
+import { Line } from 'three'
+import { LineSegmentsGeometry } from './LineSegmentsGeometry'
 
-var LineGeometry = function () {
-  LineSegmentsGeometry.call(this)
+class LineGeometry extends LineSegmentsGeometry {
+  type = 'LineGeometry'
+  isLineGeometry = true
 
-  this.type = 'LineGeometry'
-}
+  constructor() {
+    super()
+  }
 
-LineGeometry.prototype = Object.assign(Object.create(LineSegmentsGeometry.prototype), {
-  constructor: LineGeometry,
-
-  isLineGeometry: true,
-
-  setPositions: function (array) {
+  setPositions = (array: number[] | Float32Array): this => {
     // converts [ x1, y1, z1,  x2, y2, z2, ... ] to pairs format
 
-    var length = array.length - 3
-    var points = new Float32Array(2 * length)
+    const length = array.length - 3
+    const points = new Float32Array(2 * length)
 
     for (let i = 0; i < length; i += 3) {
       points[2 * i] = array[i]
@@ -30,13 +28,13 @@ LineGeometry.prototype = Object.assign(Object.create(LineSegmentsGeometry.protot
     LineSegmentsGeometry.prototype.setPositions.call(this, points)
 
     return this
-  },
+  }
 
-  setColors: function (array) {
+  setColors = (array: number[] | Float32Array): this => {
     // converts [ r1, g1, b1,  r2, g2, b2, ... ] to pairs format
 
-    var length = array.length - 3
-    var colors = new Float32Array(2 * length)
+    const length = array.length - 3
+    const colors = new Float32Array(2 * length)
 
     for (let i = 0; i < length; i += 3) {
       colors[2 * i] = array[i]
@@ -51,28 +49,25 @@ LineGeometry.prototype = Object.assign(Object.create(LineSegmentsGeometry.protot
     LineSegmentsGeometry.prototype.setColors.call(this, colors)
 
     return this
-  },
+  }
 
-  fromLine: function (line) {
-    var geometry = line.geometry
+  fromLine = (line: Line): this => {
+    const geometry = line.geometry
 
-    if (geometry.isGeometry) {
-      console.error('THREE.LineGeometry no longer supports Geometry. Use THREE.BufferGeometry instead.')
-      return
-    } else if (geometry.isBufferGeometry) {
-      this.setPositions(geometry.attributes.position.array) // assumes non-indexed
+    if (geometry.isBufferGeometry) {
+      this.setPositions(Array.from(geometry.attributes.position.array)) // assumes non-indexed
     }
 
     // set colors, maybe
 
     return this
-  },
+  }
 
-  copy: function (/* source */) {
+  copy = (/* source */): this => {
     // todo
 
     return this
-  },
-})
+  }
+}
 
 export { LineGeometry }

@@ -9,6 +9,9 @@
     "prebuild": "rimraf dist",
     "build": "rollup -c && npm run copy",
     "prepare": "npm run build",
+    "types": "tsc --noEmit --emitDeclarationOnly false",
+    "eslint": "eslint --cache --fix src/**/*.{ts,tsx}",
+    "eslint:ci": "eslint src/**/*.{ts,tsx}",
     "copy": "copyfiles package.json readme.md LICENSE dist && json -I -f dist/package.json -e \"this.private=false; this.devDependencies=undefined; this.optionalDependencies=undefined; this.scripts=undefined; this.husky=undefined; this.prettier=undefined; this.jest=undefined; this['lint-staged']=undefined;\"",
     "test": "echo \"Error: no test specified\""
   },
@@ -20,7 +23,11 @@
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
-      "prettier --write"
+      "prettier --write",
+      "eslint --fix"
+    ],
+    "*.{ts,tsx}": [
+      "tsc --noEmit --emitDeclarationOnly false"
     ]
   },
   "repository": {
@@ -43,8 +50,20 @@
     "@babel/preset-env": "7.11.0",
     "@babel/preset-react": "7.10.4",
     "@babel/preset-typescript": "^7.10.4",
+    "@rollup/plugin-typescript": "^8.2.0",
+    "@types/three": "^0.125.3",
+    "@typescript-eslint/eslint-plugin": "^4.15.2",
+    "@typescript-eslint/parser": "^4.15.2",
+    "babel-eslint": "^10.1.0",
     "babel-plugin-transform-react-remove-prop-types": "^0.4.24",
     "copyfiles": "^2.3.0",
+    "eslint": "^7.7.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-jest": "^23.20.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "eslint-plugin-react": "^7.20.6",
+    "eslint-plugin-react-hooks": "^4.1.0",
     "husky": "^4.2.5",
     "json": "^10.0.0",
     "lint-staged": "^10.2.11",
@@ -58,7 +77,9 @@
     "rollup-plugin-multi-input": "^1.1.1",
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-size-snapshot": "^0.12.0",
-    "three": "^0.126.0"
+    "three": "^0.126.0",
+    "tslib": "^2.1.0",
+    "typescript": "<4.2.0"
   },
   "dependencies": {
     "@webgpu/glslang": "^0.0.15",

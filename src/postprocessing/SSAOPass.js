@@ -23,9 +23,7 @@ import {
 } from 'three'
 import { Pass } from '../postprocessing/Pass'
 import { SimplexNoise } from '../math/SimplexNoise'
-import { SSAOShader } from '../shaders/SSAOShader'
-import { SSAOBlurShader } from '../shaders/SSAOShader'
-import { SSAODepthShader } from '../shaders/SSAOShader'
+import { SSAOBlurShader, SSAODepthShader, SSAOShader } from '../shaders/SSAOShader'
 import { CopyShader } from '../shaders/CopyShader'
 
 var SSAOPass = function (scene, camera, width, height) {
