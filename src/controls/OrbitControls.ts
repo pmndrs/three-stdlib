@@ -78,10 +78,12 @@ class OrbitControls extends EventDispatcher {
 
   getPolarAngle: () => number
   getAzimuthalAngle: () => number
+  // eslint-disable-next-line no-unused-vars
   listenToKeyEvents: (domElement: any) => void
   saveState: () => void
   reset: () => void
   update: () => void
+  // eslint-disable-next-line no-unused-vars
   connect: (domElement: HTMLElement) => void
   dispose: () => void
 
@@ -661,7 +663,7 @@ class OrbitControls extends EventDispatcher {
       switch (event.pointerType) {
         case 'mouse':
         case 'pen':
-          onMouseUp(event)
+          onMouseUp()
           break
 
         // TODO touch
@@ -761,7 +763,7 @@ class OrbitControls extends EventDispatcher {
       }
     }
 
-    function onMouseUp(event: MouseEvent) {
+    function onMouseUp() {
       scope.domElement?.ownerDocument.removeEventListener('pointermove', onPointerMove)
       scope.domElement?.ownerDocument.removeEventListener('pointerup', onPointerUp)
 
@@ -880,7 +882,7 @@ class OrbitControls extends EventDispatcher {
       }
     }
 
-    function onTouchEnd(event: TouchEvent) {
+    function onTouchEnd() {
       if (scope.enabled === false) return
 
       handleTouchEnd()
