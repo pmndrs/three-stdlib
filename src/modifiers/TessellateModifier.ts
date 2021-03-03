@@ -5,17 +5,15 @@ import { BufferGeometry, Color, Float32BufferAttribute, Vector2, Vector3 } from 
  */
 
 class TessellateModifier {
+  maxEdgeLength: number
+  maxIterations: number
+
   constructor(maxEdgeLength = 0.1, maxIterations = 6) {
     this.maxEdgeLength = maxEdgeLength
     this.maxIterations = maxIterations
   }
 
-  modify(geometry) {
-    if (geometry.isGeometry === true) {
-      console.error('THREE.TessellateModifier no longer supports Geometry. Use BufferGeometry instead.')
-      return geometry
-    }
-
+  public modify = (geometry: BufferGeometry): BufferGeometry => {
     if (geometry.index !== null) {
       geometry = geometry.toNonIndexed()
     }
@@ -67,7 +65,7 @@ class TessellateModifier {
     let uvs = hasUVs ? attributes.uv.array : null
     let uv2s = hasUV2s ? attributes.uv2.array : null
 
-    let positions2 = positions
+    let positions2 = positions as number[]
     let normals2 = normals
     let colors2 = colors
     let uvs2 = uvs
@@ -76,7 +74,7 @@ class TessellateModifier {
     let iteration = 0
     let tessellating = true
 
-    function addTriangle(a, b, c) {
+    function addTriangle(a: number, b: number, c: number) {
       const v1 = vs[a]
       const v2 = vs[b]
       const v3 = vs[c]
@@ -90,9 +88,9 @@ class TessellateModifier {
         const n2 = ns[b]
         const n3 = ns[c]
 
-        normals2.push(n1.x, n1.y, n1.z)
-        normals2.push(n2.x, n2.y, n2.z)
-        normals2.push(n3.x, n3.y, n3.z)
+        ;(normals2 as number[]).push(n1.x, n1.y, n1.z)
+        ;(normals2 as number[]).push(n2.x, n2.y, n2.z)
+        ;(normals2 as number[]).push(n3.x, n3.y, n3.z)
       }
 
       if (hasColors) {
@@ -100,9 +98,9 @@ class TessellateModifier {
         const c2 = cs[b]
         const c3 = cs[c]
 
-        colors2.push(c1.x, c1.y, c1.z)
-        colors2.push(c2.x, c2.y, c2.z)
-        colors2.push(c3.x, c3.y, c3.z)
+        ;(colors2 as number[]).push(c1.r, c1.g, c1.b)
+        ;(colors2 as number[]).push(c2.r, c2.g, c2.b)
+        ;(colors2 as number[]).push(c3.r, c3.g, c3.b)
       }
 
       if (hasUVs) {
@@ -110,9 +108,9 @@ class TessellateModifier {
         const u2 = us[b]
         const u3 = us[c]
 
-        uvs2.push(u1.x, u1.y)
-        uvs2.push(u2.x, u2.y)
-        uvs2.push(u3.x, u3.y)
+        ;(uvs2 as number[]).push(u1.x, u1.y)
+        ;(uvs2 as number[]).push(u2.x, u2.y)
+        ;(uvs2 as number[]).push(u3.x, u3.y)
       }
 
       if (hasUV2s) {
@@ -120,9 +118,9 @@ class TessellateModifier {
         const u22 = u2s[b]
         const u23 = u2s[c]
 
-        uv2s2.push(u21.x, u21.y)
-        uv2s2.push(u22.x, u22.y)
-        uv2s2.push(u23.x, u23.y)
+        ;(uv2s2 as number[]).push(u21.x, u21.y)
+        ;(uv2s2 as number[]).push(u22.x, u22.y)
+        ;(uv2s2 as number[]).push(u23.x, u23.y)
       }
     }
 
@@ -158,25 +156,25 @@ class TessellateModifier {
         vb.fromArray(positions, i + 3)
         vc.fromArray(positions, i + 6)
 
-        if (hasNormals) {
+        if (hasNormals && normals) {
           na.fromArray(normals, i + 0)
           nb.fromArray(normals, i + 3)
           nc.fromArray(normals, i + 6)
         }
 
-        if (hasColors) {
+        if (hasColors && colors) {
           ca.fromArray(colors, i + 0)
           cb.fromArray(colors, i + 3)
           cc.fromArray(colors, i + 6)
         }
 
-        if (hasUVs) {
+        if (hasUVs && uvs) {
           ua.fromArray(uvs, i2 + 0)
           ub.fromArray(uvs, i2 + 2)
           uc.fromArray(uvs, i2 + 4)
         }
 
-        if (hasUV2s) {
+        if (hasUV2s && uv2s) {
           u2a.fromArray(uv2s, i2 + 0)
           u2b.fromArray(uv2s, i2 + 2)
           u2c.fromArray(uv2s, i2 + 4)
@@ -228,19 +226,19 @@ class TessellateModifier {
     geometry2.setAttribute('position', new Float32BufferAttribute(positions2, 3))
 
     if (hasNormals) {
-      geometry2.setAttribute('normal', new Float32BufferAttribute(normals2, 3))
+      geometry2.setAttribute('normal', new Float32BufferAttribute(normals2 as number[], 3))
     }
 
     if (hasColors) {
-      geometry2.setAttribute('color', new Float32BufferAttribute(colors2, 3))
+      geometry2.setAttribute('color', new Float32BufferAttribute(colors2 as number[], 3))
     }
 
     if (hasUVs) {
-      geometry2.setAttribute('uv', new Float32BufferAttribute(uvs2, 2))
+      geometry2.setAttribute('uv', new Float32BufferAttribute(uvs2 as number[], 2))
     }
 
     if (hasUV2s) {
-      geometry2.setAttribute('uv2', new Float32BufferAttribute(uv2s2, 2))
+      geometry2.setAttribute('uv2', new Float32BufferAttribute(uv2s2 as number[], 2))
     }
 
     return geometry2

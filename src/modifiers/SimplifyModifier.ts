@@ -13,39 +13,6 @@ function removeFromArray<TItem>(array: TItem[], object: TItem) {
   if (k > -1) array.splice(k, 1)
 }
 
-function removeVertex(v: Vertex, vertices: Vertex[]) {
-  console.assert(v.faces.length === 0)
-
-  while (v.neighbors.length) {
-    const n = v.neighbors.pop() as Vertex
-    removeFromArray(n.neighbors, v)
-  }
-
-  removeFromArray(vertices, v)
-}
-
-function removeFace(f: Triangle, faces: Triangle[]) {
-  removeFromArray(faces, f)
-
-  if (f.v1) removeFromArray(f.v1.faces, f)
-  if (f.v2) removeFromArray(f.v2.faces, f)
-  if (f.v3) removeFromArray(f.v3.faces, f)
-
-  // TODO optimize this!
-  const vs = [f.v1, f.v2, f.v3]
-  let v1, v2
-
-  for (let i = 0; i < 3; i++) {
-    v1 = vs[i]
-    v2 = vs[(i + 1) % 3]
-
-    if (!v1 || !v2) continue
-
-    v1.removeIfNonNeighbor(v2)
-    v2.removeIfNonNeighbor(v1)
-  }
-}
-
 class Vertex {
   public position: Vector3
   private id: number
@@ -235,6 +202,17 @@ class SimplifyModifier {
     return amt
   }
 
+  private removeVertex(v: Vertex, vertices: Vertex[]) {
+    console.assert(v.faces.length === 0)
+
+    while (v.neighbors.length) {
+      const n = v.neighbors.pop() as Vertex
+      removeFromArray(n.neighbors, v)
+    }
+
+    removeFromArray(vertices, v)
+  }
+
   private computeEdgeCostAtVertex = (v: Vertex) => {
     // compute the edge collapse cost for all edges that start
     // from vertex v.  Since we are only interested in reducing
@@ -280,6 +258,28 @@ class SimplifyModifier {
     // v.collapseCost = v.minCost;
   }
 
+  private removeFace = (f: Triangle, faces: Triangle[]) => {
+    removeFromArray(faces, f)
+
+    if (f.v1) removeFromArray(f.v1.faces, f)
+    if (f.v2) removeFromArray(f.v2.faces, f)
+    if (f.v3) removeFromArray(f.v3.faces, f)
+
+    // TODO optimize this!
+    const vs = [f.v1, f.v2, f.v3]
+    let v1, v2
+
+    for (let i = 0; i < 3; i++) {
+      v1 = vs[i]
+      v2 = vs[(i + 1) % 3]
+
+      if (!v1 || !v2) continue
+
+      v1.removeIfNonNeighbor(v2)
+      v2.removeIfNonNeighbor(v1)
+    }
+  }
+
   private collapse = (vertices: Vertex[], faces: Triangle[], u: Vertex, v: Vertex) => {
     // u and v are pointers to vertices of an edge
 
@@ -287,7 +287,7 @@ class SimplifyModifier {
 
     if (!v) {
       // u is a vertex all by itself so just delete it..
-      removeVertex(u, vertices)
+      this.removeVertex(u, vertices)
       return
     }
 
@@ -301,7 +301,7 @@ class SimplifyModifier {
     // delete triangles on edge uv:
     for (i = u.faces.length - 1; i >= 0; i--) {
       if (u.faces[i].hasVertex(v)) {
-        removeFace(u.faces[i], faces)
+        this.removeFace(u.faces[i], faces)
       }
     }
 
@@ -310,7 +310,7 @@ class SimplifyModifier {
       u.faces[i].replaceVertex(u, v)
     }
 
-    removeVertex(u, vertices)
+    this.removeVertex(u, vertices)
 
     // recompute the edge collapse costs in neighborhood
     for (i = 0; i < tmpVertices.length; i++) {
