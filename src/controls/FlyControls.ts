@@ -14,17 +14,16 @@ class FlyControls extends EventDispatcher {
   dragToLook = false
   autoForward = false
 
-  scope = this
-  changeEvent = { type: 'change' }
-  EPS = 0.000001
+  private changeEvent = { type: 'change' }
+  private EPS = 0.000001
 
-  tmpQuaternion = new Quaternion()
+  private tmpQuaternion = new Quaternion()
 
-  mouseStatus = 0
+  private mouseStatus = 0
 
-  movementSpeedMultiplier = 1
+  private movementSpeedMultiplier = 1
 
-  moveState = {
+  private moveState = {
     up: 0,
     down: 0,
     left: 0,
@@ -38,8 +37,8 @@ class FlyControls extends EventDispatcher {
     rollLeft: 0,
     rollRight: 0,
   }
-  moveVector = new Vector3(0, 0, 0)
-  rotationVector = new Vector3(0, 0, 0)
+  private moveVector = new Vector3(0, 0, 0)
+  private rotationVector = new Vector3(0, 0, 0)
 
   constructor(object: Camera, domElement: HTMLElement | Document) {
     super()
@@ -56,12 +55,6 @@ class FlyControls extends EventDispatcher {
       domElement.setAttribute('tabindex', -1 as any)
     }
 
-    // API
-
-    // disable default target object behavior
-
-    // internals
-
     this.domElement.addEventListener('contextmenu', contextmenu)
 
     this.domElement.addEventListener('mousemove', this.mousemove as any)
@@ -75,7 +68,7 @@ class FlyControls extends EventDispatcher {
     this.updateRotationVector()
   }
 
-  keydown = (event: KeyboardEvent) => {
+  private keydown = (event: KeyboardEvent) => {
     if (event.altKey) {
       return
     }
@@ -135,7 +128,7 @@ class FlyControls extends EventDispatcher {
     this.updateRotationVector()
   }
 
-  keyup = (event: KeyboardEvent) => {
+  private keyup = (event: KeyboardEvent) => {
     switch (event.code) {
       case 'ShiftLeft':
       case 'ShiftRight':
@@ -189,7 +182,7 @@ class FlyControls extends EventDispatcher {
     this.updateRotationVector()
   }
 
-  mousedown = (event: MouseEvent) => {
+  private mousedown = (event: MouseEvent) => {
     if (this.domElement !== document && !(this.domElement instanceof Document)) {
       this.domElement.focus()
     }
@@ -212,7 +205,7 @@ class FlyControls extends EventDispatcher {
     }
   }
 
-  mousemove = (event: MouseEvent) => {
+  private mousemove = (event: MouseEvent) => {
     if (!this.dragToLook || this.mouseStatus > 0) {
       const container = this.getContainerDimensions()
       const halfWidth = container.size[0] / 2
@@ -225,7 +218,7 @@ class FlyControls extends EventDispatcher {
     }
   }
 
-  mouseup = (event: MouseEvent) => {
+  private mouseup = (event: MouseEvent) => {
     event.preventDefault()
 
     if (this.dragToLook) {
@@ -248,54 +241,47 @@ class FlyControls extends EventDispatcher {
     this.updateRotationVector()
   }
 
-  update = (() => {
-    const lastQuaternion = new Quaternion()
-    const lastPosition = new Vector3()
-    const scope = this
+  private lastQuaternion = new Quaternion()
+  private lastPosition = new Vector3()
 
-    return (delta: number) => {
-      const moveMult = delta * scope.movementSpeed
-      const rotMult = delta * scope.rollSpeed
+  public update = (delta: number) => {
+    const moveMult = delta * this.movementSpeed
+    const rotMult = delta * this.rollSpeed
 
-      scope.object.translateX(scope.moveVector.x * moveMult)
-      scope.object.translateY(scope.moveVector.y * moveMult)
-      scope.object.translateZ(scope.moveVector.z * moveMult)
+    this.object.translateX(this.moveVector.x * moveMult)
+    this.object.translateY(this.moveVector.y * moveMult)
+    this.object.translateZ(this.moveVector.z * moveMult)
 
-      scope.tmpQuaternion
-        .set(scope.rotationVector.x * rotMult, scope.rotationVector.y * rotMult, scope.rotationVector.z * rotMult, 1)
-        .normalize()
-      scope.object.quaternion.multiply(scope.tmpQuaternion)
+    this.tmpQuaternion
+      .set(this.rotationVector.x * rotMult, this.rotationVector.y * rotMult, this.rotationVector.z * rotMult, 1)
+      .normalize()
+    this.object.quaternion.multiply(this.tmpQuaternion)
 
-      if (
-        lastPosition.distanceToSquared(scope.object.position) > this.EPS ||
-        8 * (1 - lastQuaternion.dot(scope.object.quaternion)) > this.EPS
-      ) {
-        scope.dispatchEvent(this.changeEvent)
-        lastQuaternion.copy(scope.object.quaternion)
-        lastPosition.copy(scope.object.position)
-      }
+    if (
+      this.lastPosition.distanceToSquared(this.object.position) > this.EPS ||
+      8 * (1 - this.lastQuaternion.dot(this.object.quaternion)) > this.EPS
+    ) {
+      this.dispatchEvent(this.changeEvent)
+      this.lastQuaternion.copy(this.object.quaternion)
+      this.lastPosition.copy(this.object.position)
     }
-  })()
+  }
 
-  updateMovementVector = () => {
+  private updateMovementVector = () => {
     const forward = this.moveState.forward || (this.autoForward && !this.moveState.back) ? 1 : 0
 
     this.moveVector.x = -this.moveState.left + this.moveState.right
     this.moveVector.y = -this.moveState.down + this.moveState.up
     this.moveVector.z = -forward + this.moveState.back
-
-    //console.log( 'move:', [ this.moveVector.x, this.moveVector.y, this.moveVector.z ] );
   }
 
-  updateRotationVector = () => {
+  private updateRotationVector = () => {
     this.rotationVector.x = -this.moveState.pitchDown + this.moveState.pitchUp
     this.rotationVector.y = -this.moveState.yawRight + this.moveState.yawLeft
     this.rotationVector.z = -this.moveState.rollRight + this.moveState.rollLeft
-
-    //console.log( 'rotate:', [ this.rotationVector.x, this.rotationVector.y, this.rotationVector.z ] );
   }
 
-  getContainerDimensions = () => {
+  private getContainerDimensions = () => {
     if (this.domElement != document && !(this.domElement instanceof Document)) {
       return {
         size: [this.domElement.offsetWidth, this.domElement.offsetHeight],
@@ -309,7 +295,7 @@ class FlyControls extends EventDispatcher {
     }
   }
 
-  dispose = () => {
+  public dispose = () => {
     this.domElement.removeEventListener('contextmenu', contextmenu)
     this.domElement.removeEventListener('mousemove', this.mousemove as any)
     this.domElement.removeEventListener('mousedown', this.mousedown as any)

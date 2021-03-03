@@ -27,20 +27,20 @@ class FirstPersonControls extends EventDispatcher {
 
   // internals
 
-  autoSpeedFactor = 0.0
+  private autoSpeedFactor = 0.0
 
-  mouseX = 0
-  mouseY = 0
+  private mouseX = 0
+  private mouseY = 0
 
-  moveForward = false
-  moveBackward = false
-  moveLeft = false
-  moveRight = false
-  moveUp = false
-  moveDown = false
+  private moveForward = false
+  private moveBackward = false
+  private moveLeft = false
+  private moveRight = false
+  private moveUp = false
+  private moveDown = false
 
-  viewHalfX = 0
-  viewHalfY = 0
+  private viewHalfX = 0
+  private viewHalfY = 0
 
   private lat = 0
   private lon = 0
