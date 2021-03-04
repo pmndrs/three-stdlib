@@ -13,7 +13,7 @@ export type LineMaterialParameters = ShaderMaterialParameters & {
   resolution?: Vector2
 }
 
-UniformsLib.line = {
+export const LineUniforms = {
   linewidth: { value: 1 },
   resolution: { value: new Vector2(1, 1) },
   dashScale: { value: 1 },
@@ -24,7 +24,7 @@ UniformsLib.line = {
 }
 
 ShaderLib['line'] = {
-  uniforms: UniformsUtils.merge([UniformsLib.common, UniformsLib.fog, UniformsLib.line]),
+  uniforms: UniformsUtils.merge([UniformsLib.common, UniformsLib.fog, LineUniforms]),
 
   vertexShader: /* glsl */ `
 		#include <common>
