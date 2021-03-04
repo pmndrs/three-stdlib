@@ -2,12 +2,12 @@ name: release
 on:
   push:
     branches:
-      - 'master'
+      - 'main'
       - 'beta'
       - 'alpha'
   pull_request: {}
 jobs:
-  main:
+  test:
     runs-on: ubuntu-latest
     steps:
       - name: Cancel Previous Runs
@@ -30,9 +30,9 @@ jobs:
       - name: Type check
         run: yarn types
   release:
-    needs: main
+    needs: test
     runs-on: ubuntu-latest
-    if: ${{ github.repository == 'pmndrs/three-stdlib' && contains('refs/heads/master,refs/heads/beta,refs/heads/alpha',github.ref) && github.event_name == 'push' }}
+    if: ${{ github.repository == 'pmndrs/three-stdlib' && contains('refs/heads/main,refs/heads/beta,refs/heads/alpha',github.ref) && github.event_name == 'push' }}
     steps:
       - name: Cancel Previous Runs
         uses: styfle/cancel-workflow-action@0.6.0
