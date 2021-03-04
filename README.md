@@ -1,3 +1,7 @@
+# three-stdlib
+
+[![release](https://github.com/pmndrs/three-stdlib/actions/workflows/main.yml/badge.svg)](https://github.com/pmndrs/three-stdlib/actions/workflows/main.yml)
+
     npm install three-stdlib
 
 ```jsx
