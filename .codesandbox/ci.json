@@ -1,0 +1,4 @@
+{
+  "sandboxes": ["/demos/ssr"],
+  "packages": ["dist"]
+}
