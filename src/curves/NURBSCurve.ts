@@ -1,4 +1,4 @@
-import { Curve, Vector2, Vector3, Vector4 } from 'three'
+import { Curve, Vector, Vector2, Vector3, Vector4 } from 'three'
 import * as NURBSUtils from '../curves/NURBSUtils'
 
 /**
@@ -9,7 +9,7 @@ import * as NURBSUtils from '../curves/NURBSUtils'
  * Implementation is based on (x, y [, z=0 [, w=1]]) control points with w=weight.
  *
  */
-class NURBSCurve extends Curve<any> {
+class NURBSCurve extends Curve<Vector> {
   degree: number
   /** array of reals */
   knots: number[]
