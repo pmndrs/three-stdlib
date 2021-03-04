@@ -14,17 +14,19 @@ class NURBSCurve extends Curve<any> {
   /** array of reals */
   knots: number[]
 
-  controlPoints: Array<Vector2 | Vector3 | Vector4>
+  controlPoints: Vector4[]
 
+  /** index in knots */
   startKnot: number
+  /** index in knots */
   endKnot: number
 
   constructor(
     degree: number,
     knots: number[],
     controlPoints: Array<Vector2 | Vector3 | Vector4>,
-    startKnot: number /* index in knots */,
-    endKnot: number /* index in knots */,
+    startKnot: number,
+    endKnot: number,
   ) {
     super()
 
@@ -37,7 +39,9 @@ class NURBSCurve extends Curve<any> {
     for (let i = 0; i < controlPoints.length; ++i) {
       // ensure Vector4 for control points
       const point = controlPoints[i]
-      this.controlPoints[i] = new Vector4(point.x, point.y, point.z, point.w)
+      const z = point instanceof Vector3 ? point.z : undefined
+      const w = point instanceof Vector4 ? point.w : undefined
+      this.controlPoints[i] = new Vector4(point.x, point.y, z, w)
     }
   }
 
