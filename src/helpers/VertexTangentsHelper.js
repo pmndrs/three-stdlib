@@ -1,10 +1,4 @@
-import {
-  BufferGeometry,
-  Float32BufferAttribute,
-  LineSegments,
-  LineBasicMaterial,
-  Vector3,
-} from 'three'
+import { BufferGeometry, Float32BufferAttribute, LineSegments, LineBasicMaterial, Vector3 } from 'three'
 
 const _v1 = new Vector3()
 const _v2 = new Vector3()
