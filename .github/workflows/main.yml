@@ -21,12 +21,14 @@ jobs:
         with:
           node-version: '14.x'
       - name: Install deps
+        # there's a build step for post installation so we don't run build when "testing"
         run: yarn install
-      - name: Test this 🧪
-      - run: yarn eslint:ci
-      - run: yarn prettier:check
-      - run: yarn types
-      - run: yarn build
+      - name: Lint test 🧪
+        run: yarn eslint:ci
+      - name: Prettier test
+        run: yarn prettier:check
+      - name: Type check
+        run: yarn types
   release:
     needs: main
     runs-on: ubuntu-latest
