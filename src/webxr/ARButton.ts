@@ -1,28 +1,37 @@
+import { WebGLRenderer, XRSession, XRSessionInit } from 'three'
+
+interface ARButtonSessionInit extends XRSessionInit {
+  domOverlay?: {
+    root: HTMLDivElement
+  }
+}
+
 class ARButton {
-  static createButton(renderer, sessionInit = {}) {
+  static createButton(
+    renderer: WebGLRenderer,
+    sessionInit: ARButtonSessionInit = {},
+  ): HTMLButtonElement | HTMLAnchorElement {
     const button = document.createElement('button')
 
     function showStartAR(/*device*/) {
       if (sessionInit.domOverlay === undefined) {
-        var overlay = document.createElement('div')
+        const overlay = document.createElement('div')
         overlay.style.display = 'none'
         document.body.appendChild(overlay)
 
-        var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
-        svg.setAttribute('width', 38)
-        svg.setAttribute('height', 38)
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+        svg.setAttribute('width', '38')
+        svg.setAttribute('height', '38')
         svg.style.position = 'absolute'
         svg.style.right = '20px'
         svg.style.top = '20px'
-        svg.addEventListener('click', function () {
-          currentSession.end()
-        })
+        svg.addEventListener('click', () => currentSession?.end())
         overlay.appendChild(svg)
 
-        var path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
         path.setAttribute('d', 'M 12,12 L 28,28 M 28,12 12,28')
         path.setAttribute('stroke', '#fff')
-        path.setAttribute('stroke-width', 2)
+        path.setAttribute('stroke-width', '2')
         svg.appendChild(path)
 
         if (sessionInit.optionalFeatures === undefined) {
@@ -35,9 +44,9 @@ class ARButton {
 
       //
 
-      let currentSession = null
+      let currentSession: XRSession | null
 
-      async function onSessionStarted(session) {
+      async function onSessionStarted(session: XRSession) {
         session.addEventListener('end', onSessionEnded)
 
         renderer.xr.setReferenceSpaceType('local')
@@ -45,16 +54,16 @@ class ARButton {
         await renderer.xr.setSession(session)
 
         button.textContent = 'STOP AR'
-        sessionInit.domOverlay.root.style.display = ''
+        sessionInit.domOverlay!.root.style.display = ''
 
         currentSession = session
       }
 
       function onSessionEnded(/*event*/) {
-        currentSession.removeEventListener('end', onSessionEnded)
+        currentSession?.removeEventListener('end', onSessionEnded)
 
         button.textContent = 'START AR'
-        sessionInit.domOverlay.root.style.display = 'none'
+        sessionInit.domOverlay!.root.style.display = 'none'
 
         currentSession = null
       }
@@ -79,7 +88,8 @@ class ARButton {
 
       button.onclick = function () {
         if (currentSession === null) {
-          navigator.xr.requestSession('immersive-ar', sessionInit).then(onSessionStarted)
+          const xr: THREE.XR = (navigator as any).xr
+          xr.requestSession('immersive-ar', sessionInit).then(onSessionStarted)
         } else {
           currentSession.end()
         }
@@ -101,11 +111,10 @@ class ARButton {
 
     function showARNotSupported() {
       disableButton()
-
       button.textContent = 'AR NOT SUPPORTED'
     }
 
-    function stylizeElement(element) {
+    function stylizeElement(element: HTMLElement) {
       element.style.position = 'absolute'
       element.style.bottom = '20px'
       element.style.padding = '12px 6px'
@@ -126,9 +135,9 @@ class ARButton {
 
       stylizeElement(button)
 
-      navigator.xr
-        .isSessionSupported('immersive-ar')
-        .then(function (supported) {
+      const xr: THREE.XR = (navigator as any).xr
+      xr.isSessionSupported('immersive-ar')
+        .then((supported) => {
           supported ? showStartAR() : showARNotSupported()
         })
         .catch(showARNotSupported)
