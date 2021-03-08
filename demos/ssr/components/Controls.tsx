@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+// @ts-ignore
 import { OrbitControls } from 'three-stdlib'
 import { useThree } from 'react-three-fiber'
 
@@ -22,5 +23,5 @@ export const Controls = () => {
     }
   }, [controls, invalidate])
 
-  return <primitive dispose={undefined} object={controls} enableDamping />
+  return controls ? <primitive dispose={undefined} object={controls} enableDamping /> : null
 }
