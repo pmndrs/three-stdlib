@@ -1,5 +1,7 @@
-import { BufferAttribute, BufferGeometry, TypedArray, Vector3 } from 'three'
+import { BufferAttribute, BufferGeometry, Vector3 } from 'three'
 import * as BufferGeometryUtils from '../utils/BufferGeometryUtils'
+
+import { TypedArray } from '../types/shared'
 
 interface EdgeSplitToGroupsResult {
   splitGroup: number[]
@@ -162,10 +164,10 @@ class EdgeSplitModifier {
     } = {}
     for (let name of Object.keys(geometry.attributes)) {
       const oldAttribute = geometry.attributes[name]
-      // @ts-expect-error it does exist, console.log(Float32Array.constructor) in browser devtools gives a function
-      const newArray = new (oldAttribute.array as TypedArray).constructor(
+      const newArray = (oldAttribute.array as TypedArray).constructor(
         (this.indexes.length + this.splitIndexes.length) * oldAttribute.itemSize,
       )
+
       newArray.set(oldAttribute.array)
       newAttributes[name] = new BufferAttribute(newArray, oldAttribute.itemSize, oldAttribute.normalized)
     }

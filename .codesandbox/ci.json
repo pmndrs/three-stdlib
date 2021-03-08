@@ -1,4 +1,5 @@
 {
   "sandboxes": ["/demos/ssr"],
-  "packages": ["dist"]
+  "packages": ["dist"],
+  "node": "14"
 }

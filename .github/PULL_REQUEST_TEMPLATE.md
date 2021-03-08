@@ -26,6 +26,7 @@ Remove items that are irrelevant to your changes.
 -->
 
 - [ ] Documentation updated
+- [ ] Storybook entry added
 - [ ] Ready to be merged
 
 <!-- if you untick ready to be merged & you haven't submitted as a draft, we will change it to draft. -->
