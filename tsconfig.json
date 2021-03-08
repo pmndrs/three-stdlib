@@ -1,10 +1,10 @@
 {
   "compilerOptions": {
     "target": "es6",
+    "lib": ["es2019", "dom"],
     "module": "commonjs",
     "moduleResolution": "node",
     "esModuleInterop": true,
-    "jsx": "react",
     "pretty": true,
     "strict": true,
     "skipLibCheck": true,
@@ -16,6 +16,6 @@
     "noImplicitThis": false,
     "baseUrl": "./src"
   },
-  "include": ["./src", "tests"],
+  "include": ["./src/**/*", "tests"],
   "exclude": ["./node_modules/**/*"]
 }
