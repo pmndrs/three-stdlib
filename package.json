@@ -8,7 +8,7 @@
   "scripts": {
     "build": "rollup -c && npm run copy",
     "build-storybook": "build-storybook -s ./.storybook/public",
-    "copy": "copyfiles package.json readme.md LICENSE dist && json -I -f dist/package.json -e \"this.private=false; this.devDependencies=undefined; this.optionalDependencies=undefined; this.scripts=undefined; this.husky=undefined; this.prettier=undefined; this.jest=undefined; this['lint-staged']=undefined;\"",
+    "copy": "copyfiles package.json README.md LICENSE dist && json -I -f dist/package.json -e \"this.private=false; this.devDependencies=undefined; this.optionalDependencies=undefined; this.scripts=undefined; this.husky=undefined; this.prettier=undefined; this.jest=undefined; this['lint-staged']=undefined;\"",
     "eslint": "eslint --cache --fix src/**/*.ts",
     "eslint:ci": "eslint src/**/*.ts",
     "prebuild": "rimraf dist",
