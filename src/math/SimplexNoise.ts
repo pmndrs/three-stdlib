@@ -5,12 +5,12 @@
 // Sean McCullough banksean@gmail.com
 //
 
-interface NumberGenerator {
+export interface NumberGenerator {
   random: () => number
 }
 
 // Added 4D noise
-class SimplexNoise {
+export class SimplexNoise {
   grad3 = [
     [1, 1, 0],
     [-1, 1, 0],
@@ -530,5 +530,3 @@ class SimplexNoise {
     return 27.0 * (n0 + n1 + n2 + n3 + n4)
   }
 }
-
-export { SimplexNoise, NumberGenerator }
