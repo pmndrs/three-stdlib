@@ -1,6 +1,6 @@
 import { WebGLRenderer, XRSession, XRSessionInit } from 'three'
 
-interface ARButtonSessionInit extends XRSessionInit {
+export interface ARButtonSessionInit extends XRSessionInit {
   domOverlay?: {
     root: HTMLDivElement
   }
