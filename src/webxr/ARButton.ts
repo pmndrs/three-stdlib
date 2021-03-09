@@ -88,8 +88,10 @@ class ARButton {
 
       button.onclick = function () {
         if (currentSession === null) {
-          const xr: THREE.XR = (navigator as any).xr
-          xr.requestSession('immersive-ar', sessionInit).then(onSessionStarted)
+          // @ts-expect-error waiting for TypeScript lib.dom.d.ts update
+          // https://developer.mozilla.org/en-US/docs/Web/API/Navigator/xr
+          // https://github.com/Microsoft/TypeScript/blob/master/lib/lib.dom.d.ts
+          navigator.xr.requestSession('immersive-ar', sessionInit).then(onSessionStarted)
         } else {
           currentSession.end()
         }
@@ -135,9 +137,12 @@ class ARButton {
 
       stylizeElement(button)
 
-      const xr: THREE.XR = (navigator as any).xr
-      xr.isSessionSupported('immersive-ar')
-        .then((supported) => {
+      // @ts-expect-error waiting for TypeScript lib.dom.d.ts update
+      // https://developer.mozilla.org/en-US/docs/Web/API/Navigator/xr
+      // https://github.com/Microsoft/TypeScript/blob/master/lib/lib.dom.d.ts
+      navigator.xr
+        .isSessionSupported('immersive-ar')
+        .then((supported: boolean) => {
           supported ? showStartAR() : showARNotSupported()
         })
         .catch(showARNotSupported)
