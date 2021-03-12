@@ -1,10 +1,18 @@
 # three-stdlib
 
-[![release](https://github.com/pmndrs/three-stdlib/actions/workflows/main.yml/badge.svg)](https://github.com/pmndrs/three-stdlib/actions/workflows/main.yml)
+[![Version](https://img.shields.io/npm/v/three-stdlib?style=flat&colorA=000000&colorB=000000)](https://npmjs.com/package/three-stdlib)
+[![Downloads](https://img.shields.io/npm/dt/three-stdlib.svg?style=flat&colorA=000000&colorB=000000)](https://npmjs.com/package/three-stdlib)
+[![Twitter](https://img.shields.io/twitter/follow/pmndrs?label=%40pmndrs&style=flat&colorA=000000&colorB=000000&logo=twitter&logoColor=000000)](https://twitter.com/pmndrs)
+[![Discord](https://img.shields.io/discord/740090768164651008?style=flat&colorA=000000&colorB=000000&label=discord&logo=discord&logoColor=000000)](https://discord.gg/ZZjjNvJ)
+[![release](https://github.com/pmndrs/three-stdlib/actions/workflows/main.yml/badge.svg?style=flat&colorA=000000&colorB=000000)](https://github.com/pmndrs/three-stdlib/actions/workflows/main.yml)
+
+Stand-alone version of [threejs/examples/jsm](https://github.com/mrdoob/three.js/tree/dev/examples/jsm) written in Typescript & built for ESM & CJS.
+
+## Basic usage
 
     npm install three-stdlib
 
-```jsx
+```ts
 // Export collection
 import * as STDLIB from 'three-stdlib'
 // Flatbundle
@@ -13,9 +21,11 @@ import { OrbitControls, ... } from 'three-stdlib'
 import { OrbitControls } from 'three-stdlib/controls/OrbitControls'
 ```
 
-This is a stand-alone of https://github.com/mrdoob/three.js/tree/dev/examples/jsm
+## Problem
 
-Our main goals are:
+`threejs/examples` were always considered as something that you need to copy/paste into your project and adapt to your needs. But that's not how people use them. This causes numerous issues & little support.
+
+## Solution
 
 - Real, npm/node conform esm modules with marked dependencies
 - Class based, optimized for tree-shaking, no global pollution, exports instead of collections
@@ -24,11 +34,14 @@ Our main goals are:
 - Typesafety with simple annotation-like types
 - CI, tests, linting, formatting (prettier)
 
-But most importantly, allowing the people that use and rely on these primitives to hold a little stake, and to distribute the weight of maintaining it. Jsm/examples were always considered as something that you copy/paste into your project and adapt to your needs. But that is not how people use it.
+But most importantly, allowing the people that use and rely on these primitives to hold a little stake, and to distribute the weight of maintaining it.
 
 Let's give jsm/examples the care it deserves!
 
-## Changes
+## How to contribute
 
-- [x] All Collections have been converted to export maps (GeometryUtils, CurveExtras, etc)
-- [x] WebGL has been moved to /misc
+If you want to get involved you could do any of the following:
+
+- Create amazing stories for these examples for our dedicate storybook
+- Convert some of the files to Typescript
+- Add new examples for the library you think could be awesome for others
