@@ -10,7 +10,7 @@ import {
   Vector3,
   WebGLRenderTarget,
 } from 'three'
-import { Pass } from '../postprocessing/Pass'
+import { Pass, FullScreenQuad } from '../postprocessing/Pass'
 import { CopyShader } from '../shaders/CopyShader'
 import { LuminosityHighPassShader } from '../shaders/LuminosityHighPassShader'
 
@@ -153,7 +153,7 @@ var UnrealBloomPass = function (resolution, strength, radius, threshold) {
 
   this.basic = new MeshBasicMaterial()
 
-  this.fsQuad = new Pass.FullScreenQuad(null)
+  this.fsQuad = new FullScreenQuad(null)
 }
 
 UnrealBloomPass.prototype = Object.assign(Object.create(Pass.prototype), {

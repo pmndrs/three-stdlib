@@ -8,7 +8,7 @@ import {
   UniformsUtils,
   WebGLRenderTarget,
 } from 'three'
-import { Pass } from '../postprocessing/Pass'
+import { Pass, FullScreenQuad } from '../postprocessing/Pass'
 import { BokehShader } from '../shaders/BokehShader'
 
 /**
@@ -72,7 +72,7 @@ var BokehPass = function (scene, camera, params) {
   this.uniforms = bokehUniforms
   this.needsSwap = false
 
-  this.fsQuad = new Pass.FullScreenQuad(this.materialBokeh)
+  this.fsQuad = new FullScreenQuad(this.materialBokeh)
 
   this._oldClearColor = new Color()
 }

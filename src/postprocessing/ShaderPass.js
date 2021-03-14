@@ -1,5 +1,5 @@
 import { ShaderMaterial, UniformsUtils } from 'three'
-import { Pass } from '../postprocessing/Pass'
+import { Pass, FullScreenQuad } from '../postprocessing/Pass'
 
 var ShaderPass = function (shader, textureID) {
   Pass.call(this)
@@ -21,7 +21,7 @@ var ShaderPass = function (shader, textureID) {
     })
   }
 
-  this.fsQuad = new Pass.FullScreenQuad(this.material)
+  this.fsQuad = new FullScreenQuad(this.material)
 }
 
 ShaderPass.prototype = Object.assign(Object.create(Pass.prototype), {

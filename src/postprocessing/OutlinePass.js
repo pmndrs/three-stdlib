@@ -15,7 +15,7 @@ import {
   Vector3,
   WebGLRenderTarget,
 } from 'three'
-import { Pass } from '../postprocessing/Pass'
+import { Pass, FullScreenQuad } from '../postprocessing/Pass'
 import { CopyShader } from '../shaders/CopyShader'
 
 var OutlinePass = function (resolution, scene, camera, selectedObjects) {
@@ -124,7 +124,7 @@ var OutlinePass = function (resolution, scene, camera, selectedObjects) {
   this._oldClearColor = new Color()
   this.oldClearAlpha = 1
 
-  this.fsQuad = new Pass.FullScreenQuad(null)
+  this.fsQuad = new FullScreenQuad(null)
 
   this.tempPulseColor1 = new Color()
   this.tempPulseColor2 = new Color()

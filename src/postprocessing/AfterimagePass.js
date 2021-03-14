@@ -7,7 +7,7 @@ import {
   UniformsUtils,
   WebGLRenderTarget,
 } from 'three'
-import { Pass } from '../postprocessing/Pass'
+import { Pass, FullScreenQuad } from '../postprocessing/Pass'
 import { AfterimageShader } from '../shaders/AfterimageShader'
 
 var AfterimagePass = function (damp) {
@@ -39,10 +39,10 @@ var AfterimagePass = function (damp) {
     fragmentShader: this.shader.fragmentShader,
   })
 
-  this.compFsQuad = new Pass.FullScreenQuad(this.shaderMaterial)
+  this.compFsQuad = new FullScreenQuad(this.shaderMaterial)
 
   var material = new MeshBasicMaterial()
-  this.copyFsQuad = new Pass.FullScreenQuad(material)
+  this.copyFsQuad = new FullScreenQuad(material)
 }
 
 AfterimagePass.prototype = Object.assign(Object.create(Pass.prototype), {

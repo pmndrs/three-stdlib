@@ -7,7 +7,7 @@ import {
   UniformsUtils,
   WebGLRenderTarget,
 } from 'three'
-import { Pass } from '../postprocessing/Pass'
+import { Pass, FullScreenQuad } from '../postprocessing/Pass'
 import { CopyShader } from '../shaders/CopyShader'
 
 /**
@@ -50,7 +50,7 @@ var SSAARenderPass = function (scene, camera, clearColor, clearAlpha) {
     depthWrite: false,
   })
 
-  this.fsQuad = new Pass.FullScreenQuad(this.copyMaterial)
+  this.fsQuad = new FullScreenQuad(this.copyMaterial)
 }
 
 SSAARenderPass.prototype = Object.assign(Object.create(Pass.prototype), {
