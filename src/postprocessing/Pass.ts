@@ -18,7 +18,7 @@ class Pass {
     /* eslint-disable no-unused-vars */
     width: number,
     height: number,
-  ) {}
+  ): void {}
 
   render(
     /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -28,35 +28,35 @@ class Pass {
     readBuffer: WebGLRenderTarget,
     deltaTime: number,
     maskActive: unknown,
-  ) {
+  ): void {
     console.error('THREE.Pass: .render() must be implemented in derived pass.')
   }
 }
 
 // Helper for passes that need to fill the viewport with a single quad.
-class FullScreenQuad {
-  camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1)
-  geometry = new PlaneGeometry(2, 2)
-  _mesh: Mesh
+class FullScreenQuad<TMaterial extends Material = Material> {
+  public camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1)
+  public geometry = new PlaneGeometry(2, 2)
+  private mesh: Mesh<PlaneGeometry, TMaterial>
 
-  constructor(material: Material) {
-    this._mesh = new Mesh(this.geometry, material)
+  constructor(material: TMaterial) {
+    this.mesh = new Mesh(this.geometry, material)
   }
 
-  get material() {
-    return this._mesh.material
+  get material(): TMaterial {
+    return this.mesh.material
   }
 
   set material(value) {
-    this._mesh.material = value
+    this.mesh.material = value
   }
 
-  dispose() {
-    this._mesh.geometry.dispose()
+  dispose(): void {
+    this.mesh.geometry.dispose()
   }
 
-  render(renderer: Renderer) {
-    renderer.render(this._mesh, this.camera)
+  render(renderer: Renderer): void {
+    renderer.render(this.mesh, this.camera)
   }
 }
 
