@@ -1,26 +1,32 @@
-import { OrthographicCamera, PlaneGeometry, Mesh, Material, Renderer } from 'three'
+import { OrthographicCamera, PlaneGeometry, Mesh, Material, Renderer, WebGLRenderer, WebGLRenderTarget } from 'three'
 
-function Pass() {
+class Pass {
   // if set to true, the pass is processed by the composer
-  this.enabled = true
+  enabled = true
 
   // if set to true, the pass indicates to swap read and write buffer after rendering
-  this.needsSwap = true
+  needsSwap = true
 
   // if set to true, the pass clears its buffer before rendering
-  this.clear = false
+  clear = false
 
   // if set to true, the result of the pass is rendered to screen. This is set automatically by EffectComposer.
-  this.renderToScreen = false
-}
+  renderToScreen = false
 
-Object.assign(Pass.prototype, {
-  setSize: function (/* width, height */) {},
+  setSize(/* width, height */) {}
 
-  render: function (/* renderer, writeBuffer, readBuffer, deltaTime, maskActive */) {
+  render(
+    /* eslint-disable @typescript-eslint/no-unused-vars */
+    /* eslint-disable no-unused-vars */
+    renderer: WebGLRenderer,
+    writeBuffer: WebGLRenderTarget,
+    readBuffer: WebGLRenderTarget,
+    deltaTime: number,
+    maskActive: unknown,
+  ) {
     console.error('THREE.Pass: .render() must be implemented in derived pass.')
-  },
-})
+  }
+}
 
 // Helper for passes that need to fill the viewport with a single quad.
 class FullScreenQuad {

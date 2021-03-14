@@ -1,17 +1,7 @@
-import {
-  Clock,
-  LinearFilter,
-  Mesh,
-  OrthographicCamera,
-  PlaneGeometry,
-  RGBAFormat,
-  Vector2,
-  WebGLRenderTarget,
-} from 'three'
+import { Clock, LinearFilter, RGBAFormat, Vector2, WebGLRenderTarget } from 'three'
 import { CopyShader } from '../shaders/CopyShader'
 import { ShaderPass } from '../postprocessing/ShaderPass'
-import { MaskPass } from '../postprocessing/MaskPass'
-import { ClearMaskPass } from '../postprocessing/MaskPass'
+import { MaskPass, ClearMaskPass } from '../postprocessing/MaskPass'
 
 var EffectComposer = function (renderer, renderTarget) {
   this.renderer = renderer
