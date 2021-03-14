@@ -1,9 +1,10 @@
-import { Clock, LinearFilter, RGBAFormat, Vector2, WebGLRenderTarget } from 'three'
+import { Clock, LinearFilter, RGBAFormat, Vector2, WebGLRenderer, WebGLRenderTarget } from 'three'
 import { CopyShader } from '../shaders/CopyShader'
-import { ShaderPass } from '../postprocessing/ShaderPass'
-import { MaskPass, ClearMaskPass } from '../postprocessing/MaskPass'
+import { ShaderPass } from './ShaderPass'
+import { MaskPass, ClearMaskPass } from './MaskPass'
+import { Pass } from './Pass'
 
-var EffectComposer = function (renderer, renderTarget) {
+var EffectComposer = function (renderer: WebGLRenderer, renderTarget: WebGLRenderTarget) {
   this.renderer = renderer
 
   if (renderTarget === undefined) {
@@ -59,17 +60,17 @@ Object.assign(EffectComposer.prototype, {
     this.writeBuffer = tmp
   },
 
-  addPass: function (pass) {
+  addPass: function (pass: Pass) {
     this.passes.push(pass)
     pass.setSize(this._width * this._pixelRatio, this._height * this._pixelRatio)
   },
 
-  insertPass: function (pass, index) {
+  insertPass: function (pass: Pass, index: number) {
     this.passes.splice(index, 0, pass)
     pass.setSize(this._width * this._pixelRatio, this._height * this._pixelRatio)
   },
 
-  removePass: function (pass) {
+  removePass: function (pass: Pass) {
     const index = this.passes.indexOf(pass)
 
     if (index !== -1) {
@@ -77,7 +78,7 @@ Object.assign(EffectComposer.prototype, {
     }
   },
 
-  isLastEnabledPass: function (passIndex) {
+  isLastEnabledPass: function (passIndex: number) {
     for (let i = passIndex + 1; i < this.passes.length; i++) {
       if (this.passes[i].enabled) {
         return false
@@ -87,7 +88,7 @@ Object.assign(EffectComposer.prototype, {
     return true
   },
 
-  render: function (deltaTime) {
+  render: function (deltaTime: number) {
     // deltaTime value is in seconds
 
     if (deltaTime === undefined) {
@@ -139,7 +140,7 @@ Object.assign(EffectComposer.prototype, {
     this.renderer.setRenderTarget(currentRenderTarget)
   },
 
-  reset: function (renderTarget) {
+  reset: function (renderTarget: WebGLRenderTarget) {
     if (renderTarget === undefined) {
       var size = this.renderer.getSize(new Vector2())
       this._pixelRatio = this.renderer.getPixelRatio()
@@ -159,7 +160,7 @@ Object.assign(EffectComposer.prototype, {
     this.readBuffer = this.renderTarget2
   },
 
-  setSize: function (width, height) {
+  setSize: function (width: number, height: number) {
     this._width = width
     this._height = height
 
@@ -174,7 +175,7 @@ Object.assign(EffectComposer.prototype, {
     }
   },
 
-  setPixelRatio: function (pixelRatio) {
+  setPixelRatio: function (pixelRatio: number) {
     this._pixelRatio = pixelRatio
 
     this.setSize(this._width, this._height)

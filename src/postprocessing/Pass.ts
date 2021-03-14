@@ -13,7 +13,12 @@ class Pass {
   // if set to true, the result of the pass is rendered to screen. This is set automatically by EffectComposer.
   renderToScreen = false
 
-  setSize(/* width, height */) {}
+  setSize(
+    /* eslint-disable @typescript-eslint/no-unused-vars */
+    /* eslint-disable no-unused-vars */
+    width: number,
+    height: number,
+  ) {}
 
   render(
     /* eslint-disable @typescript-eslint/no-unused-vars */

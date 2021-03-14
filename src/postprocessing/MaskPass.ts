@@ -1,6 +1,7 @@
-import { Pass } from '../postprocessing/Pass'
+import { Camera, Scene, WebGLRenderer, WebGLRenderTarget } from 'three'
+import { Pass } from './Pass'
 
-var MaskPass = function (scene, camera) {
+var MaskPass = function (scene: Scene, camera: Camera) {
   Pass.call(this)
 
   this.scene = scene
@@ -15,7 +16,11 @@ var MaskPass = function (scene, camera) {
 MaskPass.prototype = Object.assign(Object.create(Pass.prototype), {
   constructor: MaskPass,
 
-  render: function (renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */) {
+  render: function (
+    renderer: WebGLRenderer,
+    writeBuffer: WebGLRenderTarget,
+    readBuffer: WebGLRenderTarget /*, deltaTime, maskActive */,
+  ) {
     var context = renderer.getContext()
     var state = renderer.state
 
@@ -80,7 +85,7 @@ var ClearMaskPass = function () {
 ClearMaskPass.prototype = Object.create(Pass.prototype)
 
 Object.assign(ClearMaskPass.prototype, {
-  render: function (renderer /*, writeBuffer, readBuffer, deltaTime, maskActive */) {
+  render: function (renderer: WebGLRenderer /*, writeBuffer, readBuffer, deltaTime, maskActive */) {
     renderer.state.buffers.stencil.setLocked(false)
     renderer.state.buffers.stencil.setTest(false)
   },
