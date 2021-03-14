@@ -4,81 +4,92 @@ import { ShaderPass } from './ShaderPass'
 import { MaskPass, ClearMaskPass } from './MaskPass'
 import { Pass } from './Pass'
 
-var EffectComposer = function (renderer: WebGLRenderer, renderTarget: WebGLRenderTarget) {
-  this.renderer = renderer
+class EffectComposer {
+  renderer: WebGLRenderer
+  private _pixelRatio: number
+  private _width: number
+  private _height: number
+  renderTarget1: WebGLRenderTarget
+  renderTarget2: WebGLRenderTarget
+  writeBuffer: WebGLRenderTarget
+  readBuffer: WebGLRenderTarget
+  renderToScreen: boolean
+  passes: Pass[] = []
+  copyPass: Pass
+  clock: Clock
 
-  if (renderTarget === undefined) {
-    var parameters = {
-      minFilter: LinearFilter,
-      magFilter: LinearFilter,
-      format: RGBAFormat,
+  constructor(renderer: WebGLRenderer, renderTarget: WebGLRenderTarget) {
+    this.renderer = renderer
+
+    if (renderTarget === undefined) {
+      var parameters = {
+        minFilter: LinearFilter,
+        magFilter: LinearFilter,
+        format: RGBAFormat,
+      }
+
+      var size = renderer.getSize(new Vector2())
+      this._pixelRatio = renderer.getPixelRatio()
+      this._width = size.width
+      this._height = size.height
+
+      renderTarget = new WebGLRenderTarget(this._width * this._pixelRatio, this._height * this._pixelRatio, parameters)
+      renderTarget.texture.name = 'EffectComposer.rt1'
+    } else {
+      this._pixelRatio = 1
+      this._width = renderTarget.width
+      this._height = renderTarget.height
     }
 
-    var size = renderer.getSize(new Vector2())
-    this._pixelRatio = renderer.getPixelRatio()
-    this._width = size.width
-    this._height = size.height
+    this.renderTarget1 = renderTarget
+    this.renderTarget2 = renderTarget.clone()
+    this.renderTarget2.texture.name = 'EffectComposer.rt2'
 
-    renderTarget = new WebGLRenderTarget(this._width * this._pixelRatio, this._height * this._pixelRatio, parameters)
-    renderTarget.texture.name = 'EffectComposer.rt1'
-  } else {
-    this._pixelRatio = 1
-    this._width = renderTarget.width
-    this._height = renderTarget.height
+    this.writeBuffer = this.renderTarget1
+    this.readBuffer = this.renderTarget2
+
+    this.renderToScreen = true
+
+    // dependencies
+
+    if (CopyShader === undefined) {
+      console.error('THREE.EffectComposer relies on CopyShader')
+    }
+
+    if (ShaderPass === undefined) {
+      console.error('THREE.EffectComposer relies on ShaderPass')
+    }
+
+    this.copyPass = new ShaderPass(CopyShader)
+
+    this.clock = new Clock()
   }
 
-  this.renderTarget1 = renderTarget
-  this.renderTarget2 = renderTarget.clone()
-  this.renderTarget2.texture.name = 'EffectComposer.rt2'
-
-  this.writeBuffer = this.renderTarget1
-  this.readBuffer = this.renderTarget2
-
-  this.renderToScreen = true
-
-  this.passes = []
-
-  // dependencies
-
-  if (CopyShader === undefined) {
-    console.error('THREE.EffectComposer relies on CopyShader')
-  }
-
-  if (ShaderPass === undefined) {
-    console.error('THREE.EffectComposer relies on ShaderPass')
-  }
-
-  this.copyPass = new ShaderPass(CopyShader)
-
-  this.clock = new Clock()
-}
-
-Object.assign(EffectComposer.prototype, {
-  swapBuffers: function () {
+  swapBuffers() {
     var tmp = this.readBuffer
     this.readBuffer = this.writeBuffer
     this.writeBuffer = tmp
-  },
+  }
 
-  addPass: function (pass: Pass) {
+  addPass(pass: Pass) {
     this.passes.push(pass)
     pass.setSize(this._width * this._pixelRatio, this._height * this._pixelRatio)
-  },
+  }
 
-  insertPass: function (pass: Pass, index: number) {
+  insertPass(pass: Pass, index: number) {
     this.passes.splice(index, 0, pass)
     pass.setSize(this._width * this._pixelRatio, this._height * this._pixelRatio)
-  },
+  }
 
-  removePass: function (pass: Pass) {
+  removePass(pass: Pass) {
     const index = this.passes.indexOf(pass)
 
     if (index !== -1) {
       this.passes.splice(index, 1)
     }
-  },
+  }
 
-  isLastEnabledPass: function (passIndex: number) {
+  isLastEnabledPass(passIndex: number) {
     for (let i = passIndex + 1; i < this.passes.length; i++) {
       if (this.passes[i].enabled) {
         return false
@@ -86,9 +97,9 @@ Object.assign(EffectComposer.prototype, {
     }
 
     return true
-  },
+  }
 
-  render: function (deltaTime: number) {
+  render(deltaTime: number) {
     // deltaTime value is in seconds
 
     if (deltaTime === undefined) {
@@ -138,9 +149,9 @@ Object.assign(EffectComposer.prototype, {
     }
 
     this.renderer.setRenderTarget(currentRenderTarget)
-  },
+  }
 
-  reset: function (renderTarget: WebGLRenderTarget) {
+  reset(renderTarget: WebGLRenderTarget) {
     if (renderTarget === undefined) {
       var size = this.renderer.getSize(new Vector2())
       this._pixelRatio = this.renderer.getPixelRatio()
@@ -158,9 +169,9 @@ Object.assign(EffectComposer.prototype, {
 
     this.writeBuffer = this.renderTarget1
     this.readBuffer = this.renderTarget2
-  },
+  }
 
-  setSize: function (width: number, height: number) {
+  setSize(width: number, height: number) {
     this._width = width
     this._height = height
 
@@ -173,13 +184,13 @@ Object.assign(EffectComposer.prototype, {
     for (let i = 0; i < this.passes.length; i++) {
       this.passes[i].setSize(effectiveWidth, effectiveHeight)
     }
-  },
+  }
 
-  setPixelRatio: function (pixelRatio: number) {
+  setPixelRatio(pixelRatio: number) {
     this._pixelRatio = pixelRatio
 
     this.setSize(this._width, this._height)
-  },
-})
+  }
+}
 
 export { EffectComposer }

@@ -27,7 +27,7 @@ class Pass {
     writeBuffer: WebGLRenderTarget,
     readBuffer: WebGLRenderTarget,
     deltaTime: number,
-    maskActive: unknown,
+    maskActive?: unknown,
   ): void {
     console.error('THREE.Pass: .render() must be implemented in derived pass.')
   }
