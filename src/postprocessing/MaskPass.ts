@@ -1,7 +1,7 @@
 import { Camera, Scene, WebGLRenderer, WebGLRenderTarget } from 'three'
 import { Pass } from './Pass'
 
-var MaskPass = function (scene: Scene, camera: Camera) {
+const MaskPass = function (scene: Scene, camera: Camera) {
   Pass.call(this)
 
   this.scene = scene
@@ -21,8 +21,8 @@ MaskPass.prototype = Object.assign(Object.create(Pass.prototype), {
     writeBuffer: WebGLRenderTarget,
     readBuffer: WebGLRenderTarget /*, deltaTime, maskActive */,
   ) {
-    var context = renderer.getContext()
-    var state = renderer.state
+    const context = renderer.getContext()
+    const state = renderer.state
 
     // don't update color or depth
 
@@ -36,7 +36,7 @@ MaskPass.prototype = Object.assign(Object.create(Pass.prototype), {
 
     // set up stencil
 
-    var writeValue, clearValue
+    let writeValue, clearValue
 
     if (this.inverse) {
       writeValue = 0
@@ -76,7 +76,7 @@ MaskPass.prototype = Object.assign(Object.create(Pass.prototype), {
   },
 })
 
-var ClearMaskPass = function () {
+const ClearMaskPass = function () {
   Pass.call(this)
 
   this.needsSwap = false

@@ -22,13 +22,13 @@ class EffectComposer {
     this.renderer = renderer
 
     if (renderTarget === undefined) {
-      var parameters = {
+      const parameters = {
         minFilter: LinearFilter,
         magFilter: LinearFilter,
         format: RGBAFormat,
       }
 
-      var size = renderer.getSize(new Vector2())
+      const size = renderer.getSize(new Vector2())
       this._pixelRatio = renderer.getPixelRatio()
       this._width = size.width
       this._height = size.height
@@ -66,7 +66,7 @@ class EffectComposer {
   }
 
   swapBuffers() {
-    var tmp = this.readBuffer
+    const tmp = this.readBuffer
     this.readBuffer = this.writeBuffer
     this.writeBuffer = tmp
   }
@@ -106,16 +106,14 @@ class EffectComposer {
       deltaTime = this.clock.getDelta()
     }
 
-    var currentRenderTarget = this.renderer.getRenderTarget()
+    const currentRenderTarget = this.renderer.getRenderTarget()
 
-    var maskActive = false
+    let maskActive = false
 
-    var pass,
-      i,
-      il = this.passes.length
+    const il = this.passes.length
 
-    for (i = 0; i < il; i++) {
-      pass = this.passes[i]
+    for (let i = 0; i < il; i++) {
+      const pass = this.passes[i]
 
       if (pass.enabled === false) continue
 
@@ -124,8 +122,8 @@ class EffectComposer {
 
       if (pass.needsSwap) {
         if (maskActive) {
-          var context = this.renderer.getContext()
-          var stencil = this.renderer.state.buffers.stencil
+          const context = this.renderer.getContext()
+          const stencil = this.renderer.state.buffers.stencil
 
           //context.stencilFunc( context.NOTEQUAL, 1, 0xffffffff );
           stencil.setFunc(context.NOTEQUAL, 1, 0xffffffff)
@@ -153,7 +151,7 @@ class EffectComposer {
 
   reset(renderTarget: WebGLRenderTarget) {
     if (renderTarget === undefined) {
-      var size = this.renderer.getSize(new Vector2())
+      const size = this.renderer.getSize(new Vector2())
       this._pixelRatio = this.renderer.getPixelRatio()
       this._width = size.width
       this._height = size.height
@@ -175,8 +173,8 @@ class EffectComposer {
     this._width = width
     this._height = height
 
-    var effectiveWidth = this._width * this._pixelRatio
-    var effectiveHeight = this._height * this._pixelRatio
+    const effectiveWidth = this._width * this._pixelRatio
+    const effectiveHeight = this._height * this._pixelRatio
 
     this.renderTarget1.setSize(effectiveWidth, effectiveHeight)
     this.renderTarget2.setSize(effectiveWidth, effectiveHeight)
