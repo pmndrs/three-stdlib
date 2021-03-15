@@ -47,7 +47,7 @@ class FullScreenQuad<TMaterial extends Material = Material> {
     return this.mesh.material
   }
 
-  set material(value) {
+  set material(value: TMaterial) {
     this.mesh.material = value
   }
 

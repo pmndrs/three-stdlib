@@ -7,10 +7,10 @@ class ShaderPass extends Pass {
   material: ShaderMaterial
   fsQuad: FullScreenQuad
 
-  constructor(shader: ShaderMaterial | (Shader & { defines?: Object }), textureID?: string) {
+  constructor(shader: ShaderMaterial | (Shader & { defines?: Object }), textureID = 'tDiffuse') {
     super()
 
-    this.textureID = textureID !== undefined ? textureID : 'tDiffuse'
+    this.textureID = textureID
 
     if (shader instanceof ShaderMaterial) {
       this.uniforms = shader.uniforms
@@ -34,7 +34,7 @@ class ShaderPass extends Pass {
     renderer: WebGLRenderer,
     writeBuffer: WebGLRenderTarget,
     readBuffer: WebGLRenderTarget /*, deltaTime, maskActive */,
-  ) {
+  ): void {
     if (this.uniforms[this.textureID]) {
       this.uniforms[this.textureID].value = readBuffer.texture
     }
