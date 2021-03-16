@@ -2,25 +2,25 @@ import { OrthographicCamera, PlaneGeometry, Mesh, Material, Renderer, WebGLRende
 
 class Pass {
   // if set to true, the pass is processed by the composer
-  enabled = true
+  public enabled = true
 
   // if set to true, the pass indicates to swap read and write buffer after rendering
-  needsSwap = true
+  public needsSwap = true
 
   // if set to true, the pass clears its buffer before rendering
-  clear = false
+  public clear = false
 
   // if set to true, the result of the pass is rendered to screen. This is set automatically by EffectComposer.
-  renderToScreen = false
+  public renderToScreen = false
 
-  setSize(
+  public setSize(
     /* eslint-disable @typescript-eslint/no-unused-vars */
     /* eslint-disable no-unused-vars */
     width: number,
     height: number,
   ): void {}
 
-  render(
+  public render(
     /* eslint-disable @typescript-eslint/no-unused-vars */
     /* eslint-disable no-unused-vars */
     renderer: WebGLRenderer,
@@ -39,23 +39,23 @@ class FullScreenQuad<TMaterial extends Material = Material> {
   public geometry = new PlaneGeometry(2, 2)
   private mesh: Mesh<PlaneGeometry, TMaterial>
 
-  constructor(material: TMaterial) {
+  public constructor(material: TMaterial) {
     this.mesh = new Mesh(this.geometry, material)
   }
 
-  get material(): TMaterial {
+  public get material(): TMaterial {
     return this.mesh.material
   }
 
-  set material(value: TMaterial) {
+  public set material(value: TMaterial) {
     this.mesh.material = value
   }
 
-  dispose(): void {
+  public dispose(): void {
     this.mesh.geometry.dispose()
   }
 
-  render(renderer: Renderer): void {
+  public render(renderer: Renderer): void {
     renderer.render(this.mesh, this.camera)
   }
 }

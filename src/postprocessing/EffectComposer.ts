@@ -5,20 +5,20 @@ import { MaskPass, ClearMaskPass } from './MaskPass'
 import { Pass } from './Pass'
 
 class EffectComposer {
-  renderer: WebGLRenderer
+  public renderer: WebGLRenderer
   private _pixelRatio: number
   private _width: number
   private _height: number
-  renderTarget1: WebGLRenderTarget
-  renderTarget2: WebGLRenderTarget
-  writeBuffer: WebGLRenderTarget
-  readBuffer: WebGLRenderTarget
-  renderToScreen: boolean
-  passes: Pass[] = []
-  copyPass: Pass
-  clock: Clock
+  public renderTarget1: WebGLRenderTarget
+  public renderTarget2: WebGLRenderTarget
+  public writeBuffer: WebGLRenderTarget
+  public readBuffer: WebGLRenderTarget
+  public renderToScreen: boolean
+  public passes: Pass[] = []
+  public copyPass: Pass
+  public clock: Clock
 
-  constructor(renderer: WebGLRenderer, renderTarget: WebGLRenderTarget) {
+  public constructor(renderer: WebGLRenderer, renderTarget: WebGLRenderTarget) {
     this.renderer = renderer
 
     if (renderTarget === undefined) {
@@ -65,23 +65,23 @@ class EffectComposer {
     this.clock = new Clock()
   }
 
-  swapBuffers() {
+  public swapBuffers(): void {
     const tmp = this.readBuffer
     this.readBuffer = this.writeBuffer
     this.writeBuffer = tmp
   }
 
-  addPass(pass: Pass) {
+  public addPass(pass: Pass) {
     this.passes.push(pass)
     pass.setSize(this._width * this._pixelRatio, this._height * this._pixelRatio)
   }
 
-  insertPass(pass: Pass, index: number) {
+  public insertPass(pass: Pass, index: number): void {
     this.passes.splice(index, 0, pass)
     pass.setSize(this._width * this._pixelRatio, this._height * this._pixelRatio)
   }
 
-  removePass(pass: Pass) {
+  public removePass(pass: Pass): void {
     const index = this.passes.indexOf(pass)
 
     if (index !== -1) {
@@ -89,7 +89,7 @@ class EffectComposer {
     }
   }
 
-  isLastEnabledPass(passIndex: number) {
+  public isLastEnabledPass(passIndex: number): boolean {
     for (let i = passIndex + 1; i < this.passes.length; i++) {
       if (this.passes[i].enabled) {
         return false
@@ -99,7 +99,7 @@ class EffectComposer {
     return true
   }
 
-  render(deltaTime: number) {
+  public render(deltaTime: number): void {
     // deltaTime value is in seconds
 
     if (deltaTime === undefined) {
@@ -149,7 +149,7 @@ class EffectComposer {
     this.renderer.setRenderTarget(currentRenderTarget)
   }
 
-  reset(renderTarget: WebGLRenderTarget) {
+  public reset(renderTarget: WebGLRenderTarget): void {
     if (renderTarget === undefined) {
       const size = this.renderer.getSize(new Vector2())
       this._pixelRatio = this.renderer.getPixelRatio()
@@ -169,7 +169,7 @@ class EffectComposer {
     this.readBuffer = this.renderTarget2
   }
 
-  setSize(width: number, height: number) {
+  public setSize(width: number, height: number): void {
     this._width = width
     this._height = height
 
@@ -184,7 +184,7 @@ class EffectComposer {
     }
   }
 
-  setPixelRatio(pixelRatio: number) {
+  public setPixelRatio(pixelRatio: number): void {
     this._pixelRatio = pixelRatio
 
     this.setSize(this._width, this._height)

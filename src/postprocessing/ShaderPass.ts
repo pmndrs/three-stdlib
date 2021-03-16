@@ -2,12 +2,12 @@ import { Shader, ShaderMaterial, UniformsUtils, WebGLRenderer, WebGLRenderTarget
 import { Pass, FullScreenQuad } from './Pass'
 
 class ShaderPass extends Pass {
-  textureID: string
-  uniforms: Shader['uniforms']
-  material: ShaderMaterial
-  fsQuad: FullScreenQuad
+  public textureID: string
+  public uniforms: Shader['uniforms']
+  public material: ShaderMaterial
+  public fsQuad: FullScreenQuad
 
-  constructor(shader: ShaderMaterial | (Shader & { defines?: Object }), textureID = 'tDiffuse') {
+  public constructor(shader: ShaderMaterial | (Shader & { defines?: Object }), textureID = 'tDiffuse') {
     super()
 
     this.textureID = textureID
@@ -30,7 +30,7 @@ class ShaderPass extends Pass {
     this.fsQuad = new FullScreenQuad(this.material)
   }
 
-  render(
+  public render(
     renderer: WebGLRenderer,
     writeBuffer: WebGLRenderTarget,
     readBuffer: WebGLRenderTarget /*, deltaTime, maskActive */,
