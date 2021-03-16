@@ -282,13 +282,13 @@ class OrbitControls extends EventDispatcher {
     // internals
     //
 
-    var scope = this
+    const scope = this
 
-    var changeEvent = { type: 'change' }
+    const changeEvent = { type: 'change' }
     const startEvent = { type: 'start' }
     const endEvent = { type: 'end' }
 
-    var STATE = {
+    const STATE = {
       NONE: -1,
       ROTATE: 0,
       DOLLY: 1,
@@ -299,17 +299,17 @@ class OrbitControls extends EventDispatcher {
       TOUCH_DOLLY_ROTATE: 6,
     }
 
-    var state = STATE.NONE
+    let state = STATE.NONE
 
-    var EPS = 0.000001
+    const EPS = 0.000001
 
     // current position in spherical coordinates
-    var spherical = new Spherical()
-    var sphericalDelta = new Spherical()
+    const spherical = new Spherical()
+    const sphericalDelta = new Spherical()
 
-    var scale = 1
-    var panOffset = new Vector3()
-    var zoomChanged = false
+    let scale = 1
+    const panOffset = new Vector3()
+    let zoomChanged = false
 
     const rotateStart = new Vector2()
     const rotateEnd = new Vector2()

@@ -37,6 +37,7 @@
     "import/default": "off",
     "@typescript-eslint/explicit-module-boundary-types": "off",
     "no-unused-vars": ["warn"],
+    "no-var": "error",
     "react/jsx-uses-react": "error",
     "react/jsx-uses-vars": "error",
     "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }],
