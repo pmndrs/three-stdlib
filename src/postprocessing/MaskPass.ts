@@ -1,7 +1,7 @@
 import { Camera, Scene, WebGLRenderer, WebGLRenderTarget } from 'three'
 import { Pass } from './Pass'
 
-const MaskPass = function (scene: Scene, camera: Camera) {
+const MaskPass = function (scene: Scene, camera: Camera): void {
   Pass.call(this)
 
   this.scene = scene
@@ -76,7 +76,7 @@ MaskPass.prototype = Object.assign(Object.create(Pass.prototype), {
   },
 })
 
-const ClearMaskPass = function () {
+const ClearMaskPass = function (): void {
   Pass.call(this)
 
   this.needsSwap = false

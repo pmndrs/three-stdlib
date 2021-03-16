@@ -71,7 +71,7 @@ class EffectComposer {
     this.writeBuffer = tmp
   }
 
-  public addPass(pass: Pass) {
+  public addPass(pass: Pass): void {
     this.passes.push(pass)
     pass.setSize(this._width * this._pixelRatio, this._height * this._pixelRatio)
   }
