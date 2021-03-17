@@ -1,26 +1,28 @@
 import { Camera, Scene, WebGLRenderer, WebGLRenderTarget } from 'three'
 import { Pass } from './Pass'
 
-const MaskPass = function (scene: Scene, camera: Camera): void {
-  Pass.call(this)
+class MaskPass extends Pass {
+  public scene: Scene
+  public camera: Camera
+  public inverse: boolean
 
-  this.scene = scene
-  this.camera = camera
+  public constructor(scene: Scene, camera: Camera) {
+    super()
 
-  this.clear = true
-  this.needsSwap = false
+    this.scene = scene
+    this.camera = camera
 
-  this.inverse = false
-}
+    this.clear = true
+    this.needsSwap = false
 
-MaskPass.prototype = Object.assign(Object.create(Pass.prototype), {
-  constructor: MaskPass,
+    this.inverse = false
+  }
 
-  render: function (
+  public render(
     renderer: WebGLRenderer,
     writeBuffer: WebGLRenderTarget,
     readBuffer: WebGLRenderTarget /*, deltaTime, maskActive */,
-  ) {
+  ): void {
     const context = renderer.getContext()
     const state = renderer.state
 
@@ -73,22 +75,19 @@ MaskPass.prototype = Object.assign(Object.create(Pass.prototype), {
     state.buffers.stencil.setFunc(context.EQUAL, 1, 0xffffffff) // draw if == 1
     state.buffers.stencil.setOp(context.KEEP, context.KEEP, context.KEEP)
     state.buffers.stencil.setLocked(true)
-  },
-})
-
-const ClearMaskPass = function (): void {
-  Pass.call(this)
-
-  this.needsSwap = false
+  }
 }
 
-ClearMaskPass.prototype = Object.create(Pass.prototype)
+class ClearMaskPass extends Pass {
+  public constructor() {
+    super()
+    this.needsSwap = false
+  }
 
-Object.assign(ClearMaskPass.prototype, {
-  render: function (renderer: WebGLRenderer /*, writeBuffer, readBuffer, deltaTime, maskActive */) {
+  public render(renderer: WebGLRenderer /*, writeBuffer, readBuffer, deltaTime, maskActive */): void {
     renderer.state.buffers.stencil.setLocked(false)
     renderer.state.buffers.stencil.setTest(false)
-  },
-})
+  }
+}
 
 export { MaskPass, ClearMaskPass }
