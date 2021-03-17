@@ -8,10 +8,8 @@ import {
   UniformsUtils,
   WebGLRenderTarget,
 } from 'three'
-import { Pass } from '../postprocessing/Pass'
-import { SMAAEdgesShader } from '../shaders/SMAAShader'
-import { SMAAWeightsShader } from '../shaders/SMAAShader'
-import { SMAABlendShader } from '../shaders/SMAAShader'
+import { Pass, FullScreenQuad } from '../postprocessing/Pass'
+import { SMAAEdgesShader, SMAAWeightsShader, SMAABlendShader } from '../shaders/SMAAShader'
 
 var SMAAPass = function (width, height) {
   Pass.call(this)
@@ -115,7 +113,7 @@ var SMAAPass = function (width, height) {
 
   this.needsSwap = false
 
-  this.fsQuad = new Pass.FullScreenQuad(null)
+  this.fsQuad = new FullScreenQuad(null)
 }
 
 SMAAPass.prototype = Object.assign(Object.create(Pass.prototype), {

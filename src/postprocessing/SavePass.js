@@ -1,5 +1,5 @@
 import { LinearFilter, RGBFormat, ShaderMaterial, UniformsUtils, WebGLRenderTarget } from 'three'
-import { Pass } from '../postprocessing/Pass'
+import { Pass, FullScreenQuad } from '../postprocessing/Pass'
 import { CopyShader } from '../shaders/CopyShader'
 
 var SavePass = function (renderTarget) {
@@ -32,7 +32,7 @@ var SavePass = function (renderTarget) {
 
   this.needsSwap = false
 
-  this.fsQuad = new Pass.FullScreenQuad(this.material)
+  this.fsQuad = new FullScreenQuad(this.material)
 }
 
 SavePass.prototype = Object.assign(Object.create(Pass.prototype), {

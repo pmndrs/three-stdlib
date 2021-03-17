@@ -1,5 +1,5 @@
 import { ShaderMaterial, UniformsUtils } from 'three'
-import { Pass } from '../postprocessing/Pass'
+import { Pass, FullScreenQuad } from '../postprocessing/Pass'
 import { CopyShader } from '../shaders/CopyShader'
 
 var TexturePass = function (map, opacity) {
@@ -24,7 +24,7 @@ var TexturePass = function (map, opacity) {
 
   this.needsSwap = false
 
-  this.fsQuad = new Pass.FullScreenQuad(null)
+  this.fsQuad = new FullScreenQuad(null)
 }
 
 TexturePass.prototype = Object.assign(Object.create(Pass.prototype), {

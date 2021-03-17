@@ -1,5 +1,5 @@
 import { ShaderMaterial, UniformsUtils } from 'three'
-import { Pass } from '../postprocessing/Pass'
+import { Pass, FullScreenQuad } from '../postprocessing/Pass'
 import { HalftoneShader } from '../shaders/HalftoneShader'
 
 /**
@@ -30,7 +30,7 @@ var HalftonePass = function (width, height, params) {
     }
   }
 
-  this.fsQuad = new Pass.FullScreenQuad(this.material)
+  this.fsQuad = new FullScreenQuad(this.material)
 }
 
 HalftonePass.prototype = Object.assign(Object.create(Pass.prototype), {

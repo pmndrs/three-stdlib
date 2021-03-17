@@ -21,7 +21,7 @@ import {
   WebGLRenderTarget,
   ZeroFactor,
 } from 'three'
-import { Pass } from '../postprocessing/Pass'
+import { Pass, FullScreenQuad } from '../postprocessing/Pass'
 import { SimplexNoise } from '../math/SimplexNoise'
 import { SSAOBlurShader, SSAODepthShader, SSAOShader } from '../shaders/SSAOShader'
 import { CopyShader } from '../shaders/CopyShader'
@@ -154,7 +154,7 @@ var SSAOPass = function (scene, camera, width, height) {
     blendEquationAlpha: AddEquation,
   })
 
-  this.fsQuad = new Pass.FullScreenQuad(null)
+  this.fsQuad = new FullScreenQuad(null)
 
   this.originalClearColor = new Color()
 }

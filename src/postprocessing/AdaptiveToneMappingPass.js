@@ -8,7 +8,7 @@ import {
   UniformsUtils,
   WebGLRenderTarget,
 } from 'three'
-import { Pass } from '../postprocessing/Pass'
+import { Pass, FullScreenQuad } from '../postprocessing/Pass'
 import { CopyShader } from '../shaders/CopyShader'
 import { LuminosityShader } from '../shaders/LuminosityShader'
 import { ToneMapShader } from '../shaders/ToneMapShader'
@@ -122,7 +122,7 @@ var AdaptiveToneMappingPass = function (adaptive, resolution) {
     blending: NoBlending,
   })
 
-  this.fsQuad = new Pass.FullScreenQuad(null)
+  this.fsQuad = new FullScreenQuad(null)
 }
 
 AdaptiveToneMappingPass.prototype = Object.assign(Object.create(Pass.prototype), {
