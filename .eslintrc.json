@@ -36,7 +36,7 @@
     "import/namespace": "off",
     "import/default": "off",
     "@typescript-eslint/explicit-module-boundary-types": "off",
-    "no-unused-vars": ["warn"],
+    "no-unused-vars": ["off"],
     "no-var": "error",
     "react/jsx-uses-react": "error",
     "react/jsx-uses-vars": "error",
@@ -44,8 +44,7 @@
     "@typescript-eslint/no-use-before-define": "off",
     "@typescript-eslint/no-empty-function": "off",
     "@typescript-eslint/no-empty-interface": "off",
-    "@typescript-eslint/no-explicit-any": "off",
-    "jest/consistent-test-it": ["error", { "fn": "it", "withinDescribe": "it" }]
+    "@typescript-eslint/no-explicit-any": "off"
   },
   "settings": {
     "react": {
@@ -67,6 +66,13 @@
       "files": ["src"],
       "parserOptions": {
         "project": ["./tsconfig.json", "./storybook/tsconfig.json"]
+      }
+    },
+    {
+      // enable the rule specifically for TypeScript files
+      "files": ["*.ts", "*.tsx"],
+      "rules": {
+        "@typescript-eslint/explicit-function-return-type": ["error", { "allowHigherOrderFunctions": true }]
       }
     }
   ]

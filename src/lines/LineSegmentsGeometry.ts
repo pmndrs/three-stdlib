@@ -133,7 +133,7 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
 
   private box = new Box3()
 
-  computeBoundingBox = () => {
+  computeBoundingBox = (): void => {
     if (this.boundingBox === null) {
       this.boundingBox = new Box3()
     }
@@ -152,7 +152,7 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
 
   private vector = new Vector3()
 
-  computeBoundingSphere = () => {
+  computeBoundingSphere = (): void => {
     if (this.boundingSphere === null) {
       this.boundingSphere = new Sphere()
     }
@@ -192,11 +192,11 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
     }
   }
 
-  toJSON = () => {
+  toJSON = (): void => {
     // todo
   }
 
-  applyMatrix = (matrix: Matrix4) => {
+  applyMatrix = (matrix: Matrix4): this => {
     console.warn('THREE.LineSegmentsGeometry: applyMatrix() has been renamed to applyMatrix4().')
 
     return this.applyMatrix4(matrix)

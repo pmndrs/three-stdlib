@@ -114,7 +114,7 @@ class TrackballControls extends EventDispatcher {
 
   private onScreenVector = new Vector2()
 
-  private getMouseOnScreen = (pageX: number, pageY: number) => {
+  private getMouseOnScreen = (pageX: number, pageY: number): Vector2 => {
     this.onScreenVector.set(
       (pageX - this.screen.left) / this.screen.width,
       (pageY - this.screen.top) / this.screen.height,
@@ -125,7 +125,7 @@ class TrackballControls extends EventDispatcher {
 
   private onCircleVector = new Vector2()
 
-  private getMouseOnCircle = (pageX: number, pageY: number) => {
+  private getMouseOnCircle = (pageX: number, pageY: number): Vector2 => {
     this.onCircleVector.set(
       (pageX - this.screen.width * 0.5 - this.screen.left) / (this.screen.width * 0.5),
       (this.screen.height + 2 * (this.screen.top - pageY)) / this.screen.width, // screen.width intentional
@@ -142,7 +142,7 @@ class TrackballControls extends EventDispatcher {
   private moveDirection = new Vector3()
   private angle: number = 0
 
-  private rotateCamera = () => {
+  private rotateCamera = (): void => {
     this.moveDirection.set(this._moveCurr.x - this._movePrev.x, this._moveCurr.y - this._movePrev.y, 0)
     this.angle = this.moveDirection.length()
 
@@ -179,7 +179,7 @@ class TrackballControls extends EventDispatcher {
     this._movePrev.copy(this._moveCurr)
   }
 
-  private zoomCamera = () => {
+  private zoomCamera = (): void => {
     let factor
 
     if (this._state === this.STATE.TOUCH_ZOOM_PAN) {
@@ -220,7 +220,7 @@ class TrackballControls extends EventDispatcher {
   private objectUp = new Vector3()
   private pan = new Vector3()
 
-  private panCamera = () => {
+  private panCamera = (): void => {
     this.mouseChange.copy(this._panEnd).sub(this._panStart)
 
     if (this.mouseChange.lengthSq()) {
@@ -251,7 +251,7 @@ class TrackballControls extends EventDispatcher {
     }
   }
 
-  private checkDistances = () => {
+  private checkDistances = (): void => {
     if (!this.noZoom || !this.noPan) {
       if (this._eye.lengthSq() > this.maxDistance * this.maxDistance) {
         this.object.position.addVectors(this.target, this._eye.setLength(this.maxDistance))
@@ -265,7 +265,7 @@ class TrackballControls extends EventDispatcher {
     }
   }
 
-  private handleResize = () => {
+  private handleResize = (): void => {
     const box = this.domElement.getBoundingClientRect()
     // adjustments come from similar code in the jquery offset() function
     const d = this.domElement.ownerDocument.documentElement
@@ -275,7 +275,7 @@ class TrackballControls extends EventDispatcher {
     this.screen.height = box.height
   }
 
-  public update = () => {
+  public update = (): void => {
     this._eye.subVectors(this.object.position, this.target)
 
     if (!this.noRotate) {
@@ -316,7 +316,7 @@ class TrackballControls extends EventDispatcher {
     }
   }
 
-  public reset = () => {
+  public reset = (): void => {
     this._state = this.STATE.NONE
     this._keyState = this.STATE.NONE
 
@@ -337,7 +337,7 @@ class TrackballControls extends EventDispatcher {
     this.lastZoom = this.object.zoom
   }
 
-  private keydown = (event: KeyboardEvent) => {
+  private keydown = (event: KeyboardEvent): void => {
     if (this.enabled === false) return
 
     window.removeEventListener('keydown', this.keydown)
@@ -353,7 +353,7 @@ class TrackballControls extends EventDispatcher {
     }
   }
 
-  private onPointerDown = (event: PointerEvent) => {
+  private onPointerDown = (event: PointerEvent): void => {
     if (this.enabled === false) return
 
     switch (event.pointerType) {
@@ -366,7 +366,7 @@ class TrackballControls extends EventDispatcher {
     }
   }
 
-  private onPointerMove = (event: PointerEvent) => {
+  private onPointerMove = (event: PointerEvent): void => {
     if (this.enabled === false) return
 
     switch (event.pointerType) {
@@ -379,7 +379,7 @@ class TrackballControls extends EventDispatcher {
     }
   }
 
-  private onPointerUp = (event: PointerEvent) => {
+  private onPointerUp = (event: PointerEvent): void => {
     if (this.enabled === false) return
 
     switch (event.pointerType) {
@@ -392,7 +392,7 @@ class TrackballControls extends EventDispatcher {
     }
   }
 
-  private keyup = () => {
+  private keyup = (): void => {
     if (this.enabled === false) return
 
     this._keyState = this.STATE.NONE
@@ -400,7 +400,7 @@ class TrackballControls extends EventDispatcher {
     window.addEventListener('keydown', this.keydown)
   }
 
-  private onMouseDown = (event: MouseEvent) => {
+  private onMouseDown = (event: MouseEvent): void => {
     event.preventDefault()
 
     if (this._state === this.STATE.NONE) {
@@ -441,7 +441,7 @@ class TrackballControls extends EventDispatcher {
     this.dispatchEvent(this.startEvent)
   }
 
-  private onMouseMove = (event: MouseEvent) => {
+  private onMouseMove = (event: MouseEvent): void => {
     if (this.enabled === false) return
 
     event.preventDefault()
@@ -458,7 +458,7 @@ class TrackballControls extends EventDispatcher {
     }
   }
 
-  private onMouseUp = (event: MouseEvent) => {
+  private onMouseUp = (event: MouseEvent): void => {
     if (this.enabled === false) return
 
     event.preventDefault()
@@ -471,7 +471,7 @@ class TrackballControls extends EventDispatcher {
     this.dispatchEvent(this.endEvent)
   }
 
-  private mousewheel = (event: WheelEvent) => {
+  private mousewheel = (event: WheelEvent): void => {
     if (this.enabled === false) return
 
     if (this.noZoom === true) return
@@ -499,7 +499,7 @@ class TrackballControls extends EventDispatcher {
     this.dispatchEvent(this.endEvent)
   }
 
-  private touchstart = (event: TouchEvent) => {
+  private touchstart = (event: TouchEvent): void => {
     if (this.enabled === false) return
 
     event.preventDefault()
@@ -528,7 +528,7 @@ class TrackballControls extends EventDispatcher {
     this.dispatchEvent(this.startEvent)
   }
 
-  private touchmove = (event: TouchEvent) => {
+  private touchmove = (event: TouchEvent): void => {
     if (this.enabled === false) return
 
     event.preventDefault()
@@ -552,7 +552,7 @@ class TrackballControls extends EventDispatcher {
     }
   }
 
-  private touchend = (event: TouchEvent) => {
+  private touchend = (event: TouchEvent): void => {
     if (this.enabled === false) return
 
     switch (event.touches.length) {
@@ -570,13 +570,13 @@ class TrackballControls extends EventDispatcher {
     this.dispatchEvent(this.endEvent)
   }
 
-  private contextmenu = (event: MouseEvent) => {
+  private contextmenu = (event: MouseEvent): void => {
     if (this.enabled === false) return
 
     event.preventDefault()
   }
 
-  public dispose = () => {
+  public dispose = (): void => {
     this.domElement.removeEventListener('contextmenu', this.contextmenu)
 
     this.domElement.removeEventListener('pointerdown', this.onPointerDown)

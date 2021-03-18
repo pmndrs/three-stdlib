@@ -26,7 +26,7 @@ class LineSegments2 extends Mesh<LineSegmentsGeometry, LineMaterial> {
   private distStart = new Vector3()
   private distEnd = new Vector3()
 
-  computeLineDistances = () => {
+  computeLineDistances = (): this => {
     const geometry = this.geometry
 
     const instanceStart = geometry.attributes.instanceStart as InterleavedBufferAttribute
@@ -58,7 +58,7 @@ class LineSegments2 extends Mesh<LineSegmentsGeometry, LineMaterial> {
   private line = new Line3()
   private closestPoint = new Vector3()
 
-  raycast = (raycaster: Raycaster, intersects: Array<Intersection & { pointOnLine: Vector3 }>) => {
+  raycast = (raycaster: Raycaster, intersects: Array<Intersection & { pointOnLine: Vector3 }>): void => {
     if (raycaster.camera === null) {
       console.error('LineSegments2: "Raycaster.camera" needs to be set in order to raycast against LineSegments2.')
     }

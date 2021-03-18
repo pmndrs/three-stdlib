@@ -157,11 +157,11 @@ export class SimplexNoise {
     return g[0] * x + g[1] * y + g[2] * z
   }
 
-  dot4 = (g: number[], x: number, y: number, z: number, w: number) => {
+  dot4 = (g: number[], x: number, y: number, z: number, w: number): number => {
     return g[0] * x + g[1] * y + g[2] * z + g[3] * w
   }
 
-  noise = (xin: number, yin: number) => {
+  noise = (xin: number, yin: number): number => {
     let n0
     let n1
     let n2 // Noise contributions from the three corners

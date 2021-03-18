@@ -9,8 +9,8 @@
     "build": "rollup -c && npm run copy",
     "build-storybook": "build-storybook -s ./.storybook/public",
     "copy": "copyfiles package.json README.md LICENSE dist && json -I -f dist/package.json -e \"this.private=false; this.devDependencies=undefined; this.optionalDependencies=undefined; this.scripts=undefined; this.husky=undefined; this.prettier=undefined; this.jest=undefined; this['lint-staged']=undefined;\"",
-    "eslint": "eslint --cache --fix src/**/*.ts",
-    "eslint:ci": "eslint src/**/*.ts",
+    "lint": "eslint --cache --fix src/**/*.ts",
+    "lint:ci": "eslint src/**/*.ts",
     "prebuild": "rimraf dist && npm run typegen",
     "prepare": "npm run build",
     "prettier:write": "prettier --write .",
@@ -36,6 +36,9 @@
     "url": "git+https://github.com/pmndrs/three-stdlib.git"
   },
   "author": "Paul Henschel",
+  "maintainers": [
+    "Josh Ellis (https://github.com/joshuaellis"
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/pmndrs/three-stdlib/issues"
@@ -60,8 +63,8 @@
     "@storybook/html": "^6.1.21",
     "@storybook/preset-typescript": "^3.0.0",
     "@types/three": "^0.126.0",
-    "@typescript-eslint/eslint-plugin": "^4.15.2",
-    "@typescript-eslint/parser": "^4.15.2",
+    "@typescript-eslint/eslint-plugin": "^4.18.0",
+    "@typescript-eslint/parser": "^4.18.0",
     "babel-eslint": "^10.1.0",
     "babel-loader": "^8.2.2",
     "babel-plugin-transform-react-remove-prop-types": "^0.4.24",

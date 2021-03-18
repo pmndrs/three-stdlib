@@ -5,7 +5,7 @@ import { Mesh } from 'three'
 import { Lights } from './Lights'
 import { Controls } from './Controls'
 
-export const Scene = () => {
+export const Scene = (): JSX.Element => {
   const meshRef = useRef<Mesh>()
 
   useFrame((_, delta) => {

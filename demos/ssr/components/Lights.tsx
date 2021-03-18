@@ -1,4 +1,4 @@
-export const Lights = () => {
+export const Lights = (): JSX.Element => {
   return (
     <group>
       <spotLight position={[-3, 6, -4]} intensity={10} angle={Math.PI / 4} decay={3.5} distance={35} penumbra={2} />

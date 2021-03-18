@@ -598,7 +598,7 @@ export function computeMorphedAttributes(object: Mesh | Line | Points): Computed
     b: number,
     c: number,
     modifiedAttributeArray: Float32Array,
-  ) {
+  ): void {
     _vA.fromBufferAttribute(attribute, a)
     _vB.fromBufferAttribute(attribute, b)
     _vC.fromBufferAttribute(attribute, c)

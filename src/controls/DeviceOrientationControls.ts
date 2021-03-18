@@ -11,7 +11,7 @@ class DeviceOrientationControls extends EventDispatcher {
   private EPS = 0.000001
 
   enabled = true
-  deviceOrientation = { alpha: 0, beta: 0, gamma: 0 }
+  deviceOrientation: Partial<DeviceOrientationEvent> = { alpha: 0, beta: 0, gamma: 0 }
   screenOrientation: string | number = 0
   alphaOffset = 0 // radians
 
@@ -24,11 +24,11 @@ class DeviceOrientationControls extends EventDispatcher {
     this.connect()
   }
 
-  private onDeviceOrientationChangeEvent = (event: any) => {
+  private onDeviceOrientationChangeEvent = (event: DeviceOrientationEvent): void => {
     this.deviceOrientation = event
   }
 
-  private onScreenOrientationChangeEvent = () => {
+  private onScreenOrientationChangeEvent = (): void => {
     this.screenOrientation = window.orientation || 0
   }
 
@@ -44,14 +44,14 @@ class DeviceOrientationControls extends EventDispatcher {
     beta: number,
     gamma: number,
     orient: number,
-  ) => {
+  ): void => {
     this.euler.set(beta, alpha, -gamma, 'YXZ') // 'ZXY' for the device, but 'YXZ' for us
     quaternion.setFromEuler(this.euler) // orient the device
     quaternion.multiply(this.q1) // camera looks out the back of the device, not the top
     quaternion.multiply(this.q0.setFromAxisAngle(this.zee, -orient)) // adjust for screen orientation
   }
 
-  connect = () => {
+  connect = (): void => {
     this.onScreenOrientationChangeEvent() // run once on load
 
     // iOS 13+
@@ -78,7 +78,7 @@ class DeviceOrientationControls extends EventDispatcher {
     this.enabled = true
   }
 
-  disconnect = () => {
+  disconnect = (): void => {
     window.removeEventListener('orientationchange', this.onScreenOrientationChangeEvent)
     window.removeEventListener('deviceorientation', this.onDeviceOrientationChangeEvent)
 
@@ -86,7 +86,7 @@ class DeviceOrientationControls extends EventDispatcher {
   }
 
   private lastQuaternion = new Quaternion()
-  update = () => {
+  update = (): void => {
     if (this.enabled === false) return
 
     const device = this.deviceOrientation
@@ -106,7 +106,7 @@ class DeviceOrientationControls extends EventDispatcher {
     }
   }
 
-  dispose = () => this.disconnect()
+  dispose = (): void => this.disconnect()
 }
 
 export { DeviceOrientationControls }

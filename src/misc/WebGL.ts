@@ -1,5 +1,5 @@
 export const WEBGL = {
-  isWebGLAvailable: function () {
+  isWebGLAvailable: function (): boolean {
     try {
       const canvas = document.createElement('canvas')
       return !!(window.WebGLRenderingContext && (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')))
@@ -8,7 +8,7 @@ export const WEBGL = {
     }
   },
 
-  isWebGL2Available: function () {
+  isWebGL2Available: function (): boolean {
     try {
       const canvas = document.createElement('canvas')
       return !!(window.WebGL2RenderingContext && canvas.getContext('webgl2'))
@@ -17,15 +17,15 @@ export const WEBGL = {
     }
   },
 
-  getWebGLErrorMessage: function () {
+  getWebGLErrorMessage: function (): HTMLDivElement {
     return this.getErrorMessage(1)
   },
 
-  getWebGL2ErrorMessage: function () {
+  getWebGL2ErrorMessage: function (): HTMLDivElement {
     return this.getErrorMessage(2)
   },
 
-  getErrorMessage: function (version: 1 | 2) {
+  getErrorMessage: function (version: 1 | 2): HTMLDivElement {
     const names = {
       1: 'WebGL',
       2: 'WebGL 2',

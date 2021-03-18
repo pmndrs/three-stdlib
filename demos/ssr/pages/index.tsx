@@ -3,7 +3,7 @@ import styled from 'styled-components'
 
 import { Scene } from '../components/Scene'
 
-export default function IndexPage() {
+export default function IndexPage(): JSX.Element {
   return (
     <Root>
       <Canvas>

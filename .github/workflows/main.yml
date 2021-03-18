@@ -24,7 +24,7 @@ jobs:
         # there's a build step for post installation so we don't run build when "testing"
         run: yarn install
       - name: Lint test 🧪
-        run: yarn eslint:ci
+        run: yarn lint:ci
       - name: Prettier test
         run: yarn prettier:check
       - name: Type check

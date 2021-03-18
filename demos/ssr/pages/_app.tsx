@@ -1,5 +1,6 @@
 import React from 'react'
 import { createGlobalStyle } from 'styled-components'
+import type { AppProps } from 'next/app'
 
 const GlobalStyle = createGlobalStyle`
     *,
@@ -45,7 +46,7 @@ const GlobalStyle = createGlobalStyle`
     }
 `
 
-const App = ({ Component, pageProps }) => {
+const App = ({ Component, pageProps }: AppProps): JSX.Element => {
   return (
     <>
       <Component {...pageProps} />

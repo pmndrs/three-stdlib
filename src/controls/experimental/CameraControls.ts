@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import {
   EventDispatcher,
   MOUSE,
@@ -11,11 +12,11 @@ import {
   Vector3,
 } from 'three'
 
-type CHANGE_EVENT = {
+export type CHANGE_EVENT = {
   type: 'change' | 'start' | 'end'
 }
 
-enum STATE {
+export enum STATE {
   NONE = -1,
   ROTATE = 0,
   DOLLY = 1,
@@ -212,18 +213,18 @@ class CameraControls extends EventDispatcher {
     this.saveState()
   }
 
-  getPolarAngle = () => this.spherical.phi
+  getPolarAngle = (): number => this.spherical.phi
 
-  getAzimuthalAngle = () => this.spherical.theta
+  getAzimuthalAngle = (): number => this.spherical.theta
 
-  saveState = () => {
+  saveState = (): void => {
     this.target0.copy(this.target)
     this.position0.copy(this.object.position)
     this.quaternion0.copy(this.object.quaternion)
     this.zoom0 = this.object.zoom
   }
 
-  reset = () => {
+  reset = (): void => {
     this.target.copy(this.target0)
     this.object.position.copy(this.position0)
     this.object.quaternion.copy(this.quaternion0)
@@ -237,7 +238,7 @@ class CameraControls extends EventDispatcher {
     this.state = STATE.NONE
   }
 
-  dispose = () => {
+  dispose = (): void => {
     this.domElement.removeEventListener('contextmenu', this.onContextMenu, false)
     this.domElement.removeEventListener('mousedown', this.onMouseDown, false)
     this.domElement.removeEventListener('wheel', this.onMouseWheel, false)
@@ -254,7 +255,7 @@ class CameraControls extends EventDispatcher {
     //this.dispatchEvent( { type: 'dispose' } ); // should this be added here?
   }
 
-  private update = () => {
+  private update = (): boolean => {
     const position = this.object.position
 
     this.offset.copy(position).sub(this.target)
@@ -373,22 +374,26 @@ class CameraControls extends EventDispatcher {
     return false
   }
 
-  private getAutoRotationAngle = () => ((2 * Math.PI) / 60 / 60) * this.autoRotateSpeed
+  private getAutoRotationAngle = (): number => ((2 * Math.PI) / 60 / 60) * this.autoRotateSpeed
 
-  private getZoomScale = () => Math.pow(0.95, this.zoomSpeed)
+  private getZoomScale = (): number => Math.pow(0.95, this.zoomSpeed)
 
-  private rotateLeft = (angle: number) => (this.sphericalDelta.theta -= angle)
+  private rotateLeft = (angle: number): void => {
+    this.sphericalDelta.theta -= angle
+  }
 
-  private rotateUp = (angle: number) => (this.sphericalDelta.phi -= angle)
+  private rotateUp = (angle: number): void => {
+    this.sphericalDelta.phi -= angle
+  }
 
-  private panLeft = (distance: number, objectMatrix: Matrix4) => {
+  private panLeft = (distance: number, objectMatrix: Matrix4): void => {
     this.v.setFromMatrixColumn(objectMatrix, 0) // get X column of objectMatrix
     this.v.multiplyScalar(-distance)
 
     this.panOffset.add(this.v)
   }
 
-  private panUp = (distance: number, objectMatrix: Matrix4) => {
+  private panUp = (distance: number, objectMatrix: Matrix4): void => {
     if (this.screenSpacePanning === true) {
       this.v.setFromMatrixColumn(objectMatrix, 1)
     } else {
@@ -402,7 +407,7 @@ class CameraControls extends EventDispatcher {
   }
 
   // deltaX and deltaY are in pixels; right and down are positive
-  private pan = (deltaX: number, deltaY: number) => {
+  private pan = (deltaX: number, deltaY: number): void => {
     const element = this.domElement
 
     if (this.object instanceof PerspectiveCamera) {
@@ -434,7 +439,7 @@ class CameraControls extends EventDispatcher {
     }
   }
 
-  private dollyIn = (dollyScale: number) => {
+  private dollyIn = (dollyScale: number): void => {
     // TODO: replace w/.isPerspectiveCamera ?
     if (this.object instanceof PerspectiveCamera) {
       this.scale /= dollyScale
@@ -449,7 +454,7 @@ class CameraControls extends EventDispatcher {
     }
   }
 
-  private dollyOut = (dollyScale: number) => {
+  private dollyOut = (dollyScale: number): void => {
     // TODO: replace w/.isPerspectiveCamera ?
     if (this.object instanceof PerspectiveCamera) {
       this.scale *= dollyScale
@@ -466,20 +471,20 @@ class CameraControls extends EventDispatcher {
 
   // event callbacks - update the object state
 
-  private handleMouseDownRotate = (event: MouseEvent) => {
+  private handleMouseDownRotate = (event: MouseEvent): void => {
     this.rotateStart.set(event.clientX, event.clientY)
   }
 
   // TODO: confirm if worthwhile to return the Vector2 instead of void
-  private handleMouseDownDolly = (event: MouseEvent) => {
+  private handleMouseDownDolly = (event: MouseEvent): void => {
     this.dollyStart.set(event.clientX, event.clientY)
   }
 
-  private handleMouseDownPan = (event: MouseEvent) => {
+  private handleMouseDownPan = (event: MouseEvent): void => {
     this.panStart.set(event.clientX, event.clientY)
   }
 
-  private handleMouseMoveRotate = (event: MouseEvent) => {
+  private handleMouseMoveRotate = (event: MouseEvent): void => {
     this.rotateEnd.set(event.clientX, event.clientY)
 
     this.rotateDelta.subVectors(this.rotateEnd, this.rotateStart).multiplyScalar(this.rotateSpeed)
@@ -495,7 +500,7 @@ class CameraControls extends EventDispatcher {
     this.update()
   }
 
-  private handleMouseMoveDolly = (event: MouseEvent) => {
+  private handleMouseMoveDolly = (event: MouseEvent): void => {
     this.dollyEnd.set(event.clientX, event.clientY)
 
     this.dollyDelta.subVectors(this.dollyEnd, this.dollyStart)
@@ -511,7 +516,7 @@ class CameraControls extends EventDispatcher {
     this.update()
   }
 
-  private handleMouseMovePan = (event: MouseEvent) => {
+  private handleMouseMovePan = (event: MouseEvent): void => {
     this.panEnd.set(event.clientX, event.clientY)
 
     this.panDelta.subVectors(this.panEnd, this.panStart).multiplyScalar(this.panSpeed)
@@ -523,11 +528,11 @@ class CameraControls extends EventDispatcher {
     this.update()
   }
 
-  private handleMouseUp(/*event*/) {
+  private handleMouseUp(/*event*/): void {
     // no-op
   }
 
-  private handleMouseWheel = (event: WheelEvent) => {
+  private handleMouseWheel = (event: WheelEvent): void => {
     if (event.deltaY < 0) {
       this.dollyOut(this.getZoomScale())
     } else if (event.deltaY > 0) {
@@ -537,7 +542,7 @@ class CameraControls extends EventDispatcher {
     this.update()
   }
 
-  private handleKeyDown = (event: KeyboardEvent) => {
+  private handleKeyDown = (event: KeyboardEvent): void => {
     let needsUpdate = false
 
     // TODO: keyCode deprecated?
@@ -571,7 +576,7 @@ class CameraControls extends EventDispatcher {
     }
   }
 
-  private handleTouchStartRotate = (event: TouchEvent) => {
+  private handleTouchStartRotate = (event: TouchEvent): void => {
     if (event.touches.length == 1) {
       this.rotateStart.set(event.touches[0].pageX, event.touches[0].pageY)
     } else {
@@ -582,7 +587,7 @@ class CameraControls extends EventDispatcher {
     }
   }
 
-  private handleTouchStartPan = (event: TouchEvent) => {
+  private handleTouchStartPan = (event: TouchEvent): void => {
     if (event.touches.length == 1) {
       this.panStart.set(event.touches[0].pageX, event.touches[0].pageY)
     } else {
@@ -593,7 +598,7 @@ class CameraControls extends EventDispatcher {
     }
   }
 
-  private handleTouchStartDolly = (event: TouchEvent) => {
+  private handleTouchStartDolly = (event: TouchEvent): void => {
     const dx = event.touches[0].pageX - event.touches[1].pageX
     const dy = event.touches[0].pageY - event.touches[1].pageY
 
@@ -602,19 +607,19 @@ class CameraControls extends EventDispatcher {
     this.dollyStart.set(0, distance)
   }
 
-  private handleTouchStartDollyPan = (event: TouchEvent) => {
+  private handleTouchStartDollyPan = (event: TouchEvent): void => {
     if (this.enableZoom) this.handleTouchStartDolly(event)
 
     if (this.enablePan) this.handleTouchStartPan(event)
   }
 
-  private handleTouchStartDollyRotate = (event: TouchEvent) => {
+  private handleTouchStartDollyRotate = (event: TouchEvent): void => {
     if (this.enableZoom) this.handleTouchStartDolly(event)
 
     if (this.enableRotate) this.handleTouchStartRotate(event)
   }
 
-  private handleTouchMoveRotate = (event: TouchEvent) => {
+  private handleTouchMoveRotate = (event: TouchEvent): void => {
     if (event.touches.length == 1) {
       this.rotateEnd.set(event.touches[0].pageX, event.touches[0].pageY)
     } else {
@@ -635,7 +640,7 @@ class CameraControls extends EventDispatcher {
     this.rotateStart.copy(this.rotateEnd)
   }
 
-  private handleTouchMovePan = (event: TouchEvent) => {
+  private handleTouchMovePan = (event: TouchEvent): void => {
     if (event.touches.length == 1) {
       this.panEnd.set(event.touches[0].pageX, event.touches[0].pageY)
     } else {
@@ -652,7 +657,7 @@ class CameraControls extends EventDispatcher {
     this.panStart.copy(this.panEnd)
   }
 
-  private handleTouchMoveDolly = (event: TouchEvent) => {
+  private handleTouchMoveDolly = (event: TouchEvent): void => {
     const dx = event.touches[0].pageX - event.touches[1].pageX
     const dy = event.touches[0].pageY - event.touches[1].pageY
 
@@ -667,19 +672,19 @@ class CameraControls extends EventDispatcher {
     this.dollyStart.copy(this.dollyEnd)
   }
 
-  private handleTouchMoveDollyPan = (event: TouchEvent) => {
+  private handleTouchMoveDollyPan = (event: TouchEvent): void => {
     if (this.enableZoom) this.handleTouchMoveDolly(event)
 
     if (this.enablePan) this.handleTouchMovePan(event)
   }
 
-  private handleTouchMoveDollyRotate = (event: TouchEvent) => {
+  private handleTouchMoveDollyRotate = (event: TouchEvent): void => {
     if (this.enableZoom) this.handleTouchMoveDolly(event)
 
     if (this.enableRotate) this.handleTouchMoveRotate(event)
   }
 
-  private handleTouchEnd(/*event*/) {
+  private handleTouchEnd(/*event*/): void {
     // no-op
   }
 
@@ -687,7 +692,7 @@ class CameraControls extends EventDispatcher {
   // event handlers - FSM: listen for events and reset state
   //
 
-  private onMouseDown = (event: MouseEvent) => {
+  private onMouseDown = (event: MouseEvent): void => {
     if (this.enabled === false) return
 
     // Prevent the browser from scrolling.
@@ -774,7 +779,7 @@ class CameraControls extends EventDispatcher {
     }
   }
 
-  private onMouseMove = (event: MouseEvent) => {
+  private onMouseMove = (event: MouseEvent): void => {
     if (this.enabled === false) return
 
     event.preventDefault()
@@ -803,7 +808,7 @@ class CameraControls extends EventDispatcher {
     }
   }
 
-  private onMouseUp = (event: MouseEvent) => {
+  private onMouseUp = (): void => {
     if (this.enabled === false) return
 
     // this.handleMouseUp()
@@ -816,7 +821,7 @@ class CameraControls extends EventDispatcher {
     this.state = STATE.NONE
   }
 
-  private onMouseWheel = (event: WheelEvent) => {
+  private onMouseWheel = (event: WheelEvent): void => {
     if (
       this.enabled === false ||
       this.enableZoom === false ||
@@ -834,13 +839,13 @@ class CameraControls extends EventDispatcher {
     this.dispatchEvent(this.endEvent)
   }
 
-  private onKeyDown = (event: KeyboardEvent) => {
+  private onKeyDown = (event: KeyboardEvent): void => {
     if (this.enabled === false || this.enableKeys === false || this.enablePan === false) return
 
     this.handleKeyDown(event)
   }
 
-  private onTouchStart = (event: TouchEvent) => {
+  private onTouchStart = (event: TouchEvent): void => {
     if (this.enabled === false) return
 
     event.preventDefault()
@@ -907,7 +912,7 @@ class CameraControls extends EventDispatcher {
     }
   }
 
-  private onTouchMove = (event: TouchEvent) => {
+  private onTouchMove = (event: TouchEvent): void => {
     if (this.enabled === false) return
 
     event.preventDefault()
@@ -954,7 +959,7 @@ class CameraControls extends EventDispatcher {
     }
   }
 
-  private onTouchEnd = (event: TouchEvent) => {
+  private onTouchEnd = (): void => {
     if (this.enabled === false) return
 
     // this.handleTouchEnd()
@@ -964,7 +969,7 @@ class CameraControls extends EventDispatcher {
     this.state = STATE.NONE
   }
 
-  private onContextMenu = (event: Event) => {
+  private onContextMenu = (event: Event): void => {
     if (this.enabled === false) return
 
     event.preventDefault()

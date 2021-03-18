@@ -1,6 +1,6 @@
 import { Camera, EventDispatcher, Quaternion, Vector3 } from 'three'
 
-function contextmenu(event: Event) {
+function contextmenu(event: Event): void {
   event.preventDefault()
 }
 
@@ -56,10 +56,9 @@ class FlyControls extends EventDispatcher {
     }
 
     this.domElement.addEventListener('contextmenu', contextmenu)
-
-    this.domElement.addEventListener('mousemove', this.mousemove as any)
-    this.domElement.addEventListener('mousedown', this.mousedown as any)
-    this.domElement.addEventListener('mouseup', this.mouseup as any)
+    ;(this.domElement as HTMLElement).addEventListener('mousemove', this.mousemove)
+    ;(this.domElement as HTMLElement).addEventListener('mousedown', this.mousedown)
+    ;(this.domElement as HTMLElement).addEventListener('mouseup', this.mouseup)
 
     window.addEventListener('keydown', this.keydown)
     window.addEventListener('keyup', this.keyup)
@@ -68,7 +67,7 @@ class FlyControls extends EventDispatcher {
     this.updateRotationVector()
   }
 
-  private keydown = (event: KeyboardEvent) => {
+  private keydown = (event: KeyboardEvent): void => {
     if (event.altKey) {
       return
     }
@@ -128,7 +127,7 @@ class FlyControls extends EventDispatcher {
     this.updateRotationVector()
   }
 
-  private keyup = (event: KeyboardEvent) => {
+  private keyup = (event: KeyboardEvent): void => {
     switch (event.code) {
       case 'ShiftLeft':
       case 'ShiftRight':
@@ -182,7 +181,7 @@ class FlyControls extends EventDispatcher {
     this.updateRotationVector()
   }
 
-  private mousedown = (event: MouseEvent) => {
+  private mousedown = (event: MouseEvent): void => {
     if (this.domElement !== document && !(this.domElement instanceof Document)) {
       this.domElement.focus()
     }
@@ -205,7 +204,7 @@ class FlyControls extends EventDispatcher {
     }
   }
 
-  private mousemove = (event: MouseEvent) => {
+  private mousemove = (event: MouseEvent): void => {
     if (!this.dragToLook || this.mouseStatus > 0) {
       const container = this.getContainerDimensions()
       const halfWidth = container.size[0] / 2
@@ -218,7 +217,7 @@ class FlyControls extends EventDispatcher {
     }
   }
 
-  private mouseup = (event: MouseEvent) => {
+  private mouseup = (event: MouseEvent): void => {
     event.preventDefault()
 
     if (this.dragToLook) {
@@ -244,7 +243,7 @@ class FlyControls extends EventDispatcher {
   private lastQuaternion = new Quaternion()
   private lastPosition = new Vector3()
 
-  public update = (delta: number) => {
+  public update = (delta: number): void => {
     const moveMult = delta * this.movementSpeed
     const rotMult = delta * this.rollSpeed
 
@@ -267,7 +266,7 @@ class FlyControls extends EventDispatcher {
     }
   }
 
-  private updateMovementVector = () => {
+  private updateMovementVector = (): void => {
     const forward = this.moveState.forward || (this.autoForward && !this.moveState.back) ? 1 : 0
 
     this.moveVector.x = -this.moveState.left + this.moveState.right
@@ -275,13 +274,16 @@ class FlyControls extends EventDispatcher {
     this.moveVector.z = -forward + this.moveState.back
   }
 
-  private updateRotationVector = () => {
+  private updateRotationVector = (): void => {
     this.rotationVector.x = -this.moveState.pitchDown + this.moveState.pitchUp
     this.rotationVector.y = -this.moveState.yawRight + this.moveState.yawLeft
     this.rotationVector.z = -this.moveState.rollRight + this.moveState.rollLeft
   }
 
-  private getContainerDimensions = () => {
+  private getContainerDimensions = (): {
+    size: number[]
+    offset: number[]
+  } => {
     if (this.domElement != document && !(this.domElement instanceof Document)) {
       return {
         size: [this.domElement.offsetWidth, this.domElement.offsetHeight],
@@ -295,11 +297,11 @@ class FlyControls extends EventDispatcher {
     }
   }
 
-  public dispose = () => {
+  public dispose = (): void => {
     this.domElement.removeEventListener('contextmenu', contextmenu)
-    this.domElement.removeEventListener('mousemove', this.mousemove as any)
-    this.domElement.removeEventListener('mousedown', this.mousedown as any)
-    this.domElement.removeEventListener('mouseup', this.mouseup as any)
+    ;(this.domElement as HTMLElement).removeEventListener('mousemove', this.mousemove)
+    ;(this.domElement as HTMLElement).removeEventListener('mousedown', this.mousedown)
+    ;(this.domElement as HTMLElement).removeEventListener('mouseup', this.mouseup)
 
     window.removeEventListener('keydown', this.keydown)
     window.removeEventListener('keyup', this.keyup)

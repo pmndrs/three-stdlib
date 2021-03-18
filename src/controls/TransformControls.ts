@@ -20,6 +20,7 @@ import {
   Quaternion,
   Raycaster,
   SphereGeometry,
+  Intersection,
   TorusGeometry,
   Vector3,
 } from 'three'
@@ -151,7 +152,7 @@ class TransformControls extends Object3D {
     }
 
     // Defined getter, setter and store for a property
-    function defineProperty<TValue>(propName: string, defaultValue: TValue) {
+    function defineProperty<TValue>(propName: string, defaultValue: TValue): void {
       Object.defineProperty(this, propName, {
         get: function () {
           return this[propName]
@@ -174,7 +175,11 @@ class TransformControls extends Object3D {
     }
   }
 
-  private intersectObjectWithRay = (object: Object3D, raycaster: Raycaster, includeInvisible?: boolean) => {
+  private intersectObjectWithRay = (
+    object: Object3D,
+    raycaster: Raycaster,
+    includeInvisible?: boolean,
+  ): false | Intersection => {
     const allIntersections = raycaster.intersectObject(object, true)
 
     for (let i = 0; i < allIntersections.length; i++) {
@@ -203,7 +208,7 @@ class TransformControls extends Object3D {
     return this
   }
 
-  public updateMatrixWorld = () => {
+  public updateMatrixWorld = (): void => {
     if (this._object !== undefined) {
       this._object.updateMatrixWorld()
 
@@ -227,7 +232,7 @@ class TransformControls extends Object3D {
     Object3D.prototype.updateMatrixWorld.call(this)
   }
 
-  private pointerHover = (pointer: TransformControlsPointerObject) => {
+  private pointerHover = (pointer: TransformControlsPointerObject): void => {
     if (this._object === undefined || this._dragging === true) return
 
     this.raycaster.setFromCamera(pointer, this._camera)
@@ -241,7 +246,7 @@ class TransformControls extends Object3D {
     }
   }
 
-  private pointerDown = (pointer: TransformControlsPointerObject) => {
+  private pointerDown = (pointer: TransformControlsPointerObject): void => {
     if (this._object === undefined || this._dragging === true || pointer.button !== 0) return
 
     if (this._axis !== null) {
@@ -287,7 +292,7 @@ class TransformControls extends Object3D {
     }
   }
 
-  private pointerMove = (pointer: TransformControlsPointerObject) => {
+  private pointerMove = (pointer: TransformControlsPointerObject): void => {
     const axis = this._axis
     const mode = this._mode
     const object = this._object
@@ -472,7 +477,7 @@ class TransformControls extends Object3D {
     this.dispatchEvent(this.objectChangeEvent)
   }
 
-  private pointerUp = (pointer: TransformControlsPointerObject) => {
+  private pointerUp = (pointer: TransformControlsPointerObject): void => {
     if (pointer.button !== 0) return
 
     if (this._dragging && this._axis !== null) {
@@ -506,7 +511,7 @@ class TransformControls extends Object3D {
     }
   }
 
-  private onPointerHover = (event: Event) => {
+  private onPointerHover = (event: Event): void => {
     if (!this._enabled) return
 
     switch ((event as PointerEvent).pointerType) {
@@ -517,7 +522,7 @@ class TransformControls extends Object3D {
     }
   }
 
-  private onPointerDown = (event: Event) => {
+  private onPointerDown = (event: Event): void => {
     if (!this._enabled) return
     ;(this.domElement as HTMLElement).style.touchAction = 'none' // disable touch scroll
     this.domElement.ownerDocument?.addEventListener('pointermove', this.onPointerMove)
@@ -526,13 +531,13 @@ class TransformControls extends Object3D {
     this.pointerDown(this.getPointer(event))
   }
 
-  private onPointerMove = (event: Event) => {
+  private onPointerMove = (event: Event): void => {
     if (!this._enabled) return
 
     this.pointerMove(this.getPointer(event))
   }
 
-  private onPointerUp = (event: Event) => {
+  private onPointerUp = (event: Event): void => {
     if (!this._enabled) return
     ;(this.domElement as HTMLElement).style.touchAction = ''
     this.domElement.ownerDocument?.removeEventListener('pointermove', this.onPointerMove)
@@ -540,29 +545,29 @@ class TransformControls extends Object3D {
     this.pointerUp(this.getPointer(event))
   }
 
-  getMode = () => this._mode
+  getMode = (): TransformControls['_mode'] => this._mode
 
-  setMode = (mode: 'translate' | 'rotate' | 'scale') => {
+  setMode = (mode: TransformControls['_mode']): void => {
     this._mode = mode
   }
 
-  setTranslationSnap = (translationSnap: number) => {
+  setTranslationSnap = (translationSnap: number): void => {
     this._translationSnap = translationSnap
   }
 
-  setRotationSnap = (rotationSnap: number) => {
+  setRotationSnap = (rotationSnap: number): void => {
     this._rotationSnap = rotationSnap
   }
 
-  setScaleSnap = (scaleSnap: number) => {
+  setScaleSnap = (scaleSnap: number): void => {
     this._scaleSnap = scaleSnap
   }
 
-  setSize = (size: number) => {
+  setSize = (size: number): void => {
     this._size = size
   }
 
-  setSpace = (space: string) => {
+  setSpace = (space: string): void => {
     this._space = space
   }
 
@@ -572,7 +577,7 @@ class TransformControls extends Object3D {
     )
   }
 
-  public dispose = () => {
+  public dispose = (): void => {
     this.domElement.removeEventListener('pointerdown', this.onPointerDown)
     this.domElement.removeEventListener('pointermove', this.onPointerHover)
     this.domElement.ownerDocument?.removeEventListener('pointermove', this.onPointerMove)
@@ -728,7 +733,7 @@ class TransformControlsGizmo extends Object3D {
     const lineGeometry = new BufferGeometry()
     lineGeometry.setAttribute('position', new Float32BufferAttribute([0, 0, 0, 1, 0, 0], 3))
 
-    const CircleGeometry = (radius: number, arc: number) => {
+    const CircleGeometry = (radius: number, arc: number): BufferGeometry => {
       const geometry = new BufferGeometry()
       const vertices = []
 
@@ -743,7 +748,7 @@ class TransformControlsGizmo extends Object3D {
 
     // Special geometry for transform helper. If scaled with position vector it spans from [0,0,0] to position
 
-    const TranslateHelperGeometry = () => {
+    const TranslateHelperGeometry = (): BufferGeometry => {
       const geometry = new BufferGeometry()
 
       geometry.setAttribute('position', new Float32BufferAttribute([0, 0, 0, 1, 1, 1], 3))
@@ -918,7 +923,7 @@ class TransformControlsGizmo extends Object3D {
 
     // Creates an Object3D with gizmos described in custom hierarchy definition.
     // this is nearly impossible to Type so i'm leaving it
-    const setupGizmo = (gizmoMap: any) => {
+    const setupGizmo = (gizmoMap: any): Object3D => {
       const gizmo = new Object3D()
 
       for (let name in gizmoMap) {
@@ -986,7 +991,7 @@ class TransformControlsGizmo extends Object3D {
   }
 
   // updateMatrixWorld will update transformations and appearance of individual handles
-  public updateMatrixWorld = () => {
+  public updateMatrixWorld = (): void => {
     let space = this._space
 
     if (this._mode === 'scale') space = 'local' // scale always oriented to local rotation
@@ -1318,7 +1323,7 @@ class TransformControlsPlane extends Mesh<PlaneGeometry, MeshBasicMaterial> {
   private _mode: 'translate' | 'rotate' | 'scale' = 'translate'
   private _space = 'world'
 
-  updateMatrixWorld = () => {
+  updateMatrixWorld = (): void => {
     let space = this._space
 
     this.position.copy(this._worldPosition)

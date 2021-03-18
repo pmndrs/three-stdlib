@@ -116,11 +116,11 @@ export function modifyShader<TMaterial extends Material = Material>(
   material: ModifiedMaterial<TMaterial>,
   uniforms: CurveModifierUniforms,
   numberOfCurves = 1,
-) {
+): void {
   if (material.__ok) return
   material.__ok = true
 
-  material.onBeforeCompile = (shader: Shader & { __modified: boolean }) => {
+  material.onBeforeCompile = (shader: Shader & { __modified: boolean }): void => {
     if (shader.__modified) return
     shader.__modified = true
 

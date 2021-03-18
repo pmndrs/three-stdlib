@@ -74,7 +74,7 @@ class TessellateModifier {
     let iteration = 0
     let tessellating = true
 
-    function addTriangle(a: number, b: number, c: number) {
+    function addTriangle(a: number, b: number, c: number): void {
       const v1 = vs[a]
       const v2 = vs[b]
       const v3 = vs[c]

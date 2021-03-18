@@ -95,7 +95,7 @@ class EdgeSplitModifier {
     return result
   }
 
-  private edgeSplit = (indexes: number[], cutOff: number, original: number | null = null) => {
+  private edgeSplit = (indexes: number[], cutOff: number, original: number | null = null): void => {
     if (indexes.length === 0) return
 
     const groupResults: EdgeSplitToGroupsResult[] = []
@@ -124,7 +124,7 @@ class EdgeSplitModifier {
     }
   }
 
-  public modify = (geometry: BufferGeometry, cutOffAngle: number, tryKeepNormals = true) => {
+  public modify = (geometry: BufferGeometry, cutOffAngle: number, tryKeepNormals = true): BufferGeometry => {
     let hadNormals = false
 
     if (geometry.attributes.normal) {

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import {
   Camera,
   EventDispatcher,
@@ -78,12 +79,10 @@ class OrbitControls extends EventDispatcher {
 
   getPolarAngle: () => number
   getAzimuthalAngle: () => number
-  // eslint-disable-next-line no-unused-vars
-  listenToKeyEvents: (domElement: any) => void
+  listenToKeyEvents: (domElement: HTMLElement) => void
   saveState: () => void
   reset: () => void
   update: () => void
-  // eslint-disable-next-line no-unused-vars
   connect: (domElement: HTMLElement) => void
   dispose: () => void
 
@@ -101,22 +100,22 @@ class OrbitControls extends EventDispatcher {
     // public methods
     //
 
-    this.getPolarAngle = () => spherical.phi
+    this.getPolarAngle = (): number => spherical.phi
 
-    this.getAzimuthalAngle = () => spherical.theta
+    this.getAzimuthalAngle = (): number => spherical.theta
 
-    this.listenToKeyEvents = (domElement) => {
+    this.listenToKeyEvents = (domElement: HTMLElement): void => {
       domElement.addEventListener('keydown', onKeyDown)
       this._domElementKeyEvents = domElement
     }
 
-    this.saveState = () => {
+    this.saveState = (): void => {
       scope.target0.copy(scope.target)
       scope.position0.copy(scope.object.position)
       scope.zoom0 = scope.object instanceof PerspectiveCamera ? scope.object.zoom : 1
     }
 
-    this.reset = () => {
+    this.reset = (): void => {
       scope.target.copy(scope.target0)
       scope.object.position.copy(scope.position0)
       if (scope.object instanceof PerspectiveCamera) {
@@ -132,7 +131,7 @@ class OrbitControls extends EventDispatcher {
     }
 
     // this method is exposed, but perhaps it would be better if we can make it private...
-    this.update = (() => {
+    this.update = ((): (() => void) => {
       const offset = new Vector3()
 
       // so camera.up is the orbit axis
@@ -144,7 +143,7 @@ class OrbitControls extends EventDispatcher {
 
       const twoPI = 2 * Math.PI
 
-      return function update() {
+      return function update(): boolean {
         const position = scope.object.position
 
         offset.copy(position).sub(scope.target)
@@ -248,7 +247,7 @@ class OrbitControls extends EventDispatcher {
     })()
 
     // https://github.com/mrdoob/three.js/issues/20575
-    this.connect = (domElement: HTMLElement) => {
+    this.connect = (domElement: HTMLElement): void => {
       if ((domElement as any) === document) {
         console.error(
           'THREE.OrbitControls: "document" should not be used as the target "domElement". Please use "renderer.domElement" instead.',
@@ -263,7 +262,7 @@ class OrbitControls extends EventDispatcher {
       scope.domElement.addEventListener('touchmove', onTouchMove)
     }
 
-    this.dispose = () => {
+    this.dispose = (): void => {
       scope.domElement?.removeEventListener('contextmenu', onContextMenu)
       scope.domElement?.removeEventListener('pointerdown', onPointerDown)
       scope.domElement?.removeEventListener('wheel', onMouseWheel)
@@ -323,19 +322,19 @@ class OrbitControls extends EventDispatcher {
     const dollyEnd = new Vector2()
     const dollyDelta = new Vector2()
 
-    function getAutoRotationAngle() {
+    function getAutoRotationAngle(): number {
       return ((2 * Math.PI) / 60 / 60) * scope.autoRotateSpeed
     }
 
-    function getZoomScale() {
+    function getZoomScale(): number {
       return Math.pow(0.95, scope.zoomSpeed)
     }
 
-    function rotateLeft(angle: number) {
+    function rotateLeft(angle: number): void {
       sphericalDelta.theta -= angle
     }
 
-    function rotateUp(angle: number) {
+    function rotateUp(angle: number): void {
       sphericalDelta.phi -= angle
     }
 

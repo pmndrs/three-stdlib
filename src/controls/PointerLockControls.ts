@@ -35,7 +35,7 @@ class PointerLockControls extends EventDispatcher {
     this.connect()
   }
 
-  private onMouseMove = (event: MouseEvent) => {
+  private onMouseMove = (event: MouseEvent): void => {
     if (this.isLocked === false) return
 
     const movementX = event.movementX || (event as any).mozMovementX || (event as any).webkitMovementX || 0
@@ -53,7 +53,7 @@ class PointerLockControls extends EventDispatcher {
     this.dispatchEvent(this.changeEvent)
   }
 
-  private onPointerlockChange = () => {
+  private onPointerlockChange = (): void => {
     if (this.domElement.ownerDocument.pointerLockElement === this.domElement) {
       this.dispatchEvent(this.lockEvent)
 
@@ -65,34 +65,34 @@ class PointerLockControls extends EventDispatcher {
     }
   }
 
-  private onPointerlockError = () => {
+  private onPointerlockError = (): void => {
     console.error('THREE.PointerLockControls: Unable to use Pointer Lock API')
   }
 
-  connect = () => {
+  connect = (): void => {
     this.domElement.ownerDocument.addEventListener('mousemove', this.onMouseMove)
     this.domElement.ownerDocument.addEventListener('pointerlockchange', this.onPointerlockChange)
     this.domElement.ownerDocument.addEventListener('pointerlockerror', this.onPointerlockError)
   }
 
-  disconnect = () => {
+  disconnect = (): void => {
     this.domElement.ownerDocument.removeEventListener('mousemove', this.onMouseMove)
     this.domElement.ownerDocument.removeEventListener('pointerlockchange', this.onPointerlockChange)
     this.domElement.ownerDocument.removeEventListener('pointerlockerror', this.onPointerlockError)
   }
 
-  dispose = () => {
+  dispose = (): void => {
     this.disconnect()
   }
 
-  private getObject = () =>
+  private getObject = (): Camera =>
     // retaining this method for backward compatibility
     this.camera
 
   private direction = new Vector3(0, 0, -1)
-  getDirection = (v: Vector3) => v.copy(this.direction).applyQuaternion(this.camera.quaternion)
+  getDirection = (v: Vector3): Vector3 => v.copy(this.direction).applyQuaternion(this.camera.quaternion)
 
-  moveForward = (distance: number) => {
+  moveForward = (distance: number): void => {
     // move forward parallel to the xz-plane
     // assumes this.camera.up is y-up
 
@@ -103,17 +103,17 @@ class PointerLockControls extends EventDispatcher {
     this.camera.position.addScaledVector(this.vec, distance)
   }
 
-  moveRight = (distance: number) => {
+  moveRight = (distance: number): void => {
     this.vec.setFromMatrixColumn(this.camera.matrix, 0)
 
     this.camera.position.addScaledVector(this.vec, distance)
   }
 
-  lock = () => {
+  lock = (): void => {
     this.domElement.requestPointerLock()
   }
 
-  unlock = () => {
+  unlock = (): void => {
     this.domElement.ownerDocument.exitPointerLock()
   }
 }
