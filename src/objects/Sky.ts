@@ -18,7 +18,7 @@ class Sky extends Mesh {
     super(new BoxGeometry(1, 1, 1), Sky.material)
   }
 
-  static SkyShader = {
+  public static SkyShader = {
     uniforms: {
       turbidity: { value: 2 },
       rayleigh: { value: 1 },
@@ -190,7 +190,7 @@ class Sky extends Mesh {
     ].join('\n'),
   }
 
-  static material = new ShaderMaterial({
+  public static material = new ShaderMaterial({
     name: 'SkyShader',
     fragmentShader: Sky.SkyShader.fragmentShader,
     vertexShader: Sky.SkyShader.vertexShader,

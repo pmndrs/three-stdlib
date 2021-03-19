@@ -39,11 +39,11 @@ class Vertex {
     this.collapseNeighbor = null // best candinate for collapsing
   }
 
-  addUniqueNeighbor(vertex: Vertex): void {
+  public addUniqueNeighbor(vertex: Vertex): void {
     pushIfUnique(this.neighbors, vertex)
   }
 
-  removeIfNonNeighbor(n: Vertex): void {
+  public removeIfNonNeighbor(n: Vertex): void {
     const neighbors = this.neighbors
     const faces = this.faces
 
@@ -63,9 +63,9 @@ class Triangle {
   private b: number
   private c: Number
 
-  v1: Vertex
-  v2: Vertex
-  v3: Vertex
+  public v1: Vertex
+  public v2: Vertex
+  public v3: Vertex
 
   public normal = new Vector3()
 
@@ -332,7 +332,7 @@ class SimplifyModifier {
     return least
   }
 
-  modify = (geometry: BufferGeometry, count: number): BufferGeometry => {
+  public modify = (geometry: BufferGeometry, count: number): BufferGeometry => {
     geometry = geometry.clone()
     const attributes = geometry.attributes
 

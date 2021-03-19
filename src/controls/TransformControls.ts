@@ -32,11 +32,11 @@ export interface TransformControlsPointerObject {
 }
 
 class TransformControls extends Object3D {
-  isTransformControls = true
+  public readonly isTransformControls = true
 
-  visible = false
+  public visible = false
 
-  domElement: HTMLElement | Document
+  private domElement: HTMLElement | Document
 
   private raycaster = new Raycaster()
 
@@ -100,10 +100,10 @@ class TransformControls extends Object3D {
   private _showZ = true
 
   // events
-  changeEvent = { type: 'change' }
-  mouseDownEvent = { type: 'mouseDown' }
-  mouseUpEvent = { type: 'mouseUp', mode: this._mode }
-  objectChangeEvent = { type: 'objectChange' }
+  private changeEvent = { type: 'change' }
+  private mouseDownEvent = { type: 'mouseDown' }
+  private mouseUpEvent = { type: 'mouseUp', mode: this._mode }
+  private objectChangeEvent = { type: 'objectChange' }
 
   constructor(camera: PerspectiveCamera | OrthographicCamera, domElement: HTMLElement) {
     super()
@@ -545,29 +545,29 @@ class TransformControls extends Object3D {
     this.pointerUp(this.getPointer(event))
   }
 
-  getMode = (): TransformControls['_mode'] => this._mode
+  public getMode = (): TransformControls['_mode'] => this._mode
 
-  setMode = (mode: TransformControls['_mode']): void => {
+  public setMode = (mode: TransformControls['_mode']): void => {
     this._mode = mode
   }
 
-  setTranslationSnap = (translationSnap: number): void => {
+  public setTranslationSnap = (translationSnap: number): void => {
     this._translationSnap = translationSnap
   }
 
-  setRotationSnap = (rotationSnap: number): void => {
+  public setRotationSnap = (rotationSnap: number): void => {
     this._rotationSnap = rotationSnap
   }
 
-  setScaleSnap = (scaleSnap: number): void => {
+  public setScaleSnap = (scaleSnap: number): void => {
     this._scaleSnap = scaleSnap
   }
 
-  setSize = (size: number): void => {
+  public setSize = (size: number): void => {
     this._size = size
   }
 
-  setSpace = (space: string): void => {
+  public setSpace = (space: string): void => {
     this._space = space
   }
 
@@ -603,8 +603,8 @@ type TransformControlsGizmoPrivateGizmos = {
 }
 
 class TransformControlsGizmo extends Object3D {
-  isTransformControlsGizmo = true
-  type = 'TransformControlsGizmo'
+  private isTransformControlsGizmo = true
+  public type = 'TransformControlsGizmo'
 
   private tempVector = new Vector3(0, 0, 0)
   private tempEuler = new Euler()
@@ -619,9 +619,9 @@ class TransformControlsGizmo extends Object3D {
   private unitY = new Vector3(0, 1, 0)
   private unitZ = new Vector3(0, 0, 1)
 
-  gizmo: TransformControlsGizmoPrivateGizmos
-  picker: TransformControlsGizmoPrivateGizmos
-  helper: TransformControlsGizmoPrivateGizmos
+  private gizmo: TransformControlsGizmoPrivateGizmos
+  public picker: TransformControlsGizmoPrivateGizmos
+  private helper: TransformControlsGizmoPrivateGizmos
 
   // these are set from parent class TransformControls
   private _rotationAxis = new Vector3()
@@ -1284,8 +1284,8 @@ class TransformControlsGizmo extends Object3D {
 }
 
 class TransformControlsPlane extends Mesh<PlaneGeometry, MeshBasicMaterial> {
-  isTransformControlsPlane = true
-  type = 'TransformControlsPlane'
+  private isTransformControlsPlane = true
+  public type = 'TransformControlsPlane'
 
   constructor() {
     super(
@@ -1323,7 +1323,7 @@ class TransformControlsPlane extends Mesh<PlaneGeometry, MeshBasicMaterial> {
   private _mode: 'translate' | 'rotate' | 'scale' = 'translate'
   private _space = 'world'
 
-  updateMatrixWorld = (): void => {
+  public updateMatrixWorld = (): void => {
     let space = this._space
 
     this.position.copy(this._worldPosition)

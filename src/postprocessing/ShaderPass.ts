@@ -7,7 +7,7 @@ class ShaderPass extends Pass {
   public material: ShaderMaterial
   public fsQuad: FullScreenQuad
 
-  public constructor(shader: ShaderMaterial | (Shader & { defines?: Object }), textureID = 'tDiffuse') {
+  constructor(shader: ShaderMaterial | (Shader & { defines?: Object }), textureID = 'tDiffuse') {
     super()
 
     this.textureID = textureID

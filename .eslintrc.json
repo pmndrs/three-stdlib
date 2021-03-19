@@ -36,6 +36,7 @@
     "import/namespace": "off",
     "import/default": "off",
     "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@typescript-eslint/explicit-member-accessibility": ["error", { "overrides": { "constructors": "no-public" } }],
     "no-unused-vars": ["off"],
     "no-var": "error",
     "react/jsx-uses-react": "error",

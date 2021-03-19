@@ -1,34 +1,34 @@
 import { EventDispatcher, MOUSE, Quaternion, Vector2, Vector3, PerspectiveCamera, OrthographicCamera } from 'three'
 
 class TrackballControls extends EventDispatcher {
-  enabled = true
+  public enabled = true
 
-  screen = { left: 0, top: 0, width: 0, height: 0 }
+  public screen = { left: 0, top: 0, width: 0, height: 0 }
 
-  rotateSpeed = 1.0
-  zoomSpeed = 1.2
-  panSpeed = 0.3
+  public rotateSpeed = 1.0
+  public zoomSpeed = 1.2
+  public panSpeed = 0.3
 
-  noRotate = false
-  noZoom = false
-  noPan = false
+  public noRotate = false
+  public noZoom = false
+  public noPan = false
 
-  staticMoving = false
-  dynamicDampingFactor = 0.2
+  public staticMoving = false
+  public dynamicDampingFactor = 0.2
 
-  minDistance = 0
-  maxDistance = Infinity
+  public minDistance = 0
+  public maxDistance = Infinity
 
-  keys: [number, number, number] = [65 /*A*/, 83 /*S*/, 68 /*D*/]
+  public keys: [number, number, number] = [65 /*A*/, 83 /*S*/, 68 /*D*/]
 
-  mouseButtons = {
+  public mouseButtons = {
     LEFT: MOUSE.ROTATE,
     MIDDLE: MOUSE.DOLLY,
     RIGHT: MOUSE.PAN,
   }
 
-  object: PerspectiveCamera | OrthographicCamera
-  domElement: HTMLElement
+  public object: PerspectiveCamera | OrthographicCamera
+  public domElement: HTMLElement
 
   private target = new Vector3()
 
