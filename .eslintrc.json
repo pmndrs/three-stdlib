@@ -36,7 +36,6 @@
     "import/namespace": "off",
     "import/default": "off",
     "@typescript-eslint/explicit-module-boundary-types": "off",
-    "@typescript-eslint/explicit-member-accessibility": ["error", { "overrides": { "constructors": "no-public" } }],
     "no-unused-vars": ["off"],
     "no-var": "error",
     "react/jsx-uses-react": "error",
@@ -73,7 +72,8 @@
       // enable the rule specifically for TypeScript files
       "files": ["*.ts", "*.tsx"],
       "rules": {
-        "@typescript-eslint/explicit-function-return-type": ["error", { "allowHigherOrderFunctions": true }]
+        "@typescript-eslint/explicit-function-return-type": ["error", { "allowHigherOrderFunctions": true }],
+        "@typescript-eslint/explicit-member-accessibility": ["error", { "overrides": { "constructors": "no-public" } }]
       }
     }
   ]

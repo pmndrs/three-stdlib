@@ -31,7 +31,7 @@ export const Default = () => {
     const spotLight = new SpotLight('white', 2, 35, Math.PI / 4, 2, 3.5)
     spotLight.position.set(-3, 6, -4)
 
-    const { scene } = useThree({
+    const { scene, renderer } = useThree({
       useFrame: (_, delta) => {
         mesh.rotation.x += delta
         mesh.rotation.y += delta
@@ -40,7 +40,11 @@ export const Default = () => {
 
     scene.background = new Color(0x0000ff).convertSRGBToLinear()
     scene.add(ambientLight, directionalLight, pointLight1, pointLight2, spotLight, mesh)
-  })
+
+    return () => {
+      renderer.dispose()
+    }
+  }, [])
 
   return ''
 }
