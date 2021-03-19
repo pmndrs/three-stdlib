@@ -1,0 +1,30 @@
+{
+  "name": "three-stdlib-ssr",
+  "version": "1.0.0",
+  "description": "three-stdlib ssr demo",
+  "main": "index.js",
+  "author": "Josh Ellis",
+  "license": "MIT",
+  "private": false,
+  "scripts": {
+    "dev": "next",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "next": "^10.0.7",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1",
+    "react-three-fiber": "^5.3.19",
+    "styled-components": "^5.2.1",
+    "three": "^0.126.1",
+    "three-stdlib": "file:../../dist"
+  },
+  "devDependencies": {
+    "@types/node": "^14.14.31",
+    "@types/react": "^17.0.2",
+    "@types/styled-components": "^5.1.7",
+    "babel-plugin-styled-components": "^1.12.0",
+    "typescript": "^4.2.2"
+  }
+}

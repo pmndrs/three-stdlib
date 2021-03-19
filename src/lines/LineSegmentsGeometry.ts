@@ -15,11 +15,11 @@ import {
 } from 'three'
 
 class LineSegmentsGeometry extends InstancedBufferGeometry {
-  isLineSegmentsGeometry = true
-  type = 'LineSegmentsGeometry'
+  public readonly isLineSegmentsGeometry = true
+  public type = 'LineSegmentsGeometry'
 
-  boundingBox: Box3 | null = null
-  boundingSphere: Sphere | null = null
+  public boundingBox: Box3 | null = null
+  public boundingSphere: Sphere | null = null
 
   constructor() {
     super()
@@ -33,7 +33,7 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
     this.setAttribute('uv', new Float32BufferAttribute(uvs, 2))
   }
 
-  applyMatrix4 = (matrix: Matrix4): this => {
+  public applyMatrix4 = (matrix: Matrix4): this => {
     const start = this.attributes.instanceStart
     const end = this.attributes.instanceEnd
 
@@ -56,7 +56,7 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
     return this
   }
 
-  setPositions = (array: number[] | Float32Array): this => {
+  public setPositions = (array: number[] | Float32Array): this => {
     let lineSegments
 
     if (array instanceof Float32Array) {
@@ -81,7 +81,7 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
     return this
   }
 
-  setColors = (array: number[] | Float32Array): this => {
+  public setColors = (array: number[] | Float32Array): this => {
     let colors
 
     if (array instanceof Float32Array) {
@@ -101,25 +101,25 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
     return this
   }
 
-  fromWireframeGeometry = (geometry: BufferGeometry): this => {
+  public fromWireframeGeometry = (geometry: BufferGeometry): this => {
     this.setPositions(Array.from(geometry.attributes.position.array))
 
     return this
   }
 
-  fromEdgesGeometry = (geometry: BufferGeometry): this => {
+  public fromEdgesGeometry = (geometry: BufferGeometry): this => {
     this.setPositions(Array.from(geometry.attributes.position.array))
 
     return this
   }
 
-  fromMesh = (mesh: Mesh): this => {
+  public fromMesh = (mesh: Mesh): this => {
     this.fromWireframeGeometry(new WireframeGeometry(mesh.geometry))
 
     return this
   }
 
-  fromLineSegments = (lineSegments: LineSegments): this => {
+  public fromLineSegments = (lineSegments: LineSegments): this => {
     const geometry = lineSegments.geometry
 
     if (geometry.isBufferGeometry) {
@@ -133,7 +133,7 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
 
   private box = new Box3()
 
-  computeBoundingBox = () => {
+  public computeBoundingBox = (): void => {
     if (this.boundingBox === null) {
       this.boundingBox = new Box3()
     }
@@ -152,7 +152,7 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
 
   private vector = new Vector3()
 
-  computeBoundingSphere = () => {
+  public computeBoundingSphere = (): void => {
     if (this.boundingSphere === null) {
       this.boundingSphere = new Sphere()
     }
@@ -192,14 +192,8 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
     }
   }
 
-  toJSON = () => {
+  public toJSON = (): void => {
     // todo
-  }
-
-  applyMatrix = (matrix: Matrix4) => {
-    console.warn('THREE.LineSegmentsGeometry: applyMatrix() has been renamed to applyMatrix4().')
-
-    return this.applyMatrix4(matrix)
   }
 }
 

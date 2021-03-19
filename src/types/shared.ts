@@ -20,6 +20,17 @@ export type GenericShader<TShaderUniforms = GenericUniforms> = {
 
 export type ColorOptions = Color | string | number
 
+export type TypedArray =
+  | Int8Array
+  | Uint8Array
+  | Uint8ClampedArray
+  | Int16Array
+  | Uint16Array
+  | Int32Array
+  | Uint32Array
+  | Float32Array
+  | Float64Array
+
 export type TypedArrayConstructors =
   | Int8Array['constructor']
   | Uint8Array['constructor']

@@ -20,6 +20,7 @@ import {
   Quaternion,
   Raycaster,
   SphereGeometry,
+  Intersection,
   TorusGeometry,
   Vector3,
 } from 'three'
@@ -31,11 +32,11 @@ export interface TransformControlsPointerObject {
 }
 
 class TransformControls extends Object3D {
-  isTransformControls = true
+  public readonly isTransformControls = true
 
-  visible = false
+  public visible = false
 
-  domElement: HTMLElement | Document
+  private domElement: HTMLElement | Document
 
   private raycaster = new Raycaster()
 
@@ -99,10 +100,10 @@ class TransformControls extends Object3D {
   private _showZ = true
 
   // events
-  changeEvent = { type: 'change' }
-  mouseDownEvent = { type: 'mouseDown' }
-  mouseUpEvent = { type: 'mouseUp', mode: this._mode }
-  objectChangeEvent = { type: 'objectChange' }
+  private changeEvent = { type: 'change' }
+  private mouseDownEvent = { type: 'mouseDown' }
+  private mouseUpEvent = { type: 'mouseUp', mode: this._mode }
+  private objectChangeEvent = { type: 'objectChange' }
 
   constructor(camera: PerspectiveCamera | OrthographicCamera, domElement: HTMLElement) {
     super()
@@ -151,7 +152,7 @@ class TransformControls extends Object3D {
     }
 
     // Defined getter, setter and store for a property
-    function defineProperty<TValue>(propName: string, defaultValue: TValue) {
+    function defineProperty<TValue>(propName: string, defaultValue: TValue): void {
       Object.defineProperty(this, propName, {
         get: function () {
           return this[propName]
@@ -174,7 +175,11 @@ class TransformControls extends Object3D {
     }
   }
 
-  private intersectObjectWithRay = (object: Object3D, raycaster: Raycaster, includeInvisible?: boolean) => {
+  private intersectObjectWithRay = (
+    object: Object3D,
+    raycaster: Raycaster,
+    includeInvisible?: boolean,
+  ): false | Intersection => {
     const allIntersections = raycaster.intersectObject(object, true)
 
     for (let i = 0; i < allIntersections.length; i++) {
@@ -249,7 +254,7 @@ class TransformControls extends Object3D {
     }
   }
 
-  private pointerHover = (pointer: TransformControlsPointerObject) => {
+  private pointerHover = (pointer: TransformControlsPointerObject): void => {
     if (this._object === undefined || this._dragging === true) return
 
     this.raycaster.setFromCamera(pointer, this._camera)
@@ -263,7 +268,7 @@ class TransformControls extends Object3D {
     }
   }
 
-  private pointerDown = (pointer: TransformControlsPointerObject) => {
+  private pointerDown = (pointer: TransformControlsPointerObject): void => {
     if (this._object === undefined || this._dragging === true || pointer.button !== 0) return
 
     if (this._axis !== null) {
@@ -309,7 +314,7 @@ class TransformControls extends Object3D {
     }
   }
 
-  private pointerMove = (pointer: TransformControlsPointerObject) => {
+  private pointerMove = (pointer: TransformControlsPointerObject): void => {
     const axis = this._axis
     const mode = this._mode
     const object = this._object
@@ -494,7 +499,7 @@ class TransformControls extends Object3D {
     this.dispatchEvent(this.objectChangeEvent)
   }
 
-  private pointerUp = (pointer: TransformControlsPointerObject) => {
+  private pointerUp = (pointer: TransformControlsPointerObject): void => {
     if (pointer.button !== 0) return
 
     if (this._dragging && this._axis !== null) {
@@ -528,7 +533,7 @@ class TransformControls extends Object3D {
     }
   }
 
-  private onPointerHover = (event: Event) => {
+  private onPointerHover = (event: Event): void => {
     if (!this._enabled) return
 
     switch ((event as PointerEvent).pointerType) {
@@ -539,7 +544,7 @@ class TransformControls extends Object3D {
     }
   }
 
-  private onPointerDown = (event: Event) => {
+  private onPointerDown = (event: Event): void => {
     if (!this._enabled) return
     ;(this.domElement as HTMLElement).style.touchAction = 'none' // disable touch scroll
     this.domElement.ownerDocument?.addEventListener('pointermove', this.onPointerMove)
@@ -548,13 +553,13 @@ class TransformControls extends Object3D {
     this.pointerDown(this.getPointer(event))
   }
 
-  private onPointerMove = (event: Event) => {
+  private onPointerMove = (event: Event): void => {
     if (!this._enabled) return
 
     this.pointerMove(this.getPointer(event))
   }
 
-  private onPointerUp = (event: Event) => {
+  private onPointerUp = (event: Event): void => {
     if (!this._enabled) return
     ;(this.domElement as HTMLElement).style.touchAction = ''
     this.domElement.ownerDocument?.removeEventListener('pointermove', this.onPointerMove)
@@ -562,29 +567,29 @@ class TransformControls extends Object3D {
     this.pointerUp(this.getPointer(event))
   }
 
-  getMode = () => this._mode
+  public getMode = (): TransformControls['_mode'] => this._mode
 
-  setMode = (mode: 'translate' | 'rotate' | 'scale') => {
+  public setMode = (mode: TransformControls['_mode']): void => {
     this._mode = mode
   }
 
-  setTranslationSnap = (translationSnap: number) => {
+  public setTranslationSnap = (translationSnap: number): void => {
     this._translationSnap = translationSnap
   }
 
-  setRotationSnap = (rotationSnap: number) => {
+  public setRotationSnap = (rotationSnap: number): void => {
     this._rotationSnap = rotationSnap
   }
 
-  setScaleSnap = (scaleSnap: number) => {
+  public setScaleSnap = (scaleSnap: number): void => {
     this._scaleSnap = scaleSnap
   }
 
-  setSize = (size: number) => {
+  public setSize = (size: number): void => {
     this._size = size
   }
 
-  setSpace = (space: string) => {
+  public setSpace = (space: string): void => {
     this._space = space
   }
 
@@ -594,7 +599,7 @@ class TransformControls extends Object3D {
     )
   }
 
-  public dispose = () => {
+  public dispose = (): void => {
     this.domElement.removeEventListener('pointerdown', this.onPointerDown)
     this.domElement.removeEventListener('pointermove', this.onPointerHover)
     this.domElement.ownerDocument?.removeEventListener('pointermove', this.onPointerMove)
@@ -620,8 +625,8 @@ type TransformControlsGizmoPrivateGizmos = {
 }
 
 class TransformControlsGizmo extends Object3D {
-  isTransformControlsGizmo = true
-  type = 'TransformControlsGizmo'
+  private isTransformControlsGizmo = true
+  public type = 'TransformControlsGizmo'
 
   private tempVector = new Vector3(0, 0, 0)
   private tempEuler = new Euler()
@@ -636,9 +641,9 @@ class TransformControlsGizmo extends Object3D {
   private unitY = new Vector3(0, 1, 0)
   private unitZ = new Vector3(0, 0, 1)
 
-  gizmo: TransformControlsGizmoPrivateGizmos
-  picker: TransformControlsGizmoPrivateGizmos
-  helper: TransformControlsGizmoPrivateGizmos
+  private gizmo: TransformControlsGizmoPrivateGizmos
+  public picker: TransformControlsGizmoPrivateGizmos
+  private helper: TransformControlsGizmoPrivateGizmos
 
   // these are set from parent class TransformControls
   private _rotationAxis = new Vector3()
@@ -750,7 +755,7 @@ class TransformControlsGizmo extends Object3D {
     const lineGeometry = new BufferGeometry()
     lineGeometry.setAttribute('position', new Float32BufferAttribute([0, 0, 0, 1, 0, 0], 3))
 
-    const CircleGeometry = (radius: number, arc: number) => {
+    const CircleGeometry = (radius: number, arc: number): BufferGeometry => {
       const geometry = new BufferGeometry()
       const vertices = []
 
@@ -765,7 +770,7 @@ class TransformControlsGizmo extends Object3D {
 
     // Special geometry for transform helper. If scaled with position vector it spans from [0,0,0] to position
 
-    const TranslateHelperGeometry = () => {
+    const TranslateHelperGeometry = (): BufferGeometry => {
       const geometry = new BufferGeometry()
 
       geometry.setAttribute('position', new Float32BufferAttribute([0, 0, 0, 1, 1, 1], 3))
@@ -940,7 +945,7 @@ class TransformControlsGizmo extends Object3D {
 
     // Creates an Object3D with gizmos described in custom hierarchy definition.
     // this is nearly impossible to Type so i'm leaving it
-    const setupGizmo = (gizmoMap: any) => {
+    const setupGizmo = (gizmoMap: any): Object3D => {
       const gizmo = new Object3D()
 
       for (let name in gizmoMap) {
@@ -1323,8 +1328,8 @@ class TransformControlsGizmo extends Object3D {
 }
 
 class TransformControlsPlane extends Mesh<PlaneGeometry, MeshBasicMaterial> {
-  isTransformControlsPlane = true
-  type = 'TransformControlsPlane'
+  private isTransformControlsPlane = true
+  public type = 'TransformControlsPlane'
 
   constructor() {
     super(

@@ -46,3 +46,7 @@ jspm_packages/
 pnpm-lock.yaml
 
 dist
+.next
+
+# storybook
+storybook-static

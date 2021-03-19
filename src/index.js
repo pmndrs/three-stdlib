@@ -1,3 +1,5 @@
+/* eslint-disable import/export */
+export * from './libs/meshopt_decoder'
 export * from './offscreen/scene'
 export * from './offscreen/offscreen'
 export * from './offscreen/jank'

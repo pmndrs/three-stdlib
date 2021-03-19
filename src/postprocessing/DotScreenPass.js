@@ -1,5 +1,5 @@
 import { ShaderMaterial, UniformsUtils } from 'three'
-import { Pass } from '../postprocessing/Pass'
+import { Pass, FullScreenQuad } from '../postprocessing/Pass'
 import { DotScreenShader } from '../shaders/DotScreenShader'
 
 var DotScreenPass = function (center, angle, scale) {
@@ -21,7 +21,7 @@ var DotScreenPass = function (center, angle, scale) {
     fragmentShader: shader.fragmentShader,
   })
 
-  this.fsQuad = new Pass.FullScreenQuad(this.material)
+  this.fsQuad = new FullScreenQuad(this.material)
 }
 
 DotScreenPass.prototype = Object.assign(Object.create(Pass.prototype), {

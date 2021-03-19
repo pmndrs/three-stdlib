@@ -7,7 +7,7 @@ import {
   Vector2,
   WebGLRenderTarget,
 } from 'three'
-import { Pass } from '../postprocessing/Pass'
+import { Pass, FullScreenQuad } from '../postprocessing/Pass'
 import { CopyShader } from '../shaders/CopyShader'
 import { ConvolutionShader } from '../shaders/ConvolutionShader'
 
@@ -73,7 +73,7 @@ var BloomPass = function (strength, kernelSize, sigma, resolution) {
 
   this.needsSwap = false
 
-  this.fsQuad = new Pass.FullScreenQuad(null)
+  this.fsQuad = new FullScreenQuad(null)
 }
 
 BloomPass.prototype = Object.assign(Object.create(Pass.prototype), {

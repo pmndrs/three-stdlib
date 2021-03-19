@@ -1,5 +1,5 @@
 import { DataTexture, FloatType, MathUtils, RGBFormat, ShaderMaterial, UniformsUtils } from 'three'
-import { Pass } from '../postprocessing/Pass'
+import { Pass, FullScreenQuad } from '../postprocessing/Pass'
 import { DigitalGlitch } from '../shaders/DigitalGlitch'
 
 var GlitchPass = function (dt_size) {
@@ -20,7 +20,7 @@ var GlitchPass = function (dt_size) {
     fragmentShader: shader.fragmentShader,
   })
 
-  this.fsQuad = new Pass.FullScreenQuad(this.material)
+  this.fsQuad = new FullScreenQuad(this.material)
 
   this.goWild = false
   this.curF = 0

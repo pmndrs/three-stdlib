@@ -19,10 +19,9 @@ import {
   WebGLRenderTarget,
   ZeroFactor,
 } from 'three'
-import { Pass } from '../postprocessing/Pass'
+import { Pass, FullScreenQuad } from '../postprocessing/Pass'
 import { SAOShader } from '../shaders/SAOShader'
-import { DepthLimitedBlurShader } from '../shaders/DepthLimitedBlurShader'
-import { BlurShaderUtils } from '../shaders/DepthLimitedBlurShader'
+import { DepthLimitedBlurShader, BlurShaderUtils } from '../shaders/DepthLimitedBlurShader'
 import { CopyShader } from '../shaders/CopyShader'
 import { UnpackDepthRGBAShader } from '../shaders/UnpackDepthRGBAShader'
 
@@ -180,7 +179,7 @@ var SAOPass = function (scene, camera, depthTexture, useNormals, resolution) {
     blending: NoBlending,
   })
 
-  this.fsQuad = new Pass.FullScreenQuad(null)
+  this.fsQuad = new FullScreenQuad(null)
 }
 
 SAOPass.OUTPUT = {

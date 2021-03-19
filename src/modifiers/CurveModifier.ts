@@ -116,11 +116,11 @@ export function modifyShader<TMaterial extends Material = Material>(
   material: ModifiedMaterial<TMaterial>,
   uniforms: CurveModifierUniforms,
   numberOfCurves = 1,
-) {
+): void {
   if (material.__ok) return
   material.__ok = true
 
-  material.onBeforeCompile = (shader: Shader & { __modified: boolean }) => {
+  material.onBeforeCompile = (shader: Shader & { __modified: boolean }): void => {
     if (shader.__modified) return
     shader.__modified = true
 
@@ -204,12 +204,12 @@ export function modifyShader<TMaterial extends Material = Material>(
  * A helper class for making meshes bend aroudn curves
  */
 export class Flow<TMesh extends Mesh = Mesh> {
-  curveArray: Curve<any>[]
-  curveLengthArray: number[]
+  public curveArray: Curve<any>[]
+  public curveLengthArray: number[]
 
-  object3D: TMesh
-  splineTexure: DataTexture
-  uniforms: CurveModifierUniforms
+  public object3D: TMesh
+  public splineTexure: DataTexture
+  public uniforms: CurveModifierUniforms
 
   /**
    * @param {Mesh} mesh The mesh to clone and modify to bend around the curve
@@ -235,7 +235,7 @@ export class Flow<TMesh extends Mesh = Mesh> {
     this.uniforms = uniforms
   }
 
-  updateCurve<TCurve extends Curve<any>>(index: number, curve: TCurve): void {
+  public updateCurve<TCurve extends Curve<any>>(index: number, curve: TCurve): void {
     if (index >= this.curveArray.length) throw Error('Index out of range for Flow')
     const curveLength = curve.getLength()
     this.uniforms.spineLength.value = curveLength
@@ -244,7 +244,7 @@ export class Flow<TMesh extends Mesh = Mesh> {
     updateSplineTexture(this.splineTexure, curve, index)
   }
 
-  moveAlongCurve(amount: number): void {
+  public moveAlongCurve(amount: number): void {
     this.uniforms.pathOffset.value += amount
   }
 }
@@ -257,8 +257,8 @@ export class InstancedFlow<
   TGeometry extends BufferGeometry = BufferGeometry,
   TMaterial extends Material = Material
 > extends Flow<InstancedMesh<TGeometry, TMaterial>> {
-  offsets: number[]
-  whichCurve: number[]
+  public offsets: number[]
+  public whichCurve: number[]
 
   /**
    *
@@ -282,7 +282,7 @@ export class InstancedFlow<
    *
    * @param {number} index of the instanced element to update
    */
-  writeChanges(index: number): void {
+  private writeChanges(index: number): void {
     matrix.makeTranslation(this.curveLengthArray[this.whichCurve[index]], this.whichCurve[index], this.offsets[index])
     this.object3D.setMatrixAt(index, matrix)
     this.object3D.instanceMatrix.needsUpdate = true
@@ -294,7 +294,7 @@ export class InstancedFlow<
    * @param {number} index Which element to update
    * @param {number} offset Move by how much
    */
-  moveIndividualAlongCurve(index: number, offset: number): void {
+  public moveIndividualAlongCurve(index: number, offset: number): void {
     this.offsets[index] += offset
     this.writeChanges(index)
   }
@@ -305,7 +305,7 @@ export class InstancedFlow<
    * @param {number} index the index of the instanced element to update
    * @param {number} curveNo the index of the curve it should use
    */
-  setCurve(index: number, curveNo: number): void {
+  public setCurve(index: number, curveNo: number): void {
     if (isNaN(curveNo)) throw Error('curve index being set is Not a Number (NaN)')
     this.whichCurve[index] = curveNo
     this.writeChanges(index)

@@ -1,5 +1,7 @@
-import { BufferAttribute, BufferGeometry, TypedArray, Vector3 } from 'three'
+import { BufferAttribute, BufferGeometry, Vector3 } from 'three'
 import * as BufferGeometryUtils from '../utils/BufferGeometryUtils'
+
+import { TypedArray } from '../types/shared'
 
 interface EdgeSplitToGroupsResult {
   splitGroup: number[]
@@ -12,16 +14,16 @@ interface SplitIndexes {
 }
 
 class EdgeSplitModifier {
-  A = new Vector3()
-  B = new Vector3()
-  C = new Vector3()
+  private A = new Vector3()
+  private B = new Vector3()
+  private C = new Vector3()
 
-  positions: ArrayLike<number> = []
-  normals: Float32Array = new Float32Array()
-  indexes: ArrayLike<number> = []
-  pointToIndexMap: number[][] = []
-  splitIndexes: SplitIndexes[] = []
-  oldNormals: ArrayLike<number> = []
+  private positions: ArrayLike<number> = []
+  private normals: Float32Array = new Float32Array()
+  private indexes: ArrayLike<number> = []
+  private pointToIndexMap: number[][] = []
+  private splitIndexes: SplitIndexes[] = []
+  private oldNormals: ArrayLike<number> = []
 
   constructor() {}
 
@@ -93,7 +95,7 @@ class EdgeSplitModifier {
     return result
   }
 
-  private edgeSplit = (indexes: number[], cutOff: number, original: number | null = null) => {
+  private edgeSplit = (indexes: number[], cutOff: number, original: number | null = null): void => {
     if (indexes.length === 0) return
 
     const groupResults: EdgeSplitToGroupsResult[] = []
@@ -122,7 +124,7 @@ class EdgeSplitModifier {
     }
   }
 
-  public modify = (geometry: BufferGeometry, cutOffAngle: number, tryKeepNormals = true) => {
+  public modify = (geometry: BufferGeometry, cutOffAngle: number, tryKeepNormals = true): BufferGeometry => {
     let hadNormals = false
 
     if (geometry.attributes.normal) {
@@ -162,10 +164,10 @@ class EdgeSplitModifier {
     } = {}
     for (let name of Object.keys(geometry.attributes)) {
       const oldAttribute = geometry.attributes[name]
-      // @ts-expect-error it does exist, console.log(Float32Array.constructor) in browser devtools gives a function
-      const newArray = new (oldAttribute.array as TypedArray).constructor(
+      const newArray = (oldAttribute.array as TypedArray).constructor(
         (this.indexes.length + this.splitIndexes.length) * oldAttribute.itemSize,
       )
+
       newArray.set(oldAttribute.array)
       newAttributes[name] = new BufferAttribute(newArray, oldAttribute.itemSize, oldAttribute.normalized)
     }

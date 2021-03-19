@@ -2,10 +2,8 @@ import path from 'path'
 import babel from 'rollup-plugin-babel'
 import resolve from 'rollup-plugin-node-resolve'
 import json from 'rollup-plugin-json'
-import glslify from 'rollup-plugin-glslify'
 import multiInput from 'rollup-plugin-multi-input'
-import { sizeSnapshot } from 'rollup-plugin-size-snapshot'
-import typescript from '@rollup/plugin-typescript'
+import { terser } from 'rollup-plugin-terser'
 
 const root = process.platform === 'win32' ? path.resolve('/') : '/'
 const external = (id) => !id.startsWith('.') && !id.startsWith(root)
@@ -19,25 +17,14 @@ const getBabelOptions = ({ useESModules }, targets) => ({
   presets: [['@babel/preset-env', { loose: true, modules: false, targets }], '@babel/preset-typescript'],
   plugins: [
     '@babel/plugin-proposal-class-properties',
+    '@babel/plugin-proposal-optional-chaining',
     ['@babel/transform-runtime', { regenerator: false, useESModules }],
   ],
 })
 
 export default [
   {
-    input: `./src/index.js`,
-    output: { dir: `dist`, format: 'esm' },
-    external,
-    plugins: [
-      json(),
-      babel(getBabelOptions({ useESModules: true }, '>1%, not dead, not ie 11, not op_mini all')),
-      resolve({ extensions }),
-      typescript(),
-    ],
-    preserveModules: true,
-  },
-  {
-    input: ['src/**/*.js', 'src/**/*.ts', '!src/index.js'],
+    input: ['src/**/*.ts', 'src/**/*.js', '!src/index.js'],
     output: { dir: `dist`, format: 'esm' },
     external,
     plugins: [
@@ -45,27 +32,37 @@ export default [
       json(),
       babel(getBabelOptions({ useESModules: true }, '>1%, not dead, not ie 11, not op_mini all')),
       resolve({ extensions }),
-      typescript(),
     ],
   },
   {
-    input: ['src/**/*.js', 'src/**/*.ts', '!src/index.js'],
+    input: `./src/index.js`,
+    output: { dir: `dist`, format: 'esm' },
+    external,
+    plugins: [
+      json(),
+      babel(getBabelOptions({ useESModules: true }, '>1%, not dead, not ie 11, not op_mini all')),
+      resolve({ extensions }),
+    ],
+    preserveModules: true,
+  },
+  {
+    input: ['src/**/*.ts', 'src/**/*.js', '!src/index.js'],
     output: { dir: `dist`, format: 'cjs' },
     external,
     plugins: [
       multiInput({
-        transformOutputPath: (output) => path.join(path.dirname(output), path.basename(output, '.js') + '.cjs.js'),
+        transformOutputPath: (output) => output.replace(/\.[^/.]+$/, '.cjs.js'),
       }),
       json(),
       babel(getBabelOptions({ useESModules: false })),
       resolve({ extensions }),
-      typescript(),
+      terser(),
     ],
   },
   {
     input: `./src/index.js`,
     output: { file: `dist/index.cjs.js`, format: 'cjs' },
     external,
-    plugins: [json(), babel(getBabelOptions({ useESModules: false })), resolve({ extensions }, typescript())],
+    plugins: [json(), babel(getBabelOptions({ useESModules: false })), resolve({ extensions }), terser()],
   },
 ]

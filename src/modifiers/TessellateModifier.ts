@@ -5,8 +5,8 @@ import { BufferGeometry, Color, Float32BufferAttribute, Vector2, Vector3 } from 
  */
 
 class TessellateModifier {
-  maxEdgeLength: number
-  maxIterations: number
+  public maxEdgeLength: number
+  public maxIterations: number
 
   constructor(maxEdgeLength = 0.1, maxIterations = 6) {
     this.maxEdgeLength = maxEdgeLength
@@ -74,7 +74,7 @@ class TessellateModifier {
     let iteration = 0
     let tessellating = true
 
-    function addTriangle(a: number, b: number, c: number) {
+    function addTriangle(a: number, b: number, c: number): void {
       const v1 = vs[a]
       const v2 = vs[b]
       const v3 = vs[c]

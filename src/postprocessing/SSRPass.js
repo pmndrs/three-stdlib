@@ -17,10 +17,8 @@ import {
   WebGLRenderTarget,
   HalfFloatType,
 } from 'three'
-import { Pass } from '../postprocessing/Pass'
-import { SSRShader } from '../shaders/SSRShader'
-import { SSRBlurShader } from '../shaders/SSRShader'
-import { SSRDepthShader } from '../shaders/SSRShader'
+import { Pass, FullScreenQuad } from '../postprocessing/Pass'
+import { SSRShader, SSRBlurShader, SSRDepthShader } from '../shaders/SSRShader'
 import { CopyShader } from '../shaders/CopyShader'
 
 var SSRPass = function ({
@@ -311,7 +309,7 @@ var SSRPass = function ({
     // premultipliedAlpha:true,
   })
 
-  this.fsQuad = new Pass.FullScreenQuad(null)
+  this.fsQuad = new FullScreenQuad(null)
 
   this.originalClearColor = new Color()
 }

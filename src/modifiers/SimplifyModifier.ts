@@ -4,11 +4,11 @@ import * as BufferGeometryUtils from '../utils/BufferGeometryUtils'
 const cb = new Vector3(),
   ab = new Vector3()
 
-function pushIfUnique<TItem>(array: TItem[], object: TItem) {
+function pushIfUnique<TItem>(array: TItem[], object: TItem): void {
   if (array.indexOf(object) === -1) array.push(object)
 }
 
-function removeFromArray<TItem>(array: TItem[], object: TItem) {
+function removeFromArray<TItem>(array: TItem[], object: TItem): void {
   const k = array.indexOf(object)
   if (k > -1) array.splice(k, 1)
 }
@@ -39,11 +39,11 @@ class Vertex {
     this.collapseNeighbor = null // best candinate for collapsing
   }
 
-  addUniqueNeighbor(vertex: Vertex): void {
+  public addUniqueNeighbor(vertex: Vertex): void {
     pushIfUnique(this.neighbors, vertex)
   }
 
-  removeIfNonNeighbor(n: Vertex): void {
+  public removeIfNonNeighbor(n: Vertex): void {
     const neighbors = this.neighbors
     const faces = this.faces
 
@@ -63,9 +63,9 @@ class Triangle {
   private b: number
   private c: Number
 
-  v1: Vertex
-  v2: Vertex
-  v3: Vertex
+  public v1: Vertex
+  public v2: Vertex
+  public v3: Vertex
 
   public normal = new Vector3()
 
@@ -150,7 +150,7 @@ class Triangle {
 class SimplifyModifier {
   constructor() {}
 
-  private computeEdgeCollapseCost = (u: Vertex, v: Vertex) => {
+  private computeEdgeCollapseCost = (u: Vertex, v: Vertex): number => {
     // if we collapse edge uv by moving u to v then how
     // much different will the model change, i.e. the "error".
 
@@ -202,7 +202,7 @@ class SimplifyModifier {
     return amt
   }
 
-  private removeVertex(v: Vertex, vertices: Vertex[]) {
+  private removeVertex(v: Vertex, vertices: Vertex[]): void {
     console.assert(v.faces.length === 0)
 
     while (v.neighbors.length) {
@@ -213,7 +213,7 @@ class SimplifyModifier {
     removeFromArray(vertices, v)
   }
 
-  private computeEdgeCostAtVertex = (v: Vertex) => {
+  private computeEdgeCostAtVertex = (v: Vertex): void => {
     // compute the edge collapse cost for all edges that start
     // from vertex v.  Since we are only interested in reducing
     // the object by selecting the min cost edge at each step, we
@@ -258,7 +258,7 @@ class SimplifyModifier {
     // v.collapseCost = v.minCost;
   }
 
-  private removeFace = (f: Triangle, faces: Triangle[]) => {
+  private removeFace = (f: Triangle, faces: Triangle[]): void => {
     removeFromArray(faces, f)
 
     if (f.v1) removeFromArray(f.v1.faces, f)
@@ -280,7 +280,7 @@ class SimplifyModifier {
     }
   }
 
-  private collapse = (vertices: Vertex[], faces: Triangle[], u: Vertex, v: Vertex) => {
+  private collapse = (vertices: Vertex[], faces: Triangle[], u: Vertex, v: Vertex): void => {
     // u and v are pointers to vertices of an edge
 
     // Collapse the edge uv by moving vertex u onto v
@@ -318,7 +318,7 @@ class SimplifyModifier {
     }
   }
 
-  private minimumCostEdge = (vertices: Vertex[]) => {
+  private minimumCostEdge = (vertices: Vertex[]): Vertex => {
     // O(n * n) approach. TODO optimize this
 
     let least = vertices[0]
@@ -332,7 +332,7 @@ class SimplifyModifier {
     return least
   }
 
-  modify = (geometry: BufferGeometry, count: number) => {
+  public modify = (geometry: BufferGeometry, count: number): BufferGeometry => {
     geometry = geometry.clone()
     const attributes = geometry.attributes
 

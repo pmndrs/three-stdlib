@@ -8,7 +8,6 @@ import {
   TriangleStripDrawMode,
   TrianglesDrawMode,
   Vector3,
-  TypedArray,
   Mesh,
   Line,
   Points,
@@ -18,7 +17,7 @@ import {
 } from 'three'
 
 import { getWithKey } from '../types/helpers'
-import { TypedArrayConstructors } from '../types/shared'
+import { TypedArrayConstructors, TypedArray } from '../types/shared'
 
 /**
  * @param  {Array<BufferGeometry>} geometries
@@ -451,8 +450,7 @@ export function mergeVertices(geometry: BufferGeometry, tolerance = 1e-4): Buffe
     const name = attributeNames[i]
     const oldAttribute = geometry.getAttribute(name)
 
-    // @ts-expect-error it does exist, console.log(Float32Array.constructor) in browser devtools gives a function
-    const buffer = new (oldAttribute.array as TypedArray).constructor(attrArrays[name])
+    const buffer = (oldAttribute.array as TypedArray).constructor(attrArrays[name])
     const attribute = new BufferAttribute(buffer, oldAttribute.itemSize, oldAttribute.normalized)
 
     result.setAttribute(name, attribute)
@@ -461,8 +459,7 @@ export function mergeVertices(geometry: BufferGeometry, tolerance = 1e-4): Buffe
     if (name in morphAttrsArrays) {
       for (let j = 0; j < morphAttrsArrays[name].length; j++) {
         const oldMorphAttribute = geometry.morphAttributes[name][j]
-        // @ts-expect-error it does exist, console.log(Float32Array.constructor) in browser devtools gives a function
-        const buffer = new (oldMorphAttribute.array as TypedArray).constructor(morphAttrsArrays[name][j])
+        const buffer = (oldMorphAttribute.array as TypedArray).constructor(morphAttrsArrays[name][j])
         const morphAttribute = new BufferAttribute(buffer, oldMorphAttribute.itemSize, oldMorphAttribute.normalized)
         result.morphAttributes[name][j] = morphAttribute
       }
@@ -601,7 +598,7 @@ export function computeMorphedAttributes(object: Mesh | Line | Points): Computed
     b: number,
     c: number,
     modifiedAttributeArray: Float32Array,
-  ) {
+  ): void {
     _vA.fromBufferAttribute(attribute, a)
     _vB.fromBufferAttribute(attribute, b)
     _vC.fromBufferAttribute(attribute, c)

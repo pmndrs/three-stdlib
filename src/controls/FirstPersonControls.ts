@@ -1,29 +1,29 @@
 import { MathUtils, Spherical, Vector3, EventDispatcher, Camera } from 'three'
 
 class FirstPersonControls extends EventDispatcher {
-  object: Camera
-  domElement: HTMLElement | Document
+  public object: Camera
+  public domElement: HTMLElement | Document
 
-  enabled = true
+  public enabled = true
 
-  movementSpeed = 1.0
-  lookSpeed = 0.005
+  public movementSpeed = 1.0
+  public lookSpeed = 0.005
 
-  lookVertical = true
-  autoForward = false
+  public lookVertical = true
+  public autoForward = false
 
-  activeLook = true
+  public activeLook = true
 
-  heightSpeed = false
-  heightCoef = 1.0
-  heightMin = 0.0
-  heightMax = 1.0
+  public heightSpeed = false
+  public heightCoef = 1.0
+  public heightMin = 0.0
+  public heightMax = 1.0
 
-  constrainVertical = false
-  verticalMin = 0
-  verticalMax = Math.PI
+  public constrainVertical = false
+  public verticalMin = 0
+  public verticalMax = Math.PI
 
-  mouseDragOn = false
+  public mouseDragOn = false
 
   // internals
 
@@ -77,7 +77,7 @@ class FirstPersonControls extends EventDispatcher {
     window.addEventListener('keyup', this.onKeyUp)
   }
 
-  dispose = () => {
+  public dispose = (): void => {
     this.domElement.removeEventListener('contextmenu', this.contextmenu)
     ;(this.domElement as HTMLElement).removeEventListener('mousedown', this.onMouseDown)
     ;(this.domElement as HTMLElement).removeEventListener('mousemove', this.onMouseMove)
@@ -87,7 +87,7 @@ class FirstPersonControls extends EventDispatcher {
     window.removeEventListener('keyup', this.onKeyUp)
   }
 
-  handleResize = () => {
+  public handleResize = (): void => {
     if (this.domElement instanceof Document) {
       this.viewHalfX = window.innerWidth / 2
       this.viewHalfY = window.innerHeight / 2
@@ -97,7 +97,7 @@ class FirstPersonControls extends EventDispatcher {
     }
   }
 
-  private onMouseDown = (event: MouseEvent) => {
+  private onMouseDown = (event: MouseEvent): void => {
     if (this.domElement instanceof HTMLElement) {
       this.domElement.focus()
     }
@@ -118,7 +118,7 @@ class FirstPersonControls extends EventDispatcher {
     this.mouseDragOn = true
   }
 
-  private onMouseUp = (event: MouseEvent) => {
+  private onMouseUp = (event: MouseEvent): void => {
     event.preventDefault()
 
     if (this.activeLook) {
@@ -135,7 +135,7 @@ class FirstPersonControls extends EventDispatcher {
     this.mouseDragOn = false
   }
 
-  private onMouseMove = (event: MouseEvent) => {
+  private onMouseMove = (event: MouseEvent): void => {
     if (this.domElement instanceof Document) {
       this.mouseX = event.pageX - this.viewHalfX
       this.mouseY = event.pageY - this.viewHalfY
@@ -145,7 +145,7 @@ class FirstPersonControls extends EventDispatcher {
     }
   }
 
-  private onKeyDown = (event: KeyboardEvent) => {
+  private onKeyDown = (event: KeyboardEvent): void => {
     //event.preventDefault();
 
     switch (event.code) {
@@ -178,7 +178,7 @@ class FirstPersonControls extends EventDispatcher {
     }
   }
 
-  private onKeyUp = (event: KeyboardEvent) => {
+  private onKeyUp = (event: KeyboardEvent): void => {
     switch (event.code) {
       case 'ArrowUp':
       case 'KeyW':
@@ -209,7 +209,7 @@ class FirstPersonControls extends EventDispatcher {
     }
   }
 
-  lookAt = (x: Vector3 | number, y?: number, z?: number) => {
+  public lookAt = (x: Vector3 | number, y?: number, z?: number): this => {
     if (x instanceof Vector3) {
       this.target.copy(x)
     } else if (y && z) {
@@ -224,7 +224,8 @@ class FirstPersonControls extends EventDispatcher {
   }
 
   private targetPosition = new Vector3()
-  update = (delta: number) => {
+
+  public update = (delta: number): void => {
     if (this.enabled === false) return
 
     if (this.heightSpeed) {
@@ -280,9 +281,9 @@ class FirstPersonControls extends EventDispatcher {
     this.object.lookAt(this.targetPosition)
   }
 
-  private contextmenu = (event: Event) => event.preventDefault()
+  private contextmenu = (event: Event): void => event.preventDefault()
 
-  private setOrientation = (controls: FirstPersonControls) => {
+  private setOrientation = (controls: FirstPersonControls): void => {
     const quaternion = controls.object.quaternion
 
     this.lookDirection.set(0, 0, -1).applyQuaternion(quaternion)

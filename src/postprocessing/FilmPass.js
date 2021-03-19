@@ -1,5 +1,5 @@
 import { ShaderMaterial, UniformsUtils } from 'three'
-import { Pass } from '../postprocessing/Pass'
+import { Pass, FullScreenQuad } from '../postprocessing/Pass'
 import { FilmShader } from '../shaders/FilmShader'
 
 var FilmPass = function (noiseIntensity, scanlinesIntensity, scanlinesCount, grayscale) {
@@ -22,7 +22,7 @@ var FilmPass = function (noiseIntensity, scanlinesIntensity, scanlinesCount, gra
   if (scanlinesIntensity !== undefined) this.uniforms.sIntensity.value = scanlinesIntensity
   if (scanlinesCount !== undefined) this.uniforms.sCount.value = scanlinesCount
 
-  this.fsQuad = new Pass.FullScreenQuad(this.material)
+  this.fsQuad = new FullScreenQuad(this.material)
 }
 
 FilmPass.prototype = Object.assign(Object.create(Pass.prototype), {
