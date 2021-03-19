@@ -152,7 +152,7 @@ class TransformControls extends Object3D {
     }
 
     // Defined getter, setter and store for a property
-    function defineProperty<TValue>(propName: string, defaultValue: TValue): void {
+    const defineProperty = <TValue>(propName: string, defaultValue: TValue): void => {
       Object.defineProperty(this, propName, {
         get: function () {
           return this[propName]
@@ -169,8 +169,9 @@ class TransformControls extends Object3D {
           }
         },
       })
-
+      // @ts-ignore
       this._plane[propName] = defaultValue
+      // @ts-ignore
       this._gizmo[propName] = defaultValue
     }
   }
