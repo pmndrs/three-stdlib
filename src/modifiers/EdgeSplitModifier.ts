@@ -14,16 +14,16 @@ interface SplitIndexes {
 }
 
 class EdgeSplitModifier {
-  A = new Vector3()
-  B = new Vector3()
-  C = new Vector3()
+  private A = new Vector3()
+  private B = new Vector3()
+  private C = new Vector3()
 
-  positions: ArrayLike<number> = []
-  normals: Float32Array = new Float32Array()
-  indexes: ArrayLike<number> = []
-  pointToIndexMap: number[][] = []
-  splitIndexes: SplitIndexes[] = []
-  oldNormals: ArrayLike<number> = []
+  private positions: ArrayLike<number> = []
+  private normals: Float32Array = new Float32Array()
+  private indexes: ArrayLike<number> = []
+  private pointToIndexMap: number[][] = []
+  private splitIndexes: SplitIndexes[] = []
+  private oldNormals: ArrayLike<number> = []
 
   constructor() {}
 

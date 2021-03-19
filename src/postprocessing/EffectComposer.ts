@@ -18,7 +18,7 @@ class EffectComposer {
   public copyPass: Pass
   public clock: Clock
 
-  public constructor(renderer: WebGLRenderer, renderTarget: WebGLRenderTarget) {
+  constructor(renderer: WebGLRenderer, renderTarget: WebGLRenderTarget) {
     this.renderer = renderer
 
     if (renderTarget === undefined) {

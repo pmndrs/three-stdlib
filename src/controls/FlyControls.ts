@@ -5,14 +5,14 @@ function contextmenu(event: Event): void {
 }
 
 class FlyControls extends EventDispatcher {
-  object: Camera
-  domElement: HTMLElement | Document
+  public object: Camera
+  public domElement: HTMLElement | Document
 
-  movementSpeed = 1.0
-  rollSpeed = 0.005
+  public movementSpeed = 1.0
+  public rollSpeed = 0.005
 
-  dragToLook = false
-  autoForward = false
+  public dragToLook = false
+  public autoForward = false
 
   private changeEvent = { type: 'change' }
   private EPS = 0.000001

@@ -5,15 +5,15 @@ import { Camera, Euler, EventDispatcher, MathUtils, Quaternion, Vector3 } from '
  */
 
 class DeviceOrientationControls extends EventDispatcher {
-  object: Camera
+  public object: Camera
 
   private changeEvent = { type: 'change' }
   private EPS = 0.000001
 
-  enabled = true
-  deviceOrientation: Partial<DeviceOrientationEvent> = { alpha: 0, beta: 0, gamma: 0 }
-  screenOrientation: string | number = 0
-  alphaOffset = 0 // radians
+  public enabled = true
+  public deviceOrientation: Partial<DeviceOrientationEvent> = { alpha: 0, beta: 0, gamma: 0 }
+  public screenOrientation: string | number = 0
+  public alphaOffset = 0 // radians
 
   constructor(object: Camera) {
     super()
@@ -51,7 +51,7 @@ class DeviceOrientationControls extends EventDispatcher {
     quaternion.multiply(this.q0.setFromAxisAngle(this.zee, -orient)) // adjust for screen orientation
   }
 
-  connect = (): void => {
+  public connect = (): void => {
     this.onScreenOrientationChangeEvent() // run once on load
 
     // iOS 13+
@@ -78,7 +78,7 @@ class DeviceOrientationControls extends EventDispatcher {
     this.enabled = true
   }
 
-  disconnect = (): void => {
+  public disconnect = (): void => {
     window.removeEventListener('orientationchange', this.onScreenOrientationChangeEvent)
     window.removeEventListener('deviceorientation', this.onDeviceOrientationChangeEvent)
 
@@ -86,7 +86,7 @@ class DeviceOrientationControls extends EventDispatcher {
   }
 
   private lastQuaternion = new Quaternion()
-  update = (): void => {
+  public update = (): void => {
     if (this.enabled === false) return
 
     const device = this.deviceOrientation
@@ -106,7 +106,7 @@ class DeviceOrientationControls extends EventDispatcher {
     }
   }
 
-  dispose = (): void => this.disconnect()
+  public dispose = (): void => this.disconnect()
 }
 
 export { DeviceOrientationControls }

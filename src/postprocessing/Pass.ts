@@ -39,7 +39,7 @@ class FullScreenQuad<TMaterial extends Material = Material> {
   public geometry = new PlaneGeometry(2, 2)
   private mesh: Mesh<PlaneGeometry, TMaterial>
 
-  public constructor(material: TMaterial) {
+  constructor(material: TMaterial) {
     this.mesh = new Mesh(this.geometry, material)
   }
 

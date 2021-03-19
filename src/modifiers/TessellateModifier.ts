@@ -5,8 +5,8 @@ import { BufferGeometry, Color, Float32BufferAttribute, Vector2, Vector3 } from 
  */
 
 class TessellateModifier {
-  maxEdgeLength: number
-  maxIterations: number
+  public maxEdgeLength: number
+  public maxIterations: number
 
   constructor(maxEdgeLength = 0.1, maxIterations = 6) {
     this.maxEdgeLength = maxEdgeLength

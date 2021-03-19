@@ -6,7 +6,7 @@ class MaskPass extends Pass {
   public camera: Camera
   public inverse: boolean
 
-  public constructor(scene: Scene, camera: Camera) {
+  constructor(scene: Scene, camera: Camera) {
     super()
 
     this.scene = scene
@@ -79,7 +79,7 @@ class MaskPass extends Pass {
 }
 
 class ClearMaskPass extends Pass {
-  public constructor() {
+  constructor() {
     super()
     this.needsSwap = false
   }

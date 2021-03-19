@@ -233,55 +233,55 @@ ShaderLib['line'] = {
 }
 
 class LineMaterial extends ShaderMaterial {
-  dashed: boolean
+  public dashed: boolean
 
-  isLineMaterial = true
+  private isLineMaterial = true
 
-  get color(): any {
+  public get color(): any {
     return this.uniforms.diffuse.value
   }
 
-  set color(value: any) {
+  public set color(value: any) {
     this.uniforms.diffuse.value = value
   }
 
-  get dashScale(): number {
+  public get dashScale(): number {
     return this.uniforms.dashScale.value
   }
 
-  set dashScale(value: number) {
+  public set dashScale(value: number) {
     this.uniforms.dashScale.value = value
   }
 
-  get dashSize(): number {
+  public get dashSize(): number {
     return this.uniforms.dashSize.value
   }
 
-  set dashSize(value: number) {
+  public set dashSize(value: number) {
     this.uniforms.dashSize.value = value
   }
 
-  get dashOffset(): number {
+  public get dashOffset(): number {
     return this.uniforms.dashOffset.value
   }
 
-  set dashOffset(value: number) {
+  public set dashOffset(value: number) {
     this.uniforms.dashOffset.value = value
   }
 
-  get gapSize(): number {
+  public get gapSize(): number {
     return this.uniforms.gapSize.value
   }
 
-  set gapSize(value: number) {
+  public set gapSize(value: number) {
     this.uniforms.gapSize.value = value
   }
 
-  get resolution(): Vector2 {
+  public get resolution(): Vector2 {
     return this.uniforms.gapSize.value
   }
 
-  set resolution(value: Vector2) {
+  public set resolution(value: Vector2) {
     this.uniforms.gapSize.value = value
   }
 
@@ -304,7 +304,7 @@ class LineMaterial extends ShaderMaterial {
         get: function (): number {
           return this.uniforms.linewidth.value
         },
-        set: function (value: number) {
+        set: function (value: number): void {
           this.uniforms.linewidth.value = value
         },
       },
@@ -325,7 +325,7 @@ class LineMaterial extends ShaderMaterial {
         get: function (): number {
           return this.uniforms.opacity.value
         },
-        set: function (value: number) {
+        set: function (value: number): void {
           this.uniforms.opacity.value = value
         },
       },

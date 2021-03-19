@@ -1,8 +1,8 @@
 import { Camera, EventDispatcher, Intersection, Matrix4, Object3D, Plane, Raycaster, Vector2, Vector3 } from 'three'
 
 class DragControls extends EventDispatcher {
-  enabled = true
-  transformGroup = false
+  public enabled = true
+  public transformGroup = false
 
   private _objects: Object3D[]
   private _camera: Camera
@@ -30,7 +30,7 @@ class DragControls extends EventDispatcher {
     this.activate()
   }
 
-  activate = (): void => {
+  public activate = (): void => {
     this._domElement.addEventListener('pointermove', this.onPointerMove)
     this._domElement.addEventListener('pointerdown', this.onPointerDown)
     this._domElement.addEventListener('pointerup', this.onPointerCancel)
@@ -40,7 +40,7 @@ class DragControls extends EventDispatcher {
     this._domElement.addEventListener('touchend', this.onTouchEnd)
   }
 
-  deactivate = (): void => {
+  public deactivate = (): void => {
     this._domElement.removeEventListener('pointermove', this.onPointerMove)
     this._domElement.removeEventListener('pointerdown', this.onPointerDown)
     this._domElement.removeEventListener('pointerup', this.onPointerCancel)
@@ -53,9 +53,9 @@ class DragControls extends EventDispatcher {
   }
 
   // TODO: confirm if this can be removed?
-  dispose = (): void => this.deactivate()
+  public dispose = (): void => this.deactivate()
 
-  getObjects = (): Object3D[] => this._objects
+  public getObjects = (): Object3D[] => this._objects
 
   private onMouseMove = (event: MouseEvent): void => {
     const rect = this._domElement.getBoundingClientRect()

@@ -11,7 +11,7 @@ export interface NumberGenerator {
 
 // Added 4D noise
 export class SimplexNoise {
-  grad3 = [
+  private grad3 = [
     [1, 1, 0],
     [-1, 1, 0],
     [1, -1, 0],
@@ -26,7 +26,7 @@ export class SimplexNoise {
     [0, -1, -1],
   ]
 
-  grad4 = [
+  private grad4 = [
     [0, 1, 1, 1],
     [0, 1, 1, -1],
     [0, 1, -1, 1],
@@ -61,14 +61,14 @@ export class SimplexNoise {
     [-1, -1, -1, 0],
   ]
 
-  p: number[] = []
+  private p: number[] = []
 
   // To remove the need for index wrapping, double the permutation table length
-  perm: number[] = []
+  private perm: number[] = []
 
   // A lookup table to traverse the simplex around a given point in 4D.
   // Details can be found where this table is used, in the 4D noise method.
-  simplex = [
+  private simplex = [
     [0, 1, 2, 3],
     [0, 1, 3, 2],
     [0, 0, 0, 0],
@@ -149,19 +149,19 @@ export class SimplexNoise {
     }
   }
 
-  dot = (g: number[], x: number, y: number): number => {
+  public dot = (g: number[], x: number, y: number): number => {
     return g[0] * x + g[1] * y
   }
 
-  dot3 = (g: number[], x: number, y: number, z: number): number => {
+  public dot3 = (g: number[], x: number, y: number, z: number): number => {
     return g[0] * x + g[1] * y + g[2] * z
   }
 
-  dot4 = (g: number[], x: number, y: number, z: number, w: number): number => {
+  public dot4 = (g: number[], x: number, y: number, z: number, w: number): number => {
     return g[0] * x + g[1] * y + g[2] * z + g[3] * w
   }
 
-  noise = (xin: number, yin: number): number => {
+  public noise = (xin: number, yin: number): number => {
     let n0
     let n1
     let n2 // Noise contributions from the three corners
@@ -231,7 +231,7 @@ export class SimplexNoise {
   }
 
   // 3D simplex noise
-  noise3d = (xin: number, yin: number, zin: number): number => {
+  private noise3d = (xin: number, yin: number, zin: number): number => {
     // Noise contributions from the four corners
     let n0
     let n1
@@ -377,7 +377,7 @@ export class SimplexNoise {
   }
 
   // 4D simplex noise
-  noise4d = (x: number, y: number, z: number, w: number): number => {
+  public noise4d = (x: number, y: number, z: number, w: number): number => {
     // For faster and easier lookups
     const grad4 = this.grad4
     const simplex = this.simplex

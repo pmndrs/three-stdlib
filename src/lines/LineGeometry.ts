@@ -2,14 +2,14 @@ import { Line } from 'three'
 import { LineSegmentsGeometry } from './LineSegmentsGeometry'
 
 class LineGeometry extends LineSegmentsGeometry {
-  type = 'LineGeometry'
-  isLineGeometry = true
+  public type = 'LineGeometry'
+  private isLineGeometry = true
 
   constructor() {
     super()
   }
 
-  setPositions = (array: number[] | Float32Array): this => {
+  public setPositions = (array: number[] | Float32Array): this => {
     // converts [ x1, y1, z1,  x2, y2, z2, ... ] to pairs format
 
     const length = array.length - 3
@@ -30,7 +30,7 @@ class LineGeometry extends LineSegmentsGeometry {
     return this
   }
 
-  setColors = (array: number[] | Float32Array): this => {
+  public setColors = (array: number[] | Float32Array): this => {
     // converts [ r1, g1, b1,  r2, g2, b2, ... ] to pairs format
 
     const length = array.length - 3
@@ -51,7 +51,7 @@ class LineGeometry extends LineSegmentsGeometry {
     return this
   }
 
-  fromLine = (line: Line): this => {
+  public fromLine = (line: Line): this => {
     const geometry = line.geometry
 
     if (geometry.isBufferGeometry) {
@@ -63,7 +63,7 @@ class LineGeometry extends LineSegmentsGeometry {
     return this
   }
 
-  copy = (/* source */): this => {
+  public copy = (/* source */): this => {
     // todo
 
     return this
