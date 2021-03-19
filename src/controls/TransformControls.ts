@@ -119,6 +119,30 @@ class TransformControls extends Object3D {
     this.add(this._gizmo)
     this.add(this._plane)
 
+    // Defined getter, setter and store for a property
+    const defineProperty = <TValue>(propName: string, defaultValue: TValue): void => {
+      Object.defineProperty(this, propName, {
+        get: function () {
+          return this[propName]
+        },
+
+        set: function (value) {
+          if (this[propName] !== value) {
+            this[propName] = value
+            this._plane[propName] = value
+            this._gizmo[propName] = value
+
+            this.dispatchEvent({ type: `${propName}-changed`, value })
+            this.dispatchEvent(this.changeEvent)
+          }
+        },
+      })
+      // @ts-ignore
+      this._plane[propName] = defaultValue
+      // @ts-ignore
+      this._gizmo[propName] = defaultValue
+    }
+
     defineProperty('camera', this._camera)
     defineProperty('object', this._object)
     defineProperty('enabled', this._enabled)
@@ -149,30 +173,6 @@ class TransformControls extends Object3D {
       domElement.addEventListener('pointerdown', this.onPointerDown)
       domElement.addEventListener('pointermove', this.onPointerHover)
       this.domElement.ownerDocument.addEventListener('pointerup', this.onPointerUp)
-    }
-
-    // Defined getter, setter and store for a property
-    const defineProperty = <TValue>(propName: string, defaultValue: TValue): void => {
-      Object.defineProperty(this, propName, {
-        get: function () {
-          return this[propName]
-        },
-
-        set: function (value) {
-          if (this[propName] !== value) {
-            this[propName] = value
-            this._plane[propName] = value
-            this._gizmo[propName] = value
-
-            this.dispatchEvent({ type: `${propName}-changed`, value })
-            this.dispatchEvent(this.changeEvent)
-          }
-        },
-      })
-      // @ts-ignore
-      this._plane[propName] = defaultValue
-      // @ts-ignore
-      this._gizmo[propName] = defaultValue
     }
   }
 
