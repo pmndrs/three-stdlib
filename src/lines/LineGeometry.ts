@@ -1,4 +1,4 @@
-import { Line } from 'three'
+import { Line, InstancedInterleavedBuffer, InterleavedBufferAttribute } from 'three'
 import { LineSegmentsGeometry } from './LineSegmentsGeometry'
 
 class LineGeometry extends LineSegmentsGeometry {
@@ -25,7 +25,26 @@ class LineGeometry extends LineSegmentsGeometry {
       points[2 * i + 5] = array[i + 5]
     }
 
-    LineSegmentsGeometry.prototype.setPositions.call(this, points)
+    let lineSegments
+
+    if (array instanceof Float32Array) {
+      lineSegments = array
+    } else if (Array.isArray(array)) {
+      lineSegments = new Float32Array(array)
+    } else {
+      console.error('LineSegmentsGeometry.setPosition requires either a Float32Array or regular array of numbers')
+      return this
+    }
+
+    const instanceBuffer = new InstancedInterleavedBuffer(lineSegments, 6, 1) // xyz, xyz
+
+    this.setAttribute('instanceStart', new InterleavedBufferAttribute(instanceBuffer, 3, 0)) // xyz
+    this.setAttribute('instanceEnd', new InterleavedBufferAttribute(instanceBuffer, 3, 3)) // xyz
+
+    //
+
+    this.computeBoundingBox()
+    this.computeBoundingSphere()
 
     return this
   }
@@ -46,7 +65,10 @@ class LineGeometry extends LineSegmentsGeometry {
       colors[2 * i + 5] = array[i + 5]
     }
 
-    LineSegmentsGeometry.prototype.setColors.call(this, colors)
+    const instanceColorBuffer = new InstancedInterleavedBuffer(colors, 6, 1) // rgb, rgb
+
+    this.setAttribute('instanceColorStart', new InterleavedBufferAttribute(instanceColorBuffer, 3, 0)) // rgb
+    this.setAttribute('instanceColorEnd', new InterleavedBufferAttribute(instanceColorBuffer, 3, 3)) // rgb
 
     return this
   }

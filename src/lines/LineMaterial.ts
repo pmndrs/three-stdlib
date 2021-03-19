@@ -295,6 +295,8 @@ class LineMaterial extends ShaderMaterial {
 
     this.dashed = false
 
+    this.setValues(parameters)
+
     Object.defineProperties(this, {
       color: {
         enumerable: true,
@@ -333,8 +335,6 @@ class LineMaterial extends ShaderMaterial {
         enumerable: true,
       },
     })
-
-    this.setValues(parameters)
   }
 }
 
