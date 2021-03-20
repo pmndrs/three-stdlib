@@ -164,7 +164,8 @@ class EdgeSplitModifier {
     } = {}
     for (let name of Object.keys(geometry.attributes)) {
       const oldAttribute = geometry.attributes[name]
-      const newArray = (oldAttribute.array as TypedArray).constructor(
+      // @ts-ignore
+      const newArray = new oldAttribute.array.constructor(
         (this.indexes.length + this.splitIndexes.length) * oldAttribute.itemSize,
       )
 
