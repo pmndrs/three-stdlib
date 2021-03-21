@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { OrbitControls } from 'three-stdlib'
 import { useThree } from 'react-three-fiber'
 
-export const Controls = () => {
+export const Controls = (): JSX.Element | null => {
   const { camera, gl, invalidate } = useThree()
 
   const [controls, setControls] = useState<OrbitControls>()
@@ -16,7 +16,7 @@ export const Controls = () => {
     if (controls) {
       controls.addEventListener('change', invalidate)
     }
-    return () => {
+    return (): void => {
       if (controls) {
         controls.removeEventListener('change', invalidate)
       }

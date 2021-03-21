@@ -119,6 +119,30 @@ class TransformControls extends Object3D {
     this.add(this._gizmo)
     this.add(this._plane)
 
+    // Defined getter, setter and store for a property
+    const defineProperty = <TValue>(propName: string, defaultValue: TValue): void => {
+      Object.defineProperty(this, propName, {
+        get: function () {
+          return this[propName]
+        },
+
+        set: function (value) {
+          if (this[propName] !== value) {
+            this[propName] = value
+            this._plane[propName] = value
+            this._gizmo[propName] = value
+
+            this.dispatchEvent({ type: `${propName}-changed`, value })
+            this.dispatchEvent(this.changeEvent)
+          }
+        },
+      })
+      // @ts-ignore
+      this._plane[propName] = defaultValue
+      // @ts-ignore
+      this._gizmo[propName] = defaultValue
+    }
+
     defineProperty('camera', this._camera)
     defineProperty('object', this._object)
     defineProperty('enabled', this._enabled)
@@ -149,29 +173,6 @@ class TransformControls extends Object3D {
       domElement.addEventListener('pointerdown', this.onPointerDown)
       domElement.addEventListener('pointermove', this.onPointerHover)
       this.domElement.ownerDocument.addEventListener('pointerup', this.onPointerUp)
-    }
-
-    // Defined getter, setter and store for a property
-    function defineProperty<TValue>(propName: string, defaultValue: TValue): void {
-      Object.defineProperty(this, propName, {
-        get: function () {
-          return this[propName]
-        },
-
-        set: function (value) {
-          if (this[propName] !== value) {
-            this[propName] = value
-            this._plane[propName] = value
-            this._gizmo[propName] = value
-
-            this.dispatchEvent({ type: `${propName}-changed`, value })
-            this.dispatchEvent(this.changeEvent)
-          }
-        },
-      })
-
-      this._plane[propName] = defaultValue
-      this._gizmo[propName] = defaultValue
     }
   }
 
@@ -208,7 +209,7 @@ class TransformControls extends Object3D {
     return this
   }
 
-  public updateMatrixWorld = (): void => {
+  public updateMatrixWorld = (force: boolean): void => {
     if (this._object !== undefined) {
       this._object.updateMatrixWorld()
 
@@ -229,7 +230,29 @@ class TransformControls extends Object3D {
 
     this._eye.copy(this._cameraPosition).sub(this._worldPosition).normalize()
 
-    Object3D.prototype.updateMatrixWorld.call(this)
+    if (this.matrixAutoUpdate) {
+      this.updateMatrix()
+    }
+
+    if (this.matrixWorldNeedsUpdate || force) {
+      if (this.parent === null) {
+        this.matrixWorld.copy(this.matrix)
+      } else {
+        this.matrixWorld.multiplyMatrices(this.parent.matrixWorld, this.matrix)
+      }
+
+      this.matrixWorldNeedsUpdate = false
+
+      force = true
+    }
+
+    // update children
+
+    const children = this.children
+
+    for (let i = 0, l = children.length; i < l; i++) {
+      children[i].updateMatrixWorld(force)
+    }
   }
 
   private pointerHover = (pointer: TransformControlsPointerObject): void => {
@@ -991,7 +1014,7 @@ class TransformControlsGizmo extends Object3D {
   }
 
   // updateMatrixWorld will update transformations and appearance of individual handles
-  public updateMatrixWorld = (): void => {
+  public updateMatrixWorld = (force: boolean): void => {
     let space = this._space
 
     if (this._mode === 'scale') space = 'local' // scale always oriented to local rotation
@@ -1279,7 +1302,29 @@ class TransformControlsGizmo extends Object3D {
       }
     }
 
-    Object3D.prototype.updateMatrixWorld.call(this)
+    if (this.matrixAutoUpdate) {
+      this.updateMatrix()
+    }
+
+    if (this.matrixWorldNeedsUpdate || force) {
+      if (this.parent === null) {
+        this.matrixWorld.copy(this.matrix)
+      } else {
+        this.matrixWorld.multiplyMatrices(this.parent.matrixWorld, this.matrix)
+      }
+
+      this.matrixWorldNeedsUpdate = false
+
+      force = true
+    }
+
+    // update children
+
+    const children = this.children
+
+    for (let i = 0, l = children.length; i < l; i++) {
+      children[i].updateMatrixWorld(force)
+    }
   }
 }
 
@@ -1323,7 +1368,7 @@ class TransformControlsPlane extends Mesh<PlaneGeometry, MeshBasicMaterial> {
   private _mode: 'translate' | 'rotate' | 'scale' = 'translate'
   private _space = 'world'
 
-  public updateMatrixWorld = (): void => {
+  public updateMatrixWorld = (force: boolean): void => {
     let space = this._space
 
     this.position.copy(this._worldPosition)
@@ -1386,7 +1431,29 @@ class TransformControlsPlane extends Mesh<PlaneGeometry, MeshBasicMaterial> {
       this.quaternion.setFromRotationMatrix(this.tempMatrix)
     }
 
-    Object3D.prototype.updateMatrixWorld.call(this)
+    if (this.matrixAutoUpdate) {
+      this.updateMatrix()
+    }
+
+    if (this.matrixWorldNeedsUpdate || force) {
+      if (this.parent === null) {
+        this.matrixWorld.copy(this.matrix)
+      } else {
+        this.matrixWorld.multiplyMatrices(this.parent.matrixWorld, this.matrix)
+      }
+
+      this.matrixWorldNeedsUpdate = false
+
+      force = true
+    }
+
+    // update children
+
+    const children = this.children
+
+    for (let i = 0, l = children.length; i < l; i++) {
+      children[i].updateMatrixWorld(force)
+    }
   }
 }
 

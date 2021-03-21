@@ -1,4 +1,4 @@
-import { Line } from 'three'
+import { Line, InstancedInterleavedBuffer, InterleavedBufferAttribute } from 'three'
 import { LineSegmentsGeometry } from './LineSegmentsGeometry'
 
 class LineGeometry extends LineSegmentsGeometry {

@@ -449,8 +449,8 @@ export function mergeVertices(geometry: BufferGeometry, tolerance = 1e-4): Buffe
   for (let i = 0, l = attributeNames.length; i < l; i++) {
     const name = attributeNames[i]
     const oldAttribute = geometry.getAttribute(name)
-
-    const buffer = (oldAttribute.array as TypedArray).constructor(attrArrays[name])
+    //@ts-expect-error  something to do with functions and constructors and new
+    const buffer = new (oldAttribute.array as TypedArray).constructor(attrArrays[name])
     const attribute = new BufferAttribute(buffer, oldAttribute.itemSize, oldAttribute.normalized)
 
     result.setAttribute(name, attribute)
@@ -459,7 +459,8 @@ export function mergeVertices(geometry: BufferGeometry, tolerance = 1e-4): Buffe
     if (name in morphAttrsArrays) {
       for (let j = 0; j < morphAttrsArrays[name].length; j++) {
         const oldMorphAttribute = geometry.morphAttributes[name][j]
-        const buffer = (oldMorphAttribute.array as TypedArray).constructor(morphAttrsArrays[name][j])
+        //@ts-expect-error something to do with functions and constructors and new
+        const buffer = new (oldMorphAttribute.array as TypedArray).constructor(morphAttrsArrays[name][j])
         const morphAttribute = new BufferAttribute(buffer, oldMorphAttribute.itemSize, oldMorphAttribute.normalized)
         result.morphAttributes[name][j] = morphAttribute
       }
