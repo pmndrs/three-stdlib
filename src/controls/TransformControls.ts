@@ -40,8 +40,8 @@ class TransformControls extends Object3D {
 
   private raycaster = new Raycaster()
 
-  private _gizmo = new TransformControlsGizmo()
-  private _plane = new TransformControlsPlane()
+  private _gizmo: TransformControlsGizmo
+  private _plane: TransformControlsPlane
 
   private _tempVector = new Vector3()
   private _tempVector2 = new Vector3()
@@ -116,58 +116,66 @@ class TransformControls extends Object3D {
     this.domElement = domElement
     this._camera = camera
 
+    this._gizmo = new TransformControlsGizmo()
     this.add(this._gizmo)
+
+    this._plane = new TransformControlsPlane()
     this.add(this._plane)
 
     // Defined getter, setter and store for a property
     const defineProperty = <TValue>(propName: string, defaultValue: TValue): void => {
+      let propValue = defaultValue
+
       Object.defineProperty(this, propName, {
         get: function () {
-          return this[propName]
+          return propValue !== undefined ? propValue : defaultValue
         },
 
         set: function (value) {
-          if (this[propName] !== value) {
-            this[propName] = value
+          if (propValue !== value) {
+            propValue = value
             this._plane[propName] = value
             this._gizmo[propName] = value
 
-            this.dispatchEvent({ type: `${propName}-changed`, value })
+            this.dispatchEvent({ type: propName + '-changed', value: value })
             this.dispatchEvent(this.changeEvent)
           }
         },
       })
+
+      //@ts-ignore
+      this[propName] = defaultValue
       // @ts-ignore
       this._plane[propName] = defaultValue
       // @ts-ignore
       this._gizmo[propName] = defaultValue
     }
 
-    defineProperty('camera', this._camera)
-    defineProperty('object', this._object)
-    defineProperty('enabled', this._enabled)
-    defineProperty('axis', this._axis)
-    defineProperty('mode', this._mode)
-    defineProperty('translationSnap', this._translationSnap)
-    defineProperty('rotationSnap', this._rotationSnap)
-    defineProperty('scaleSnap', this._scaleSnap)
-    defineProperty('space', this._space)
-    defineProperty('size', this._size)
-    defineProperty('dragging', this._dragging)
-    defineProperty('showX', this._showX)
-    defineProperty('showY', this._showY)
-    defineProperty('showZ', this._showZ)
-    defineProperty('worldPosition', this._worldPosition)
-    defineProperty('worldPositionStart', this._worldPositionStart)
-    defineProperty('worldQuaternion', this._worldQuaternion)
-    defineProperty('worldQuaternionStart', this._worldQuaternionStart)
-    defineProperty('cameraPosition', this._cameraPosition)
-    defineProperty('cameraQuaternion', this._cameraQuaternion)
-    defineProperty('pointStart', this._pointStart)
-    defineProperty('pointEnd', this._pointEnd)
-    defineProperty('rotationAxis', this._rotationAxis)
-    defineProperty('rotationAngle', this._rotationAngle)
-    defineProperty('eye', this._eye)
+    defineProperty('_camera', this._camera)
+    defineProperty('_object', this._object)
+    defineProperty('_enabled', this._enabled)
+    defineProperty('_axis', this._axis)
+    defineProperty('_mode', this._mode)
+    defineProperty('_translationSnap', this._translationSnap)
+    defineProperty('_rotationSnap', this._rotationSnap)
+    defineProperty('_scaleSnap', this._scaleSnap)
+    defineProperty('_space', this._space)
+    defineProperty('_size', this._size)
+    defineProperty('_dragging', this._dragging)
+    defineProperty('_showX', this._showX)
+    defineProperty('_showY', this._showY)
+    defineProperty('_showZ', this._showZ)
+    defineProperty('_worldPosition', this._worldPosition)
+    defineProperty('_worldPositionStart', this._worldPositionStart)
+    defineProperty('_worldQuaternion', this._worldQuaternion)
+    defineProperty('_worldQuaternionStart', this._worldQuaternionStart)
+    defineProperty('_cameraPosition', this._cameraPosition)
+    defineProperty('_cameraQuaternion', this._cameraQuaternion)
+    defineProperty('_pointStart', this._pointStart)
+    defineProperty('_pointEnd', this._pointEnd)
+    defineProperty('_rotationAxis', this._rotationAxis)
+    defineProperty('_rotationAngle', this._rotationAngle)
+    defineProperty('_eye', this._eye)
 
     {
       domElement.addEventListener('pointerdown', this.onPointerDown)
@@ -209,7 +217,7 @@ class TransformControls extends Object3D {
     return this
   }
 
-  public updateMatrixWorld = (force: boolean): void => {
+  public updateMatrixWorld = (): void => {
     if (this._object !== undefined) {
       this._object.updateMatrixWorld()
 
@@ -230,29 +238,7 @@ class TransformControls extends Object3D {
 
     this._eye.copy(this._cameraPosition).sub(this._worldPosition).normalize()
 
-    if (this.matrixAutoUpdate) {
-      this.updateMatrix()
-    }
-
-    if (this.matrixWorldNeedsUpdate || force) {
-      if (this.parent === null) {
-        this.matrixWorld.copy(this.matrix)
-      } else {
-        this.matrixWorld.multiplyMatrices(this.parent.matrixWorld, this.matrix)
-      }
-
-      this.matrixWorldNeedsUpdate = false
-
-      force = true
-    }
-
-    // update children
-
-    const children = this.children
-
-    for (let i = 0, l = children.length; i < l; i++) {
-      children[i].updateMatrixWorld(force)
-    }
+    super.updateMatrixWorld()
   }
 
   private pointerHover = (pointer: TransformControlsPointerObject): void => {
@@ -1014,10 +1000,12 @@ class TransformControlsGizmo extends Object3D {
   }
 
   // updateMatrixWorld will update transformations and appearance of individual handles
-  public updateMatrixWorld = (force: boolean): void => {
+  public updateMatrixWorld = (): void => {
     let space = this._space
 
-    if (this._mode === 'scale') space = 'local' // scale always oriented to local rotation
+    if (this._mode === 'scale') {
+      space = 'local' // scale always oriented to local rotation
+    }
 
     const quaternion = space === 'local' ? this._worldQuaternion : this.identityQuaternion
 
@@ -1031,10 +1019,10 @@ class TransformControlsGizmo extends Object3D {
     this.helper['rotate'].visible = this._mode === 'rotate'
     this.helper['scale'].visible = this._mode === 'scale'
 
-    let handles: Array<Mesh<BufferGeometry, MeshBasicMaterial> & { tag?: string }> = []
-    handles = handles.concat(this.picker[this._mode].children as Mesh<BufferGeometry, MeshBasicMaterial>[])
-    handles = handles.concat(this.gizmo[this._mode].children as Mesh<BufferGeometry, MeshBasicMaterial>[])
-    handles = handles.concat(this.helper[this._mode].children as Mesh<BufferGeometry, MeshBasicMaterial>[])
+    let handles: Array<Object3D & { tag?: string }> = []
+    handles = handles.concat(this.picker[this._mode].children)
+    handles = handles.concat(this.gizmo[this._mode].children)
+    handles = handles.concat(this.helper[this._mode].children)
 
     for (let i = 0; i < handles.length; i++) {
       const handle = handles[i]
@@ -1045,11 +1033,12 @@ class TransformControlsGizmo extends Object3D {
       handle.rotation.set(0, 0, 0)
       handle.position.copy(this._worldPosition)
 
-      let factor: number
+      let factor
 
       if ((this._camera as OrthographicCamera).isOrthographicCamera) {
         factor =
-          ((this._camera as OrthographicCamera).top - (this._camera as OrthographicCamera).bottom) / this._camera.zoom
+          ((this._camera as OrthographicCamera).top - (this._camera as OrthographicCamera).bottom) /
+          (this._camera as OrthographicCamera).zoom
       } else {
         factor =
           this._worldPosition.distanceTo(this._cameraPosition) *
@@ -1282,49 +1271,45 @@ class TransformControlsGizmo extends Object3D {
 
       // highlight selected axis
 
-      handle.material.color.copy(handle.material.color)
-      handle.material.opacity = handle.material.opacity
+      //@ts-ignore
+      handle.material._opacity = handle.material._opacity || handle.material.opacity
+      //@ts-ignore
+      handle.material._color = handle.material._color || handle.material.color.clone()
+      //@ts-ignore
+      handle.material.color.copy(handle.material._color)
+      //@ts-ignore
+      handle.material.opacity = handle.material._opacity
 
       if (!this._enabled) {
+        //@ts-ignore
         handle.material.opacity *= 0.5
+        //@ts-ignore
         handle.material.color.lerp(new Color(1, 1, 1), 0.5)
       } else if (this._axis) {
         if (handle.name === this._axis) {
+          //@ts-ignore
           handle.material.opacity = 1.0
+          //@ts-ignore
           handle.material.color.lerp(new Color(1, 1, 1), 0.5)
-        } else if (this._axis.split('').some((a) => handle.name === a)) {
+        } else if (
+          this._axis.split('').some(function (a) {
+            return handle.name === a
+          })
+        ) {
+          //@ts-ignore
           handle.material.opacity = 1.0
+          //@ts-ignore
           handle.material.color.lerp(new Color(1, 1, 1), 0.5)
         } else {
+          //@ts-ignore
           handle.material.opacity *= 0.25
+          //@ts-ignore
           handle.material.color.lerp(new Color(1, 1, 1), 0.5)
         }
       }
     }
 
-    if (this.matrixAutoUpdate) {
-      this.updateMatrix()
-    }
-
-    if (this.matrixWorldNeedsUpdate || force) {
-      if (this.parent === null) {
-        this.matrixWorld.copy(this.matrix)
-      } else {
-        this.matrixWorld.multiplyMatrices(this.parent.matrixWorld, this.matrix)
-      }
-
-      this.matrixWorldNeedsUpdate = false
-
-      force = true
-    }
-
-    // update children
-
-    const children = this.children
-
-    for (let i = 0, l = children.length; i < l; i++) {
-      children[i].updateMatrixWorld(force)
-    }
+    super.updateMatrixWorld()
   }
 }
 
@@ -1368,7 +1353,7 @@ class TransformControlsPlane extends Mesh<PlaneGeometry, MeshBasicMaterial> {
   private _mode: 'translate' | 'rotate' | 'scale' = 'translate'
   private _space = 'world'
 
-  public updateMatrixWorld = (force: boolean): void => {
+  public updateMatrixWorld = (): void => {
     let space = this._space
 
     this.position.copy(this._worldPosition)
@@ -1431,29 +1416,7 @@ class TransformControlsPlane extends Mesh<PlaneGeometry, MeshBasicMaterial> {
       this.quaternion.setFromRotationMatrix(this.tempMatrix)
     }
 
-    if (this.matrixAutoUpdate) {
-      this.updateMatrix()
-    }
-
-    if (this.matrixWorldNeedsUpdate || force) {
-      if (this.parent === null) {
-        this.matrixWorld.copy(this.matrix)
-      } else {
-        this.matrixWorld.multiplyMatrices(this.parent.matrixWorld, this.matrix)
-      }
-
-      this.matrixWorldNeedsUpdate = false
-
-      force = true
-    }
-
-    // update children
-
-    const children = this.children
-
-    for (let i = 0, l = children.length; i < l; i++) {
-      children[i].updateMatrixWorld(force)
-    }
+    super.updateMatrixWorld()
   }
 }
 

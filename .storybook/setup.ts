@@ -6,6 +6,7 @@ interface useThreeReturn {
   camera: Camera
   scene: Scene
   renderer: WebGLRenderer
+  render: () => void
 }
 
 interface useFrameProps {
@@ -14,9 +15,10 @@ interface useFrameProps {
 
 interface useThreeProps {
   useFrame?: ({ clock }: useFrameProps, delta: number) => void
+  orbit: boolean
 }
 
-export const useThree = ({ useFrame }: useThreeProps = {}): useThreeReturn => {
+export const useThree = ({ useFrame, orbit }: useThreeProps = { orbit: true }): useThreeReturn => {
   const container = document.getElementById('canvas-root') as HTMLCanvasElement
 
   const renderer = new WebGLRenderer({
@@ -43,9 +45,12 @@ export const useThree = ({ useFrame }: useThreeProps = {}): useThreeReturn => {
   }
 
   const clock = new Clock()
+  let controls: OrbitControls = null
 
-  const controls = new OrbitControls(camera, container)
-  controls.enableDamping = true
+  if (orbit) {
+    controls = new OrbitControls(camera, container)
+    controls.enableDamping = true
+  }
 
   function animate() {
     if (useFrame) {
@@ -57,7 +62,9 @@ export const useThree = ({ useFrame }: useThreeProps = {}): useThreeReturn => {
       )
     }
 
-    controls.update()
+    if (controls !== null) {
+      controls.update()
+    }
 
     render()
 
@@ -76,5 +83,6 @@ export const useThree = ({ useFrame }: useThreeProps = {}): useThreeReturn => {
     camera,
     scene,
     renderer,
+    render,
   }
 }
