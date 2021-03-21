@@ -9,7 +9,7 @@ class LineGeometry extends LineSegmentsGeometry {
     super()
   }
 
-  public setPositions = (array: number[] | Float32Array): this => {
+  public setPositions(array: number[] | Float32Array): this {
     // converts [ x1, y1, z1,  x2, y2, z2, ... ] to pairs format
 
     const length = array.length - 3
@@ -25,7 +25,7 @@ class LineGeometry extends LineSegmentsGeometry {
       points[2 * i + 5] = array[i + 5]
     }
 
-    LineSegmentsGeometry.prototype.setPositions.call(this, points)
+    super.setPositions(points)
 
     return this
   }
@@ -46,7 +46,7 @@ class LineGeometry extends LineSegmentsGeometry {
       colors[2 * i + 5] = array[i + 5]
     }
 
-    LineSegmentsGeometry.prototype.setColors.call(this, colors)
+    super.setColors(colors)
 
     return this
   }
