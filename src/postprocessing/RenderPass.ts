@@ -1,31 +1,40 @@
-import { Color } from 'three'
-import { Pass } from '../postprocessing/Pass'
+import { Camera, Color, Material, Scene, WebGLRenderTarget, WebGLRenderer } from 'three'
+import { Pass } from './Pass'
 
-var RenderPass = function (scene, camera, overrideMaterial, clearColor, clearAlpha) {
-  Pass.call(this)
+class RenderPass extends Pass {
+  public scene: Scene
+  public camera: Camera
+  public overrideMaterial: Material | undefined
+  public clearColor: Color | undefined
+  public clearAlpha: number
+  public clearDepth = false
+  private _oldClearColor = new Color()
 
-  this.scene = scene
-  this.camera = camera
+  constructor(scene: Scene, camera: Camera, overrideMaterial?: Material, clearColor?: Color, clearAlpha = 0) {
+    super()
 
-  this.overrideMaterial = overrideMaterial
+    this.scene = scene
+    this.camera = camera
 
-  this.clearColor = clearColor
-  this.clearAlpha = clearAlpha !== undefined ? clearAlpha : 0
+    this.overrideMaterial = overrideMaterial
 
-  this.clear = true
-  this.clearDepth = false
-  this.needsSwap = false
-  this._oldClearColor = new Color()
-}
+    this.clearColor = clearColor
+    this.clearAlpha = clearAlpha
 
-RenderPass.prototype = Object.assign(Object.create(Pass.prototype), {
-  constructor: RenderPass,
+    this.clear = true
+    this.needsSwap = false
+  }
 
-  render: function (renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */) {
-    var oldAutoClear = renderer.autoClear
+  public render(
+    renderer: WebGLRenderer,
+    writeBuffer: WebGLRenderTarget,
+    readBuffer: WebGLRenderTarget /*, deltaTime, maskActive */,
+  ): void {
+    let oldAutoClear = renderer.autoClear
     renderer.autoClear = false
 
-    var oldClearAlpha, oldOverrideMaterial
+    let oldClearAlpha
+    let oldOverrideMaterial: Material | null = null
 
     if (this.overrideMaterial !== undefined) {
       oldOverrideMaterial = this.scene.overrideMaterial
@@ -59,7 +68,7 @@ RenderPass.prototype = Object.assign(Object.create(Pass.prototype), {
     }
 
     renderer.autoClear = oldAutoClear
-  },
-})
+  }
+}
 
 export { RenderPass }
