@@ -1,8 +1,6 @@
 import { BufferAttribute, BufferGeometry, Vector3 } from 'three'
 import * as BufferGeometryUtils from '../utils/BufferGeometryUtils'
 
-import { TypedArray } from '../types/shared'
-
 interface EdgeSplitToGroupsResult {
   splitGroup: number[]
   currentGroup: number[]
@@ -183,7 +181,7 @@ class EdgeSplitModifier {
       for (let attribute of Object.values(newAttributes)) {
         for (let j = 0; j < attribute.itemSize; j++) {
           // @ts-expect-error ArrayLike can't be mutated, but this works – https://github.com/three-types/three-ts-types/issues/35
-          attribute.array[(indexes.length + i) * attribute.itemSize + j] =
+          attribute.array[(this.indexes.length + i) * attribute.itemSize + j] =
             attribute.array[index * attribute.itemSize + j]
         }
       }
