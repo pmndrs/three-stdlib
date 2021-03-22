@@ -1,4 +1,4 @@
-import { ShaderLib, ShaderMaterial, ShaderMaterialParameters, UniformsLib, UniformsUtils, Vector2 } from 'three'
+import { ShaderLib, ShaderMaterial, UniformsLib, UniformsUtils, Vector2, ShaderMaterialParameters } from 'three'
 
 import { ColorOptions } from '../types/shared'
 
@@ -13,7 +13,20 @@ export type LineMaterialParameters = ShaderMaterialParameters & {
   resolution?: Vector2
 }
 
-export const LineUniforms = {
+/**
+ * parameters = {
+ *  color: <hex>,
+ *  linewidth: <float>,
+ *  dashed: <boolean>,
+ *  dashScale: <float>,
+ *  dashSize: <float>,
+ *  dashOffset: <float>,
+ *  gapSize: <float>,
+ *  resolution: <Vector2>, // to be set by renderer
+ * }
+ */
+
+const LineUniforms = {
   linewidth: { value: 1 },
   resolution: { value: new Vector2(1, 1) },
   dashScale: { value: 1 },
@@ -206,6 +219,24 @@ ShaderLib['line'] = {
 
 			#endif
 
+			float alpha = opacity;
+
+			#ifdef ALPHA_TO_COVERAGE
+
+			// artifacts appear on some hardware if a derivative is taken within a conditional
+			float a = vUv.x;
+			float b = ( vUv.y > 0.0 ) ? vUv.y - 1.0 : vUv.y + 1.0;
+			float len2 = a * a + b * b;
+			float dlen = fwidth( len2 );
+
+			if ( abs( vUv.y ) > 1.0 ) {
+
+				alpha = 1.0 - smoothstep( 1.0 - dlen, 1.0 + dlen, len2 );
+
+			}
+
+			#else
+
 			if ( abs( vUv.y ) > 1.0 ) {
 
 				float a = vUv.x;
@@ -216,12 +247,14 @@ ShaderLib['line'] = {
 
 			}
 
-			vec4 diffuseColor = vec4( diffuse, opacity );
+			#endif
+
+			vec4 diffuseColor = vec4( diffuse, alpha );
 
 			#include <logdepthbuf_fragment>
 			#include <color_fragment>
 
-			gl_FragColor = vec4( diffuseColor.rgb, diffuseColor.a );
+			gl_FragColor = vec4( diffuseColor.rgb, alpha );
 
 			#include <tonemapping_fragment>
 			#include <encodings_fragment>
@@ -233,59 +266,20 @@ ShaderLib['line'] = {
 }
 
 class LineMaterial extends ShaderMaterial {
-  public dashed: boolean
+  private readonly isLineMaterial = true
 
-  private isLineMaterial = true
+  public dashed = false
 
-  public get color(): any {
-    return this.uniforms.diffuse.value
-  }
+  public color: number = 0
+  public lineWidth: number = 0
+  public dashScale: number = 0
+  public dashOffset: number = 0
+  public dashSize: number = 0
+  public opacity: number = 0
+  public resolution: Vector2 = new Vector2()
+  public alphaToCoverage: boolean = false
 
-  public set color(value: any) {
-    this.uniforms.diffuse.value = value
-  }
-
-  public get dashScale(): number {
-    return this.uniforms.dashScale.value
-  }
-
-  public set dashScale(value: number) {
-    this.uniforms.dashScale.value = value
-  }
-
-  public get dashSize(): number {
-    return this.uniforms.dashSize.value
-  }
-
-  public set dashSize(value: number) {
-    this.uniforms.dashSize.value = value
-  }
-
-  public get dashOffset(): number {
-    return this.uniforms.dashOffset.value
-  }
-
-  public set dashOffset(value: number) {
-    this.uniforms.dashOffset.value = value
-  }
-
-  public get gapSize(): number {
-    return this.uniforms.gapSize.value
-  }
-
-  public set gapSize(value: number) {
-    this.uniforms.gapSize.value = value
-  }
-
-  public get resolution(): Vector2 {
-    return this.uniforms.gapSize.value
-  }
-
-  public set resolution(value: Vector2) {
-    this.uniforms.gapSize.value = value
-  }
-
-  constructor(parameters: LineMaterialParameters = {}) {
+  constructor(parameters: LineMaterialParameters) {
     super({
       uniforms: UniformsUtils.clone(ShaderLib['line'].uniforms),
       vertexShader: ShaderLib['line'].vertexShader,
@@ -293,48 +287,123 @@ class LineMaterial extends ShaderMaterial {
       clipping: true, // required for clipping support
     })
 
-    this.dashed = false
-
-    this.setValues(parameters)
-
+    /**
+     * Everytime I remove this, everything just breaks,
+     * so I'm just gonna leave it here.
+     */
     Object.defineProperties(this, {
       color: {
         enumerable: true,
+
+        get: function () {
+          return this.uniforms.diffuse.value
+        },
+
+        set: function (value) {
+          this.uniforms.diffuse.value = value
+        },
       },
       linewidth: {
         enumerable: true,
-        get: function (): number {
+
+        get: function () {
           return this.uniforms.linewidth.value
         },
-        set: function (value: number): void {
+
+        set: function (value) {
           this.uniforms.linewidth.value = value
         },
       },
       dashScale: {
         enumerable: true,
+
+        get: function () {
+          return this.uniforms.dashScale.value
+        },
+
+        set: function (value) {
+          this.uniforms.dashScale.value = value
+        },
       },
       dashSize: {
         enumerable: true,
+
+        get: function () {
+          return this.uniforms.dashSize.value
+        },
+
+        set: function (value) {
+          this.uniforms.dashSize.value = value
+        },
       },
       dashOffset: {
         enumerable: true,
+
+        get: function () {
+          return this.uniforms.dashOffset.value
+        },
+
+        set: function (value) {
+          this.uniforms.dashOffset.value = value
+        },
       },
       gapSize: {
         enumerable: true,
+
+        get: function () {
+          return this.uniforms.gapSize.value
+        },
+
+        set: function (value) {
+          this.uniforms.gapSize.value = value
+        },
       },
       opacity: {
         enumerable: true,
-        get: function (): number {
+
+        get: function () {
           return this.uniforms.opacity.value
         },
-        set: function (value: number): void {
+
+        set: function (value) {
           this.uniforms.opacity.value = value
         },
       },
       resolution: {
         enumerable: true,
+
+        get: function () {
+          return this.uniforms.resolution.value
+        },
+
+        set: function (value) {
+          this.uniforms.resolution.value.copy(value)
+        },
+      },
+      alphaToCoverage: {
+        enumerable: true,
+
+        get: function () {
+          return Boolean('ALPHA_TO_COVERAGE' in this.defines)
+        },
+
+        set: function (value) {
+          if (Boolean(value) !== Boolean('ALPHA_TO_COVERAGE' in this.defines)) {
+            this.needsUpdate = true
+          }
+
+          if (value) {
+            this.defines.ALPHA_TO_COVERAGE = ''
+            this.extensions.derivatives = true
+          } else {
+            delete this.defines.ALPHA_TO_COVERAGE
+            this.extensions.derivatives = false
+          }
+        },
       },
     })
+
+    this.setValues(parameters)
   }
 }
 

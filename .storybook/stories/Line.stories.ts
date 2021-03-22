@@ -1,4 +1,4 @@
-import { Color, AmbientLight, DirectionalLight, PointLight, SpotLight, Vector3 } from 'three'
+import { Color, CatmullRomCurve3, Vector3, Scene, Vector2 } from 'three'
 import { useEffect } from '@storybook/client-api'
 
 import { useThree } from '../setup'
@@ -13,38 +13,49 @@ export default {
 export const Default = () => {
   // must run in this so the canvas has mounted in the iframe & can be accessed by `three`
   useEffect(() => {
-    console.log('calling effect')
-    const points = hilbert3D(new Vector3(0), 5).map((p: Vector3) => [p.x, p.y, p.z]) as [number, number, number][]
+    const { scene, renderer } = useThree()
 
-    const lineGeometry = new LineGeometry()
-    const pValues = points.map((p) => (p instanceof Vector3 ? p.toArray() : p))
-    lineGeometry.setPositions(pValues.flat())
+    // Position and THREE.Color Data
 
-    const line2 = new Line2(
-      lineGeometry,
-      new LineMaterial({
-        color: 'red',
-        lineWidth: 3,
-      }),
-    )
-    line2.computeLineDistances()
+    const positions = []
+    const colors = []
 
-    const ambientLight = new AmbientLight('white', 0.2)
-    const directionalLight = new DirectionalLight('pink', 2)
-    directionalLight.position.set(0, -5, 0)
-    const pointLight1 = new PointLight('pink', 0.4)
-    pointLight1.position.set(-10, -10, 10)
-    const pointLight2 = new PointLight('white', 0.2)
-    pointLight2.position.set(-10, -10, 10)
-    const spotLight = new SpotLight('white', 2, 35, Math.PI / 4, 2, 3.5)
-    spotLight.position.set(-3, 6, -4)
+    const points = hilbert3D(new Vector3(0, 0, 0), 20.0, 1, 0, 1, 2, 3, 4, 5, 6, 7)
 
-    const { renderer, scene } = useThree({
-      // useFrame: (_, delta) => {},
+    const spline = new CatmullRomCurve3(points)
+    const divisions = Math.round(12 * points.length)
+    const point = new Vector3()
+    const color = new Color()
+
+    console.log(spline)
+
+    for (let i = 0, l = divisions; i < l; i++) {
+      const t = i / l
+
+      spline.getPoint(t, point)
+      positions.push(point.x, point.y, point.z)
+
+      color.setHSL(t, 1.0, 0.5)
+      colors.push(color.r, color.g, color.b)
+    }
+
+    const geometry = new LineGeometry()
+    geometry.setPositions(positions)
+    geometry.setColors(colors)
+
+    const matLine = new LineMaterial({
+      color: 0xffffff,
+      linewidth: 5, // in pixels
+      vertexColors: true,
+      resolution: new Vector2(window.innerWidth, window.innerHeight),
+      dashed: false,
     })
 
-    scene.background = new Color(0x000000).convertSRGBToLinear()
-    scene.add(ambientLight, directionalLight, pointLight1, pointLight2, spotLight, line2)
+    const line = new Line2(geometry, matLine)
+    line.computeLineDistances()
+    line.scale.set(1, 1, 1)
+
+    scene.add(line)
 
     return () => {
       renderer.dispose()

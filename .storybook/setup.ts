@@ -11,14 +11,15 @@ interface useThreeReturn {
 
 interface useFrameProps {
   clock: Clock
+  renderer: WebGLRenderer
 }
 
 interface useThreeProps {
-  useFrame?: ({ clock }: useFrameProps, delta: number) => void
-  orbit: boolean
+  useFrame?: ({ clock, renderer }: useFrameProps, delta: number) => void
+  orbit?: boolean
 }
 
-export const useThree = ({ useFrame, orbit }: useThreeProps = { orbit: true }): useThreeReturn => {
+export const useThree = ({ useFrame, orbit = true }: useThreeProps = {}): useThreeReturn => {
   const container = document.getElementById('canvas-root') as HTMLCanvasElement
 
   const renderer = new WebGLRenderer({
@@ -56,6 +57,7 @@ export const useThree = ({ useFrame, orbit }: useThreeProps = { orbit: true }): 
     if (useFrame) {
       useFrame(
         {
+          renderer,
           clock,
         },
         clock.getDelta(),

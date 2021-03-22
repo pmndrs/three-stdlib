@@ -26,7 +26,7 @@ class LineSegments2 extends Mesh<LineSegmentsGeometry, LineMaterial> {
   private distStart = new Vector3()
   private distEnd = new Vector3()
 
-  private computeLineDistances = (): this => {
+  public computeLineDistances = (): this => {
     const geometry = this.geometry
 
     const instanceStart = geometry.attributes.instanceStart as InterleavedBufferAttribute
