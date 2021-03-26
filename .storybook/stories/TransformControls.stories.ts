@@ -3,8 +3,7 @@ import { useEffect } from '@storybook/client-api'
 
 import { useThree } from '../setup'
 
-//@ts-ignore
-import { TransformControls, OrbitControls } from '../../src'
+import { TransformControls } from '../../src'
 
 export default {
   title: 'Controls/Transform',
