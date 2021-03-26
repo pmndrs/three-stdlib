@@ -6,7 +6,7 @@
   "main": "index.cjs.js",
   "module": "index.js",
   "scripts": {
-    "build": "rollup -c && node ./scripts/createDeclarations.js",
+    "build": "rollup -c && node ./scripts/createDeclarations.js && yarn copy",
     "build-storybook": "build-storybook -s ./.storybook/public",
     "copy": "copyfiles package.json README.md LICENSE dist && json -I -f dist/package.json -e \"this.private=false; this.devDependencies=undefined; this.optionalDependencies=undefined; this.scripts=undefined; this.husky=undefined; this.prettier=undefined; this.jest=undefined; this['lint-staged']=undefined;\"",
     "lint": "eslint --cache --fix src/**/*.ts",
