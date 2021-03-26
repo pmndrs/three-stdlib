@@ -23,6 +23,7 @@ import {
   Intersection,
   TorusGeometry,
   Vector3,
+  Camera,
 } from 'three'
 
 export interface TransformControlsPointerObject {
@@ -31,7 +32,7 @@ export interface TransformControlsPointerObject {
   button: number
 }
 
-class TransformControls extends Object3D {
+class TransformControls<TCamera extends Camera = Camera> extends Object3D {
   public readonly isTransformControls = true
 
   public visible = false
@@ -84,7 +85,7 @@ class TransformControls extends Object3D {
   private _quaternionStart = new Quaternion()
   private _scaleStart = new Vector3()
 
-  private _camera: PerspectiveCamera | OrthographicCamera
+  private _camera: TCamera
   private _object: Object3D | undefined
   private _enabled = true
   private _axis: string | null = null
@@ -105,7 +106,7 @@ class TransformControls extends Object3D {
   private mouseUpEvent = { type: 'mouseUp', mode: this._mode }
   private objectChangeEvent = { type: 'objectChange' }
 
-  constructor(camera: PerspectiveCamera | OrthographicCamera, domElement: HTMLElement) {
+  constructor(camera: TCamera, domElement: HTMLElement) {
     super()
 
     if (domElement === undefined) {
