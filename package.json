@@ -6,7 +6,7 @@
   "main": "index.cjs.js",
   "module": "index.js",
   "scripts": {
-    "build": "rollup -c && npm run copy",
+    "build": "rollup -c && node ./scripts/createDeclarations.js",
     "build-storybook": "build-storybook -s ./.storybook/public",
     "copy": "copyfiles package.json README.md LICENSE dist && json -I -f dist/package.json -e \"this.private=false; this.devDependencies=undefined; this.optionalDependencies=undefined; this.scripts=undefined; this.husky=undefined; this.prettier=undefined; this.jest=undefined; this['lint-staged']=undefined;\"",
     "lint": "eslint --cache --fix src/**/*.ts",
@@ -78,6 +78,7 @@
     "json": "^10.0.0",
     "lint-staged": "^10.2.11",
     "prettier": "^2.2.1",
+    "recrawl": "^2.0.0",
     "rimraf": "^3.0.2",
     "rollup": "^2.26.4",
     "rollup-plugin-babel": "^4.4.0",

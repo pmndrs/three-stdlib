@@ -1193,6 +1193,11 @@
     exec-sh "^0.3.2"
     minimist "^1.2.0"
 
+"@cush/relative@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@cush/relative/-/relative-0.1.0.tgz#19bfc2c8d46335205932f2032e3569f99fd61b40"
+  integrity sha512-pnF2c2hhHyC520CmYYKq3hGOS0kipkGBgRnp3z7wx7lDzykaUwQW3wPQmiX9YtbHUcgUu1qQtzstixmeYMwQoA==
+
 "@emotion/cache@^10.0.27":
   version "10.0.29"
   resolved "https://registry.yarnpkg.com/@emotion/cache/-/cache-10.0.29.tgz#87e7e64f412c060102d589fe7c6dc042e6f9d1e0"
@@ -5734,6 +5739,11 @@ glob-promise@^3.4.0:
   dependencies:
     "@types/glob" "*"
 
+glob-regex@^0.3.0:
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/glob-regex/-/glob-regex-0.3.2.tgz#27348f2f60648ec32a4a53137090b9fb934f3425"
+  integrity sha512-m5blUd3/OqDTWwzBBtWBPrGlAzatRywHameHeekAZyZrskYouOGdNB8T/q6JucucvJXtOuyHIn0/Yia7iDasDw==
+
 glob-to-regexp@^0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/glob-to-regexp/-/glob-to-regexp-0.3.0.tgz#8c5a1494d2066c570cc3bfe4496175acc4d502ab"
@@ -9058,6 +9068,15 @@ rechoir@^0.6.2:
   dependencies:
     resolve "^1.1.6"
 
+recrawl@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/recrawl/-/recrawl-2.0.0.tgz#bb2e4d5424435d2a2ac15a61a84f21510d087fec"
+  integrity sha512-PmL1uxEDduB/qqWc06KZzGJ4j//sXAuMlTcNJFFAEMTffJIFrzFghOxkgHU8+auKOUILEdbyfuEvFyoeu4mJgQ==
+  dependencies:
+    "@cush/relative" "^0.1.0"
+    glob-regex "^0.3.0"
+    tslib "^1.9.3"
+
 recursive-readdir@2.2.2:
   version "2.2.2"
   resolved "https://registry.yarnpkg.com/recursive-readdir/-/recursive-readdir-2.2.2.tgz#9946fb3274e1628de6e36b2f6714953b4845094f"
@@ -10447,7 +10466,7 @@ tsconfig-paths@^3.9.0:
     minimist "^1.2.0"
     strip-bom "^3.0.0"
 
-tslib@^1.8.1, tslib@^1.9.0:
+tslib@^1.8.1, tslib@^1.9.0, tslib@^1.9.3:
   version "1.14.1"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.14.1.tgz#cf2d38bdc34a134bcaf1091c41f6619e2f672d00"
   integrity sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==
