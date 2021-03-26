@@ -279,7 +279,7 @@ class LineMaterial extends ShaderMaterial {
   public resolution: Vector2 = new Vector2()
   public alphaToCoverage: boolean = false
 
-  constructor(parameters: LineMaterialParameters) {
+  constructor(parameters: LineMaterialParameters = {}) {
     super({
       uniforms: UniformsUtils.clone(ShaderLib['line'].uniforms),
       vertexShader: ShaderLib['line'].vertexShader,

@@ -4,7 +4,7 @@ import { ShaderPass } from './ShaderPass'
 import { MaskPass, ClearMaskPass } from './MaskPass'
 import { Pass } from './Pass'
 
-class EffectComposer {
+class EffectComposer<TRenderTarget extends WebGLRenderTarget = WebGLRenderTarget> {
   public renderer: WebGLRenderer
   private _pixelRatio: number
   private _width: number
@@ -18,7 +18,7 @@ class EffectComposer {
   public copyPass: Pass
   public clock: Clock
 
-  constructor(renderer: WebGLRenderer, renderTarget: WebGLRenderTarget) {
+  constructor(renderer: WebGLRenderer, renderTarget?: TRenderTarget) {
     this.renderer = renderer
 
     if (renderTarget === undefined) {
@@ -33,7 +33,11 @@ class EffectComposer {
       this._width = size.width
       this._height = size.height
 
-      renderTarget = new WebGLRenderTarget(this._width * this._pixelRatio, this._height * this._pixelRatio, parameters)
+      renderTarget = new WebGLRenderTarget(
+        this._width * this._pixelRatio,
+        this._height * this._pixelRatio,
+        parameters,
+      ) as TRenderTarget
       renderTarget.texture.name = 'EffectComposer.rt1'
     } else {
       this._pixelRatio = 1
@@ -99,7 +103,7 @@ class EffectComposer {
     return true
   }
 
-  public render(deltaTime: number): void {
+  public render(deltaTime?: number): void {
     // deltaTime value is in seconds
 
     if (deltaTime === undefined) {
