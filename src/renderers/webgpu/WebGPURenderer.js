@@ -11,7 +11,7 @@ import WebGPURenderLists from './WebGPURenderLists'
 import WebGPUTextures from './WebGPUTextures'
 import WebGPUBackground from './WebGPUBackground'
 import WebGPUNodes from './nodes/WebGPUNodes'
-import glslang from '@webgpu/glslang'
+import glslang from '@webgpu/glslang/dist/web-devel/glslang'
 
 import { Frustum, Matrix4, Vector3, Color } from 'three'
 
