@@ -1,6 +1,5 @@
 /* eslint-disable import/export */
 // @ts-nocheck
-export * from './libs/MeshoptDecoder'
 export * from './offscreen/scene'
 export * from './offscreen/offscreen'
 export * from './offscreen/jank'
@@ -384,3 +383,4 @@ export * from './curves/NURBSCurve'
 export * from './curves/NURBSSurface'
 export * from './curves/CurveExtras'
 export * from './deprecated/Geometry'
+export * from './libs/MeshoptDecoder'

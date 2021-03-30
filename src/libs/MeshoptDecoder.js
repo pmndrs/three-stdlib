@@ -1,8 +1,6 @@
 // This file is part of meshoptimizer library and is distributed under the terms of MIT License.
 // Copyright (C) 2016-2020, by Arseny Kapoulkine (arseny.kapoulkine@gmail.com)
-var MeshoptDecoder = (function () {
-  'use strict'
-
+const MeshoptDecoder = (() => {
   // Built with clang version 11.0.0 (https://github.com/llvm/llvm-project.git 0160ad802e899c2922bc9b29564080c22eb0908c)
   // Built from meshoptimizer 0.14
   var wasm_base =
