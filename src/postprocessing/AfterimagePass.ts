@@ -12,17 +12,19 @@ import { Pass, FullScreenQuad } from './Pass'
 import { AfterimageShader } from '../shaders/AfterimageShader'
 
 class AfterimagePass extends Pass {
-  public shader = AfterimageShader
-  public uniforms = UniformsUtils.clone(this.shader.uniforms)
+  public shader
+  public uniforms
   public textureComp: WebGLRenderTarget
   public textureOld: WebGLRenderTarget
   public shaderMaterial: ShaderMaterial
   public compFsQuad: FullScreenQuad<ShaderMaterial>
   public copyFsQuad: FullScreenQuad<MeshBasicMaterial>
 
-  constructor(damp = 0.96) {
+  constructor(damp = 0.96, shader = AfterimageShader) {
     super()
 
+    this.shader = shader
+    this.uniforms = UniformsUtils.clone(shader.uniforms)
     this.uniforms['damp'].value = damp
 
     this.textureComp = new WebGLRenderTarget(window.innerWidth, window.innerHeight, {
