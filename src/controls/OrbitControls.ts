@@ -910,7 +910,7 @@ class OrbitControls extends EventDispatcher {
 //    Pan - left mouse, or arrow keys / touch: one-finger move
 
 class MapControls extends OrbitControls {
-  constructor(object: Camera, domElement: HTMLElement) {
+  constructor(object: Camera, domElement?: HTMLElement) {
     super(object, domElement)
 
     this.screenSpacePanning = false // pan orthogonal to world-space direction camera.up
