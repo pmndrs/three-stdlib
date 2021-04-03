@@ -4,7 +4,7 @@
  * https://codepen.io/brunoimbrizi/pen/MoRJaN?page=1&
  */
 
-var AfterimageShader = {
+const AfterimageShader = {
   uniforms: {
     damp: { value: 0.96 },
     tOld: { value: null },
