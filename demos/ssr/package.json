@@ -12,7 +12,9 @@
     "start": "next start"
   },
   "dependencies": {
+    "@react-three/fiber": "^6.0.10",
     "next": "^10.0.7",
+    "next-transpile-modules": "^6.4.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-three-fiber": "^5.3.19",
