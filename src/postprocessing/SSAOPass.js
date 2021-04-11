@@ -27,8 +27,6 @@ import { SSAOBlurShader, SSAODepthShader, SSAOShader } from '../shaders/SSAOShad
 import { CopyShader } from '../shaders/CopyShader'
 
 var SSAOPass = function (scene, camera, width, height) {
-  new Pass.call(this)
-
   this.width = width !== undefined ? width : 512
   this.height = height !== undefined ? height : 512
 

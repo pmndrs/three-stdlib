@@ -3,8 +3,6 @@ import { Pass, FullScreenQuad } from '../postprocessing/Pass'
 import { DigitalGlitch } from '../shaders/DigitalGlitch'
 
 var GlitchPass = function (dt_size) {
-  new Pass.call(this)
-
   if (DigitalGlitch === undefined) console.error('THREE.GlitchPass relies on DigitalGlitch')
 
   var shader = DigitalGlitch

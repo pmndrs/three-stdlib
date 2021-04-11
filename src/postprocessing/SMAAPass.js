@@ -12,8 +12,6 @@ import { Pass, FullScreenQuad } from '../postprocessing/Pass'
 import { SMAAEdgesShader, SMAAWeightsShader, SMAABlendShader } from '../shaders/SMAAShader'
 
 var SMAAPass = function (width, height) {
-  new Pass.call(this)
-
   // render targets
 
   this.edgesRT = new WebGLRenderTarget(width, height, {

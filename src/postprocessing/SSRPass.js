@@ -34,8 +34,6 @@ var SSRPass = function ({
   morphTargets = false,
   groundReflector,
 }) {
-  new Pass.call(this)
-
   this.width = width !== undefined ? width : 512
   this.height = height !== undefined ? height : 512
 

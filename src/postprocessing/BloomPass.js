@@ -12,8 +12,6 @@ import { CopyShader } from '../shaders/CopyShader'
 import { ConvolutionShader } from '../shaders/ConvolutionShader'
 
 var BloomPass = function (strength, kernelSize, sigma, resolution) {
-  new Pass.call(this)
-
   strength = strength !== undefined ? strength : 1
   kernelSize = kernelSize !== undefined ? kernelSize : 25
   sigma = sigma !== undefined ? sigma : 4.0

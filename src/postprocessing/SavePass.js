@@ -3,8 +3,6 @@ import { Pass, FullScreenQuad } from '../postprocessing/Pass'
 import { CopyShader } from '../shaders/CopyShader'
 
 var SavePass = function (renderTarget) {
-  new Pass.call(this)
-
   if (CopyShader === undefined) console.error('THREE.SavePass relies on CopyShader')
 
   var shader = CopyShader

@@ -22,8 +22,6 @@ import { ToneMapShader } from '../shaders/ToneMapShader'
  */
 
 var AdaptiveToneMappingPass = function (adaptive, resolution) {
-  new Pass.call(this)
-
   this.resolution = resolution !== undefined ? resolution : 256
   this.needsInit = true
   this.adaptive = adaptive !== undefined ? !!adaptive : true

@@ -21,8 +21,6 @@ import { CopyShader } from '../shaders/CopyShader'
  */
 
 var SSAARenderPass = function (scene, camera, clearColor, clearAlpha) {
-  new Pass.call(this)
-
   this.scene = scene
   this.camera = camera
 

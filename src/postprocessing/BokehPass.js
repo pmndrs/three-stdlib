@@ -16,8 +16,6 @@ import { BokehShader } from '../shaders/BokehShader'
  */
 
 var BokehPass = function (scene, camera, params) {
-  new Pass.call(this)
-
   this.scene = scene
   this.camera = camera
 
