@@ -12,7 +12,7 @@ import { Pass, FullScreenQuad } from '../postprocessing/Pass'
 import { SMAAEdgesShader, SMAAWeightsShader, SMAABlendShader } from '../shaders/SMAAShader'
 
 var SMAAPass = function (width, height) {
-  Pass.call(this)
+  new Pass.call(this)
 
   // render targets
 

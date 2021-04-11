@@ -24,7 +24,7 @@ import { LuminosityHighPassShader } from '../shaders/LuminosityHighPassShader'
  * - https://docs.unrealengine.com/latest/INT/Engine/Rendering/PostProcessEffects/Bloom/
  */
 var UnrealBloomPass = function (resolution, strength, radius, threshold) {
-  Pass.call(this)
+  new Pass.call(this)
 
   this.strength = strength !== undefined ? strength : 1
   this.radius = radius

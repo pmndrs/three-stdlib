@@ -30,7 +30,7 @@ import { UnpackDepthRGBAShader } from '../shaders/UnpackDepthRGBAShader'
  */
 
 var SAOPass = function (scene, camera, depthTexture, useNormals, resolution) {
-  Pass.call(this)
+  new Pass.call(this)
 
   this.scene = scene
   this.camera = camera

@@ -3,7 +3,7 @@ import { Pass, FullScreenQuad } from '../postprocessing/Pass'
 import { FilmShader } from '../shaders/FilmShader'
 
 var FilmPass = function (noiseIntensity, scanlinesIntensity, scanlinesCount, grayscale) {
-  Pass.call(this)
+  new Pass.call(this)
 
   if (FilmShader === undefined) console.error('THREE.FilmPass relies on FilmShader')
 

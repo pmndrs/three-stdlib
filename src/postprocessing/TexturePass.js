@@ -3,7 +3,7 @@ import { Pass, FullScreenQuad } from '../postprocessing/Pass'
 import { CopyShader } from '../shaders/CopyShader'
 
 var TexturePass = function (map, opacity) {
-  Pass.call(this)
+  new Pass.call(this)
 
   if (CopyShader === undefined) console.error('THREE.TexturePass relies on CopyShader')
 

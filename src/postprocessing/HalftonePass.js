@@ -7,7 +7,7 @@ import { HalftoneShader } from '../shaders/HalftoneShader'
  */
 
 var HalftonePass = function (width, height, params) {
-  Pass.call(this)
+  new Pass.call(this)
 
   if (HalftoneShader === undefined) {
     console.error('THREE.HalftonePass requires HalftoneShader')

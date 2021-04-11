@@ -2,7 +2,7 @@ import { BackSide, BoxGeometry, Mesh, PerspectiveCamera, Scene, ShaderLib, Shade
 import { Pass } from '../postprocessing/Pass'
 
 var CubeTexturePass = function (camera, envMap, opacity) {
-  Pass.call(this)
+  new Pass.call(this)
 
   this.camera = camera
 

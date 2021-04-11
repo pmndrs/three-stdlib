@@ -2,7 +2,7 @@ import { Color } from 'three'
 import { Pass } from '../postprocessing/Pass'
 
 var ClearPass = function (clearColor, clearAlpha) {
-  Pass.call(this)
+  new Pass.call(this)
 
   this.needsSwap = false
 

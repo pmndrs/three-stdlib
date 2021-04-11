@@ -33,7 +33,7 @@ var OutlinePass = function (resolution, scene, camera, selectedObjects) {
 
   this._visibilityCache = new Map()
 
-  Pass.call(this)
+  new Pass.call(this)
 
   this.resolution = resolution !== undefined ? new Vector2(resolution.x, resolution.y) : new Vector2(256, 256)
 

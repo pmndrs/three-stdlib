@@ -3,7 +3,7 @@ import { Pass, FullScreenQuad } from '../postprocessing/Pass'
 import { DotScreenShader } from '../shaders/DotScreenShader'
 
 var DotScreenPass = function (center, angle, scale) {
-  Pass.call(this)
+  new Pass.call(this)
 
   if (DotScreenShader === undefined) console.error('THREE.DotScreenPass relies on DotScreenShader')
 
