@@ -18,7 +18,7 @@ const getBabelOptions = ({ useESModules }, targets) => ({
   plugins: [
     '@babel/plugin-proposal-class-properties',
     '@babel/plugin-proposal-optional-chaining',
-    ['@babel/transform-runtime', { regenerator: false, useESModules }],
+    ['@babel/transform-runtime'],
   ],
 })
 
