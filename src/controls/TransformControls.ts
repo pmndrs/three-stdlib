@@ -41,69 +41,69 @@ class TransformControls<TCamera extends Camera = Camera> extends Object3D {
 
   private raycaster = new Raycaster()
 
-  private _gizmo: TransformControlsGizmo
-  private _plane: TransformControlsPlane
+  private gizmo: TransformControlsGizmo
+  private plane: TransformControlsPlane
 
-  private _tempVector = new Vector3()
-  private _tempVector2 = new Vector3()
-  private _tempQuaternion = new Quaternion()
-  private _unit = {
+  private tempVector = new Vector3()
+  private tempVector2 = new Vector3()
+  private tempQuaternion = new Quaternion()
+  private unit = {
     X: new Vector3(1, 0, 0),
     Y: new Vector3(0, 1, 0),
     Z: new Vector3(0, 0, 1),
   }
 
-  private _pointStart = new Vector3()
-  private _pointEnd = new Vector3()
-  private _offset = new Vector3()
-  private _rotationAxis = new Vector3()
-  private _startNorm = new Vector3()
-  private _endNorm = new Vector3()
-  private _rotationAngle = 0
+  private pointStart = new Vector3()
+  private pointEnd = new Vector3()
+  private offset = new Vector3()
+  private rotationAxis = new Vector3()
+  private startNorm = new Vector3()
+  private endNorm = new Vector3()
+  private rotationAngle = 0
 
-  private _cameraPosition = new Vector3()
-  private _cameraQuaternion = new Quaternion()
-  private _cameraScale = new Vector3()
+  private cameraPosition = new Vector3()
+  private cameraQuaternion = new Quaternion()
+  private cameraScale = new Vector3()
 
-  private _parentPosition = new Vector3()
-  private _parentQuaternion = new Quaternion()
-  private _parentQuaternionInv = new Quaternion()
-  private _parentScale = new Vector3()
+  private parentPosition = new Vector3()
+  private parentQuaternion = new Quaternion()
+  private parentQuaternionInv = new Quaternion()
+  private parentScale = new Vector3()
 
-  private _worldPositionStart = new Vector3()
-  private _worldQuaternionStart = new Quaternion()
-  private _worldScaleStart = new Vector3()
+  private worldPositionStart = new Vector3()
+  private worldQuaternionStart = new Quaternion()
+  private worldScaleStart = new Vector3()
 
-  private _worldPosition = new Vector3()
-  private _worldQuaternion = new Quaternion()
-  private _worldQuaternionInv = new Quaternion()
-  private _worldScale = new Vector3()
+  private worldPosition = new Vector3()
+  private worldQuaternion = new Quaternion()
+  private worldQuaternionInv = new Quaternion()
+  private worldScale = new Vector3()
 
-  private _eye = new Vector3()
+  private eye = new Vector3()
 
-  private _positionStart = new Vector3()
-  private _quaternionStart = new Quaternion()
-  private _scaleStart = new Vector3()
+  private positionStart = new Vector3()
+  private quaternionStart = new Quaternion()
+  private scaleStart = new Vector3()
 
-  private _camera: TCamera
-  private _object: Object3D | undefined
-  private _enabled = true
-  private _axis: string | null = null
-  private _mode: 'translate' | 'rotate' | 'scale' = 'translate'
-  private _translationSnap: number | null = null
-  private _rotationSnap: number | null = null
-  private _scaleSnap: number | null = null
-  private _space = 'world'
-  private _size = 1
-  private _dragging = false
-  private _showX = true
-  private _showY = true
-  private _showZ = true
+  private camera: TCamera
+  private object: Object3D | undefined
+  private enabled = true
+  private axis: string | null = null
+  private mode: 'translate' | 'rotate' | 'scale' = 'translate'
+  private translationSnap: number | null = null
+  private rotationSnap: number | null = null
+  private scaleSnap: number | null = null
+  private space = 'world'
+  private size = 1
+  private dragging = false
+  private showX = true
+  private showY = true
+  private showZ = true
 
   // events
   private changeEvent = { type: 'change' }
   private mouseDownEvent = { type: 'mouseDown' }
-  private mouseUpEvent = { type: 'mouseUp', mode: this._mode }
+  private mouseUpEvent = { type: 'mouseUp', mode: this.mode }
   private objectChangeEvent = { type: 'objectChange' }
 
   constructor(camera: TCamera, domElement: HTMLElement) {
@@ -115,13 +115,13 @@ class TransformControls<TCamera extends Camera = Camera> extends Object3D {
     }
 
     this.domElement = domElement
-    this._camera = camera
+    this.camera = camera
 
-    this._gizmo = new TransformControlsGizmo()
-    this.add(this._gizmo)
+    this.gizmo = new TransformControlsGizmo()
+    this.add(this.gizmo)
 
-    this._plane = new TransformControlsPlane()
-    this.add(this._plane)
+    this.plane = new TransformControlsPlane()
+    this.add(this.plane)
 
     // Defined getter, setter and store for a property
     const defineProperty = <TValue>(propName: string, defaultValue: TValue): void => {
@@ -135,8 +135,8 @@ class TransformControls<TCamera extends Camera = Camera> extends Object3D {
         set: function (value) {
           if (propValue !== value) {
             propValue = value
-            this._plane[propName] = value
-            this._gizmo[propName] = value
+            this.plane[propName] = value
+            this.gizmo[propName] = value
 
             this.dispatchEvent({ type: propName + '-changed', value: value })
             this.dispatchEvent(this.changeEvent)
@@ -147,36 +147,36 @@ class TransformControls<TCamera extends Camera = Camera> extends Object3D {
       //@ts-ignore
       this[propName] = defaultValue
       // @ts-ignore
-      this._plane[propName] = defaultValue
+      this.plane[propName] = defaultValue
       // @ts-ignore
-      this._gizmo[propName] = defaultValue
+      this.gizmo[propName] = defaultValue
     }
 
-    defineProperty('_camera', this._camera)
-    defineProperty('_object', this._object)
-    defineProperty('_enabled', this._enabled)
-    defineProperty('_axis', this._axis)
-    defineProperty('_mode', this._mode)
-    defineProperty('_translationSnap', this._translationSnap)
-    defineProperty('_rotationSnap', this._rotationSnap)
-    defineProperty('_scaleSnap', this._scaleSnap)
-    defineProperty('_space', this._space)
-    defineProperty('_size', this._size)
-    defineProperty('_dragging', this._dragging)
-    defineProperty('_showX', this._showX)
-    defineProperty('_showY', this._showY)
-    defineProperty('_showZ', this._showZ)
-    defineProperty('_worldPosition', this._worldPosition)
-    defineProperty('_worldPositionStart', this._worldPositionStart)
-    defineProperty('_worldQuaternion', this._worldQuaternion)
-    defineProperty('_worldQuaternionStart', this._worldQuaternionStart)
-    defineProperty('_cameraPosition', this._cameraPosition)
-    defineProperty('_cameraQuaternion', this._cameraQuaternion)
-    defineProperty('_pointStart', this._pointStart)
-    defineProperty('_pointEnd', this._pointEnd)
-    defineProperty('_rotationAxis', this._rotationAxis)
-    defineProperty('_rotationAngle', this._rotationAngle)
-    defineProperty('_eye', this._eye)
+    defineProperty('camera', this.camera)
+    defineProperty('object', this.object)
+    defineProperty('enabled', this.enabled)
+    defineProperty('axis', this.axis)
+    defineProperty('mode', this.mode)
+    defineProperty('translationSnap', this.translationSnap)
+    defineProperty('rotationSnap', this.rotationSnap)
+    defineProperty('scaleSnap', this.scaleSnap)
+    defineProperty('space', this.space)
+    defineProperty('size', this.size)
+    defineProperty('dragging', this.dragging)
+    defineProperty('showX', this.showX)
+    defineProperty('showY', this.showY)
+    defineProperty('showZ', this.showZ)
+    defineProperty('worldPosition', this.worldPosition)
+    defineProperty('worldPositionStart', this.worldPositionStart)
+    defineProperty('worldQuaternion', this.worldQuaternion)
+    defineProperty('worldQuaternionStart', this.worldQuaternionStart)
+    defineProperty('cameraPosition', this.cameraPosition)
+    defineProperty('cameraQuaternion', this.cameraQuaternion)
+    defineProperty('pointStart', this.pointStart)
+    defineProperty('pointEnd', this.pointEnd)
+    defineProperty('rotationAxis', this.rotationAxis)
+    defineProperty('rotationAngle', this.rotationAngle)
+    defineProperty('eye', this.eye)
 
     {
       domElement.addEventListener('pointerdown', this.onPointerDown)
@@ -203,7 +203,7 @@ class TransformControls<TCamera extends Camera = Camera> extends Object3D {
 
   // Set current object
   public attach = (object: Object3D): this => {
-    this._object = object
+    this.object = object
     this.visible = true
 
     return this
@@ -211,102 +211,102 @@ class TransformControls<TCamera extends Camera = Camera> extends Object3D {
 
   // Detatch from object
   public detach = (): this => {
-    this._object = undefined
+    this.object = undefined
     this.visible = false
-    this._axis = null
+    this.axis = null
 
     return this
   }
 
   public updateMatrixWorld = (): void => {
-    if (this._object !== undefined) {
-      this._object.updateMatrixWorld()
+    if (this.object !== undefined) {
+      this.object.updateMatrixWorld()
 
-      if (this._object.parent === null) {
+      if (this.object.parent === null) {
         console.error('TransformControls: The attached 3D object must be a part of the scene graph.')
       } else {
-        this._object.parent.matrixWorld.decompose(this._parentPosition, this._parentQuaternion, this._parentScale)
+        this.object.parent.matrixWorld.decompose(this.parentPosition, this.parentQuaternion, this.parentScale)
       }
 
-      this._object.matrixWorld.decompose(this._worldPosition, this._worldQuaternion, this._worldScale)
+      this.object.matrixWorld.decompose(this.worldPosition, this.worldQuaternion, this.worldScale)
 
-      this._parentQuaternionInv.copy(this._parentQuaternion).invert()
-      this._worldQuaternionInv.copy(this._worldQuaternion).invert()
+      this.parentQuaternionInv.copy(this.parentQuaternion).invert()
+      this.worldQuaternionInv.copy(this.worldQuaternion).invert()
     }
 
-    this._camera.updateMatrixWorld()
-    this._camera.matrixWorld.decompose(this._cameraPosition, this._cameraQuaternion, this._cameraScale)
+    this.camera.updateMatrixWorld()
+    this.camera.matrixWorld.decompose(this.cameraPosition, this.cameraQuaternion, this.cameraScale)
 
-    this._eye.copy(this._cameraPosition).sub(this._worldPosition).normalize()
+    this.eye.copy(this.cameraPosition).sub(this.worldPosition).normalize()
 
     super.updateMatrixWorld()
   }
 
   private pointerHover = (pointer: TransformControlsPointerObject): void => {
-    if (this._object === undefined || this._dragging === true) return
+    if (this.object === undefined || this.dragging === true) return
 
-    this.raycaster.setFromCamera(pointer, this._camera)
+    this.raycaster.setFromCamera(pointer, this.camera)
 
-    const intersect = this.intersectObjectWithRay(this._gizmo.picker[this._mode], this.raycaster)
+    const intersect = this.intersectObjectWithRay(this.gizmo.picker[this.mode], this.raycaster)
 
     if (intersect) {
-      this._axis = intersect.object.name
+      this.axis = intersect.object.name
     } else {
-      this._axis = null
+      this.axis = null
     }
   }
 
   private pointerDown = (pointer: TransformControlsPointerObject): void => {
-    if (this._object === undefined || this._dragging === true || pointer.button !== 0) return
+    if (this.object === undefined || this.dragging === true || pointer.button !== 0) return
 
-    if (this._axis !== null) {
-      this.raycaster.setFromCamera(pointer, this._camera)
+    if (this.axis !== null) {
+      this.raycaster.setFromCamera(pointer, this.camera)
 
-      const planeIntersect = this.intersectObjectWithRay(this._plane, this.raycaster, true)
+      const planeIntersect = this.intersectObjectWithRay(this.plane, this.raycaster, true)
 
       if (planeIntersect) {
-        let space = this._space
+        let space = this.space
 
-        if (this._mode === 'scale') {
+        if (this.mode === 'scale') {
           space = 'local'
-        } else if (this._axis === 'E' || this._axis === 'XYZE' || this._axis === 'XYZ') {
+        } else if (this.axis === 'E' || this.axis === 'XYZE' || this.axis === 'XYZ') {
           space = 'world'
         }
 
-        if (space === 'local' && this._mode === 'rotate') {
-          const snap = this._rotationSnap
+        if (space === 'local' && this.mode === 'rotate') {
+          const snap = this.rotationSnap
 
-          if (this._axis === 'X' && snap) this._object.rotation.x = Math.round(this._object.rotation.x / snap) * snap
-          if (this._axis === 'Y' && snap) this._object.rotation.y = Math.round(this._object.rotation.y / snap) * snap
-          if (this._axis === 'Z' && snap) this._object.rotation.z = Math.round(this._object.rotation.z / snap) * snap
+          if (this.axis === 'X' && snap) this.object.rotation.x = Math.round(this.object.rotation.x / snap) * snap
+          if (this.axis === 'Y' && snap) this.object.rotation.y = Math.round(this.object.rotation.y / snap) * snap
+          if (this.axis === 'Z' && snap) this.object.rotation.z = Math.round(this.object.rotation.z / snap) * snap
         }
 
-        this._object.updateMatrixWorld()
+        this.object.updateMatrixWorld()
 
-        if (this._object.parent) {
-          this._object.parent.updateMatrixWorld()
+        if (this.object.parent) {
+          this.object.parent.updateMatrixWorld()
         }
 
-        this._positionStart.copy(this._object.position)
-        this._quaternionStart.copy(this._object.quaternion)
-        this._scaleStart.copy(this._object.scale)
+        this.positionStart.copy(this.object.position)
+        this.quaternionStart.copy(this.object.quaternion)
+        this.scaleStart.copy(this.object.scale)
 
-        this._object.matrixWorld.decompose(this._worldPositionStart, this._worldQuaternionStart, this._worldScaleStart)
+        this.object.matrixWorld.decompose(this.worldPositionStart, this.worldQuaternionStart, this.worldScaleStart)
 
-        this._pointStart.copy(planeIntersect.point).sub(this._worldPositionStart)
+        this.pointStart.copy(planeIntersect.point).sub(this.worldPositionStart)
       }
 
-      this._dragging = true
-      this.mouseDownEvent.type = this._mode
+      this.dragging = true
+      this.mouseDownEvent.type = this.mode
       this.dispatchEvent(this.mouseDownEvent)
     }
   }
 
   private pointerMove = (pointer: TransformControlsPointerObject): void => {
-    const axis = this._axis
-    const mode = this._mode
-    const object = this._object
-    let space = this._space
+    const axis = this.axis
+    const mode = this.mode
+    const object = this.object
+    let space = this.space
 
     if (mode === 'scale') {
       space = 'local'
@@ -314,172 +314,171 @@ class TransformControls<TCamera extends Camera = Camera> extends Object3D {
       space = 'world'
     }
 
-    if (object === undefined || axis === null || this._dragging === false || pointer.button !== -1) return
+    if (object === undefined || axis === null || this.dragging === false || pointer.button !== -1) return
 
-    this.raycaster.setFromCamera(pointer, this._camera)
+    this.raycaster.setFromCamera(pointer, this.camera)
 
-    const planeIntersect = this.intersectObjectWithRay(this._plane, this.raycaster, true)
+    const planeIntersect = this.intersectObjectWithRay(this.plane, this.raycaster, true)
 
     if (!planeIntersect) return
 
-    this._pointEnd.copy(planeIntersect.point).sub(this._worldPositionStart)
+    this.pointEnd.copy(planeIntersect.point).sub(this.worldPositionStart)
 
     if (mode === 'translate') {
       // Apply translate
 
-      this._offset.copy(this._pointEnd).sub(this._pointStart)
+      this.offset.copy(this.pointEnd).sub(this.pointStart)
 
       if (space === 'local' && axis !== 'XYZ') {
-        this._offset.applyQuaternion(this._worldQuaternionInv)
+        this.offset.applyQuaternion(this.worldQuaternionInv)
       }
 
-      if (axis.indexOf('X') === -1) this._offset.x = 0
-      if (axis.indexOf('Y') === -1) this._offset.y = 0
-      if (axis.indexOf('Z') === -1) this._offset.z = 0
+      if (axis.indexOf('X') === -1) this.offset.x = 0
+      if (axis.indexOf('Y') === -1) this.offset.y = 0
+      if (axis.indexOf('Z') === -1) this.offset.z = 0
 
       if (space === 'local' && axis !== 'XYZ') {
-        this._offset.applyQuaternion(this._quaternionStart).divide(this._parentScale)
+        this.offset.applyQuaternion(this.quaternionStart).divide(this.parentScale)
       } else {
-        this._offset.applyQuaternion(this._parentQuaternionInv).divide(this._parentScale)
+        this.offset.applyQuaternion(this.parentQuaternionInv).divide(this.parentScale)
       }
 
-      object.position.copy(this._offset).add(this._positionStart)
+      object.position.copy(this.offset).add(this.positionStart)
 
       // Apply translation snap
 
-      if (this._translationSnap) {
+      if (this.translationSnap) {
         if (space === 'local') {
-          object.position.applyQuaternion(this._tempQuaternion.copy(this._quaternionStart).invert())
+          object.position.applyQuaternion(this.tempQuaternion.copy(this.quaternionStart).invert())
 
           if (axis.search('X') !== -1) {
-            object.position.x = Math.round(object.position.x / this._translationSnap) * this._translationSnap
+            object.position.x = Math.round(object.position.x / this.translationSnap) * this.translationSnap
           }
 
           if (axis.search('Y') !== -1) {
-            object.position.y = Math.round(object.position.y / this._translationSnap) * this._translationSnap
+            object.position.y = Math.round(object.position.y / this.translationSnap) * this.translationSnap
           }
 
           if (axis.search('Z') !== -1) {
-            object.position.z = Math.round(object.position.z / this._translationSnap) * this._translationSnap
+            object.position.z = Math.round(object.position.z / this.translationSnap) * this.translationSnap
           }
 
-          object.position.applyQuaternion(this._quaternionStart)
+          object.position.applyQuaternion(this.quaternionStart)
         }
 
         if (space === 'world') {
           if (object.parent) {
-            object.position.add(this._tempVector.setFromMatrixPosition(object.parent.matrixWorld))
+            object.position.add(this.tempVector.setFromMatrixPosition(object.parent.matrixWorld))
           }
 
           if (axis.search('X') !== -1) {
-            object.position.x = Math.round(object.position.x / this._translationSnap) * this._translationSnap
+            object.position.x = Math.round(object.position.x / this.translationSnap) * this.translationSnap
           }
 
           if (axis.search('Y') !== -1) {
-            object.position.y = Math.round(object.position.y / this._translationSnap) * this._translationSnap
+            object.position.y = Math.round(object.position.y / this.translationSnap) * this.translationSnap
           }
 
           if (axis.search('Z') !== -1) {
-            object.position.z = Math.round(object.position.z / this._translationSnap) * this._translationSnap
+            object.position.z = Math.round(object.position.z / this.translationSnap) * this.translationSnap
           }
 
           if (object.parent) {
-            object.position.sub(this._tempVector.setFromMatrixPosition(object.parent.matrixWorld))
+            object.position.sub(this.tempVector.setFromMatrixPosition(object.parent.matrixWorld))
           }
         }
       }
     } else if (mode === 'scale') {
       if (axis.search('XYZ') !== -1) {
-        let d = this._pointEnd.length() / this._pointStart.length()
+        let d = this.pointEnd.length() / this.pointStart.length()
 
-        if (this._pointEnd.dot(this._pointStart) < 0) d *= -1
+        if (this.pointEnd.dot(this.pointStart) < 0) d *= -1
 
-        this._tempVector2.set(d, d, d)
+        this.tempVector2.set(d, d, d)
       } else {
-        this._tempVector.copy(this._pointStart)
-        this._tempVector2.copy(this._pointEnd)
+        this.tempVector.copy(this.pointStart)
+        this.tempVector2.copy(this.pointEnd)
 
-        this._tempVector.applyQuaternion(this._worldQuaternionInv)
-        this._tempVector2.applyQuaternion(this._worldQuaternionInv)
+        this.tempVector.applyQuaternion(this.worldQuaternionInv)
+        this.tempVector2.applyQuaternion(this.worldQuaternionInv)
 
-        this._tempVector2.divide(this._tempVector)
+        this.tempVector2.divide(this.tempVector)
 
         if (axis.search('X') === -1) {
-          this._tempVector2.x = 1
+          this.tempVector2.x = 1
         }
 
         if (axis.search('Y') === -1) {
-          this._tempVector2.y = 1
+          this.tempVector2.y = 1
         }
 
         if (axis.search('Z') === -1) {
-          this._tempVector2.z = 1
+          this.tempVector2.z = 1
         }
       }
 
       // Apply scale
 
-      object.scale.copy(this._scaleStart).multiply(this._tempVector2)
+      object.scale.copy(this.scaleStart).multiply(this.tempVector2)
 
-      if (this._scaleSnap && this._object) {
+      if (this.scaleSnap && this.object) {
         if (axis.search('X') !== -1) {
-          this._object.scale.x = Math.round(object.scale.x / this._scaleSnap) * this._scaleSnap || this._scaleSnap
+          this.object.scale.x = Math.round(object.scale.x / this.scaleSnap) * this.scaleSnap || this.scaleSnap
         }
 
         if (axis.search('Y') !== -1) {
-          object.scale.y = Math.round(object.scale.y / this._scaleSnap) * this._scaleSnap || this._scaleSnap
+          object.scale.y = Math.round(object.scale.y / this.scaleSnap) * this.scaleSnap || this.scaleSnap
         }
 
         if (axis.search('Z') !== -1) {
-          object.scale.z = Math.round(object.scale.z / this._scaleSnap) * this._scaleSnap || this._scaleSnap
+          object.scale.z = Math.round(object.scale.z / this.scaleSnap) * this.scaleSnap || this.scaleSnap
         }
       }
     } else if (mode === 'rotate') {
-      this._offset.copy(this._pointEnd).sub(this._pointStart)
+      this.offset.copy(this.pointEnd).sub(this.pointStart)
 
       const ROTATION_SPEED =
-        20 / this._worldPosition.distanceTo(this._tempVector.setFromMatrixPosition(this._camera.matrixWorld))
+        20 / this.worldPosition.distanceTo(this.tempVector.setFromMatrixPosition(this.camera.matrixWorld))
 
       if (axis === 'E') {
-        this._rotationAxis.copy(this._eye)
-        this._rotationAngle = this._pointEnd.angleTo(this._pointStart)
+        this.rotationAxis.copy(this.eye)
+        this.rotationAngle = this.pointEnd.angleTo(this.pointStart)
 
-        this._startNorm.copy(this._pointStart).normalize()
-        this._endNorm.copy(this._pointEnd).normalize()
+        this.startNorm.copy(this.pointStart).normalize()
+        this.endNorm.copy(this.pointEnd).normalize()
 
-        this._rotationAngle *= this._endNorm.cross(this._startNorm).dot(this._eye) < 0 ? 1 : -1
+        this.rotationAngle *= this.endNorm.cross(this.startNorm).dot(this.eye) < 0 ? 1 : -1
       } else if (axis === 'XYZE') {
-        this._rotationAxis.copy(this._offset).cross(this._eye).normalize()
-        this._rotationAngle =
-          this._offset.dot(this._tempVector.copy(this._rotationAxis).cross(this._eye)) * ROTATION_SPEED
+        this.rotationAxis.copy(this.offset).cross(this.eye).normalize()
+        this.rotationAngle = this.offset.dot(this.tempVector.copy(this.rotationAxis).cross(this.eye)) * ROTATION_SPEED
       } else if (axis === 'X' || axis === 'Y' || axis === 'Z') {
-        this._rotationAxis.copy(this._unit[axis])
+        this.rotationAxis.copy(this.unit[axis])
 
-        this._tempVector.copy(this._unit[axis])
+        this.tempVector.copy(this.unit[axis])
 
         if (space === 'local') {
-          this._tempVector.applyQuaternion(this._worldQuaternion)
+          this.tempVector.applyQuaternion(this.worldQuaternion)
         }
 
-        this._rotationAngle = this._offset.dot(this._tempVector.cross(this._eye).normalize()) * ROTATION_SPEED
+        this.rotationAngle = this.offset.dot(this.tempVector.cross(this.eye).normalize()) * ROTATION_SPEED
       }
 
       // Apply rotation snap
 
-      if (this._rotationSnap) {
-        this._rotationAngle = Math.round(this._rotationAngle / this._rotationSnap) * this._rotationSnap
+      if (this.rotationSnap) {
+        this.rotationAngle = Math.round(this.rotationAngle / this.rotationSnap) * this.rotationSnap
       }
 
       // Apply rotate
       if (space === 'local' && axis !== 'E' && axis !== 'XYZE') {
-        object.quaternion.copy(this._quaternionStart)
+        object.quaternion.copy(this.quaternionStart)
         object.quaternion
-          .multiply(this._tempQuaternion.setFromAxisAngle(this._rotationAxis, this._rotationAngle))
+          .multiply(this.tempQuaternion.setFromAxisAngle(this.rotationAxis, this.rotationAngle))
           .normalize()
       } else {
-        this._rotationAxis.applyQuaternion(this._parentQuaternionInv)
-        object.quaternion.copy(this._tempQuaternion.setFromAxisAngle(this._rotationAxis, this._rotationAngle))
-        object.quaternion.multiply(this._quaternionStart).normalize()
+        this.rotationAxis.applyQuaternion(this.parentQuaternionInv)
+        object.quaternion.copy(this.tempQuaternion.setFromAxisAngle(this.rotationAxis, this.rotationAngle))
+        object.quaternion.multiply(this.quaternionStart).normalize()
       }
     }
 
@@ -490,13 +489,13 @@ class TransformControls<TCamera extends Camera = Camera> extends Object3D {
   private pointerUp = (pointer: TransformControlsPointerObject): void => {
     if (pointer.button !== 0) return
 
-    if (this._dragging && this._axis !== null) {
-      this.mouseUpEvent.mode = this._mode
+    if (this.dragging && this.axis !== null) {
+      this.mouseUpEvent.mode = this.mode
       this.dispatchEvent(this.mouseUpEvent)
     }
 
-    this._dragging = false
-    this._axis = null
+    this.dragging = false
+    this.axis = null
   }
 
   private getPointer = (event: Event): TransformControlsPointerObject => {
@@ -522,7 +521,7 @@ class TransformControls<TCamera extends Camera = Camera> extends Object3D {
   }
 
   private onPointerHover = (event: Event): void => {
-    if (!this._enabled) return
+    if (!this.enabled) return
 
     switch ((event as PointerEvent).pointerType) {
       case 'mouse':
@@ -533,7 +532,7 @@ class TransformControls<TCamera extends Camera = Camera> extends Object3D {
   }
 
   private onPointerDown = (event: Event): void => {
-    if (!this._enabled) return
+    if (!this.enabled) return
     ;(this.domElement as HTMLElement).style.touchAction = 'none' // disable touch scroll
     this.domElement.ownerDocument?.addEventListener('pointermove', this.onPointerMove)
 
@@ -542,43 +541,43 @@ class TransformControls<TCamera extends Camera = Camera> extends Object3D {
   }
 
   private onPointerMove = (event: Event): void => {
-    if (!this._enabled) return
+    if (!this.enabled) return
 
     this.pointerMove(this.getPointer(event))
   }
 
   private onPointerUp = (event: Event): void => {
-    if (!this._enabled) return
+    if (!this.enabled) return
     ;(this.domElement as HTMLElement).style.touchAction = ''
     this.domElement.ownerDocument?.removeEventListener('pointermove', this.onPointerMove)
 
     this.pointerUp(this.getPointer(event))
   }
 
-  public getMode = (): TransformControls['_mode'] => this._mode
+  public getMode = (): TransformControls['mode'] => this.mode
 
-  public setMode = (mode: TransformControls['_mode']): void => {
-    this._mode = mode
+  public setMode = (mode: TransformControls['mode']): void => {
+    this.mode = mode
   }
 
   public setTranslationSnap = (translationSnap: number): void => {
-    this._translationSnap = translationSnap
+    this.translationSnap = translationSnap
   }
 
   public setRotationSnap = (rotationSnap: number): void => {
-    this._rotationSnap = rotationSnap
+    this.rotationSnap = rotationSnap
   }
 
   public setScaleSnap = (scaleSnap: number): void => {
-    this._scaleSnap = scaleSnap
+    this.scaleSnap = scaleSnap
   }
 
   public setSize = (size: number): void => {
-    this._size = size
+    this.size = size
   }
 
   public setSpace = (space: string): void => {
-    this._space = space
+    this.space = space
   }
 
   public update = (): void => {
@@ -634,28 +633,28 @@ class TransformControlsGizmo extends Object3D {
   private helper: TransformControlsGizmoPrivateGizmos
 
   // these are set from parent class TransformControls
-  private _rotationAxis = new Vector3()
+  private rotationAxis = new Vector3()
 
-  private _cameraPosition = new Vector3()
+  private cameraPosition = new Vector3()
 
-  private _worldPositionStart = new Vector3()
-  private _worldQuaternionStart = new Quaternion()
+  private worldPositionStart = new Vector3()
+  private worldQuaternionStart = new Quaternion()
 
-  private _worldPosition = new Vector3()
-  private _worldQuaternion = new Quaternion()
+  private worldPosition = new Vector3()
+  private worldQuaternion = new Quaternion()
 
-  private _eye = new Vector3()
+  private eye = new Vector3()
 
-  private _camera: PerspectiveCamera | OrthographicCamera = null!
-  private _enabled = true
-  private _axis: string | null = null
-  private _mode: 'translate' | 'rotate' | 'scale' = 'translate'
-  private _space = 'world'
-  private _size = 1
-  private _dragging = false
-  private _showX = true
-  private _showY = true
-  private _showZ = true
+  private camera: PerspectiveCamera | OrthographicCamera = null!
+  private enabled = true
+  private axis: string | null = null
+  private mode: 'translate' | 'rotate' | 'scale' = 'translate'
+  private space = 'world'
+  private size = 1
+  private dragging = false
+  private showX = true
+  private showY = true
+  private showZ = true
 
   constructor() {
     super()
@@ -1002,28 +1001,28 @@ class TransformControlsGizmo extends Object3D {
 
   // updateMatrixWorld will update transformations and appearance of individual handles
   public updateMatrixWorld = (): void => {
-    let space = this._space
+    let space = this.space
 
-    if (this._mode === 'scale') {
+    if (this.mode === 'scale') {
       space = 'local' // scale always oriented to local rotation
     }
 
-    const quaternion = space === 'local' ? this._worldQuaternion : this.identityQuaternion
+    const quaternion = space === 'local' ? this.worldQuaternion : this.identityQuaternion
 
     // Show only gizmos for current transform mode
 
-    this.gizmo['translate'].visible = this._mode === 'translate'
-    this.gizmo['rotate'].visible = this._mode === 'rotate'
-    this.gizmo['scale'].visible = this._mode === 'scale'
+    this.gizmo['translate'].visible = this.mode === 'translate'
+    this.gizmo['rotate'].visible = this.mode === 'rotate'
+    this.gizmo['scale'].visible = this.mode === 'scale'
 
-    this.helper['translate'].visible = this._mode === 'translate'
-    this.helper['rotate'].visible = this._mode === 'rotate'
-    this.helper['scale'].visible = this._mode === 'scale'
+    this.helper['translate'].visible = this.mode === 'translate'
+    this.helper['rotate'].visible = this.mode === 'rotate'
+    this.helper['scale'].visible = this.mode === 'scale'
 
     let handles: Array<Object3D & { tag?: string }> = []
-    handles = handles.concat(this.picker[this._mode].children)
-    handles = handles.concat(this.gizmo[this._mode].children)
-    handles = handles.concat(this.helper[this._mode].children)
+    handles = handles.concat(this.picker[this.mode].children)
+    handles = handles.concat(this.gizmo[this.mode].children)
+    handles = handles.concat(this.helper[this.mode].children)
 
     for (let i = 0; i < handles.length; i++) {
       const handle = handles[i]
@@ -1032,21 +1031,21 @@ class TransformControlsGizmo extends Object3D {
 
       handle.visible = true
       handle.rotation.set(0, 0, 0)
-      handle.position.copy(this._worldPosition)
+      handle.position.copy(this.worldPosition)
 
       let factor
 
-      if ((this._camera as OrthographicCamera).isOrthographicCamera) {
+      if ((this.camera as OrthographicCamera).isOrthographicCamera) {
         factor =
-          ((this._camera as OrthographicCamera).top - (this._camera as OrthographicCamera).bottom) /
-          (this._camera as OrthographicCamera).zoom
+          ((this.camera as OrthographicCamera).top - (this.camera as OrthographicCamera).bottom) /
+          (this.camera as OrthographicCamera).zoom
       } else {
         factor =
-          this._worldPosition.distanceTo(this._cameraPosition) *
-          Math.min((1.9 * Math.tan((Math.PI * (this._camera as PerspectiveCamera).fov) / 360)) / this._camera.zoom, 7)
+          this.worldPosition.distanceTo(this.cameraPosition) *
+          Math.min((1.9 * Math.tan((Math.PI * (this.camera as PerspectiveCamera).fov) / 360)) / this.camera.zoom, 7)
       }
 
-      handle.scale.set(1, 1, 1).multiplyScalar((factor * this._size) / 7)
+      handle.scale.set(1, 1, 1).multiplyScalar((factor * this.size) / 7)
 
       // TODO: simplify helpers and consider decoupling from gizmo
 
@@ -1054,77 +1053,77 @@ class TransformControlsGizmo extends Object3D {
         handle.visible = false
 
         if (handle.name === 'AXIS') {
-          handle.position.copy(this._worldPositionStart)
-          handle.visible = !!this._axis
+          handle.position.copy(this.worldPositionStart)
+          handle.visible = !!this.axis
 
-          if (this._axis === 'X') {
+          if (this.axis === 'X') {
             this.tempQuaternion.setFromEuler(this.tempEuler.set(0, 0, 0))
             handle.quaternion.copy(quaternion).multiply(this.tempQuaternion)
 
-            if (Math.abs(this.alignVector.copy(this.unitX).applyQuaternion(quaternion).dot(this._eye)) > 0.9) {
+            if (Math.abs(this.alignVector.copy(this.unitX).applyQuaternion(quaternion).dot(this.eye)) > 0.9) {
               handle.visible = false
             }
           }
 
-          if (this._axis === 'Y') {
+          if (this.axis === 'Y') {
             this.tempQuaternion.setFromEuler(this.tempEuler.set(0, 0, Math.PI / 2))
             handle.quaternion.copy(quaternion).multiply(this.tempQuaternion)
 
-            if (Math.abs(this.alignVector.copy(this.unitY).applyQuaternion(quaternion).dot(this._eye)) > 0.9) {
+            if (Math.abs(this.alignVector.copy(this.unitY).applyQuaternion(quaternion).dot(this.eye)) > 0.9) {
               handle.visible = false
             }
           }
 
-          if (this._axis === 'Z') {
+          if (this.axis === 'Z') {
             this.tempQuaternion.setFromEuler(this.tempEuler.set(0, Math.PI / 2, 0))
             handle.quaternion.copy(quaternion).multiply(this.tempQuaternion)
 
-            if (Math.abs(this.alignVector.copy(this.unitZ).applyQuaternion(quaternion).dot(this._eye)) > 0.9) {
+            if (Math.abs(this.alignVector.copy(this.unitZ).applyQuaternion(quaternion).dot(this.eye)) > 0.9) {
               handle.visible = false
             }
           }
 
-          if (this._axis === 'XYZE') {
+          if (this.axis === 'XYZE') {
             this.tempQuaternion.setFromEuler(this.tempEuler.set(0, Math.PI / 2, 0))
-            this.alignVector.copy(this._rotationAxis)
+            this.alignVector.copy(this.rotationAxis)
             handle.quaternion.setFromRotationMatrix(
               this.lookAtMatrix.lookAt(this.zeroVector, this.alignVector, this.unitY),
             )
             handle.quaternion.multiply(this.tempQuaternion)
-            handle.visible = this._dragging
+            handle.visible = this.dragging
           }
 
-          if (this._axis === 'E') {
+          if (this.axis === 'E') {
             handle.visible = false
           }
         } else if (handle.name === 'START') {
-          handle.position.copy(this._worldPositionStart)
-          handle.visible = this._dragging
+          handle.position.copy(this.worldPositionStart)
+          handle.visible = this.dragging
         } else if (handle.name === 'END') {
-          handle.position.copy(this._worldPosition)
-          handle.visible = this._dragging
+          handle.position.copy(this.worldPosition)
+          handle.visible = this.dragging
         } else if (handle.name === 'DELTA') {
-          handle.position.copy(this._worldPositionStart)
-          handle.quaternion.copy(this._worldQuaternionStart)
+          handle.position.copy(this.worldPositionStart)
+          handle.quaternion.copy(this.worldQuaternionStart)
           this.tempVector
             .set(1e-10, 1e-10, 1e-10)
-            .add(this._worldPositionStart)
-            .sub(this._worldPosition)
+            .add(this.worldPositionStart)
+            .sub(this.worldPosition)
             .multiplyScalar(-1)
-          this.tempVector.applyQuaternion(this._worldQuaternionStart.clone().invert())
+          this.tempVector.applyQuaternion(this.worldQuaternionStart.clone().invert())
           handle.scale.copy(this.tempVector)
-          handle.visible = this._dragging
+          handle.visible = this.dragging
         } else {
           handle.quaternion.copy(quaternion)
 
-          if (this._dragging) {
-            handle.position.copy(this._worldPositionStart)
+          if (this.dragging) {
+            handle.position.copy(this.worldPositionStart)
           } else {
-            handle.position.copy(this._worldPosition)
+            handle.position.copy(this.worldPosition)
           }
 
-          if (this._axis) {
-            handle.visible = this._axis.search(handle.name) !== -1
+          if (this.axis) {
+            handle.visible = this.axis.search(handle.name) !== -1
           }
         }
 
@@ -1136,7 +1135,7 @@ class TransformControlsGizmo extends Object3D {
 
       handle.quaternion.copy(quaternion)
 
-      if (this._mode === 'translate' || this._mode === 'scale') {
+      if (this.mode === 'translate' || this.mode === 'scale') {
         // Hide translate and scale axis facing the camera
 
         const AXIS_HIDE_TRESHOLD = 0.99
@@ -1145,7 +1144,7 @@ class TransformControlsGizmo extends Object3D {
 
         if (handle.name === 'X' || handle.name === 'XYZX') {
           if (
-            Math.abs(this.alignVector.copy(this.unitX).applyQuaternion(quaternion).dot(this._eye)) > AXIS_HIDE_TRESHOLD
+            Math.abs(this.alignVector.copy(this.unitX).applyQuaternion(quaternion).dot(this.eye)) > AXIS_HIDE_TRESHOLD
           ) {
             handle.scale.set(1e-10, 1e-10, 1e-10)
             handle.visible = false
@@ -1154,7 +1153,7 @@ class TransformControlsGizmo extends Object3D {
 
         if (handle.name === 'Y' || handle.name === 'XYZY') {
           if (
-            Math.abs(this.alignVector.copy(this.unitY).applyQuaternion(quaternion).dot(this._eye)) > AXIS_HIDE_TRESHOLD
+            Math.abs(this.alignVector.copy(this.unitY).applyQuaternion(quaternion).dot(this.eye)) > AXIS_HIDE_TRESHOLD
           ) {
             handle.scale.set(1e-10, 1e-10, 1e-10)
             handle.visible = false
@@ -1163,7 +1162,7 @@ class TransformControlsGizmo extends Object3D {
 
         if (handle.name === 'Z' || handle.name === 'XYZZ') {
           if (
-            Math.abs(this.alignVector.copy(this.unitZ).applyQuaternion(quaternion).dot(this._eye)) > AXIS_HIDE_TRESHOLD
+            Math.abs(this.alignVector.copy(this.unitZ).applyQuaternion(quaternion).dot(this.eye)) > AXIS_HIDE_TRESHOLD
           ) {
             handle.scale.set(1e-10, 1e-10, 1e-10)
             handle.visible = false
@@ -1172,7 +1171,7 @@ class TransformControlsGizmo extends Object3D {
 
         if (handle.name === 'XY') {
           if (
-            Math.abs(this.alignVector.copy(this.unitZ).applyQuaternion(quaternion).dot(this._eye)) < PLANE_HIDE_TRESHOLD
+            Math.abs(this.alignVector.copy(this.unitZ).applyQuaternion(quaternion).dot(this.eye)) < PLANE_HIDE_TRESHOLD
           ) {
             handle.scale.set(1e-10, 1e-10, 1e-10)
             handle.visible = false
@@ -1181,7 +1180,7 @@ class TransformControlsGizmo extends Object3D {
 
         if (handle.name === 'YZ') {
           if (
-            Math.abs(this.alignVector.copy(this.unitX).applyQuaternion(quaternion).dot(this._eye)) < PLANE_HIDE_TRESHOLD
+            Math.abs(this.alignVector.copy(this.unitX).applyQuaternion(quaternion).dot(this.eye)) < PLANE_HIDE_TRESHOLD
           ) {
             handle.scale.set(1e-10, 1e-10, 1e-10)
             handle.visible = false
@@ -1190,7 +1189,7 @@ class TransformControlsGizmo extends Object3D {
 
         if (handle.name === 'XZ') {
           if (
-            Math.abs(this.alignVector.copy(this.unitY).applyQuaternion(quaternion).dot(this._eye)) < PLANE_HIDE_TRESHOLD
+            Math.abs(this.alignVector.copy(this.unitY).applyQuaternion(quaternion).dot(this.eye)) < PLANE_HIDE_TRESHOLD
           ) {
             handle.scale.set(1e-10, 1e-10, 1e-10)
             handle.visible = false
@@ -1200,7 +1199,7 @@ class TransformControlsGizmo extends Object3D {
         // Flip translate and scale axis ocluded behind another axis
 
         if (handle.name.search('X') !== -1) {
-          if (this.alignVector.copy(this.unitX).applyQuaternion(quaternion).dot(this._eye) < AXIS_FLIP_TRESHOLD) {
+          if (this.alignVector.copy(this.unitX).applyQuaternion(quaternion).dot(this.eye) < AXIS_FLIP_TRESHOLD) {
             if (handle.tag === 'fwd') {
               handle.visible = false
             } else {
@@ -1212,7 +1211,7 @@ class TransformControlsGizmo extends Object3D {
         }
 
         if (handle.name.search('Y') !== -1) {
-          if (this.alignVector.copy(this.unitY).applyQuaternion(quaternion).dot(this._eye) < AXIS_FLIP_TRESHOLD) {
+          if (this.alignVector.copy(this.unitY).applyQuaternion(quaternion).dot(this.eye) < AXIS_FLIP_TRESHOLD) {
             if (handle.tag === 'fwd') {
               handle.visible = false
             } else {
@@ -1224,7 +1223,7 @@ class TransformControlsGizmo extends Object3D {
         }
 
         if (handle.name.search('Z') !== -1) {
-          if (this.alignVector.copy(this.unitZ).applyQuaternion(quaternion).dot(this._eye) < AXIS_FLIP_TRESHOLD) {
+          if (this.alignVector.copy(this.unitZ).applyQuaternion(quaternion).dot(this.eye) < AXIS_FLIP_TRESHOLD) {
             if (handle.tag === 'fwd') {
               handle.visible = false
             } else {
@@ -1234,14 +1233,14 @@ class TransformControlsGizmo extends Object3D {
             handle.visible = false
           }
         }
-      } else if (this._mode === 'rotate') {
+      } else if (this.mode === 'rotate') {
         // Align handles to current local or world rotation
 
         this.tempQuaternion2.copy(quaternion)
-        this.alignVector.copy(this._eye).applyQuaternion(this.tempQuaternion.copy(quaternion).invert())
+        this.alignVector.copy(this.eye).applyQuaternion(this.tempQuaternion.copy(quaternion).invert())
 
         if (handle.name.search('E') !== -1) {
-          handle.quaternion.setFromRotationMatrix(this.lookAtMatrix.lookAt(this._eye, this.zeroVector, this.unitY))
+          handle.quaternion.setFromRotationMatrix(this.lookAtMatrix.lookAt(this.eye, this.zeroVector, this.unitY))
         }
 
         if (handle.name === 'X') {
@@ -1264,36 +1263,35 @@ class TransformControlsGizmo extends Object3D {
       }
 
       // Hide disabled axes
-      handle.visible = handle.visible && (handle.name.indexOf('X') === -1 || this._showX)
-      handle.visible = handle.visible && (handle.name.indexOf('Y') === -1 || this._showY)
-      handle.visible = handle.visible && (handle.name.indexOf('Z') === -1 || this._showZ)
-      handle.visible =
-        handle.visible && (handle.name.indexOf('E') === -1 || (this._showX && this._showY && this._showZ))
+      handle.visible = handle.visible && (handle.name.indexOf('X') === -1 || this.showX)
+      handle.visible = handle.visible && (handle.name.indexOf('Y') === -1 || this.showY)
+      handle.visible = handle.visible && (handle.name.indexOf('Z') === -1 || this.showZ)
+      handle.visible = handle.visible && (handle.name.indexOf('E') === -1 || (this.showX && this.showY && this.showZ))
 
       // highlight selected axis
 
       //@ts-ignore
-      handle.material._opacity = handle.material._opacity || handle.material.opacity
+      handle.material.opacity = handle.material.opacity || handle.material.opacity
       //@ts-ignore
-      handle.material._color = handle.material._color || handle.material.color.clone()
+      handle.material.color = handle.material.color || handle.material.color.clone()
       //@ts-ignore
-      handle.material.color.copy(handle.material._color)
+      handle.material.color.copy(handle.material.color)
       //@ts-ignore
-      handle.material.opacity = handle.material._opacity
+      handle.material.opacity = handle.material.opacity
 
-      if (!this._enabled) {
+      if (!this.enabled) {
         //@ts-ignore
         handle.material.opacity *= 0.5
         //@ts-ignore
         handle.material.color.lerp(new Color(1, 1, 1), 0.5)
-      } else if (this._axis) {
-        if (handle.name === this._axis) {
+      } else if (this.axis) {
+        if (handle.name === this.axis) {
           //@ts-ignore
           handle.material.opacity = 1.0
           //@ts-ignore
           handle.material.color.lerp(new Color(1, 1, 1), 0.5)
         } else if (
-          this._axis.split('').some(function (a) {
+          this.axis.split('').some(function (a) {
             return handle.name === a
           })
         ) {
@@ -1343,46 +1341,46 @@ class TransformControlsPlane extends Mesh<PlaneGeometry, MeshBasicMaterial> {
   private identityQuaternion = new Quaternion()
 
   // these are set from parent class TransformControls
-  private _cameraQuaternion = new Quaternion()
+  private cameraQuaternion = new Quaternion()
 
-  private _worldPosition = new Vector3()
-  private _worldQuaternion = new Quaternion()
+  private worldPosition = new Vector3()
+  private worldQuaternion = new Quaternion()
 
-  private _eye = new Vector3()
+  private eye = new Vector3()
 
-  private _axis: string | null = null
-  private _mode: 'translate' | 'rotate' | 'scale' = 'translate'
-  private _space = 'world'
+  private axis: string | null = null
+  private mode: 'translate' | 'rotate' | 'scale' = 'translate'
+  private space = 'world'
 
   public updateMatrixWorld = (): void => {
-    let space = this._space
+    let space = this.space
 
-    this.position.copy(this._worldPosition)
+    this.position.copy(this.worldPosition)
 
-    if (this._mode === 'scale') space = 'local' // scale always oriented to local rotation
+    if (this.mode === 'scale') space = 'local' // scale always oriented to local rotation
 
-    this.unitX.set(1, 0, 0).applyQuaternion(space === 'local' ? this._worldQuaternion : this.identityQuaternion)
-    this.unitY.set(0, 1, 0).applyQuaternion(space === 'local' ? this._worldQuaternion : this.identityQuaternion)
-    this.unitZ.set(0, 0, 1).applyQuaternion(space === 'local' ? this._worldQuaternion : this.identityQuaternion)
+    this.unitX.set(1, 0, 0).applyQuaternion(space === 'local' ? this.worldQuaternion : this.identityQuaternion)
+    this.unitY.set(0, 1, 0).applyQuaternion(space === 'local' ? this.worldQuaternion : this.identityQuaternion)
+    this.unitZ.set(0, 0, 1).applyQuaternion(space === 'local' ? this.worldQuaternion : this.identityQuaternion)
 
     // Align the plane for current transform mode, axis and space.
 
     this.alignVector.copy(this.unitY)
 
-    switch (this._mode) {
+    switch (this.mode) {
       case 'translate':
       case 'scale':
-        switch (this._axis) {
+        switch (this.axis) {
           case 'X':
-            this.alignVector.copy(this._eye).cross(this.unitX)
+            this.alignVector.copy(this.eye).cross(this.unitX)
             this.dirVector.copy(this.unitX).cross(this.alignVector)
             break
           case 'Y':
-            this.alignVector.copy(this._eye).cross(this.unitY)
+            this.alignVector.copy(this.eye).cross(this.unitY)
             this.dirVector.copy(this.unitY).cross(this.alignVector)
             break
           case 'Z':
-            this.alignVector.copy(this._eye).cross(this.unitZ)
+            this.alignVector.copy(this.eye).cross(this.unitZ)
             this.dirVector.copy(this.unitZ).cross(this.alignVector)
             break
           case 'XY':
@@ -1410,7 +1408,7 @@ class TransformControlsPlane extends Mesh<PlaneGeometry, MeshBasicMaterial> {
 
     if (this.dirVector.length() === 0) {
       // If in rotate mode, make the plane parallel to camera
-      this.quaternion.copy(this._cameraQuaternion)
+      this.quaternion.copy(this.cameraQuaternion)
     } else {
       this.tempMatrix.lookAt(this.tempVector.set(0, 0, 0), this.dirVector, this.alignVector)
 
