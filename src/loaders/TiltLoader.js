@@ -129,7 +129,7 @@ class TiltLoader extends Loader {
       brushes[brush_index].push([positions, quaternions, brush_size, brush_color])
     }
 
-    for (let brush_index in brushes) {
+    for (const brush_index in brushes) {
       const geometry = new StrokeGeometry(brushes[brush_index])
       const material = getMaterial(metadata.BrushIndex[brush_index])
 
@@ -161,7 +161,7 @@ class StrokeGeometry extends BufferGeometry {
 
     // size = size / 2;
 
-    for (let k in strokes) {
+    for (const k in strokes) {
       const stroke = strokes[k]
       const positions = stroke[0]
       const quaternions = stroke[1]
@@ -366,10 +366,12 @@ const common = {
   },
 }
 
-const shaders = () => ({
+const loader = new TextureLoader().setPath('./textures/tiltbrush/')
+
+const shaders = {
   Light: {
     uniforms: {
-      mainTex: { value: new TextureLoader().setPath('./textures/tiltbrush/').load('Light.webp') },
+      mainTex: { value: loader.load('Light.webp') },
       alphaTest: { value: 0.067 },
       emission_gain: { value: 0.45 },
       alpha: { value: 1 },
@@ -445,14 +447,14 @@ const shaders = () => ({
     blendSrc: 201,
     blendSrcAlpha: 201,
   },
-})
+}
 
 function getMaterial(GUID) {
   const name = BRUSH_LIST_ARRAY[GUID]
 
   switch (name) {
     case 'Light':
-      return new RawShaderMaterial(shaders().Light)
+      return new RawShaderMaterial(shaders.Light)
 
     default:
       return new MeshBasicMaterial({ vertexColors: true, side: DoubleSide })

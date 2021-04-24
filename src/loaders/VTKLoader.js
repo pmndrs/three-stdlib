@@ -1,17 +1,15 @@
 import { BufferAttribute, BufferGeometry, FileLoader, Float32BufferAttribute, Loader, LoaderUtils } from 'three'
 import { unzlibSync } from 'fflate'
 
-var VTKLoader = function (manager) {
-  Loader.call(this, manager)
-}
+class VTKLoader extends Loader {
+  constructor(manager) {
+    super(manager)
+  }
 
-VTKLoader.prototype = Object.assign(Object.create(Loader.prototype), {
-  constructor: VTKLoader,
+  load(url, onLoad, onProgress, onError) {
+    const scope = this
 
-  load: function (url, onLoad, onProgress, onError) {
-    var scope = this
-
-    var loader = new FileLoader(scope.manager)
+    const loader = new FileLoader(scope.manager)
     loader.setPath(scope.path)
     loader.setResponseType('arraybuffer')
     loader.setRequestHeader(scope.requestHeader)
@@ -34,9 +32,9 @@ VTKLoader.prototype = Object.assign(Object.create(Loader.prototype), {
       onProgress,
       onError,
     )
-  },
+  }
 
-  parse: function (data) {
+  parse(data) {
     function parseASCII(data) {
       // connectivity of the triangles
       var indices = []
@@ -93,7 +91,7 @@ VTKLoader.prototype = Object.assign(Object.create(Loader.prototype), {
 
       var lines = data.split('\n')
 
-      for (let i in lines) {
+      for (var i in lines) {
         var line = lines[i].trim()
 
         if (line.indexOf('DATASET') === 0) {
@@ -121,7 +119,7 @@ VTKLoader.prototype = Object.assign(Object.create(Loader.prototype), {
               var i1, i2
               var k = 1
               // split the polygon in numVertices - 2 triangles
-              for (let j = 0; j < numVertices - 2; ++j) {
+              for (var j = 0; j < numVertices - 2; ++j) {
                 i1 = parseInt(inds[k])
                 i2 = parseInt(inds[k + 1])
                 indices.push(i0, i1, i2)
@@ -138,7 +136,7 @@ VTKLoader.prototype = Object.assign(Object.create(Loader.prototype), {
             if (numVertices >= 3) {
               var i0, i1, i2
               // split the polygon in numVertices - 2 triangles
-              for (let j = 0; j < numVertices - 2; j++) {
+              for (var j = 0; j < numVertices - 2; j++) {
                 if (j % 2 === 1) {
                   i0 = parseInt(inds[j])
                   i1 = parseInt(inds[j + 2])
@@ -239,7 +237,7 @@ VTKLoader.prototype = Object.assign(Object.create(Loader.prototype), {
         if (colors.length === numTriangles * 3) {
           var newColors = []
 
-          for (let i = 0; i < numTriangles; i++) {
+          for (var i = 0; i < numTriangles; i++) {
             var r = colors[3 * i + 0]
             var g = colors[3 * i + 1]
             var b = colors[3 * i + 2]
@@ -280,12 +278,7 @@ VTKLoader.prototype = Object.assign(Object.create(Loader.prototype), {
           c = buffer[index]
         }
 
-        return {
-          start: start,
-          end: index,
-          next: index + 1,
-          parsedString: s.join(''),
-        }
+        return { start: start, end: index, next: index + 1, parsedString: s.join('') }
       }
 
       var state, line
@@ -340,7 +333,7 @@ VTKLoader.prototype = Object.assign(Object.create(Loader.prototype), {
             }
 
             // retrieves the n-2 triangles from the triangle strip
-            for (let j = 0; j < indexCount - 2; j++) {
+            for (var j = 0; j < indexCount - 2; j++) {
               if (j % 2) {
                 indices[indicesIndex++] = strip[j]
                 indices[indicesIndex++] = strip[j + 2]
@@ -376,7 +369,7 @@ VTKLoader.prototype = Object.assign(Object.create(Loader.prototype), {
             }
 
             // divide the polygon in n-2 triangle
-            for (let j = 1; j < indexCount - 1; j++) {
+            for (var j = 1; j < indexCount - 1; j++) {
               indices[indicesIndex++] = strip[0]
               indices[indicesIndex++] = strip[j]
               indices[indicesIndex++] = strip[j + 1]
@@ -427,7 +420,7 @@ VTKLoader.prototype = Object.assign(Object.create(Loader.prototype), {
     }
 
     function Float32Concat(first, second) {
-      var firstLength = first.length,
+      const firstLength = first.length,
         result = new Float32Array(firstLength + second.length)
 
       result.set(first)
@@ -462,7 +455,7 @@ VTKLoader.prototype = Object.assign(Object.create(Loader.prototype), {
             if (xml.attributes.length > 0) {
               obj['attributes'] = {}
 
-              for (let j = 0; j < xml.attributes.length; j++) {
+              for (var j = 0; j < xml.attributes.length; j++) {
                 var attribute = xml.attributes.item(j)
                 obj['attributes'][attribute.nodeName] = attribute.nodeValue.trim()
               }
@@ -476,7 +469,7 @@ VTKLoader.prototype = Object.assign(Object.create(Loader.prototype), {
 
         // do children
         if (xml.hasChildNodes()) {
-          for (let i = 0; i < xml.childNodes.length; i++) {
+          for (var i = 0; i < xml.childNodes.length; i++) {
             var item = xml.childNodes.item(i)
             var nodeName = item.nodeName
 
@@ -595,7 +588,7 @@ VTKLoader.prototype = Object.assign(Object.create(Loader.prototype), {
           byteData = Base64toByteArray(rawData)
 
           blocks = byteData[0]
-          for (let i = 1; i < numBytes - 1; i++) {
+          for (var i = 1; i < numBytes - 1; i++) {
             blocks = blocks | (byteData[i] << (i * numBytes))
           }
 
@@ -611,10 +604,10 @@ VTKLoader.prototype = Object.assign(Object.create(Loader.prototype), {
           // There are three blocks before c-size-i, so we skip 3*numBytes
           cSizeStart = 3 * numBytes
 
-          for (let i = 0; i < blocks; i++) {
+          for (var i = 0; i < blocks; i++) {
             var currentBlockSize = byteData[i * numBytes + cSizeStart]
 
-            for (let j = 1; j < numBytes - 1; j++) {
+            for (var j = 1; j < numBytes - 1; j++) {
               // Each data point consists of 8 bytes regardless of the header type
               currentBlockSize = currentBlockSize | (byteData[i * numBytes + cSizeStart + j] << (j * 8))
             }
@@ -623,7 +616,7 @@ VTKLoader.prototype = Object.assign(Object.create(Loader.prototype), {
             dataOffsets.push(currentOffset)
           }
 
-          for (let i = 0; i < dataOffsets.length - 1; i++) {
+          for (var i = 0; i < dataOffsets.length - 1; i++) {
             var data = unzlibSync(byteData.slice(dataOffsets[i], dataOffsets[i + 1])) // eslint-disable-line no-undef
             content = data.buffer
 
@@ -760,7 +753,7 @@ VTKLoader.prototype = Object.assign(Object.create(Loader.prototype), {
                 var normalsName = section.attributes.Normals
 
                 if (numberOfPoints > 0) {
-                  for (let i = 0, len = arr.length; i < len; i++) {
+                  for (var i = 0, len = arr.length; i < len; i++) {
                     if (normalsName === arr[i].attributes.Name) {
                       var components = arr[i].attributes.NumberOfComponents
                       normals = new Float32Array(numberOfPoints * components)
@@ -798,16 +791,16 @@ VTKLoader.prototype = Object.assign(Object.create(Loader.prototype), {
 
                   var indicesIndex = 0
 
-                  for (let i = 0, len = numberOfStrips; i < len; i++) {
+                  for (var i = 0, len = numberOfStrips; i < len; i++) {
                     var strip = []
 
-                    for (let s = 0, len1 = offset[i], len0 = 0; s < len1 - len0; s++) {
+                    for (var s = 0, len1 = offset[i], len0 = 0; s < len1 - len0; s++) {
                       strip.push(connectivity[s])
 
                       if (i > 0) len0 = offset[i - 1]
                     }
 
-                    for (let j = 0, len1 = offset[i], len0 = 0; j < len1 - len0 - 2; j++) {
+                    for (var j = 0, len1 = offset[i], len0 = 0; j < len1 - len0 - 2; j++) {
                       if (j % 2) {
                         indices[indicesIndex++] = strip[j]
                         indices[indicesIndex++] = strip[j + 2]
@@ -901,7 +894,7 @@ VTKLoader.prototype = Object.assign(Object.create(Loader.prototype), {
     } else {
       return parseBinary(data)
     }
-  },
-})
+  }
+}
 
 export { VTKLoader }

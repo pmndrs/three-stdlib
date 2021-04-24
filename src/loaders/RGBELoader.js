@@ -15,19 +15,17 @@ import {
 // https://github.com/mrdoob/three.js/issues/5552
 // http://en.wikipedia.org/wiki/RGBE_image_format
 
-var RGBELoader = function (manager) {
-  DataTextureLoader.call(this, manager)
+class RGBELoader extends DataTextureLoader {
+  constructor(manager) {
+    super(manager)
 
-  this.type = UnsignedByteType
-}
-
-RGBELoader.prototype = Object.assign(Object.create(DataTextureLoader.prototype), {
-  constructor: RGBELoader,
+    this.type = UnsignedByteType
+  }
 
   // adapted from http://www.graphics.cornell.edu/~bjw/rgbe.html
 
-  parse: function (buffer) {
-    var /* return codes for rgbe routines */
+  parse(buffer) {
+    const /* return codes for rgbe routines */
       //RGBE_RETURN_SUCCESS = 0,
       RGBE_RETURN_FAILURE = -1,
       /* default error routine.  change this to change error handling */
@@ -67,13 +65,15 @@ RGBELoader.prototype = Object.assign(Object.create(DataTextureLoader.prototype),
       RGBE_VALID_DIMENSIONS = 4,
       NEWLINE = '\n',
       fgets = function (buffer, lineLimit, consume) {
+        const chunkSize = 128
+
         lineLimit = !lineLimit ? 1024 : lineLimit
-        var p = buffer.pos,
+        let p = buffer.pos,
           i = -1,
           len = 0,
           s = '',
-          chunkSize = 128,
           chunk = String.fromCharCode.apply(null, new Uint16Array(buffer.subarray(p, p + chunkSize)))
+
         while (0 > (i = chunk.indexOf(NEWLINE)) && len < lineLimit && p < buffer.byteLength) {
           s += chunk
           len += chunk.length
@@ -96,10 +96,8 @@ RGBELoader.prototype = Object.assign(Object.create(DataTextureLoader.prototype),
       },
       /* minimal header reading.  modify if you want to parse more information */
       RGBE_ReadHeader = function (buffer) {
-        var line,
-          match,
-          // regexes to parse header info fields
-          magic_token_re = /^#\?(\S+)/,
+        // regexes to parse header info fields
+        const magic_token_re = /^#\?(\S+)/,
           gamma_re = /^\s*GAMMA\s*=\s*(\d+(\.\d+)?)\s*$/,
           exposure_re = /^\s*EXPOSURE\s*=\s*(\d+(\.\d+)?)\s*$/,
           format_re = /^\s*FORMAT=(\S+)\s*$/,
@@ -123,6 +121,8 @@ RGBELoader.prototype = Object.assign(Object.create(DataTextureLoader.prototype),
             width: 0,
             height: 0 /* image dimensions, width/height */,
           }
+
+        let line, match
 
         if (buffer.pos >= buffer.byteLength || !(line = fgets(buffer))) {
           return rgbe_error(rgbe_read_error, 'no header found')
@@ -180,21 +180,7 @@ RGBELoader.prototype = Object.assign(Object.create(DataTextureLoader.prototype),
         return header
       },
       RGBE_ReadPixels_RLE = function (buffer, w, h) {
-        var data_rgba,
-          offset,
-          pos,
-          count,
-          byteValue,
-          scanline_buffer,
-          ptr,
-          ptr_end,
-          i,
-          l,
-          off,
-          isEncodedRun,
-          scanline_width = w,
-          num_scanlines = h,
-          rgbeStart
+        const scanline_width = w
 
         if (
           // run length encoding is not allowed so read flat
@@ -213,17 +199,19 @@ RGBELoader.prototype = Object.assign(Object.create(DataTextureLoader.prototype),
           return rgbe_error(rgbe_format_error, 'wrong scanline width')
         }
 
-        data_rgba = new Uint8Array(4 * w * h)
+        const data_rgba = new Uint8Array(4 * w * h)
 
         if (!data_rgba.length) {
           return rgbe_error(rgbe_memory_error, 'unable to allocate buffer space')
         }
 
-        offset = 0
-        pos = 0
-        ptr_end = 4 * scanline_width
-        rgbeStart = new Uint8Array(4)
-        scanline_buffer = new Uint8Array(ptr_end)
+        let offset = 0,
+          pos = 0
+
+        const ptr_end = 4 * scanline_width
+        const rgbeStart = new Uint8Array(4)
+        const scanline_buffer = new Uint8Array(ptr_end)
+        let num_scanlines = h
 
         // read in each successive scanline
         while (num_scanlines > 0 && pos < buffer.byteLength) {
@@ -242,10 +230,12 @@ RGBELoader.prototype = Object.assign(Object.create(DataTextureLoader.prototype),
 
           // read each of the four channels for the scanline into the buffer
           // first red, then green, then blue, then exponent
-          ptr = 0
+          let ptr = 0,
+            count
+
           while (ptr < ptr_end && pos < buffer.byteLength) {
             count = buffer[pos++]
-            isEncodedRun = count > 128
+            const isEncodedRun = count > 128
             if (isEncodedRun) count -= 128
 
             if (0 === count || ptr + count > ptr_end) {
@@ -254,8 +244,8 @@ RGBELoader.prototype = Object.assign(Object.create(DataTextureLoader.prototype),
 
             if (isEncodedRun) {
               // a (encoded) run of the same value
-              byteValue = buffer[pos++]
-              for (i = 0; i < count; i++) {
+              const byteValue = buffer[pos++]
+              for (let i = 0; i < count; i++) {
                 scanline_buffer[ptr++] = byteValue
               }
               //ptr += count;
@@ -269,9 +259,9 @@ RGBELoader.prototype = Object.assign(Object.create(DataTextureLoader.prototype),
 
           // now convert data from buffer into rgba
           // first red, then green, then blue, then exponent (alpha)
-          l = scanline_width //scanline_buffer.byteLength;
-          for (i = 0; i < l; i++) {
-            off = 0
+          const l = scanline_width //scanline_buffer.byteLength;
+          for (let i = 0; i < l; i++) {
+            let off = 0
             data_rgba[offset] = scanline_buffer[i + off]
             off += scanline_width //1;
             data_rgba[offset + 1] = scanline_buffer[i + off]
@@ -288,65 +278,68 @@ RGBELoader.prototype = Object.assign(Object.create(DataTextureLoader.prototype),
         return data_rgba
       }
 
-    var RGBEByteToRGBFloat = function (sourceArray, sourceOffset, destArray, destOffset) {
-      var e = sourceArray[sourceOffset + 3]
-      var scale = Math.pow(2.0, e - 128.0) / 255.0
+    const RGBEByteToRGBFloat = function (sourceArray, sourceOffset, destArray, destOffset) {
+      const e = sourceArray[sourceOffset + 3]
+      const scale = Math.pow(2.0, e - 128.0) / 255.0
 
       destArray[destOffset + 0] = sourceArray[sourceOffset + 0] * scale
       destArray[destOffset + 1] = sourceArray[sourceOffset + 1] * scale
       destArray[destOffset + 2] = sourceArray[sourceOffset + 2] * scale
     }
 
-    var RGBEByteToRGBHalf = function (sourceArray, sourceOffset, destArray, destOffset) {
-      var e = sourceArray[sourceOffset + 3]
-      var scale = Math.pow(2.0, e - 128.0) / 255.0
+    const RGBEByteToRGBHalf = function (sourceArray, sourceOffset, destArray, destOffset) {
+      const e = sourceArray[sourceOffset + 3]
+      const scale = Math.pow(2.0, e - 128.0) / 255.0
 
       destArray[destOffset + 0] = DataUtils.toHalfFloat(sourceArray[sourceOffset + 0] * scale)
       destArray[destOffset + 1] = DataUtils.toHalfFloat(sourceArray[sourceOffset + 1] * scale)
       destArray[destOffset + 2] = DataUtils.toHalfFloat(sourceArray[sourceOffset + 2] * scale)
     }
 
-    var byteArray = new Uint8Array(buffer)
+    const byteArray = new Uint8Array(buffer)
     byteArray.pos = 0
-    var rgbe_header_info = RGBE_ReadHeader(byteArray)
+    const rgbe_header_info = RGBE_ReadHeader(byteArray)
 
     if (RGBE_RETURN_FAILURE !== rgbe_header_info) {
-      var w = rgbe_header_info.width,
+      const w = rgbe_header_info.width,
         h = rgbe_header_info.height,
         image_rgba_data = RGBE_ReadPixels_RLE(byteArray.subarray(byteArray.pos), w, h)
 
       if (RGBE_RETURN_FAILURE !== image_rgba_data) {
+        let data, format, type
+        let numElements
+
         switch (this.type) {
           case UnsignedByteType:
-            var data = image_rgba_data
-            var format = RGBEFormat // handled as THREE.RGBAFormat in shaders
-            var type = UnsignedByteType
+            data = image_rgba_data
+            format = RGBEFormat // handled as THREE.RGBAFormat in shaders
+            type = UnsignedByteType
             break
 
           case FloatType:
-            var numElements = (image_rgba_data.length / 4) * 3
-            var floatArray = new Float32Array(numElements)
+            numElements = (image_rgba_data.length / 4) * 3
+            const floatArray = new Float32Array(numElements)
 
             for (let j = 0; j < numElements; j++) {
               RGBEByteToRGBFloat(image_rgba_data, j * 4, floatArray, j * 3)
             }
 
-            var data = floatArray
-            var format = RGBFormat
-            var type = FloatType
+            data = floatArray
+            format = RGBFormat
+            type = FloatType
             break
 
           case HalfFloatType:
-            var numElements = (image_rgba_data.length / 4) * 3
-            var halfArray = new Uint16Array(numElements)
+            numElements = (image_rgba_data.length / 4) * 3
+            const halfArray = new Uint16Array(numElements)
 
             for (let j = 0; j < numElements; j++) {
               RGBEByteToRGBHalf(image_rgba_data, j * 4, halfArray, j * 3)
             }
 
-            var data = halfArray
-            var format = RGBFormat
-            var type = HalfFloatType
+            data = halfArray
+            format = RGBFormat
+            type = HalfFloatType
             break
 
           default:
@@ -368,14 +361,14 @@ RGBELoader.prototype = Object.assign(Object.create(DataTextureLoader.prototype),
     }
 
     return null
-  },
+  }
 
-  setDataType: function (value) {
+  setDataType(value) {
     this.type = value
     return this
-  },
+  }
 
-  load: function (url, onLoad, onProgress, onError) {
+  load(url, onLoad, onProgress, onError) {
     function onLoadCallback(texture, texData) {
       switch (texture.type) {
         case UnsignedByteType:
@@ -406,8 +399,8 @@ RGBELoader.prototype = Object.assign(Object.create(DataTextureLoader.prototype),
       if (onLoad) onLoad(texture, texData)
     }
 
-    return DataTextureLoader.prototype.load.call(this, url, onLoadCallback, onProgress, onError)
-  },
-})
+    return super.load(url, onLoadCallback, onProgress, onError)
+  }
+}
 
 export { RGBELoader }

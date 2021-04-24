@@ -1,16 +1,179 @@
 import { AnimationClip, BufferGeometry, FileLoader, Float32BufferAttribute, Loader, Vector3 } from 'three'
 
-var MD2Loader = function (manager) {
-  Loader.call(this, manager)
-}
+const _normalData = [
+  [-0.525731, 0.0, 0.850651],
+  [-0.442863, 0.238856, 0.864188],
+  [-0.295242, 0.0, 0.955423],
+  [-0.309017, 0.5, 0.809017],
+  [-0.16246, 0.262866, 0.951056],
+  [0.0, 0.0, 1.0],
+  [0.0, 0.850651, 0.525731],
+  [-0.147621, 0.716567, 0.681718],
+  [0.147621, 0.716567, 0.681718],
+  [0.0, 0.525731, 0.850651],
+  [0.309017, 0.5, 0.809017],
+  [0.525731, 0.0, 0.850651],
+  [0.295242, 0.0, 0.955423],
+  [0.442863, 0.238856, 0.864188],
+  [0.16246, 0.262866, 0.951056],
+  [-0.681718, 0.147621, 0.716567],
+  [-0.809017, 0.309017, 0.5],
+  [-0.587785, 0.425325, 0.688191],
+  [-0.850651, 0.525731, 0.0],
+  [-0.864188, 0.442863, 0.238856],
+  [-0.716567, 0.681718, 0.147621],
+  [-0.688191, 0.587785, 0.425325],
+  [-0.5, 0.809017, 0.309017],
+  [-0.238856, 0.864188, 0.442863],
+  [-0.425325, 0.688191, 0.587785],
+  [-0.716567, 0.681718, -0.147621],
+  [-0.5, 0.809017, -0.309017],
+  [-0.525731, 0.850651, 0.0],
+  [0.0, 0.850651, -0.525731],
+  [-0.238856, 0.864188, -0.442863],
+  [0.0, 0.955423, -0.295242],
+  [-0.262866, 0.951056, -0.16246],
+  [0.0, 1.0, 0.0],
+  [0.0, 0.955423, 0.295242],
+  [-0.262866, 0.951056, 0.16246],
+  [0.238856, 0.864188, 0.442863],
+  [0.262866, 0.951056, 0.16246],
+  [0.5, 0.809017, 0.309017],
+  [0.238856, 0.864188, -0.442863],
+  [0.262866, 0.951056, -0.16246],
+  [0.5, 0.809017, -0.309017],
+  [0.850651, 0.525731, 0.0],
+  [0.716567, 0.681718, 0.147621],
+  [0.716567, 0.681718, -0.147621],
+  [0.525731, 0.850651, 0.0],
+  [0.425325, 0.688191, 0.587785],
+  [0.864188, 0.442863, 0.238856],
+  [0.688191, 0.587785, 0.425325],
+  [0.809017, 0.309017, 0.5],
+  [0.681718, 0.147621, 0.716567],
+  [0.587785, 0.425325, 0.688191],
+  [0.955423, 0.295242, 0.0],
+  [1.0, 0.0, 0.0],
+  [0.951056, 0.16246, 0.262866],
+  [0.850651, -0.525731, 0.0],
+  [0.955423, -0.295242, 0.0],
+  [0.864188, -0.442863, 0.238856],
+  [0.951056, -0.16246, 0.262866],
+  [0.809017, -0.309017, 0.5],
+  [0.681718, -0.147621, 0.716567],
+  [0.850651, 0.0, 0.525731],
+  [0.864188, 0.442863, -0.238856],
+  [0.809017, 0.309017, -0.5],
+  [0.951056, 0.16246, -0.262866],
+  [0.525731, 0.0, -0.850651],
+  [0.681718, 0.147621, -0.716567],
+  [0.681718, -0.147621, -0.716567],
+  [0.850651, 0.0, -0.525731],
+  [0.809017, -0.309017, -0.5],
+  [0.864188, -0.442863, -0.238856],
+  [0.951056, -0.16246, -0.262866],
+  [0.147621, 0.716567, -0.681718],
+  [0.309017, 0.5, -0.809017],
+  [0.425325, 0.688191, -0.587785],
+  [0.442863, 0.238856, -0.864188],
+  [0.587785, 0.425325, -0.688191],
+  [0.688191, 0.587785, -0.425325],
+  [-0.147621, 0.716567, -0.681718],
+  [-0.309017, 0.5, -0.809017],
+  [0.0, 0.525731, -0.850651],
+  [-0.525731, 0.0, -0.850651],
+  [-0.442863, 0.238856, -0.864188],
+  [-0.295242, 0.0, -0.955423],
+  [-0.16246, 0.262866, -0.951056],
+  [0.0, 0.0, -1.0],
+  [0.295242, 0.0, -0.955423],
+  [0.16246, 0.262866, -0.951056],
+  [-0.442863, -0.238856, -0.864188],
+  [-0.309017, -0.5, -0.809017],
+  [-0.16246, -0.262866, -0.951056],
+  [0.0, -0.850651, -0.525731],
+  [-0.147621, -0.716567, -0.681718],
+  [0.147621, -0.716567, -0.681718],
+  [0.0, -0.525731, -0.850651],
+  [0.309017, -0.5, -0.809017],
+  [0.442863, -0.238856, -0.864188],
+  [0.16246, -0.262866, -0.951056],
+  [0.238856, -0.864188, -0.442863],
+  [0.5, -0.809017, -0.309017],
+  [0.425325, -0.688191, -0.587785],
+  [0.716567, -0.681718, -0.147621],
+  [0.688191, -0.587785, -0.425325],
+  [0.587785, -0.425325, -0.688191],
+  [0.0, -0.955423, -0.295242],
+  [0.0, -1.0, 0.0],
+  [0.262866, -0.951056, -0.16246],
+  [0.0, -0.850651, 0.525731],
+  [0.0, -0.955423, 0.295242],
+  [0.238856, -0.864188, 0.442863],
+  [0.262866, -0.951056, 0.16246],
+  [0.5, -0.809017, 0.309017],
+  [0.716567, -0.681718, 0.147621],
+  [0.525731, -0.850651, 0.0],
+  [-0.238856, -0.864188, -0.442863],
+  [-0.5, -0.809017, -0.309017],
+  [-0.262866, -0.951056, -0.16246],
+  [-0.850651, -0.525731, 0.0],
+  [-0.716567, -0.681718, -0.147621],
+  [-0.716567, -0.681718, 0.147621],
+  [-0.525731, -0.850651, 0.0],
+  [-0.5, -0.809017, 0.309017],
+  [-0.238856, -0.864188, 0.442863],
+  [-0.262866, -0.951056, 0.16246],
+  [-0.864188, -0.442863, 0.238856],
+  [-0.809017, -0.309017, 0.5],
+  [-0.688191, -0.587785, 0.425325],
+  [-0.681718, -0.147621, 0.716567],
+  [-0.442863, -0.238856, 0.864188],
+  [-0.587785, -0.425325, 0.688191],
+  [-0.309017, -0.5, 0.809017],
+  [-0.147621, -0.716567, 0.681718],
+  [-0.425325, -0.688191, 0.587785],
+  [-0.16246, -0.262866, 0.951056],
+  [0.442863, -0.238856, 0.864188],
+  [0.16246, -0.262866, 0.951056],
+  [0.309017, -0.5, 0.809017],
+  [0.147621, -0.716567, 0.681718],
+  [0.0, -0.525731, 0.850651],
+  [0.425325, -0.688191, 0.587785],
+  [0.587785, -0.425325, 0.688191],
+  [0.688191, -0.587785, 0.425325],
+  [-0.955423, 0.295242, 0.0],
+  [-0.951056, 0.16246, 0.262866],
+  [-1.0, 0.0, 0.0],
+  [-0.850651, 0.0, 0.525731],
+  [-0.955423, -0.295242, 0.0],
+  [-0.951056, -0.16246, 0.262866],
+  [-0.864188, 0.442863, -0.238856],
+  [-0.951056, 0.16246, -0.262866],
+  [-0.809017, 0.309017, -0.5],
+  [-0.864188, -0.442863, -0.238856],
+  [-0.951056, -0.16246, -0.262866],
+  [-0.809017, -0.309017, -0.5],
+  [-0.681718, 0.147621, -0.716567],
+  [-0.681718, -0.147621, -0.716567],
+  [-0.850651, 0.0, -0.525731],
+  [-0.688191, 0.587785, -0.425325],
+  [-0.587785, 0.425325, -0.688191],
+  [-0.425325, 0.688191, -0.587785],
+  [-0.425325, -0.688191, -0.587785],
+  [-0.587785, -0.425325, -0.688191],
+  [-0.688191, -0.587785, -0.425325],
+]
 
-MD2Loader.prototype = Object.assign(Object.create(Loader.prototype), {
-  constructor: MD2Loader,
+class MD2Loader extends Loader {
+  constructor(manager) {
+    super(manager)
+  }
 
-  load: function (url, onLoad, onProgress, onError) {
-    var scope = this
+  load(url, onLoad, onProgress, onError) {
+    const scope = this
 
-    var loader = new FileLoader(scope.manager)
+    const loader = new FileLoader(scope.manager)
     loader.setPath(scope.path)
     loader.setResponseType('arraybuffer')
     loader.setRequestHeader(scope.requestHeader)
@@ -33,415 +196,244 @@ MD2Loader.prototype = Object.assign(Object.create(Loader.prototype), {
       onProgress,
       onError,
     )
-  },
+  }
 
-  parse: (function () {
-    var normalData = [
-      [-0.525731, 0.0, 0.850651],
-      [-0.442863, 0.238856, 0.864188],
-      [-0.295242, 0.0, 0.955423],
-      [-0.309017, 0.5, 0.809017],
-      [-0.16246, 0.262866, 0.951056],
-      [0.0, 0.0, 1.0],
-      [0.0, 0.850651, 0.525731],
-      [-0.147621, 0.716567, 0.681718],
-      [0.147621, 0.716567, 0.681718],
-      [0.0, 0.525731, 0.850651],
-      [0.309017, 0.5, 0.809017],
-      [0.525731, 0.0, 0.850651],
-      [0.295242, 0.0, 0.955423],
-      [0.442863, 0.238856, 0.864188],
-      [0.16246, 0.262866, 0.951056],
-      [-0.681718, 0.147621, 0.716567],
-      [-0.809017, 0.309017, 0.5],
-      [-0.587785, 0.425325, 0.688191],
-      [-0.850651, 0.525731, 0.0],
-      [-0.864188, 0.442863, 0.238856],
-      [-0.716567, 0.681718, 0.147621],
-      [-0.688191, 0.587785, 0.425325],
-      [-0.5, 0.809017, 0.309017],
-      [-0.238856, 0.864188, 0.442863],
-      [-0.425325, 0.688191, 0.587785],
-      [-0.716567, 0.681718, -0.147621],
-      [-0.5, 0.809017, -0.309017],
-      [-0.525731, 0.850651, 0.0],
-      [0.0, 0.850651, -0.525731],
-      [-0.238856, 0.864188, -0.442863],
-      [0.0, 0.955423, -0.295242],
-      [-0.262866, 0.951056, -0.16246],
-      [0.0, 1.0, 0.0],
-      [0.0, 0.955423, 0.295242],
-      [-0.262866, 0.951056, 0.16246],
-      [0.238856, 0.864188, 0.442863],
-      [0.262866, 0.951056, 0.16246],
-      [0.5, 0.809017, 0.309017],
-      [0.238856, 0.864188, -0.442863],
-      [0.262866, 0.951056, -0.16246],
-      [0.5, 0.809017, -0.309017],
-      [0.850651, 0.525731, 0.0],
-      [0.716567, 0.681718, 0.147621],
-      [0.716567, 0.681718, -0.147621],
-      [0.525731, 0.850651, 0.0],
-      [0.425325, 0.688191, 0.587785],
-      [0.864188, 0.442863, 0.238856],
-      [0.688191, 0.587785, 0.425325],
-      [0.809017, 0.309017, 0.5],
-      [0.681718, 0.147621, 0.716567],
-      [0.587785, 0.425325, 0.688191],
-      [0.955423, 0.295242, 0.0],
-      [1.0, 0.0, 0.0],
-      [0.951056, 0.16246, 0.262866],
-      [0.850651, -0.525731, 0.0],
-      [0.955423, -0.295242, 0.0],
-      [0.864188, -0.442863, 0.238856],
-      [0.951056, -0.16246, 0.262866],
-      [0.809017, -0.309017, 0.5],
-      [0.681718, -0.147621, 0.716567],
-      [0.850651, 0.0, 0.525731],
-      [0.864188, 0.442863, -0.238856],
-      [0.809017, 0.309017, -0.5],
-      [0.951056, 0.16246, -0.262866],
-      [0.525731, 0.0, -0.850651],
-      [0.681718, 0.147621, -0.716567],
-      [0.681718, -0.147621, -0.716567],
-      [0.850651, 0.0, -0.525731],
-      [0.809017, -0.309017, -0.5],
-      [0.864188, -0.442863, -0.238856],
-      [0.951056, -0.16246, -0.262866],
-      [0.147621, 0.716567, -0.681718],
-      [0.309017, 0.5, -0.809017],
-      [0.425325, 0.688191, -0.587785],
-      [0.442863, 0.238856, -0.864188],
-      [0.587785, 0.425325, -0.688191],
-      [0.688191, 0.587785, -0.425325],
-      [-0.147621, 0.716567, -0.681718],
-      [-0.309017, 0.5, -0.809017],
-      [0.0, 0.525731, -0.850651],
-      [-0.525731, 0.0, -0.850651],
-      [-0.442863, 0.238856, -0.864188],
-      [-0.295242, 0.0, -0.955423],
-      [-0.16246, 0.262866, -0.951056],
-      [0.0, 0.0, -1.0],
-      [0.295242, 0.0, -0.955423],
-      [0.16246, 0.262866, -0.951056],
-      [-0.442863, -0.238856, -0.864188],
-      [-0.309017, -0.5, -0.809017],
-      [-0.16246, -0.262866, -0.951056],
-      [0.0, -0.850651, -0.525731],
-      [-0.147621, -0.716567, -0.681718],
-      [0.147621, -0.716567, -0.681718],
-      [0.0, -0.525731, -0.850651],
-      [0.309017, -0.5, -0.809017],
-      [0.442863, -0.238856, -0.864188],
-      [0.16246, -0.262866, -0.951056],
-      [0.238856, -0.864188, -0.442863],
-      [0.5, -0.809017, -0.309017],
-      [0.425325, -0.688191, -0.587785],
-      [0.716567, -0.681718, -0.147621],
-      [0.688191, -0.587785, -0.425325],
-      [0.587785, -0.425325, -0.688191],
-      [0.0, -0.955423, -0.295242],
-      [0.0, -1.0, 0.0],
-      [0.262866, -0.951056, -0.16246],
-      [0.0, -0.850651, 0.525731],
-      [0.0, -0.955423, 0.295242],
-      [0.238856, -0.864188, 0.442863],
-      [0.262866, -0.951056, 0.16246],
-      [0.5, -0.809017, 0.309017],
-      [0.716567, -0.681718, 0.147621],
-      [0.525731, -0.850651, 0.0],
-      [-0.238856, -0.864188, -0.442863],
-      [-0.5, -0.809017, -0.309017],
-      [-0.262866, -0.951056, -0.16246],
-      [-0.850651, -0.525731, 0.0],
-      [-0.716567, -0.681718, -0.147621],
-      [-0.716567, -0.681718, 0.147621],
-      [-0.525731, -0.850651, 0.0],
-      [-0.5, -0.809017, 0.309017],
-      [-0.238856, -0.864188, 0.442863],
-      [-0.262866, -0.951056, 0.16246],
-      [-0.864188, -0.442863, 0.238856],
-      [-0.809017, -0.309017, 0.5],
-      [-0.688191, -0.587785, 0.425325],
-      [-0.681718, -0.147621, 0.716567],
-      [-0.442863, -0.238856, 0.864188],
-      [-0.587785, -0.425325, 0.688191],
-      [-0.309017, -0.5, 0.809017],
-      [-0.147621, -0.716567, 0.681718],
-      [-0.425325, -0.688191, 0.587785],
-      [-0.16246, -0.262866, 0.951056],
-      [0.442863, -0.238856, 0.864188],
-      [0.16246, -0.262866, 0.951056],
-      [0.309017, -0.5, 0.809017],
-      [0.147621, -0.716567, 0.681718],
-      [0.0, -0.525731, 0.850651],
-      [0.425325, -0.688191, 0.587785],
-      [0.587785, -0.425325, 0.688191],
-      [0.688191, -0.587785, 0.425325],
-      [-0.955423, 0.295242, 0.0],
-      [-0.951056, 0.16246, 0.262866],
-      [-1.0, 0.0, 0.0],
-      [-0.850651, 0.0, 0.525731],
-      [-0.955423, -0.295242, 0.0],
-      [-0.951056, -0.16246, 0.262866],
-      [-0.864188, 0.442863, -0.238856],
-      [-0.951056, 0.16246, -0.262866],
-      [-0.809017, 0.309017, -0.5],
-      [-0.864188, -0.442863, -0.238856],
-      [-0.951056, -0.16246, -0.262866],
-      [-0.809017, -0.309017, -0.5],
-      [-0.681718, 0.147621, -0.716567],
-      [-0.681718, -0.147621, -0.716567],
-      [-0.850651, 0.0, -0.525731],
-      [-0.688191, 0.587785, -0.425325],
-      [-0.587785, 0.425325, -0.688191],
-      [-0.425325, 0.688191, -0.587785],
-      [-0.425325, -0.688191, -0.587785],
-      [-0.587785, -0.425325, -0.688191],
-      [-0.688191, -0.587785, -0.425325],
+  parse(buffer) {
+    const data = new DataView(buffer)
+
+    // http://tfc.duke.free.fr/coding/md2-specs-en.html
+
+    const header = {}
+    const headerNames = [
+      'ident',
+      'version',
+      'skinwidth',
+      'skinheight',
+      'framesize',
+      'num_skins',
+      'num_vertices',
+      'num_st',
+      'num_tris',
+      'num_glcmds',
+      'num_frames',
+      'offset_skins',
+      'offset_st',
+      'offset_tris',
+      'offset_frames',
+      'offset_glcmds',
+      'offset_end',
     ]
 
-    return function (buffer) {
-      var data = new DataView(buffer)
+    for (let i = 0; i < headerNames.length; i++) {
+      header[headerNames[i]] = data.getInt32(i * 4, true)
+    }
 
-      // http://tfc.duke.free.fr/coding/md2-specs-en.html
+    if (header.ident !== 844121161 || header.version !== 8) {
+      console.error('Not a valid MD2 file')
+      return
+    }
 
-      var header = {}
-      var headerNames = [
-        'ident',
-        'version',
-        'skinwidth',
-        'skinheight',
-        'framesize',
-        'num_skins',
-        'num_vertices',
-        'num_st',
-        'num_tris',
-        'num_glcmds',
-        'num_frames',
-        'offset_skins',
-        'offset_st',
-        'offset_tris',
-        'offset_frames',
-        'offset_glcmds',
-        'offset_end',
-      ]
+    if (header.offset_end !== data.byteLength) {
+      console.error('Corrupted MD2 file')
+      return
+    }
 
-      for (let i = 0; i < headerNames.length; i++) {
-        header[headerNames[i]] = data.getInt32(i * 4, true)
+    //
+
+    const geometry = new BufferGeometry()
+
+    // uvs
+
+    const uvsTemp = []
+    let offset = header.offset_st
+
+    for (let i = 0, l = header.num_st; i < l; i++) {
+      const u = data.getInt16(offset + 0, true)
+      const v = data.getInt16(offset + 2, true)
+
+      uvsTemp.push(u / header.skinwidth, 1 - v / header.skinheight)
+
+      offset += 4
+    }
+
+    // triangles
+
+    offset = header.offset_tris
+
+    const vertexIndices = []
+    const uvIndices = []
+
+    for (let i = 0, l = header.num_tris; i < l; i++) {
+      vertexIndices.push(
+        data.getUint16(offset + 0, true),
+        data.getUint16(offset + 2, true),
+        data.getUint16(offset + 4, true),
+      )
+
+      uvIndices.push(
+        data.getUint16(offset + 6, true),
+        data.getUint16(offset + 8, true),
+        data.getUint16(offset + 10, true),
+      )
+
+      offset += 12
+    }
+
+    // frames
+
+    const translation = new Vector3()
+    const scale = new Vector3()
+    const string = []
+
+    const frames = []
+
+    offset = header.offset_frames
+
+    for (let i = 0, l = header.num_frames; i < l; i++) {
+      scale.set(data.getFloat32(offset + 0, true), data.getFloat32(offset + 4, true), data.getFloat32(offset + 8, true))
+
+      translation.set(
+        data.getFloat32(offset + 12, true),
+        data.getFloat32(offset + 16, true),
+        data.getFloat32(offset + 20, true),
+      )
+
+      offset += 24
+
+      for (let j = 0; j < 16; j++) {
+        const character = data.getUint8(offset + j, true)
+        if (character === 0) break
+
+        string[j] = character
       }
 
-      if (header.ident !== 844121161 || header.version !== 8) {
-        console.error('Not a valid MD2 file')
-        return
+      const frame = {
+        name: String.fromCharCode.apply(null, string),
+        vertices: [],
+        normals: [],
       }
 
-      if (header.offset_end !== data.byteLength) {
-        console.error('Corrupted MD2 file')
-        return
+      offset += 16
+
+      for (let j = 0; j < header.num_vertices; j++) {
+        let x = data.getUint8(offset++, true)
+        let y = data.getUint8(offset++, true)
+        let z = data.getUint8(offset++, true)
+        const n = _normalData[data.getUint8(offset++, true)]
+
+        x = x * scale.x + translation.x
+        y = y * scale.y + translation.y
+        z = z * scale.z + translation.z
+
+        frame.vertices.push(x, z, y) // convert to Y-up
+        frame.normals.push(n[0], n[2], n[1]) // convert to Y-up
       }
+
+      frames.push(frame)
+    }
+
+    // static
+
+    const positions = []
+    const normals = []
+    const uvs = []
+
+    const verticesTemp = frames[0].vertices
+    const normalsTemp = frames[0].normals
+
+    for (let i = 0, l = vertexIndices.length; i < l; i++) {
+      const vertexIndex = vertexIndices[i]
+      let stride = vertexIndex * 3
 
       //
 
-      var geometry = new BufferGeometry()
+      const x = verticesTemp[stride]
+      const y = verticesTemp[stride + 1]
+      const z = verticesTemp[stride + 2]
 
-      // uvs
+      positions.push(x, y, z)
 
-      var uvsTemp = []
-      var offset = header.offset_st
+      //
 
-      for (let i = 0, l = header.num_st; i < l; i++) {
-        var u = data.getInt16(offset + 0, true)
-        var v = data.getInt16(offset + 2, true)
+      const nx = normalsTemp[stride]
+      const ny = normalsTemp[stride + 1]
+      const nz = normalsTemp[stride + 2]
 
-        uvsTemp.push(u / header.skinwidth, 1 - v / header.skinheight)
+      normals.push(nx, ny, nz)
 
-        offset += 4
-      }
+      //
 
-      // triangles
+      const uvIndex = uvIndices[i]
+      stride = uvIndex * 2
 
-      offset = header.offset_tris
+      const u = uvsTemp[stride]
+      const v = uvsTemp[stride + 1]
 
-      var vertexIndices = []
-      var uvIndices = []
-
-      for (let i = 0, l = header.num_tris; i < l; i++) {
-        vertexIndices.push(
-          data.getUint16(offset + 0, true),
-          data.getUint16(offset + 2, true),
-          data.getUint16(offset + 4, true),
-        )
-
-        uvIndices.push(
-          data.getUint16(offset + 6, true),
-          data.getUint16(offset + 8, true),
-          data.getUint16(offset + 10, true),
-        )
-
-        offset += 12
-      }
-
-      // frames
-
-      var translation = new Vector3()
-      var scale = new Vector3()
-      var string = []
-
-      var frames = []
-
-      offset = header.offset_frames
-
-      for (let i = 0, l = header.num_frames; i < l; i++) {
-        scale.set(
-          data.getFloat32(offset + 0, true),
-          data.getFloat32(offset + 4, true),
-          data.getFloat32(offset + 8, true),
-        )
-
-        translation.set(
-          data.getFloat32(offset + 12, true),
-          data.getFloat32(offset + 16, true),
-          data.getFloat32(offset + 20, true),
-        )
-
-        offset += 24
-
-        for (let j = 0; j < 16; j++) {
-          var character = data.getUint8(offset + j, true)
-          if (character === 0) break
-
-          string[j] = character
-        }
-
-        var frame = {
-          name: String.fromCharCode.apply(null, string),
-          vertices: [],
-          normals: [],
-        }
-
-        offset += 16
-
-        for (let j = 0; j < header.num_vertices; j++) {
-          var x = data.getUint8(offset++, true)
-          var y = data.getUint8(offset++, true)
-          var z = data.getUint8(offset++, true)
-          var n = normalData[data.getUint8(offset++, true)]
-
-          x = x * scale.x + translation.x
-          y = y * scale.y + translation.y
-          z = z * scale.z + translation.z
-
-          frame.vertices.push(x, z, y) // convert to Y-up
-          frame.normals.push(n[0], n[2], n[1]) // convert to Y-up
-        }
-
-        frames.push(frame)
-      }
-
-      // static
-
-      var positions = []
-      var normals = []
-      var uvs = []
-
-      var verticesTemp = frames[0].vertices
-      var normalsTemp = frames[0].normals
-
-      for (let i = 0, l = vertexIndices.length; i < l; i++) {
-        var vertexIndex = vertexIndices[i]
-        var stride = vertexIndex * 3
-
-        //
-
-        var x = verticesTemp[stride]
-        var y = verticesTemp[stride + 1]
-        var z = verticesTemp[stride + 2]
-
-        positions.push(x, y, z)
-
-        //
-
-        var nx = normalsTemp[stride]
-        var ny = normalsTemp[stride + 1]
-        var nz = normalsTemp[stride + 2]
-
-        normals.push(nx, ny, nz)
-
-        //
-
-        var uvIndex = uvIndices[i]
-        stride = uvIndex * 2
-
-        var u = uvsTemp[stride]
-        var v = uvsTemp[stride + 1]
-
-        uvs.push(u, v)
-      }
-
-      geometry.setAttribute('position', new Float32BufferAttribute(positions, 3))
-      geometry.setAttribute('normal', new Float32BufferAttribute(normals, 3))
-      geometry.setAttribute('uv', new Float32BufferAttribute(uvs, 2))
-
-      // animation
-
-      var morphPositions = []
-      var morphNormals = []
-
-      for (let i = 0, l = frames.length; i < l; i++) {
-        var frame = frames[i]
-        var attributeName = frame.name
-
-        if (frame.vertices.length > 0) {
-          var positions = []
-
-          for (let j = 0, jl = vertexIndices.length; j < jl; j++) {
-            var vertexIndex = vertexIndices[j]
-            var stride = vertexIndex * 3
-
-            var x = frame.vertices[stride]
-            var y = frame.vertices[stride + 1]
-            var z = frame.vertices[stride + 2]
-
-            positions.push(x, y, z)
-          }
-
-          var positionAttribute = new Float32BufferAttribute(positions, 3)
-          positionAttribute.name = attributeName
-
-          morphPositions.push(positionAttribute)
-        }
-
-        if (frame.normals.length > 0) {
-          var normals = []
-
-          for (let j = 0, jl = vertexIndices.length; j < jl; j++) {
-            var vertexIndex = vertexIndices[j]
-            var stride = vertexIndex * 3
-
-            var nx = frame.normals[stride]
-            var ny = frame.normals[stride + 1]
-            var nz = frame.normals[stride + 2]
-
-            normals.push(nx, ny, nz)
-          }
-
-          var normalAttribute = new Float32BufferAttribute(normals, 3)
-          normalAttribute.name = attributeName
-
-          morphNormals.push(normalAttribute)
-        }
-      }
-
-      geometry.morphAttributes.position = morphPositions
-      geometry.morphAttributes.normal = morphNormals
-      geometry.morphTargetsRelative = false
-
-      geometry.animations = AnimationClip.CreateClipsFromMorphTargetSequences(frames, 10)
-
-      return geometry
+      uvs.push(u, v)
     }
-  })(),
-})
+
+    geometry.setAttribute('position', new Float32BufferAttribute(positions, 3))
+    geometry.setAttribute('normal', new Float32BufferAttribute(normals, 3))
+    geometry.setAttribute('uv', new Float32BufferAttribute(uvs, 2))
+
+    // animation
+
+    const morphPositions = []
+    const morphNormals = []
+
+    for (let i = 0, l = frames.length; i < l; i++) {
+      const frame = frames[i]
+      const attributeName = frame.name
+
+      if (frame.vertices.length > 0) {
+        const positions = []
+
+        for (let j = 0, jl = vertexIndices.length; j < jl; j++) {
+          const vertexIndex = vertexIndices[j]
+          const stride = vertexIndex * 3
+
+          const x = frame.vertices[stride]
+          const y = frame.vertices[stride + 1]
+          const z = frame.vertices[stride + 2]
+
+          positions.push(x, y, z)
+        }
+
+        const positionAttribute = new Float32BufferAttribute(positions, 3)
+        positionAttribute.name = attributeName
+
+        morphPositions.push(positionAttribute)
+      }
+
+      if (frame.normals.length > 0) {
+        const normals = []
+
+        for (let j = 0, jl = vertexIndices.length; j < jl; j++) {
+          const vertexIndex = vertexIndices[j]
+          const stride = vertexIndex * 3
+
+          const nx = frame.normals[stride]
+          const ny = frame.normals[stride + 1]
+          const nz = frame.normals[stride + 2]
+
+          normals.push(nx, ny, nz)
+        }
+
+        const normalAttribute = new Float32BufferAttribute(normals, 3)
+        normalAttribute.name = attributeName
+
+        morphNormals.push(normalAttribute)
+      }
+    }
+
+    geometry.morphAttributes.position = morphPositions
+    geometry.morphAttributes.normal = morphNormals
+    geometry.morphTargetsRelative = false
+
+    geometry.animations = AnimationClip.CreateClipsFromMorphTargetSequences(frames, 10)
+
+    return geometry
+  }
+}
 
 export { MD2Loader }
