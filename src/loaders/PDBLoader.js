@@ -1,16 +1,14 @@
 import { BufferGeometry, FileLoader, Float32BufferAttribute, Loader } from 'three'
 
-var PDBLoader = function (manager) {
-  Loader.call(this, manager)
-}
+class PDBLoader extends Loader {
+  constructor(manager) {
+    super(manager)
+  }
 
-PDBLoader.prototype = Object.assign(Object.create(Loader.prototype), {
-  constructor: PDBLoader,
+  load(url, onLoad, onProgress, onError) {
+    const scope = this
 
-  load: function (url, onLoad, onProgress, onError) {
-    var scope = this
-
-    var loader = new FileLoader(scope.manager)
+    const loader = new FileLoader(scope.manager)
     loader.setPath(scope.path)
     loader.setRequestHeader(scope.requestHeader)
     loader.setWithCredentials(scope.withCredentials)
@@ -32,11 +30,11 @@ PDBLoader.prototype = Object.assign(Object.create(Loader.prototype), {
       onProgress,
       onError,
     )
-  },
+  }
 
   // Based on CanvasMol PDB parser
 
-  parse: function (text) {
+  parse(text) {
     function trim(text) {
       return text.replace(/^\s\s*/, '').replace(/\s\s*$/, '')
     }
@@ -49,11 +47,11 @@ PDBLoader.prototype = Object.assign(Object.create(Loader.prototype), {
       return 's' + Math.min(s, e) + 'e' + Math.max(s, e)
     }
 
-    function parseBond(start, length) {
-      var eatom = parseInt(lines[i].substr(start, length))
+    function parseBond(start, length, satom, i) {
+      const eatom = parseInt(lines[i].substr(start, length))
 
       if (eatom) {
-        var h = hash(satom, eatom)
+        const h = hash(satom, eatom)
 
         if (_bhash[h] === undefined) {
           _bonds.push([satom - 1, eatom - 1, 1])
@@ -68,7 +66,7 @@ PDBLoader.prototype = Object.assign(Object.create(Loader.prototype), {
     }
 
     function buildGeometry() {
-      var build = {
+      const build = {
         geometryAtoms: new BufferGeometry(),
         geometryBonds: new BufferGeometry(),
         json: {
@@ -76,48 +74,45 @@ PDBLoader.prototype = Object.assign(Object.create(Loader.prototype), {
         },
       }
 
-      var geometryAtoms = build.geometryAtoms
-      var geometryBonds = build.geometryBonds
+      const geometryAtoms = build.geometryAtoms
+      const geometryBonds = build.geometryBonds
 
-      var i, l
-      var x, y, z
-
-      var verticesAtoms = []
-      var colorsAtoms = []
-      var verticesBonds = []
+      const verticesAtoms = []
+      const colorsAtoms = []
+      const verticesBonds = []
 
       // atoms
 
-      for (i = 0, l = atoms.length; i < l; i++) {
-        var atom = atoms[i]
+      for (let i = 0, l = atoms.length; i < l; i++) {
+        const atom = atoms[i]
 
-        x = atom[0]
-        y = atom[1]
-        z = atom[2]
+        const x = atom[0]
+        const y = atom[1]
+        const z = atom[2]
 
         verticesAtoms.push(x, y, z)
 
-        var r = atom[3][0] / 255
-        var g = atom[3][1] / 255
-        var b = atom[3][2] / 255
+        const r = atom[3][0] / 255
+        const g = atom[3][1] / 255
+        const b = atom[3][2] / 255
 
         colorsAtoms.push(r, g, b)
       }
 
       // bonds
 
-      for (i = 0, l = _bonds.length; i < l; i++) {
-        var bond = _bonds[i]
+      for (let i = 0, l = _bonds.length; i < l; i++) {
+        const bond = _bonds[i]
 
-        var start = bond[0]
-        var end = bond[1]
+        const start = bond[0]
+        const end = bond[1]
 
-        var startAtom = _atomMap[start]
-        var endAtom = _atomMap[end]
+        const startAtom = _atomMap[start]
+        const endAtom = _atomMap[end]
 
-        x = startAtom[0]
-        y = startAtom[1]
-        z = startAtom[2]
+        let x = startAtom[0]
+        let y = startAtom[1]
+        let z = startAtom[2]
 
         verticesBonds.push(x, y, z)
 
@@ -138,7 +133,7 @@ PDBLoader.prototype = Object.assign(Object.create(Loader.prototype), {
       return build
     }
 
-    var CPK = {
+    const CPK = {
       h: [255, 255, 255],
       he: [217, 255, 255],
       li: [204, 128, 255],
@@ -259,49 +254,47 @@ PDBLoader.prototype = Object.assign(Object.create(Loader.prototype), {
       uuo: [235, 0, 38],
     }
 
-    var atoms = []
+    const atoms = []
 
-    var _bonds = []
-    var _bhash = {}
-    var _atomMap = {}
-
-    var x, y, z, index, e
+    const _bonds = []
+    const _bhash = {}
+    const _atomMap = {}
 
     // parse
 
-    var lines = text.split('\n')
+    const lines = text.split('\n')
 
     for (let i = 0, l = lines.length; i < l; i++) {
       if (lines[i].substr(0, 4) === 'ATOM' || lines[i].substr(0, 6) === 'HETATM') {
-        x = parseFloat(lines[i].substr(30, 7))
-        y = parseFloat(lines[i].substr(38, 7))
-        z = parseFloat(lines[i].substr(46, 7))
-        index = parseInt(lines[i].substr(6, 5)) - 1
+        const x = parseFloat(lines[i].substr(30, 7))
+        const y = parseFloat(lines[i].substr(38, 7))
+        const z = parseFloat(lines[i].substr(46, 7))
+        const index = parseInt(lines[i].substr(6, 5)) - 1
 
-        e = trim(lines[i].substr(76, 2)).toLowerCase()
+        let e = trim(lines[i].substr(76, 2)).toLowerCase()
 
         if (e === '') {
           e = trim(lines[i].substr(12, 2)).toLowerCase()
         }
 
-        var atomData = [x, y, z, CPK[e], capitalize(e)]
+        const atomData = [x, y, z, CPK[e], capitalize(e)]
 
         atoms.push(atomData)
         _atomMap[index] = atomData
       } else if (lines[i].substr(0, 6) === 'CONECT') {
-        var satom = parseInt(lines[i].substr(6, 5))
+        const satom = parseInt(lines[i].substr(6, 5))
 
-        parseBond(11, 5)
-        parseBond(16, 5)
-        parseBond(21, 5)
-        parseBond(26, 5)
+        parseBond(11, 5, satom, i)
+        parseBond(16, 5, satom, i)
+        parseBond(21, 5, satom, i)
+        parseBond(26, 5, satom, i)
       }
     }
 
     // build and return geometry
 
     return buildGeometry()
-  },
-})
+  }
+}
 
 export { PDBLoader }

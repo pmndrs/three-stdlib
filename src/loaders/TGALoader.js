@@ -1,40 +1,11 @@
-import { FileLoader, Loader, Texture } from 'three'
+import { DataTextureLoader, LinearMipmapLinearFilter } from 'three'
 
-var TGALoader = function (manager) {
-  Loader.call(this, manager)
-}
+class TGALoader extends DataTextureLoader {
+  constructor(manager) {
+    super(manager)
+  }
 
-TGALoader.prototype = Object.assign(Object.create(Loader.prototype), {
-  constructor: TGALoader,
-
-  load: function (url, onLoad, onProgress, onError) {
-    var scope = this
-
-    var texture = new Texture()
-
-    var loader = new FileLoader(this.manager)
-    loader.setResponseType('arraybuffer')
-    loader.setPath(this.path)
-    loader.setWithCredentials(this.withCredentials)
-
-    loader.load(
-      url,
-      function (buffer) {
-        texture.image = scope.parse(buffer)
-        texture.needsUpdate = true
-
-        if (onLoad !== undefined) {
-          onLoad(texture)
-        }
-      },
-      onProgress,
-      onError,
-    )
-
-    return texture
-  },
-
-  parse: function (buffer) {
+  parse(buffer) {
     // reference from vthibault, https://github.com/vthibault/roBrowser/blob/master/src/Loaders/Targa.js
 
     function tgaCheckHeader(header) {
@@ -88,10 +59,10 @@ TGALoader.prototype = Object.assign(Object.create(Loader.prototype), {
     // parse tga image buffer
 
     function tgaParse(use_rle, use_pal, header, offset, data) {
-      var pixel_data, pixel_size, pixel_total, palettes
+      let pixel_data, palettes
 
-      pixel_size = header.pixel_size >> 3
-      pixel_total = header.width * header.height * pixel_size
+      const pixel_size = header.pixel_size >> 3
+      const pixel_total = header.width * header.height * pixel_size
 
       // read palettes
 
@@ -104,9 +75,9 @@ TGALoader.prototype = Object.assign(Object.create(Loader.prototype), {
       if (use_rle) {
         pixel_data = new Uint8Array(pixel_total)
 
-        var c, count, i
-        var shift = 0
-        var pixels = new Uint8Array(pixel_size)
+        let c, count, i
+        let shift = 0
+        const pixels = new Uint8Array(pixel_size)
 
         while (shift < pixel_total) {
           c = data[offset++]
@@ -153,12 +124,12 @@ TGALoader.prototype = Object.assign(Object.create(Loader.prototype), {
     }
 
     function tgaGetImageData8bits(imageData, y_start, y_step, y_end, x_start, x_step, x_end, image, palettes) {
-      var colormap = palettes
-      var color,
+      const colormap = palettes
+      let color,
         i = 0,
         x,
         y
-      var width = header.width
+      const width = header.width
 
       for (y = y_start; y !== y_end; y += y_step) {
         for (x = x_start; x !== x_end; x += x_step, i++) {
@@ -174,11 +145,11 @@ TGALoader.prototype = Object.assign(Object.create(Loader.prototype), {
     }
 
     function tgaGetImageData16bits(imageData, y_start, y_step, y_end, x_start, x_step, x_end, image) {
-      var color,
+      let color,
         i = 0,
         x,
         y
-      var width = header.width
+      const width = header.width
 
       for (y = y_start; y !== y_end; y += y_step) {
         for (x = x_start; x !== x_end; x += x_step, i += 2) {
@@ -194,10 +165,10 @@ TGALoader.prototype = Object.assign(Object.create(Loader.prototype), {
     }
 
     function tgaGetImageData24bits(imageData, y_start, y_step, y_end, x_start, x_step, x_end, image) {
-      var i = 0,
+      let i = 0,
         x,
         y
-      var width = header.width
+      const width = header.width
 
       for (y = y_start; y !== y_end; y += y_step) {
         for (x = x_start; x !== x_end; x += x_step, i += 3) {
@@ -212,10 +183,10 @@ TGALoader.prototype = Object.assign(Object.create(Loader.prototype), {
     }
 
     function tgaGetImageData32bits(imageData, y_start, y_step, y_end, x_start, x_step, x_end, image) {
-      var i = 0,
+      let i = 0,
         x,
         y
-      var width = header.width
+      const width = header.width
 
       for (y = y_start; y !== y_end; y += y_step) {
         for (x = x_start; x !== x_end; x += x_step, i += 4) {
@@ -230,11 +201,11 @@ TGALoader.prototype = Object.assign(Object.create(Loader.prototype), {
     }
 
     function tgaGetImageDataGrey8bits(imageData, y_start, y_step, y_end, x_start, x_step, x_end, image) {
-      var color,
+      let color,
         i = 0,
         x,
         y
-      var width = header.width
+      const width = header.width
 
       for (y = y_start; y !== y_end; y += y_step) {
         for (x = x_start; x !== x_end; x += x_step, i++) {
@@ -250,10 +221,10 @@ TGALoader.prototype = Object.assign(Object.create(Loader.prototype), {
     }
 
     function tgaGetImageDataGrey16bits(imageData, y_start, y_step, y_end, x_start, x_step, x_end, image) {
-      var i = 0,
+      let i = 0,
         x,
         y
-      var width = header.width
+      const width = header.width
 
       for (y = y_start; y !== y_end; y += y_step) {
         for (x = x_start; x !== x_end; x += x_step, i += 2) {
@@ -268,7 +239,7 @@ TGALoader.prototype = Object.assign(Object.create(Loader.prototype), {
     }
 
     function getTgaRGBA(data, width, height, image, palette) {
-      var x_start, y_start, x_step, y_step, x_end, y_end
+      let x_start, y_start, x_step, y_step, x_end, y_end
 
       switch ((header.flags & TGA_ORIGIN_MASK) >> TGA_ORIGIN_SHIFT) {
         default:
@@ -348,14 +319,14 @@ TGALoader.prototype = Object.assign(Object.create(Loader.prototype), {
       }
 
       // Load image data according to specific method
-      // var func = 'tgaGetImageData' + (use_grey ? 'Grey' : '') + (header.pixel_size) + 'bits';
+      // let func = 'tgaGetImageData' + (use_grey ? 'Grey' : '') + (header.pixel_size) + 'bits';
       // func(data, y_start, y_step, y_end, x_start, x_step, x_end, width, image, palette );
       return data
     }
 
     // TGA constants
 
-    var TGA_TYPE_NO_DATA = 0,
+    const TGA_TYPE_NO_DATA = 0,
       TGA_TYPE_INDEXED = 1,
       TGA_TYPE_RGB = 2,
       TGA_TYPE_GREY = 3,
@@ -371,8 +342,9 @@ TGALoader.prototype = Object.assign(Object.create(Loader.prototype), {
 
     if (buffer.length < 19) console.error('THREE.TGALoader: Not enough data to contain header.')
 
-    var content = new Uint8Array(buffer),
-      offset = 0,
+    let offset = 0
+
+    const content = new Uint8Array(buffer),
       header = {
         id_length: content[offset++],
         colormap_type: content[offset++],
@@ -401,7 +373,7 @@ TGALoader.prototype = Object.assign(Object.create(Loader.prototype), {
 
     // get targa information about RLE compression and palette
 
-    var use_rle = false,
+    let use_rle = false,
       use_pal = false,
       use_grey = false
 
@@ -434,22 +406,19 @@ TGALoader.prototype = Object.assign(Object.create(Loader.prototype), {
 
     //
 
-    var useOffscreen = typeof OffscreenCanvas !== 'undefined'
+    const imageData = new Uint8Array(header.width * header.height * 4)
+    const result = tgaParse(use_rle, use_pal, header, offset, content)
+    getTgaRGBA(imageData, header.width, header.height, result.pixel_data, result.palettes)
 
-    var canvas = useOffscreen ? new OffscreenCanvas(header.width, header.height) : document.createElement('canvas')
-    canvas.width = header.width
-    canvas.height = header.height
-
-    var context = canvas.getContext('2d')
-    var imageData = context.createImageData(header.width, header.height)
-
-    var result = tgaParse(use_rle, use_pal, header, offset, content)
-    getTgaRGBA(imageData.data, header.width, header.height, result.pixel_data, result.palettes)
-
-    context.putImageData(imageData, 0, 0)
-
-    return canvas
-  },
-})
+    return {
+      data: imageData,
+      width: header.width,
+      height: header.height,
+      flipY: true,
+      generateMipmaps: true,
+      minFilter: LinearMipmapLinearFilter,
+    }
+  }
+}
 
 export { TGALoader }

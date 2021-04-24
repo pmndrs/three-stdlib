@@ -17,20 +17,18 @@ import {
  *
  */
 
-var BVHLoader = function (manager) {
-  Loader.call(this, manager)
+class BVHLoader extends Loader {
+  constructor(manager) {
+    super(manager)
 
-  this.animateBonePositions = true
-  this.animateBoneRotations = true
-}
+    this.animateBonePositions = true
+    this.animateBoneRotations = true
+  }
 
-BVHLoader.prototype = Object.assign(Object.create(Loader.prototype), {
-  constructor: BVHLoader,
+  load(url, onLoad, onProgress, onError) {
+    const scope = this
 
-  load: function (url, onLoad, onProgress, onError) {
-    var scope = this
-
-    var loader = new FileLoader(scope.manager)
+    const loader = new FileLoader(scope.manager)
     loader.setPath(scope.path)
     loader.setRequestHeader(scope.requestHeader)
     loader.setWithCredentials(scope.withCredentials)
@@ -52,9 +50,9 @@ BVHLoader.prototype = Object.assign(Object.create(Loader.prototype), {
       onProgress,
       onError,
     )
-  },
+  }
 
-  parse: function (text) {
+  parse(text) {
     /*
 			reads a string array (lines) from a BVH file
 			and outputs a skeleton structure including motion data
@@ -69,8 +67,8 @@ BVHLoader.prototype = Object.assign(Object.create(Loader.prototype), {
         console.error('THREE.BVHLoader: HIERARCHY expected.')
       }
 
-      var list = [] // collects flat array of all bones
-      var root = readNode(lines, nextLine(lines), list)
+      const list = [] // collects flat array of all bones
+      const root = readNode(lines, nextLine(lines), list)
 
       // read motion data
 
@@ -80,8 +78,8 @@ BVHLoader.prototype = Object.assign(Object.create(Loader.prototype), {
 
       // number of frames
 
-      var tokens = nextLine(lines).split(/[\s]+/)
-      var numFrames = parseInt(tokens[1])
+      let tokens = nextLine(lines).split(/[\s]+/)
+      const numFrames = parseInt(tokens[1])
 
       if (isNaN(numFrames)) {
         console.error('THREE.BVHLoader: Failed to read number of frames.')
@@ -90,7 +88,7 @@ BVHLoader.prototype = Object.assign(Object.create(Loader.prototype), {
       // frame time
 
       tokens = nextLine(lines).split(/[\s]+/)
-      var frameTime = parseFloat(tokens[2])
+      const frameTime = parseFloat(tokens[2])
 
       if (isNaN(frameTime)) {
         console.error('THREE.BVHLoader: Failed to read frame time.')
@@ -123,7 +121,7 @@ BVHLoader.prototype = Object.assign(Object.create(Loader.prototype), {
 
       // add keyframe
 
-      var keyframe = {
+      const keyframe = {
         time: frameTime,
         position: new Vector3(),
         rotation: new Quaternion(),
@@ -131,11 +129,11 @@ BVHLoader.prototype = Object.assign(Object.create(Loader.prototype), {
 
       bone.frames.push(keyframe)
 
-      var quat = new Quaternion()
+      const quat = new Quaternion()
 
-      var vx = new Vector3(1, 0, 0)
-      var vy = new Vector3(0, 1, 0)
-      var vz = new Vector3(0, 0, 1)
+      const vx = new Vector3(1, 0, 0)
+      const vy = new Vector3(0, 1, 0)
+      const vz = new Vector3(0, 0, 1)
 
       // parse values for each channel in node
 
@@ -184,12 +182,12 @@ BVHLoader.prototype = Object.assign(Object.create(Loader.prototype), {
 		 returns: a BVH node including children
 		*/
     function readNode(lines, firstline, list) {
-      var node = { name: '', type: '', frames: [] }
+      const node = { name: '', type: '', frames: [] }
       list.push(node)
 
       // parse node type and name
 
-      var tokens = firstline.split(/[\s]+/)
+      let tokens = firstline.split(/[\s]+/)
 
       if (tokens[0].toUpperCase() === 'END' && tokens[1].toUpperCase() === 'SITE') {
         node.type = 'ENDSITE'
@@ -215,7 +213,7 @@ BVHLoader.prototype = Object.assign(Object.create(Loader.prototype), {
         console.error('THREE.BVHLoader: Invalid number of values for OFFSET.')
       }
 
-      var offset = new Vector3(parseFloat(tokens[1]), parseFloat(tokens[2]), parseFloat(tokens[3]))
+      const offset = new Vector3(parseFloat(tokens[1]), parseFloat(tokens[2]), parseFloat(tokens[3]))
 
       if (isNaN(offset.x) || isNaN(offset.y) || isNaN(offset.z)) {
         console.error('THREE.BVHLoader: Invalid values of OFFSET.')
@@ -232,7 +230,7 @@ BVHLoader.prototype = Object.assign(Object.create(Loader.prototype), {
           console.error('THREE.BVHLoader: Expected CHANNELS definition.')
         }
 
-        var numChannels = parseInt(tokens[1])
+        const numChannels = parseInt(tokens[1])
         node.channels = tokens.splice(2, numChannels)
         node.children = []
       }
@@ -240,7 +238,7 @@ BVHLoader.prototype = Object.assign(Object.create(Loader.prototype), {
       // read children
 
       while (true) {
-        var line = nextLine(lines)
+        const line = nextLine(lines)
 
         if (line === '}') {
           return node
@@ -259,7 +257,7 @@ BVHLoader.prototype = Object.assign(Object.create(Loader.prototype), {
 			returns the root Bone
 		*/
     function toTHREEBone(source, list) {
-      var bone = new Bone()
+      const bone = new Bone()
       list.push(bone)
 
       bone.position.add(source.offset)
@@ -282,23 +280,23 @@ BVHLoader.prototype = Object.assign(Object.create(Loader.prototype), {
 			returns: a AnimationClip containing position and quaternion tracks
 		*/
     function toTHREEAnimation(bones) {
-      var tracks = []
+      const tracks = []
 
       // create a position and quaternion animation track for each node
 
       for (let i = 0; i < bones.length; i++) {
-        var bone = bones[i]
+        const bone = bones[i]
 
         if (bone.type === 'ENDSITE') continue
 
         // track data
 
-        var times = []
-        var positions = []
-        var rotations = []
+        const times = []
+        const positions = []
+        const rotations = []
 
         for (let j = 0; j < bone.frames.length; j++) {
-          var frame = bone.frames[j]
+          const frame = bone.frames[j]
 
           times.push(frame.time)
 
@@ -331,29 +329,29 @@ BVHLoader.prototype = Object.assign(Object.create(Loader.prototype), {
 			returns the next non-empty line in lines
 		*/
     function nextLine(lines) {
-      var line
+      let line
       // skip empty lines
       while ((line = lines.shift().trim()).length === 0) {}
 
       return line
     }
 
-    var scope = this
+    const scope = this
 
-    var lines = text.split(/[\r\n]+/g)
+    const lines = text.split(/[\r\n]+/g)
 
-    var bones = readBvh(lines)
+    const bones = readBvh(lines)
 
-    var threeBones = []
+    const threeBones = []
     toTHREEBone(bones[0], threeBones)
 
-    var threeClip = toTHREEAnimation(bones)
+    const threeClip = toTHREEAnimation(bones)
 
     return {
       skeleton: new Skeleton(threeBones),
       clip: threeClip,
     }
-  },
-})
+  }
+}
 
 export { BVHLoader }
