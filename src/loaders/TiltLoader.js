@@ -159,8 +159,6 @@ class StrokeGeometry extends BufferGeometry {
     const vector3 = new Vector3()
     const vector4 = new Vector3()
 
-    // size = size / 2;
-
     for (const k in strokes) {
       const stroke = strokes[k]
       const positions = stroke[0]
@@ -366,12 +364,10 @@ const common = {
   },
 }
 
-const loader = new TextureLoader().setPath('./textures/tiltbrush/')
-
 const shaders = {
   Light: {
     uniforms: {
-      mainTex: { value: loader.load('Light.webp') },
+      mainTex: { value: new TextureLoader().setPath('./textures/tiltbrush/').load('Light.webp') },
       alphaTest: { value: 0.067 },
       emission_gain: { value: 0.45 },
       alpha: { value: 1 },
