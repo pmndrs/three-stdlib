@@ -159,8 +159,6 @@ class StrokeGeometry extends BufferGeometry {
     const vector3 = new Vector3()
     const vector4 = new Vector3()
 
-    // size = size / 2;
-
     for (const k in strokes) {
       const stroke = strokes[k]
       const positions = stroke[0]
