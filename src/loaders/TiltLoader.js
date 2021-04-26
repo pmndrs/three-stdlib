@@ -366,12 +366,10 @@ const common = {
   },
 }
 
-const loader = new TextureLoader().setPath('./textures/tiltbrush/')
-
-const shaders = {
+const shaders = () => ({
   Light: {
     uniforms: {
-      mainTex: { value: loader.load('Light.webp') },
+      mainTex: { value: new TextureLoader().setPath('./textures/tiltbrush/').loader.load('Light.webp') },
       alphaTest: { value: 0.067 },
       emission_gain: { value: 0.45 },
       alpha: { value: 1 },
@@ -447,14 +445,14 @@ const shaders = {
     blendSrc: 201,
     blendSrcAlpha: 201,
   },
-}
+})
 
 function getMaterial(GUID) {
   const name = BRUSH_LIST_ARRAY[GUID]
 
   switch (name) {
     case 'Light':
-      return new RawShaderMaterial(shaders.Light)
+      return new RawShaderMaterial(shaders().Light)
 
     default:
       return new MeshBasicMaterial({ vertexColors: true, side: DoubleSide })
