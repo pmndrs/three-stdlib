@@ -54,7 +54,7 @@ export default [
         transformOutputPath: (output) => output.replace(/\.[^/.]+$/, '.cjs.js'),
       }),
       json(),
-      babel(getBabelOptions({ useESModules: false })),
+      babel(getBabelOptions({ useESModules: false }, '>1%, not dead, not ie 11, not op_mini all')),
       resolve({ extensions }),
       terser(),
     ],
@@ -63,6 +63,11 @@ export default [
     input: `./src/index.ts`,
     output: { file: `dist/index.cjs.js`, format: 'cjs' },
     external,
-    plugins: [json(), babel(getBabelOptions({ useESModules: false })), resolve({ extensions }), terser()],
+    plugins: [
+      json(),
+      babel(getBabelOptions({ useESModules: false }, '>1%, not dead, not ie 11, not op_mini all')),
+      resolve({ extensions }),
+      terser(),
+    ],
   },
 ]
