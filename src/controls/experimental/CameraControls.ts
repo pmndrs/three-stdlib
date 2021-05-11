@@ -95,7 +95,7 @@ class CameraControls extends EventDispatcher {
   enableKeys = true
 
   /** The four arrow keys */
-  keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40 }
+  keys = { LEFT: 'ArrowLeft', UP: 'ArrowUp', RIGHT: 'ArrowRight', BOTTOM: 'ArrowDown' }
 
   mouseButtons: {
     LEFT: MOUSE
@@ -545,8 +545,7 @@ class CameraControls extends EventDispatcher {
   private handleKeyDown = (event: KeyboardEvent): void => {
     let needsUpdate = false
 
-    // TODO: keyCode deprecated?
-    switch (event.keyCode) {
+    switch (event.code) {
       case this.keys.UP:
         this.pan(0, this.keyPanSpeed)
         needsUpdate = true

@@ -19,7 +19,7 @@ class TrackballControls extends EventDispatcher {
   public minDistance = 0
   public maxDistance = Infinity
 
-  public keys: [number, number, number] = [65 /*A*/, 83 /*S*/, 68 /*D*/]
+  public keys: [string, string, string] = ['KeyA' /*A*/, 'KeyS' /*S*/, 'KeyD' /*D*/]
 
   public mouseButtons = {
     LEFT: MOUSE.ROTATE,
@@ -344,11 +344,11 @@ class TrackballControls extends EventDispatcher {
 
     if (this._keyState !== this.STATE.NONE) {
       return
-    } else if (event.keyCode === this.keys[this.STATE.ROTATE] && !this.noRotate) {
+    } else if (event.code === this.keys[this.STATE.ROTATE] && !this.noRotate) {
       this._keyState = this.STATE.ROTATE
-    } else if (event.keyCode === this.keys[this.STATE.ZOOM] && !this.noZoom) {
+    } else if (event.code === this.keys[this.STATE.ZOOM] && !this.noZoom) {
       this._keyState = this.STATE.ZOOM
-    } else if (event.keyCode === this.keys[this.STATE.PAN] && !this.noPan) {
+    } else if (event.code === this.keys[this.STATE.PAN] && !this.noPan) {
       this._keyState = this.STATE.PAN
     }
   }
