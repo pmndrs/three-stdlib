@@ -62,7 +62,7 @@ class OrbitControls extends EventDispatcher {
   autoRotate = false
   autoRotateSpeed = 2.0 // 30 seconds per orbit when fps is 60
   // The four arrow keys
-  keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40 }
+  keys = { LEFT: 'ArrowLeft', UP: 'ArrowUp', RIGHT: 'ArrowRight', BOTTOM: 'ArrowDown' }
   // Mouse buttons
   mouseButtons = {
     LEFT: MOUSE.ROTATE,
@@ -498,7 +498,7 @@ class OrbitControls extends EventDispatcher {
     function handleKeyDown(event: KeyboardEvent) {
       let needsUpdate = false
 
-      switch (event.keyCode) {
+      switch (event.code) {
         case scope.keys.UP:
           pan(0, scope.keyPanSpeed)
           needsUpdate = true
