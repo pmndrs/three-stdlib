@@ -22,7 +22,7 @@ import { Refractor } from '../objects/Refractor'
  *
  */
 
-class Water extends Mesh {
+class Water2 extends Mesh {
   constructor(geometry, options = {}) {
     super(geometry)
 
