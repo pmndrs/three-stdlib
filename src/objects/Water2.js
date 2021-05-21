@@ -12,8 +12,8 @@ import {
   Vector2,
   Vector4,
 } from 'three'
-import { Reflector } from '../objects/Reflector'
-import { Refractor } from '../objects/Refractor'
+import { Reflector } from './Reflector'
+import { Refractor } from './Refractor'
 
 /**
  * References:
@@ -175,9 +175,9 @@ class Water2 extends Mesh {
   }
 }
 
-Water.prototype.isWater = true
+Water2.prototype.isWater = true
 
-Water.WaterShader = {
+Water2.WaterShader = {
   uniforms: {
     color: {
       type: 'c',
