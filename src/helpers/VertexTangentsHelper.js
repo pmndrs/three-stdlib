@@ -5,10 +5,6 @@ const _v2 = new Vector3()
 
 class VertexTangentsHelper extends LineSegments {
   constructor(object, size, hex) {
-    this.object = object
-
-    this.size = size !== undefined ? size : 1
-
     const color = hex !== undefined ? hex : 0x00ffff
 
     //
@@ -33,6 +29,9 @@ class VertexTangentsHelper extends LineSegments {
     super(geometry, new LineBasicMaterial({ color, toneMapped: false }))
 
     this.type = 'VertexTangentsHelper'
+    this.object = object
+
+    this.size = size !== undefined ? size : 1
 
     //
 
