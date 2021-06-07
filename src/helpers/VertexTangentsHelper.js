@@ -9,7 +9,7 @@ class VertexTangentsHelper extends LineSegments {
 
     //
 
-    const objGeometry = this.object.geometry
+    const objGeometry = object.geometry
 
     if (!(objGeometry && objGeometry.isBufferGeometry)) {
       console.error('THREE.VertexTangentsHelper: geometry not an instance of THREE.BufferGeometry.', objGeometry)
