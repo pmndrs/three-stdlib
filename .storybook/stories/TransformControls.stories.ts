@@ -27,7 +27,7 @@ export const Default = () => {
     scene.add(mesh)
     control.attach(mesh)
     scene.add(control)
-    camera.position.set(0,1.5,-4)
+    camera.position.set(0, 1.5, -4)
     camera.lookAt(mesh.position)
     scene.background = new Color(0x000000).convertSRGBToLinear()
 
@@ -59,7 +59,7 @@ export const RotateStory = () => {
     control.attach(mesh)
     control.setMode('rotate')
     scene.add(control)
-    camera.position.set(0,1.5,-4)
+    camera.position.set(0, 1.5, -4)
     camera.lookAt(mesh.position)
     scene.background = new Color(0x000000).convertSRGBToLinear()
 
@@ -92,7 +92,7 @@ export const ScaleStory = () => {
     control.attach(mesh)
     control.setMode('scale')
     scene.add(control)
-    camera.position.set(0,1.5,-4)
+    camera.position.set(0, 1.5, -4)
     camera.lookAt(mesh.position)
     scene.background = new Color(0x000000).convertSRGBToLinear()
 
@@ -104,5 +104,3 @@ export const ScaleStory = () => {
   return ''
 }
 ScaleStory.storyName = 'Scale'
-
-
