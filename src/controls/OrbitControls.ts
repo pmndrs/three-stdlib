@@ -20,6 +20,8 @@ import {
 //    Zoom - middle mouse, or mousewheel / touch: two-finger spread or squish
 //    Pan - right mouse, or left mouse + ctrl/meta/shiftKey, or arrow keys / touch: two-finger move
 
+const moduloWrapAround = (offset: number, capacity: number) => ((offset % capacity) + capacity) % capacity
+
 class OrbitControls extends EventDispatcher {
   object: Camera
   domElement: HTMLElement | undefined
@@ -79,6 +81,9 @@ class OrbitControls extends EventDispatcher {
 
   getPolarAngle: () => number
   getAzimuthalAngle: () => number
+  setPolarAngle: (x: number) => void
+  setAzimuthalAngle: (x: number) => void
+
   listenToKeyEvents: (domElement: HTMLElement) => void
   saveState: () => void
   reset: () => void
@@ -103,6 +108,46 @@ class OrbitControls extends EventDispatcher {
     this.getPolarAngle = (): number => spherical.phi
 
     this.getAzimuthalAngle = (): number => spherical.theta
+
+    this.setPolarAngle = (value: number): void => {
+      // use modulo wrapping to safeguard value
+      let phi = moduloWrapAround(value, 2 * Math.PI)
+      let currentPhi = spherical.phi
+
+      // convert to the equivalent shortest angle
+      if (currentPhi < 0) currentPhi += 2 * Math.PI
+      if (phi < 0) phi += 2 * Math.PI
+      let phiDist = Math.abs(phi - currentPhi)
+      if (2 * Math.PI - phiDist < phiDist) {
+        if (phi < currentPhi) {
+          phi += 2 * Math.PI
+        } else {
+          currentPhi += 2 * Math.PI
+        }
+      }
+      sphericalDelta.phi = phi - currentPhi
+      scope.update()
+    }
+
+    this.setAzimuthalAngle = (value: number): void => {
+      // use modulo wrapping to safeguard value
+      let theta = moduloWrapAround(value, 2 * Math.PI)
+      let currentTheta = spherical.theta
+
+      // convert to the equivalent shortest angle
+      if (currentTheta < 0) currentTheta += 2 * Math.PI
+      if (theta < 0) theta += 2 * Math.PI
+      let thetaDist = Math.abs(theta - currentTheta)
+      if (2 * Math.PI - thetaDist < thetaDist) {
+        if (theta < currentTheta) {
+          theta += 2 * Math.PI
+        } else {
+          currentTheta += 2 * Math.PI
+        }
+      }
+      sphericalDelta.theta = theta - currentTheta
+      scope.update()
+    }
 
     this.listenToKeyEvents = (domElement: HTMLElement): void => {
       domElement.addEventListener('keydown', onKeyDown)
