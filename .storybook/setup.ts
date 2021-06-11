@@ -12,10 +12,11 @@ interface useThreeReturn {
 interface useFrameProps {
   clock: Clock
   renderer: WebGLRenderer
+  controls: null | OrbitControls
 }
 
 interface useThreeProps {
-  useFrame?: ({ clock, renderer }: useFrameProps, delta: number) => void
+  useFrame?: ({ clock, renderer, controls }: useFrameProps, delta: number) => void
   orbit?: boolean
 }
 
@@ -46,7 +47,7 @@ export const useThree = ({ useFrame, orbit = true }: useThreeProps = {}): useThr
   }
 
   const clock = new Clock()
-  let controls: OrbitControls = null
+  let controls: OrbitControls | null = null
 
   if (orbit) {
     controls = new OrbitControls(camera, container)
@@ -59,6 +60,7 @@ export const useThree = ({ useFrame, orbit = true }: useThreeProps = {}): useThr
         {
           renderer,
           clock,
+          controls,
         },
         clock.getDelta(),
       )
