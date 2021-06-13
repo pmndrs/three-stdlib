@@ -1,6 +1,4 @@
 import { Camera, Scene, PerspectiveCamera, WebGLRenderer, Clock } from 'three'
-//@ts-ignore
-import { OrbitControls } from '../src'
 
 interface useThreeReturn {
   camera: Camera
@@ -46,12 +44,6 @@ export const useThree = ({ useFrame, orbit = true }: useThreeProps = {}): useThr
   }
 
   const clock = new Clock()
-  let controls: OrbitControls = null
-
-  if (orbit) {
-    controls = new OrbitControls(camera, container)
-    controls.enableDamping = true
-  }
 
   function animate() {
     if (useFrame) {
@@ -62,10 +54,6 @@ export const useThree = ({ useFrame, orbit = true }: useThreeProps = {}): useThr
         },
         clock.getDelta(),
       )
-    }
-
-    if (controls !== null) {
-      controls.update()
     }
 
     render()
