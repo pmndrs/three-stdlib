@@ -44,7 +44,6 @@ export const RotateStory = () => {
   // must run in this so the canvas has mounted in the iframe & can be accessed by `three`
   useEffect(() => {
     const { renderer, scene, camera, render } = useThree({
-      orbit: false,
       //   useFrame: (_, delta) => {},
     })
 
