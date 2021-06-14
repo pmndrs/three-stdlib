@@ -401,6 +401,25 @@ class LineMaterial extends ShaderMaterial {
           }
         },
       },
+      dashed: {
+        enumerable: true,
+
+        get: function () {
+          return Boolean('USE_DASH' in this.defines)
+        },
+
+        set: function (value) {
+          if (Boolean(value) !== Boolean('USE_DASH' in this.defines)) {
+            this.needsUpdate = true
+          }
+
+          if (value) {
+            this.defines.USE_DASH = ''
+          } else {
+            delete this.defines.USE_DASH
+          }
+        },
+      },
     })
 
     this.setValues(parameters)
