@@ -385,7 +385,7 @@ class TrackballControls extends EventDispatcher {
     switch (event.pointerType) {
       case 'mouse':
       case 'pen':
-        this.onMouseUp(event)
+        this.onMouseUp()
         break
 
       // TODO touch
@@ -401,8 +401,6 @@ class TrackballControls extends EventDispatcher {
   }
 
   private onMouseDown = (event: MouseEvent): void => {
-    event.preventDefault()
-
     if (this._state === this.STATE.NONE) {
       switch (event.button) {
         case this.mouseButtons.LEFT:
@@ -444,8 +442,6 @@ class TrackballControls extends EventDispatcher {
   private onMouseMove = (event: MouseEvent): void => {
     if (this.enabled === false) return
 
-    event.preventDefault()
-
     const state = this._keyState !== this.STATE.NONE ? this._keyState : this._state
 
     if (state === this.STATE.ROTATE && !this.noRotate) {
@@ -458,10 +454,8 @@ class TrackballControls extends EventDispatcher {
     }
   }
 
-  private onMouseUp = (event: MouseEvent): void => {
+  private onMouseUp = (): void => {
     if (this.enabled === false) return
-
-    event.preventDefault()
 
     this._state = this.STATE.NONE
 
