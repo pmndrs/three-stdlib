@@ -1,4 +1,4 @@
-import { ShaderLib, ShaderMaterial, UniformsLib, UniformsUtils, Vector2, ShaderMaterialParameters } from 'three'
+import { ShaderLib, ShaderMaterial, UniformsLib, UniformsUtils, Vector2, ShaderMaterialParameters, Color } from 'three'
 
 import { ColorOptions } from '../types/shared'
 
@@ -270,7 +270,7 @@ class LineMaterial extends ShaderMaterial {
 
   public dashed = false
 
-  public color: number = 0
+  public color: Color = new Color(0x000000)
   public lineWidth: number = 0
   public dashScale: number = 0
   public dashOffset: number = 0
@@ -300,7 +300,8 @@ class LineMaterial extends ShaderMaterial {
         },
 
         set: function (value) {
-          this.uniforms.diffuse.value = value
+          const colorObj = new Color(value)
+          this.uniforms.diffuse.value = colorObj.getHex()
         },
       },
       linewidth: {
