@@ -102,8 +102,6 @@ class FirstPersonControls extends EventDispatcher {
       this.domElement.focus()
     }
 
-    event.preventDefault()
-
     if (this.activeLook) {
       switch (event.button) {
         case 0:
@@ -119,8 +117,6 @@ class FirstPersonControls extends EventDispatcher {
   }
 
   private onMouseUp = (event: MouseEvent): void => {
-    event.preventDefault()
-
     if (this.activeLook) {
       switch (event.button) {
         case 0:
@@ -146,8 +142,6 @@ class FirstPersonControls extends EventDispatcher {
   }
 
   private onKeyDown = (event: KeyboardEvent): void => {
-    //event.preventDefault();
-
     switch (event.code) {
       case 'ArrowUp':
       case 'KeyW':
