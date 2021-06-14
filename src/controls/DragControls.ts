@@ -104,9 +104,7 @@ class DragControls extends EventDispatcher {
     }
   }
 
-  private onMouseDown = (event: MouseEvent): void => {
-    event.preventDefault()
-
+  private onMouseDown = (): void => {
     this._intersections.length = 0
 
     this._raycaster.setFromCamera(this._mouse, this._camera)
@@ -126,9 +124,7 @@ class DragControls extends EventDispatcher {
     }
   }
 
-  private onMouseCancel = (event: MouseEvent): void => {
-    event.preventDefault()
-
+  private onMouseCancel = (): void => {
     if (this._selected) {
       this.dispatchEvent({ type: 'dragend', object: this._selected })
 
@@ -139,8 +135,6 @@ class DragControls extends EventDispatcher {
   }
 
   private onPointerMove = (event: PointerEvent): void => {
-    event.preventDefault()
-
     switch (event.pointerType) {
       case 'mouse':
       case 'pen':
@@ -152,12 +146,10 @@ class DragControls extends EventDispatcher {
   }
 
   private onPointerDown = (event: PointerEvent): void => {
-    event.preventDefault()
-
     switch (event.pointerType) {
       case 'mouse':
       case 'pen':
-        this.onMouseDown(event)
+        this.onMouseDown()
         break
 
       // TODO touch
@@ -165,12 +157,10 @@ class DragControls extends EventDispatcher {
   }
 
   private onPointerCancel = (event: PointerEvent): void => {
-    event.preventDefault()
-
     switch (event.pointerType) {
       case 'mouse':
       case 'pen':
-        this.onMouseCancel(event)
+        this.onMouseCancel()
         break
 
       // TODO touch

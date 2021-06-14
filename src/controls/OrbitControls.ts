@@ -715,14 +715,6 @@ class OrbitControls extends EventDispatcher {
     }
 
     function onMouseDown(event: MouseEvent) {
-      // Prevent the browser from scrolling.
-      event.preventDefault()
-
-      // Manually set the focus since calling preventDefault above
-      // prevents the browser from setting it automatically.
-
-      scope.domElement?.focus ? scope.domElement.focus() : window.focus()
-
       let mouseAction
 
       switch (event.button) {
@@ -786,8 +778,6 @@ class OrbitControls extends EventDispatcher {
 
     function onMouseMove(event: MouseEvent) {
       if (scope.enabled === false) return
-
-      event.preventDefault()
 
       switch (state) {
         case STATE.ROTATE:
