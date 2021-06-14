@@ -6,11 +6,11 @@ import { useThree } from '../setup'
 //@ts-ignore
 import { hilbert3D, Line2, LineMaterial, LineGeometry } from '../../src'
 
-export default {
-  title: 'Geometry/Line',
+type TemplateProps = {
+  dashed: boolean
 }
 
-export const Default = () => {
+const Template = (props: TemplateProps) => {
   // must run in this so the canvas has mounted in the iframe & can be accessed by `three`
   useEffect(() => {
     const { scene, renderer } = useThree()
@@ -48,7 +48,7 @@ export const Default = () => {
       linewidth: 5, // in pixels
       vertexColors: true,
       resolution: new Vector2(window.innerWidth, window.innerHeight),
-      dashed: false,
+      dashed: props.dashed,
     })
 
     const line = new Line2(geometry, matLine)
@@ -60,7 +60,22 @@ export const Default = () => {
     return () => {
       renderer.dispose()
     }
-  }, [])
+  }, [props.dashed])
 
   return ''
+}
+
+export const Default = Template.bind({})
+
+export default {
+  title: 'Geometry/Line',
+  argTypes: {
+    dashed: {
+      name: 'dashed',
+      control: {
+        type: 'boolean',
+      },
+      defaultValue: false,
+    },
+  },
 }
