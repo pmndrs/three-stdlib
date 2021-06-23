@@ -98,7 +98,7 @@
     "@babel/runtime": "^7.13.17",
     "@webgpu/glslang": "^0.0.15",
     "@webxr-input-profiles/motion-controllers": "^1.0.0",
-    "chevrotain": "^9.0.1",
+    "chevrotain": "^9.0.2",
     "fflate": "^0.6.9",
     "ktx-parse": "^0.2.1",
     "mmd-parser": "^1.0.4",
