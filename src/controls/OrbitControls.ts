@@ -96,10 +96,6 @@ class OrbitControls extends EventDispatcher {
 
     this.object = object
     this.domElement = domElement
-    // disables touch scroll
-    // touch-action needs to be defined for pointer events to work on mobile
-    // https://stackoverflow.com/a/48254578
-    this.domElement && (this.domElement.style.touchAction = 'none')
 
     // for reset
     this.target0 = this.target.clone()
@@ -304,6 +300,10 @@ class OrbitControls extends EventDispatcher {
         )
       }
       scope.domElement = domElement
+      // disables touch scroll
+      // touch-action needs to be defined for pointer events to work on mobile
+      // https://stackoverflow.com/a/48254578
+      scope.domElement.style.touchAction = 'none'
       scope.domElement.addEventListener('contextmenu', onContextMenu)
       scope.domElement.addEventListener('pointerdown', onPointerDown)
       scope.domElement.addEventListener('pointercancel', onPointerCancel)
