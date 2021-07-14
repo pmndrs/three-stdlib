@@ -1,15 +1,10 @@
 import { Matrix4, Quaternion, Vector3, Bone, SkinnedMesh } from 'three'
-// @ts-ignore
 import { CharsetEncoder } from 'mmd-parser'
 
 /**
  * Dependencies
  *  - mmd-parser https://github.com/takahirox/mmd-parser
  */
-
-interface CharsetEncoder {
-  s2uTable: { [key: string]: number }
-}
 
 const MMDExporter = function (): void {
   // Unicode to Shift_JIS table
