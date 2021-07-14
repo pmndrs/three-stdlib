@@ -1,4 +1,5 @@
-import { Matrix4, Quaternion, Vector3 } from 'three'
+import { Matrix4, Quaternion, Vector3, Bone, SkinnedMesh } from 'three'
+// @ts-ignore
 import { CharsetEncoder } from 'mmd-parser'
 
 /**
@@ -6,13 +7,17 @@ import { CharsetEncoder } from 'mmd-parser'
  *  - mmd-parser https://github.com/takahirox/mmd-parser
  */
 
-const MMDExporter = function () {
-  // Unicode to Shift_JIS table
-  let u2sTable
+interface CharsetEncoder {
+  s2uTable: { [key: string]: number }
+}
 
-  function unicodeToShiftjis(str) {
+const MMDExporter = function (): void {
+  // Unicode to Shift_JIS table
+  let u2sTable: { [key: string]: number | undefined } | undefined
+
+  function unicodeToShiftjis(str: string): Uint8Array {
     if (u2sTable === undefined) {
-      const encoder = new CharsetEncoder() // eslint-disable-line no-undef
+      const encoder: CharsetEncoder = new CharsetEncoder() // eslint-disable-line no-undef
       const table = encoder.s2uTable
       u2sTable = {}
 
@@ -21,10 +26,9 @@ const MMDExporter = function () {
       for (let i = 0, il = keys.length; i < il; i++) {
         let key = keys[i]
 
-        var value = table[key]
-        key = parseInt(key)
+        const value = table[key]
 
-        u2sTable[value] = key
+        u2sTable[value] = parseInt(key)
       }
     }
 
@@ -33,7 +37,7 @@ const MMDExporter = function () {
     for (let i = 0, il = str.length; i < il; i++) {
       const code = str.charCodeAt(i)
 
-      var value = u2sTable[code]
+      const value = u2sTable[code]
 
       if (value === undefined) {
         throw `cannot convert charcode 0x${code.toString(16)}`
@@ -48,7 +52,7 @@ const MMDExporter = function () {
     return new Uint8Array(array)
   }
 
-  function getBindBones(skin) {
+  function getBindBones(skin: SkinnedMesh): Bone[] {
     // any more efficient ways?
     const poseSkin = skin.clone()
     poseSkin.pose()
@@ -73,13 +77,17 @@ const MMDExporter = function () {
    * skeleton -> vpd
    * Returns Shift_JIS encoded Uint8Array. Otherwise return strings.
    */
-  this.parseVpd = (skin, outputShiftJis, useOriginalBones) => {
+  this.parseVpd = (
+    skin: SkinnedMesh,
+    outputShiftJis: boolean,
+    useOriginalBones: boolean,
+  ): Uint8Array | string | null => {
     if (skin.isSkinnedMesh !== true) {
       console.warn('THREE.MMDExporter: parseVpd() requires SkinnedMesh instance.')
       return null
     }
 
-    function toStringsFromNumber(num) {
+    function toStringsFromNumber(num: number): string {
       if (Math.abs(num) < 1e-6) num = 0
 
       let a = num.toString()
@@ -98,7 +106,7 @@ const MMDExporter = function () {
       return `${d}.${p}`
     }
 
-    function toStringsFromArray(array) {
+    function toStringsFromArray(array: number[]): string {
       const a = []
 
       for (let i = 0, il = array.length; i < il; i++) {
