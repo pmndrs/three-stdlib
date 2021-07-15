@@ -67,7 +67,7 @@ class MMDExporter {
     skin.updateMatrixWorld(true)
 
     const bones = skin.skeleton.bones
-    const bones2 = getBindBones(skin)
+    const bones2 = this.getBindBones(skin)
 
     const position = new Vector3()
     const quaternion = new Quaternion()
@@ -121,55 +121,55 @@ class MMDExporter {
 
     const lines = array.join('\n')
 
-    return outputShiftJis === true ? unicodeToShiftjis(lines) : lines
+    return outputShiftJis === true ? this.unicodeToShiftjis(lines) : lines
   }
-}
 
-// Unicode to Shift_JIS table
-let u2sTable: { [key: string]: number | undefined } | undefined
+  // Unicode to Shift_JIS table
+  private u2sTable: { [key: string]: number | undefined } | undefined
 
-function unicodeToShiftjis(str: string): Uint8Array {
-  if (u2sTable === undefined) {
-    const encoder = new CharsetEncoder() // eslint-disable-line no-undef
-    const table = encoder.s2uTable
-    u2sTable = {}
+  private unicodeToShiftjis(str: string): Uint8Array {
+    if (this.u2sTable === undefined) {
+      const encoder = new CharsetEncoder() // eslint-disable-line no-undef
+      const table = encoder.s2uTable
+      this.u2sTable = {}
 
-    const keys = Object.keys(table)
+      const keys = Object.keys(table)
 
-    for (let i = 0, il = keys.length; i < il; i++) {
-      let key = keys[i]
+      for (let i = 0, il = keys.length; i < il; i++) {
+        let key = keys[i]
 
-      const value = table[key]
+        const value = table[key]
 
-      u2sTable[value] = parseInt(key)
+        this.u2sTable[value] = parseInt(key)
+      }
     }
-  }
 
-  const array = []
+    const array = []
 
-  for (let i = 0, il = str.length; i < il; i++) {
-    const code = str.charCodeAt(i)
+    for (let i = 0, il = str.length; i < il; i++) {
+      const code = str.charCodeAt(i)
 
-    const value = u2sTable[code]
+      const value = this.u2sTable[code]
 
-    if (value === undefined) {
-      throw 'cannot convert charcode 0x' + code.toString(16)
-    } else if (value > 0xff) {
-      array.push((value >> 8) & 0xff)
-      array.push(value & 0xff)
-    } else {
-      array.push(value & 0xff)
+      if (value === undefined) {
+        throw 'cannot convert charcode 0x' + code.toString(16)
+      } else if (value > 0xff) {
+        array.push((value >> 8) & 0xff)
+        array.push(value & 0xff)
+      } else {
+        array.push(value & 0xff)
+      }
     }
+
+    return new Uint8Array(array)
   }
 
-  return new Uint8Array(array)
-}
-
-function getBindBones(skin: SkinnedMesh): Bone[] {
-  // any more efficient ways?
-  const poseSkin = skin.clone()
-  poseSkin.pose()
-  return poseSkin.skeleton.bones
+  private getBindBones(skin: SkinnedMesh): Bone[] {
+    // any more efficient ways?
+    const poseSkin = skin.clone()
+    poseSkin.pose()
+    return poseSkin.skeleton.bones
+  }
 }
 
 export { MMDExporter }
