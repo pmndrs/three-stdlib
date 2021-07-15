@@ -1,4 +1,14 @@
-import { Vector3 } from 'three'
+import {
+  BufferAttribute,
+  BufferGeometry,
+  InterleavedBufferAttribute,
+  Material,
+  Mesh,
+  Object3D,
+  PlaneGeometry,
+  SkinnedMesh,
+  Vector3,
+} from 'three'
 
 /**
  * Usage:
@@ -9,17 +19,22 @@ import { Vector3 } from 'three'
  *
  */
 
+// https://github.com/DefinitelyTyped/DefinitelyTyped/blob/f7ec78508c6797e42f87a4390735bc2c650a1bfd/types/three/examples/jsm/exporters/STLExporter.d.ts
+export interface STLExporterOptions {
+  binary?: boolean
+}
+
 class STLExporter {
-  parse(scene, options = {}) {
+  public parse(scene: Object3D, options: STLExporterOptions): string | DataView {
     const binary = options.binary !== undefined ? options.binary : false
 
     //
 
-    const objects = []
+    const objects: { object3d: Object3D; geometry: PlaneGeometry }[] = []
     let triangles = 0
 
     scene.traverse(function (object) {
-      if (object.isMesh) {
+      if (object instanceof Mesh && object.isMesh) {
         const geometry = object.geometry
 
         if (geometry.isBufferGeometry !== true) {
@@ -38,7 +53,7 @@ class STLExporter {
       }
     })
 
-    let output
+    let output: string | DataView
     let offset = 80 // skip header
 
     if (binary === true) {
@@ -66,25 +81,27 @@ class STLExporter {
       const index = geometry.index
       const positionAttribute = geometry.getAttribute('position')
 
-      if (index !== null) {
-        // indexed geometry
+      if (object instanceof SkinnedMesh) {
+        if (index !== null) {
+          // indexed geometry
 
-        for (let j = 0; j < index.count; j += 3) {
-          const a = index.getX(j + 0)
-          const b = index.getX(j + 1)
-          const c = index.getX(j + 2)
+          for (let j = 0; j < index.count; j += 3) {
+            const a = index.getX(j + 0)
+            const b = index.getX(j + 1)
+            const c = index.getX(j + 2)
 
-          writeFace(a, b, c, positionAttribute, object)
-        }
-      } else {
-        // non-indexed geometry
+            writeFace(a, b, c, positionAttribute, object)
+          }
+        } else {
+          // non-indexed geometry
 
-        for (let j = 0; j < positionAttribute.count; j += 3) {
-          const a = j + 0
-          const b = j + 1
-          const c = j + 2
+          for (let j = 0; j < positionAttribute.count; j += 3) {
+            const a = j + 0
+            const b = j + 1
+            const c = j + 2
 
-          writeFace(a, b, c, positionAttribute, object)
+            writeFace(a, b, c, positionAttribute, object)
+          }
         }
       }
     }
@@ -95,7 +112,13 @@ class STLExporter {
 
     return output
 
-    function writeFace(a, b, c, positionAttribute, object) {
+    function writeFace(
+      a: number,
+      b: number,
+      c: number,
+      positionAttribute: BufferAttribute | InterleavedBufferAttribute,
+      object: SkinnedMesh,
+    ): void {
       vA.fromBufferAttribute(positionAttribute, a)
       vB.fromBufferAttribute(positionAttribute, b)
       vC.fromBufferAttribute(positionAttribute, c)
@@ -116,7 +139,7 @@ class STLExporter {
       writeVertex(vB)
       writeVertex(vC)
 
-      if (binary === true) {
+      if (binary === true && output instanceof DataView) {
         output.setUint16(offset, 0, true)
         offset += 2
       } else {
@@ -125,14 +148,14 @@ class STLExporter {
       }
     }
 
-    function writeNormal(vA, vB, vC) {
+    function writeNormal(vA: Vector3, vB: Vector3, vC: Vector3): void {
       cb.subVectors(vC, vB)
       ab.subVectors(vA, vB)
       cb.cross(ab).normalize()
 
       normal.copy(cb).normalize()
 
-      if (binary === true) {
+      if (binary === true && output instanceof DataView) {
         output.setFloat32(offset, normal.x, true)
         offset += 4
         output.setFloat32(offset, normal.y, true)
@@ -145,8 +168,8 @@ class STLExporter {
       }
     }
 
-    function writeVertex(vertex) {
-      if (binary === true) {
+    function writeVertex(vertex: Vector3): void {
+      if (binary === true && output instanceof DataView) {
         output.setFloat32(offset, vertex.x, true)
         offset += 4
         output.setFloat32(offset, vertex.y, true)
