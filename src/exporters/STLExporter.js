@@ -2,21 +2,15 @@ import { Vector3 } from 'three'
 
 /**
  * Usage:
- *  var exporter = new STLExporter();
+ *  const exporter = new STLExporter();
  *
  *  // second argument is a list of options
- *  var data = exporter.parse( mesh, { binary: true } );
+ *  const data = exporter.parse( mesh, { binary: true } );
  *
  */
 
-const STLExporter = () => {}
-
-STLExporter.prototype = {
-  constructor: STLExporter,
-
-  parse: function (scene, options) {
-    if (options === undefined) options = {}
-
+class STLExporter {
+  parse(scene, options = {}) {
     const binary = options.binary !== undefined ? options.binary : false
 
     //
@@ -24,7 +18,7 @@ STLExporter.prototype = {
     const objects = []
     let triangles = 0
 
-    scene.traverse((object) => {
+    scene.traverse(function (object) {
       if (object.isMesh) {
         const geometry = object.geometry
 
@@ -39,7 +33,7 @@ STLExporter.prototype = {
 
         objects.push({
           object3d: object,
-          geometry,
+          geometry: geometry,
         })
       }
     })
@@ -76,9 +70,9 @@ STLExporter.prototype = {
         // indexed geometry
 
         for (let j = 0; j < index.count; j += 3) {
-          var a = index.getX(j + 0)
-          var b = index.getX(j + 1)
-          var c = index.getX(j + 2)
+          const a = index.getX(j + 0)
+          const b = index.getX(j + 1)
+          const c = index.getX(j + 2)
 
           writeFace(a, b, c, positionAttribute, object)
         }
@@ -86,9 +80,9 @@ STLExporter.prototype = {
         // non-indexed geometry
 
         for (let j = 0; j < positionAttribute.count; j += 3) {
-          var a = j + 0
-          var b = j + 1
-          var c = j + 2
+          const a = j + 0
+          const b = j + 1
+          const c = j + 2
 
           writeFace(a, b, c, positionAttribute, object)
         }
@@ -146,7 +140,7 @@ STLExporter.prototype = {
         output.setFloat32(offset, normal.z, true)
         offset += 4
       } else {
-        output += `\tfacet normal ${normal.x} ${normal.y} ${normal.z}\n`
+        output += '\tfacet normal ' + normal.x + ' ' + normal.y + ' ' + normal.z + '\n'
         output += '\t\touter loop\n'
       }
     }
@@ -160,10 +154,10 @@ STLExporter.prototype = {
         output.setFloat32(offset, vertex.z, true)
         offset += 4
       } else {
-        output += `\t\t\tvertex ${vertex.x} ${vertex.y} ${vertex.z}\n`
+        output += '\t\t\tvertex ' + vertex.x + ' ' + vertex.y + ' ' + vertex.z + '\n'
       }
     }
-  },
+  }
 }
 
 export { STLExporter }
