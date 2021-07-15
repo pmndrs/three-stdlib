@@ -1,4 +1,4 @@
-import { Matrix4, Quaternion, Vector3 } from 'three'
+import { Matrix4, Quaternion, Vector3, Bone, SkinnedMesh } from 'three'
 import { CharsetEncoder } from 'mmd-parser'
 
 /**
@@ -6,66 +6,22 @@ import { CharsetEncoder } from 'mmd-parser'
  *  - mmd-parser https://github.com/takahirox/mmd-parser
  */
 
-const MMDExporter = function () {
-  // Unicode to Shift_JIS table
-  let u2sTable
-
-  function unicodeToShiftjis(str) {
-    if (u2sTable === undefined) {
-      const encoder = new CharsetEncoder() // eslint-disable-line no-undef
-      const table = encoder.s2uTable
-      u2sTable = {}
-
-      const keys = Object.keys(table)
-
-      for (let i = 0, il = keys.length; i < il; i++) {
-        let key = keys[i]
-
-        var value = table[key]
-        key = parseInt(key)
-
-        u2sTable[value] = key
-      }
-    }
-
-    const array = []
-
-    for (let i = 0, il = str.length; i < il; i++) {
-      const code = str.charCodeAt(i)
-
-      var value = u2sTable[code]
-
-      if (value === undefined) {
-        throw `cannot convert charcode 0x${code.toString(16)}`
-      } else if (value > 0xff) {
-        array.push((value >> 8) & 0xff)
-        array.push(value & 0xff)
-      } else {
-        array.push(value & 0xff)
-      }
-    }
-
-    return new Uint8Array(array)
-  }
-
-  function getBindBones(skin) {
-    // any more efficient ways?
-    const poseSkin = skin.clone()
-    poseSkin.pose()
-    return poseSkin.skeleton.bones
-  }
-
+class MMDExporter {
   /* TODO: implement
 	// mesh -> pmd
 	this.parsePmd = function ( object ) {
-
 	};
 	*/
 
   /* TODO: implement
 	// mesh -> pmx
 	this.parsePmx = function ( object ) {
+	};
+	*/
 
+  /* TODO: implement
+	// animation + skeleton -> vmd
+	this.parseVmd = function ( object ) {
 	};
 	*/
 
@@ -73,13 +29,13 @@ const MMDExporter = function () {
    * skeleton -> vpd
    * Returns Shift_JIS encoded Uint8Array. Otherwise return strings.
    */
-  this.parseVpd = (skin, outputShiftJis, useOriginalBones) => {
+  public parseVpd(skin: SkinnedMesh, outputShiftJis: boolean, useOriginalBones: boolean): Uint8Array | string | null {
     if (skin.isSkinnedMesh !== true) {
       console.warn('THREE.MMDExporter: parseVpd() requires SkinnedMesh instance.')
       return null
     }
 
-    function toStringsFromNumber(num) {
+    function toStringsFromNumber(num: number): string {
       if (Math.abs(num) < 1e-6) num = 0
 
       let a = num.toString()
@@ -95,10 +51,10 @@ const MMDExporter = function () {
       const d = a.slice(0, index)
       const p = a.slice(index + 1, index + 7)
 
-      return `${d}.${p}`
+      return d + '.' + p
     }
 
-    function toStringsFromArray(array) {
+    function toStringsFromArray(array: number[]): string {
       const a = []
 
       for (let i = 0, il = array.length; i < il; i++) {
@@ -111,7 +67,7 @@ const MMDExporter = function () {
     skin.updateMatrixWorld(true)
 
     const bones = skin.skeleton.bones
-    const bones2 = getBindBones(skin)
+    const bones2 = this.getBindBones(skin)
 
     const position = new Vector3()
     const quaternion = new Quaternion()
@@ -121,8 +77,8 @@ const MMDExporter = function () {
     const array = []
     array.push('Vocaloid Pose Data file')
     array.push('')
-    array.push(`${skin.name !== '' ? skin.name.replace(/\s/g, '_') : 'skin'}.osm;`)
-    array.push(`${bones.length};`)
+    array.push((skin.name !== '' ? skin.name.replace(/\s/g, '_') : 'skin') + '.osm;')
+    array.push(bones.length + ';')
     array.push('')
 
     for (let i = 0, il = bones.length; i < il; i++) {
@@ -154,9 +110,9 @@ const MMDExporter = function () {
       qArray[0] = -qArray[0]
       qArray[1] = -qArray[1]
 
-      array.push(`Bone${i}{${bone.name}`)
-      array.push(`  ${toStringsFromArray(pArray)};`)
-      array.push(`  ${toStringsFromArray(qArray)};`)
+      array.push('Bone' + i + '{' + bone.name)
+      array.push('  ' + toStringsFromArray(pArray) + ';')
+      array.push('  ' + toStringsFromArray(qArray) + ';')
       array.push('}')
       array.push('')
     }
@@ -165,15 +121,55 @@ const MMDExporter = function () {
 
     const lines = array.join('\n')
 
-    return outputShiftJis === true ? unicodeToShiftjis(lines) : lines
+    return outputShiftJis === true ? this.unicodeToShiftjis(lines) : lines
   }
 
-  /* TODO: implement
-	// animation + skeleton -> vmd
-	this.parseVmd = function ( object ) {
+  // Unicode to Shift_JIS table
+  private u2sTable: { [key: string]: number | undefined } | undefined
 
-	};
-	*/
+  private unicodeToShiftjis(str: string): Uint8Array {
+    if (this.u2sTable === undefined) {
+      const encoder = new CharsetEncoder() // eslint-disable-line no-undef
+      const table = encoder.s2uTable
+      this.u2sTable = {}
+
+      const keys = Object.keys(table)
+
+      for (let i = 0, il = keys.length; i < il; i++) {
+        let key = keys[i]
+
+        const value = table[key]
+
+        this.u2sTable[value] = parseInt(key)
+      }
+    }
+
+    const array = []
+
+    for (let i = 0, il = str.length; i < il; i++) {
+      const code = str.charCodeAt(i)
+
+      const value = this.u2sTable[code]
+
+      if (value === undefined) {
+        throw 'cannot convert charcode 0x' + code.toString(16)
+      } else if (value > 0xff) {
+        array.push((value >> 8) & 0xff)
+        array.push(value & 0xff)
+      } else {
+        array.push(value & 0xff)
+      }
+    }
+
+    return new Uint8Array(array)
+  }
+
+  private getBindBones(skin: SkinnedMesh): Bone[] {
+    // any more efficient ways?
+    const poseSkin = skin.clone()
+    poseSkin.pose()
+    return poseSkin.skeleton.bones
+  }
 }
 
 export { MMDExporter }
