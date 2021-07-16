@@ -173,7 +173,7 @@ class STLExporter {
       this.output.setFloat32(this.offset, this.normal.z, true)
       this.offset += 4
     } else {
-      this.output += '\tfacet normal ' + this.normal.x + ' ' + this.normal.y + ' ' + this.normal.z + '\n'
+      this.output += `\tfacet normal ${this.normal.x} ${this.normal.y} ${this.normal.z}\n`
       this.output += '\t\touter loop\n'
     }
   }
@@ -187,7 +187,7 @@ class STLExporter {
       this.output.setFloat32(this.offset, vertex.z, true)
       this.offset += 4
     } else {
-      this.output += '\t\t\tvertex ' + vertex.x + ' ' + vertex.y + ' ' + vertex.z + '\n'
+      this.output += `\t\t\tvertex vertex.x vertex.y vertex.z\n`
     }
   }
 }
