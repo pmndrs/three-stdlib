@@ -1,14 +1,4 @@
-import {
-  BufferAttribute,
-  BufferGeometry,
-  InterleavedBufferAttribute,
-  Material,
-  Mesh,
-  Object3D,
-  PlaneGeometry,
-  SkinnedMesh,
-  Vector3,
-} from 'three'
+import { BufferAttribute, InterleavedBufferAttribute, Mesh, Object3D, PlaneGeometry, SkinnedMesh, Vector3 } from 'three'
 
 /**
  * Usage:
@@ -25,58 +15,77 @@ export interface STLExporterOptions {
 }
 
 class STLExporter {
+  private binary
+
+  private output: string | DataView
+  private offset
+
+  private objects: { object3d: Object3D; geometry: PlaneGeometry }[]
+  private triangles
+
+  private vA
+  private vB
+  private vC
+  private cb
+  private ab
+  private normal
+
+  constructor() {
+    this.binary = false
+
+    this.output = ''
+    this.offset = 80 // skip header
+
+    this.objects = []
+    this.triangles = 0
+
+    this.vA = new Vector3()
+    this.vB = new Vector3()
+    this.vC = new Vector3()
+    this.cb = new Vector3()
+    this.ab = new Vector3()
+    this.normal = new Vector3()
+  }
+
   public parse(scene: Object3D, options: STLExporterOptions): string | DataView {
-    const binary = options.binary !== undefined ? options.binary : false
+    this.binary = options.binary !== undefined ? options.binary : false
 
     //
-
-    const objects: { object3d: Object3D; geometry: PlaneGeometry }[] = []
-    let triangles = 0
 
     scene.traverse(function (object) {
       if (object instanceof Mesh && object.isMesh) {
         const geometry = object.geometry
 
-        if (geometry.isBufferGeometry !== true) {
+        if (!geometry.isBufferGeometry) {
           throw new Error('THREE.STLExporter: Geometry is not of type THREE.BufferGeometry.')
         }
 
         const index = geometry.index
         const positionAttribute = geometry.getAttribute('position')
 
-        triangles += index !== null ? index.count / 3 : positionAttribute.count / 3
+        this.triangles += index !== null ? index.count / 3 : positionAttribute.count / 3
 
-        objects.push({
+        this.objects.push({
           object3d: object,
           geometry: geometry,
         })
       }
     })
 
-    let output: string | DataView
-    let offset = 80 // skip header
-
-    if (binary === true) {
-      const bufferLength = triangles * 2 + triangles * 3 * 4 * 4 + 80 + 4
+    if (this.binary) {
+      const bufferLength = this.triangles * 2 + this.triangles * 3 * 4 * 4 + 80 + 4
       const arrayBuffer = new ArrayBuffer(bufferLength)
-      output = new DataView(arrayBuffer)
-      output.setUint32(offset, triangles, true)
-      offset += 4
+      this.output = new DataView(arrayBuffer)
+      this.output.setUint32(this.offset, this.triangles, true)
+      this.offset += 4
     } else {
-      output = ''
-      output += 'solid exported\n'
+      this.output = ''
+      this.output += 'solid exported\n'
     }
 
-    const vA = new Vector3()
-    const vB = new Vector3()
-    const vC = new Vector3()
-    const cb = new Vector3()
-    const ab = new Vector3()
-    const normal = new Vector3()
-
-    for (let i = 0, il = objects.length; i < il; i++) {
-      const object = objects[i].object3d
-      const geometry = objects[i].geometry
+    for (let i = 0, il = this.objects.length; i < il; i++) {
+      const object = this.objects[i].object3d
+      const geometry = this.objects[i].geometry
 
       const index = geometry.index
       const positionAttribute = geometry.getAttribute('position')
@@ -90,7 +99,7 @@ class STLExporter {
             const b = index.getX(j + 1)
             const c = index.getX(j + 2)
 
-            writeFace(a, b, c, positionAttribute, object)
+            this.writeFace(a, b, c, positionAttribute, object)
           }
         } else {
           // non-indexed geometry
@@ -100,85 +109,85 @@ class STLExporter {
             const b = j + 1
             const c = j + 2
 
-            writeFace(a, b, c, positionAttribute, object)
+            this.writeFace(a, b, c, positionAttribute, object)
           }
         }
       }
     }
 
-    if (binary === false) {
-      output += 'endsolid exported\n'
+    if (!this.binary) {
+      this.output += 'endsolid exported\n'
     }
 
-    return output
+    return this.output
+  }
 
-    function writeFace(
-      a: number,
-      b: number,
-      c: number,
-      positionAttribute: BufferAttribute | InterleavedBufferAttribute,
-      object: SkinnedMesh,
-    ): void {
-      vA.fromBufferAttribute(positionAttribute, a)
-      vB.fromBufferAttribute(positionAttribute, b)
-      vC.fromBufferAttribute(positionAttribute, c)
+  private writeFace(
+    a: number,
+    b: number,
+    c: number,
+    positionAttribute: BufferAttribute | InterleavedBufferAttribute,
+    object: SkinnedMesh,
+  ): void {
+    this.vA.fromBufferAttribute(positionAttribute, a)
+    this.vB.fromBufferAttribute(positionAttribute, b)
+    this.vC.fromBufferAttribute(positionAttribute, c)
 
-      if (object.isSkinnedMesh === true) {
-        object.boneTransform(a, vA)
-        object.boneTransform(b, vB)
-        object.boneTransform(c, vC)
-      }
-
-      vA.applyMatrix4(object.matrixWorld)
-      vB.applyMatrix4(object.matrixWorld)
-      vC.applyMatrix4(object.matrixWorld)
-
-      writeNormal(vA, vB, vC)
-
-      writeVertex(vA)
-      writeVertex(vB)
-      writeVertex(vC)
-
-      if (binary === true && output instanceof DataView) {
-        output.setUint16(offset, 0, true)
-        offset += 2
-      } else {
-        output += '\t\tendloop\n'
-        output += '\tendfacet\n'
-      }
+    if (object.isSkinnedMesh) {
+      object.boneTransform(a, this.vA)
+      object.boneTransform(b, this.vB)
+      object.boneTransform(c, this.vC)
     }
 
-    function writeNormal(vA: Vector3, vB: Vector3, vC: Vector3): void {
-      cb.subVectors(vC, vB)
-      ab.subVectors(vA, vB)
-      cb.cross(ab).normalize()
+    this.vA.applyMatrix4(object.matrixWorld)
+    this.vB.applyMatrix4(object.matrixWorld)
+    this.vC.applyMatrix4(object.matrixWorld)
 
-      normal.copy(cb).normalize()
+    this.writeNormal(this.vA, this.vB, this.vC)
 
-      if (binary === true && output instanceof DataView) {
-        output.setFloat32(offset, normal.x, true)
-        offset += 4
-        output.setFloat32(offset, normal.y, true)
-        offset += 4
-        output.setFloat32(offset, normal.z, true)
-        offset += 4
-      } else {
-        output += '\tfacet normal ' + normal.x + ' ' + normal.y + ' ' + normal.z + '\n'
-        output += '\t\touter loop\n'
-      }
+    this.writeVertex(this.vA)
+    this.writeVertex(this.vB)
+    this.writeVertex(this.vC)
+
+    if (this.binary && this.output instanceof DataView) {
+      this.output.setUint16(this.offset, 0, true)
+      this.offset += 2
+    } else {
+      this.output += '\t\tendloop\n'
+      this.output += '\tendfacet\n'
     }
+  }
 
-    function writeVertex(vertex: Vector3): void {
-      if (binary === true && output instanceof DataView) {
-        output.setFloat32(offset, vertex.x, true)
-        offset += 4
-        output.setFloat32(offset, vertex.y, true)
-        offset += 4
-        output.setFloat32(offset, vertex.z, true)
-        offset += 4
-      } else {
-        output += '\t\t\tvertex ' + vertex.x + ' ' + vertex.y + ' ' + vertex.z + '\n'
-      }
+  private writeNormal(vA: Vector3, vB: Vector3, vC: Vector3): void {
+    this.cb.subVectors(vC, vB)
+    this.ab.subVectors(vA, vB)
+    this.cb.cross(this.ab).normalize()
+
+    this.normal.copy(this.cb).normalize()
+
+    if (this.binary && this.output instanceof DataView) {
+      this.output.setFloat32(this.offset, this.normal.x, true)
+      this.offset += 4
+      this.output.setFloat32(this.offset, this.normal.y, true)
+      this.offset += 4
+      this.output.setFloat32(this.offset, this.normal.z, true)
+      this.offset += 4
+    } else {
+      this.output += '\tfacet normal ' + this.normal.x + ' ' + this.normal.y + ' ' + this.normal.z + '\n'
+      this.output += '\t\touter loop\n'
+    }
+  }
+
+  private writeVertex(vertex: Vector3): void {
+    if (this.binary && this.output instanceof DataView) {
+      this.output.setFloat32(this.offset, vertex.x, true)
+      this.offset += 4
+      this.output.setFloat32(this.offset, vertex.y, true)
+      this.offset += 4
+      this.output.setFloat32(this.offset, vertex.z, true)
+      this.offset += 4
+    } else {
+      this.output += '\t\t\tvertex ' + vertex.x + ' ' + vertex.y + ' ' + vertex.z + '\n'
     }
   }
 }
