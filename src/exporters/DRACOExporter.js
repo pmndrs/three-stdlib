@@ -14,30 +14,25 @@
 
 /* global DracoEncoderModule */
 
-const DRACOExporter = () => {}
-
-DRACOExporter.prototype = {
-  constructor: DRACOExporter,
-
-  parse: function (object, options) {
+class DRACOExporter {
+  parse(
+    object,
+    options = {
+      decodeSpeed: 5,
+      encodeSpeed: 5,
+      encoderMethod: DRACOExporter.MESH_EDGEBREAKER_ENCODING,
+      quantization: [16, 8, 8, 8, 8],
+      exportUvs: true,
+      exportNormals: true,
+      exportColor: false,
+    },
+  ) {
     if (object.isBufferGeometry === true) {
       throw new Error('DRACOExporter: The first parameter of parse() is now an instance of Mesh or Points.')
     }
 
     if (DracoEncoderModule === undefined) {
-      throw new Error('THREE.DRACOExporter: required the draco_decoder to work.')
-    }
-
-    if (options === undefined) {
-      options = {
-        decodeSpeed: 5,
-        encodeSpeed: 5,
-        encoderMethod: DRACOExporter.MESH_EDGEBREAKER_ENCODING,
-        quantization: [16, 8, 8, 8, 8],
-        exportUvs: true,
-        exportNormals: true,
-        exportColor: false,
-      }
+      throw new Error('THREE.DRACOExporter: required the draco_encoder to work.')
     }
 
     const geometry = object.geometry
@@ -55,7 +50,7 @@ DRACOExporter.prototype = {
       builder = new dracoEncoder.MeshBuilder()
       dracoObject = new dracoEncoder.Mesh()
 
-      var vertices = geometry.getAttribute('position')
+      const vertices = geometry.getAttribute('position')
       builder.AddFloatAttributeToMesh(
         dracoObject,
         dracoEncoder.POSITION,
@@ -64,12 +59,12 @@ DRACOExporter.prototype = {
         vertices.array,
       )
 
-      var faces = geometry.getIndex()
+      const faces = geometry.getIndex()
 
       if (faces !== null) {
         builder.AddFacesToMesh(dracoObject, faces.count / 3, faces.array)
       } else {
-        var faces = new (vertices.count > 65535 ? Uint32Array : Uint16Array)(vertices.count)
+        const faces = new (vertices.count > 65535 ? Uint32Array : Uint16Array)(vertices.count)
 
         for (let i = 0; i < faces.length; i++) {
           faces[i] = i
@@ -101,7 +96,7 @@ DRACOExporter.prototype = {
       }
 
       if (options.exportColor === true) {
-        var colors = geometry.getAttribute('color')
+        const colors = geometry.getAttribute('color')
 
         if (colors !== undefined) {
           builder.AddFloatAttributeToMesh(dracoObject, dracoEncoder.COLOR, colors.count, colors.itemSize, colors.array)
@@ -111,11 +106,11 @@ DRACOExporter.prototype = {
       builder = new dracoEncoder.PointCloudBuilder()
       dracoObject = new dracoEncoder.PointCloud()
 
-      var vertices = geometry.getAttribute('position')
+      const vertices = geometry.getAttribute('position')
       builder.AddFloatAttribute(dracoObject, dracoEncoder.POSITION, vertices.count, vertices.itemSize, vertices.array)
 
       if (options.exportColor === true) {
-        var colors = geometry.getAttribute('color')
+        const colors = geometry.getAttribute('color')
 
         if (colors !== undefined) {
           builder.AddFloatAttribute(dracoObject, dracoEncoder.COLOR, colors.count, colors.itemSize, colors.array)
@@ -178,7 +173,7 @@ DRACOExporter.prototype = {
     dracoEncoder.destroy(builder)
 
     return outputData
-  },
+  }
 }
 
 // Encoder methods
