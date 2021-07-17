@@ -49,14 +49,12 @@ class DRACOExporter {
       throw new Error('DRACOExporter: The first parameter of parse() is now an instance of Mesh or Points.')
     }
 
-    // @ts-ignore
     if (DracoEncoderModule === undefined) {
       throw new Error('THREE.DRACOExporter: required the draco_encoder to work.')
     }
 
     const geometry = object.geometry
 
-    // @ts-ignore
     const dracoEncoder = DracoEncoderModule()
     const encoder = new dracoEncoder.Encoder()
     let builder
