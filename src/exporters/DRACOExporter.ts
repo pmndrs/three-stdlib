@@ -1,3 +1,5 @@
+import { BufferGeometry, Mesh, Points } from 'three'
+
 /**
  * Export draco compressed files from threejs geometry objects.
  *
@@ -12,32 +14,43 @@
  *  - exportNormals
  */
 
-/* global DracoEncoderModule */
+class DRACOExporter {
+  // Encoder methods
 
-const DRACOExporter = () => {}
+  public static MESH_EDGEBREAKER_ENCODING = 1
+  public static MESH_SEQUENTIAL_ENCODING = 0
 
-DRACOExporter.prototype = {
-  constructor: DRACOExporter,
+  // Geometry type
 
-  parse: function (object, options) {
-    if (object.isBufferGeometry === true) {
+  public static POINT_CLOUD = 0
+  public static TRIANGULAR_MESH = 1
+
+  // Attribute type
+  public static INVALID = -1
+  public static POSITION = 0
+  public static NORMAL = 1
+  public static COLOR = 2
+  public static TEX_COORD = 3
+  public static GENERIC = 4
+
+  public parse(
+    object: Mesh | Points,
+    options = {
+      decodeSpeed: 5,
+      encodeSpeed: 5,
+      encoderMethod: DRACOExporter.MESH_EDGEBREAKER_ENCODING,
+      quantization: [16, 8, 8, 8, 8],
+      exportUvs: true,
+      exportNormals: true,
+      exportColor: false,
+    },
+  ): Int8Array {
+    if (object instanceof BufferGeometry && object.isBufferGeometry) {
       throw new Error('DRACOExporter: The first parameter of parse() is now an instance of Mesh or Points.')
     }
 
     if (DracoEncoderModule === undefined) {
-      throw new Error('THREE.DRACOExporter: required the draco_decoder to work.')
-    }
-
-    if (options === undefined) {
-      options = {
-        decodeSpeed: 5,
-        encodeSpeed: 5,
-        encoderMethod: DRACOExporter.MESH_EDGEBREAKER_ENCODING,
-        quantization: [16, 8, 8, 8, 8],
-        exportUvs: true,
-        exportNormals: true,
-        exportColor: false,
-      }
+      throw new Error('THREE.DRACOExporter: required the draco_encoder to work.')
     }
 
     const geometry = object.geometry
@@ -47,15 +60,15 @@ DRACOExporter.prototype = {
     let builder
     let dracoObject
 
-    if (geometry.isBufferGeometry !== true) {
+    if (!geometry.isBufferGeometry) {
       throw new Error('THREE.DRACOExporter.parse(geometry, options): geometry is not a THREE.BufferGeometry instance.')
     }
 
-    if (object.isMesh === true) {
+    if (object instanceof Mesh && object.isMesh) {
       builder = new dracoEncoder.MeshBuilder()
       dracoObject = new dracoEncoder.Mesh()
 
-      var vertices = geometry.getAttribute('position')
+      const vertices = geometry.getAttribute('position')
       builder.AddFloatAttributeToMesh(
         dracoObject,
         dracoEncoder.POSITION,
@@ -64,12 +77,12 @@ DRACOExporter.prototype = {
         vertices.array,
       )
 
-      var faces = geometry.getIndex()
+      const faces = geometry.getIndex()
 
       if (faces !== null) {
         builder.AddFacesToMesh(dracoObject, faces.count / 3, faces.array)
       } else {
-        var faces = new (vertices.count > 65535 ? Uint32Array : Uint16Array)(vertices.count)
+        const faces = new (vertices.count > 65535 ? Uint32Array : Uint16Array)(vertices.count)
 
         for (let i = 0; i < faces.length; i++) {
           faces[i] = i
@@ -78,7 +91,7 @@ DRACOExporter.prototype = {
         builder.AddFacesToMesh(dracoObject, vertices.count, faces)
       }
 
-      if (options.exportNormals === true) {
+      if (options.exportNormals) {
         const normals = geometry.getAttribute('normal')
 
         if (normals !== undefined) {
@@ -92,7 +105,7 @@ DRACOExporter.prototype = {
         }
       }
 
-      if (options.exportUvs === true) {
+      if (options.exportUvs) {
         const uvs = geometry.getAttribute('uv')
 
         if (uvs !== undefined) {
@@ -100,22 +113,22 @@ DRACOExporter.prototype = {
         }
       }
 
-      if (options.exportColor === true) {
-        var colors = geometry.getAttribute('color')
+      if (options.exportColor) {
+        const colors = geometry.getAttribute('color')
 
         if (colors !== undefined) {
           builder.AddFloatAttributeToMesh(dracoObject, dracoEncoder.COLOR, colors.count, colors.itemSize, colors.array)
         }
       }
-    } else if (object.isPoints === true) {
+    } else if (object instanceof Points && object.isPoints) {
       builder = new dracoEncoder.PointCloudBuilder()
       dracoObject = new dracoEncoder.PointCloud()
 
-      var vertices = geometry.getAttribute('position')
+      const vertices = geometry.getAttribute('position')
       builder.AddFloatAttribute(dracoObject, dracoEncoder.POSITION, vertices.count, vertices.itemSize, vertices.array)
 
-      if (options.exportColor === true) {
-        var colors = geometry.getAttribute('color')
+      if (options.exportColor) {
+        const colors = geometry.getAttribute('color')
 
         if (colors !== undefined) {
           builder.AddFloatAttribute(dracoObject, dracoEncoder.COLOR, colors.count, colors.itemSize, colors.array)
@@ -154,7 +167,7 @@ DRACOExporter.prototype = {
 
     let length
 
-    if (object.isMesh === true) {
+    if (object instanceof Mesh && object.isMesh) {
       length = encoder.EncodeMeshToDracoBuffer(dracoObject, encodedData)
     } else {
       length = encoder.EncodePointCloudToDracoBuffer(dracoObject, true, encodedData)
@@ -178,26 +191,7 @@ DRACOExporter.prototype = {
     dracoEncoder.destroy(builder)
 
     return outputData
-  },
+  }
 }
-
-// Encoder methods
-
-DRACOExporter.MESH_EDGEBREAKER_ENCODING = 1
-DRACOExporter.MESH_SEQUENTIAL_ENCODING = 0
-
-// Geometry type
-
-DRACOExporter.POINT_CLOUD = 0
-DRACOExporter.TRIANGULAR_MESH = 1
-
-// Attribute type
-
-DRACOExporter.INVALID = -1
-DRACOExporter.POSITION = 0
-DRACOExporter.NORMAL = 1
-DRACOExporter.COLOR = 2
-DRACOExporter.TEX_COORD = 3
-DRACOExporter.GENERIC = 4
 
 export { DRACOExporter }
