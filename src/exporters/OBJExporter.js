@@ -1,11 +1,7 @@
 import { Color, Matrix3, Vector2, Vector3 } from 'three'
 
-const OBJExporter = () => {}
-
-OBJExporter.prototype = {
-  constructor: OBJExporter,
-
-  parse: function (object) {
+class OBJExporter {
+  parse(object) {
     let output = ''
 
     let indexVertex = 0
@@ -17,14 +13,9 @@ OBJExporter.prototype = {
     const normal = new Vector3()
     const uv = new Vector2()
 
-    let i
-    let j
-    let k
-    let l
-    let m
     const face = []
 
-    const parseMesh = (mesh) => {
+    function parseMesh(mesh) {
       let nbVertex = 0
       let nbNormals = 0
       let nbVertexUvs = 0
@@ -44,17 +35,17 @@ OBJExporter.prototype = {
       const indices = geometry.getIndex()
 
       // name of the mesh object
-      output += `o ${mesh.name}\n`
+      output += 'o ' + mesh.name + '\n'
 
       // name of the mesh material
       if (mesh.material && mesh.material.name) {
-        output += `usemtl ${mesh.material.name}\n`
+        output += 'usemtl ' + mesh.material.name + '\n'
       }
 
       // vertices
 
       if (vertices !== undefined) {
-        for (i = 0, l = vertices.count; i < l; i++, nbVertex++) {
+        for (let i = 0, l = vertices.count; i < l; i++, nbVertex++) {
           vertex.x = vertices.getX(i)
           vertex.y = vertices.getY(i)
           vertex.z = vertices.getZ(i)
@@ -63,19 +54,19 @@ OBJExporter.prototype = {
           vertex.applyMatrix4(mesh.matrixWorld)
 
           // transform the vertex to export format
-          output += `v ${vertex.x} ${vertex.y} ${vertex.z}\n`
+          output += 'v ' + vertex.x + ' ' + vertex.y + ' ' + vertex.z + '\n'
         }
       }
 
       // uvs
 
       if (uvs !== undefined) {
-        for (i = 0, l = uvs.count; i < l; i++, nbVertexUvs++) {
+        for (let i = 0, l = uvs.count; i < l; i++, nbVertexUvs++) {
           uv.x = uvs.getX(i)
           uv.y = uvs.getY(i)
 
           // transform the uv to export format
-          output += `vt ${uv.x} ${uv.y}\n`
+          output += 'vt ' + uv.x + ' ' + uv.y + '\n'
         }
       }
 
@@ -84,7 +75,7 @@ OBJExporter.prototype = {
       if (normals !== undefined) {
         normalMatrixWorld.getNormalMatrix(mesh.matrixWorld)
 
-        for (i = 0, l = normals.count; i < l; i++, nbNormals++) {
+        for (let i = 0, l = normals.count; i < l; i++, nbNormals++) {
           normal.x = normals.getX(i)
           normal.y = normals.getY(i)
           normal.z = normals.getZ(i)
@@ -93,39 +84,39 @@ OBJExporter.prototype = {
           normal.applyMatrix3(normalMatrixWorld).normalize()
 
           // transform the normal to export format
-          output += `vn ${normal.x} ${normal.y} ${normal.z}\n`
+          output += 'vn ' + normal.x + ' ' + normal.y + ' ' + normal.z + '\n'
         }
       }
 
       // faces
 
       if (indices !== null) {
-        for (i = 0, l = indices.count; i < l; i += 3) {
-          for (m = 0; m < 3; m++) {
-            j = indices.getX(i + m) + 1
+        for (let i = 0, l = indices.count; i < l; i += 3) {
+          for (let m = 0; m < 3; m++) {
+            const j = indices.getX(i + m) + 1
 
             face[m] =
               indexVertex +
               j +
-              (normals || uvs ? `/${uvs ? indexVertexUvs + j : ''}${normals ? `/${indexNormals + j}` : ''}` : '')
+              (normals || uvs ? '/' + (uvs ? indexVertexUvs + j : '') + (normals ? '/' + (indexNormals + j) : '') : '')
           }
 
           // transform the face to export format
-          output += `f ${face.join(' ')}\n`
+          output += 'f ' + face.join(' ') + '\n'
         }
       } else {
-        for (i = 0, l = vertices.count; i < l; i += 3) {
-          for (m = 0; m < 3; m++) {
-            j = i + m + 1
+        for (let i = 0, l = vertices.count; i < l; i += 3) {
+          for (let m = 0; m < 3; m++) {
+            const j = i + m + 1
 
             face[m] =
               indexVertex +
               j +
-              (normals || uvs ? `/${uvs ? indexVertexUvs + j : ''}${normals ? `/${indexNormals + j}` : ''}` : '')
+              (normals || uvs ? '/' + (uvs ? indexVertexUvs + j : '') + (normals ? '/' + (indexNormals + j) : '') : '')
           }
 
           // transform the face to export format
-          output += `f ${face.join(' ')}\n`
+          output += 'f ' + face.join(' ') + '\n'
         }
       }
 
@@ -135,7 +126,7 @@ OBJExporter.prototype = {
       indexNormals += nbNormals
     }
 
-    const parseLine = (line) => {
+    function parseLine(line) {
       let nbVertex = 0
 
       const geometry = line.geometry
@@ -149,10 +140,10 @@ OBJExporter.prototype = {
       const vertices = geometry.getAttribute('position')
 
       // name of the line object
-      output += `o ${line.name}\n`
+      output += 'o ' + line.name + '\n'
 
       if (vertices !== undefined) {
-        for (i = 0, l = vertices.count; i < l; i++, nbVertex++) {
+        for (let i = 0, l = vertices.count; i < l; i++, nbVertex++) {
           vertex.x = vertices.getX(i)
           vertex.y = vertices.getY(i)
           vertex.z = vertices.getZ(i)
@@ -161,23 +152,23 @@ OBJExporter.prototype = {
           vertex.applyMatrix4(line.matrixWorld)
 
           // transform the vertex to export format
-          output += `v ${vertex.x} ${vertex.y} ${vertex.z}\n`
+          output += 'v ' + vertex.x + ' ' + vertex.y + ' ' + vertex.z + '\n'
         }
       }
 
       if (type === 'Line') {
         output += 'l '
 
-        for (j = 1, l = vertices.count; j <= l; j++) {
-          output += `${indexVertex + j} `
+        for (let j = 1, l = vertices.count; j <= l; j++) {
+          output += indexVertex + j + ' '
         }
 
         output += '\n'
       }
 
       if (type === 'LineSegments') {
-        for (j = 1, k = j + 1, l = vertices.count; j < l; j += 2, k = j + 1) {
-          output += `l ${indexVertex + j} ${indexVertex + k}\n`
+        for (let j = 1, k = j + 1, l = vertices.count; j < l; j += 2, k = j + 1) {
+          output += 'l ' + (indexVertex + j) + ' ' + (indexVertex + k) + '\n'
         }
       }
 
@@ -185,7 +176,7 @@ OBJExporter.prototype = {
       indexVertex += nbVertex
     }
 
-    const parsePoints = (points) => {
+    function parsePoints(points) {
       let nbVertex = 0
 
       const geometry = points.geometry
@@ -197,19 +188,19 @@ OBJExporter.prototype = {
       const vertices = geometry.getAttribute('position')
       const colors = geometry.getAttribute('color')
 
-      output += `o ${points.name}\n`
+      output += 'o ' + points.name + '\n'
 
       if (vertices !== undefined) {
-        for (i = 0, l = vertices.count; i < l; i++, nbVertex++) {
+        for (let i = 0, l = vertices.count; i < l; i++, nbVertex++) {
           vertex.fromBufferAttribute(vertices, i)
           vertex.applyMatrix4(points.matrixWorld)
 
-          output += `v ${vertex.x} ${vertex.y} ${vertex.z}`
+          output += 'v ' + vertex.x + ' ' + vertex.y + ' ' + vertex.z
 
           if (colors !== undefined) {
             color.fromBufferAttribute(colors, i)
 
-            output += ` ${color.r} ${color.g} ${color.b}`
+            output += ' ' + color.r + ' ' + color.g + ' ' + color.b
           }
 
           output += '\n'
@@ -218,8 +209,8 @@ OBJExporter.prototype = {
 
       output += 'p '
 
-      for (j = 1, l = vertices.count; j <= l; j++) {
-        output += `${indexVertex + j} `
+      for (let j = 1, l = vertices.count; j <= l; j++) {
+        output += indexVertex + j + ' '
       }
 
       output += '\n'
@@ -228,7 +219,7 @@ OBJExporter.prototype = {
       indexVertex += nbVertex
     }
 
-    object.traverse((child) => {
+    object.traverse(function (child) {
       if (child.isMesh === true) {
         parseMesh(child)
       }
@@ -243,7 +234,7 @@ OBJExporter.prototype = {
     })
 
     return output
-  },
+  }
 }
 
 export { OBJExporter }
