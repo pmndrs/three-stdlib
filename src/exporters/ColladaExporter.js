@@ -4,36 +4,49 @@ import { Color, DoubleSide, Matrix4, MeshBasicMaterial } from 'three'
  * https://github.com/gkjohnson/collada-exporter-js
  *
  * Usage:
- *  var exporter = new ColladaExporter();
+ *  const exporter = new ColladaExporter();
  *
- *  var data = exporter.parse(mesh);
+ *  const data = exporter.parse(mesh);
  *
  * Format Definition:
  *  https://www.khronos.org/collada/
  */
 
-const ColladaExporter = () => {}
-
-ColladaExporter.prototype = {
-  constructor: ColladaExporter,
-
-  parse: function (object, onDone, options) {
-    options = options || {}
-
+class ColladaExporter {
+  parse(object, onDone, options = {}) {
     options = Object.assign(
       {
         version: '1.4.1',
         author: null,
         textureDirectory: '',
+        upAxis: 'Y_UP',
+        unitName: null,
+        unitMeter: null,
       },
       options,
     )
+
+    if (options.upAxis.match(/^[XYZ]_UP$/) === null) {
+      console.error('ColladaExporter: Invalid upAxis: valid values are X_UP, Y_UP or Z_UP.')
+      return null
+    }
+
+    if (options.unitName !== null && options.unitMeter === null) {
+      console.error('ColladaExporter: unitMeter needs to be specified if unitName is specified.')
+      return null
+    }
+
+    if (options.unitMeter !== null && options.unitName === null) {
+      console.error('ColladaExporter: unitName needs to be specified if unitMeter is specified.')
+      return null
+    }
 
     if (options.textureDirectory !== '') {
       options.textureDirectory = `${options.textureDirectory}/`.replace(/\\/g, '/').replace(/\/+/g, '/')
     }
 
     const version = options.version
+
     if (version !== '1.4.1' && version !== '1.5.0') {
       console.warn(`ColladaExporter : Version ${version} not supported for export. Only 1.4.1 and 1.5.0.`)
       return null
@@ -48,6 +61,7 @@ ColladaExporter.prototype = {
       const pad = (ch, num) => (num > 0 ? ch + pad(ch, num - 1) : '')
 
       let tagnum = 0
+
       return urdf
         .match(/(<[^>]+>[^<]+<\/[^<]+>)|(<[^>]+>)/g)
         .map((tag) => {
@@ -79,6 +93,7 @@ ColladaExporter.prototype = {
     }
 
     let canvas, ctx
+
     function imageToData(image, ext) {
       canvas = canvas || document.createElement('canvas')
       ctx = ctx || canvas.getContext('2d')
@@ -97,11 +112,13 @@ ColladaExporter.prototype = {
 
     // gets the attribute array. Generate a new array if the attribute is interleaved
     const getFuncs = ['getX', 'getY', 'getZ', 'getW']
+
     function attrBufferToArray(attr) {
       if (attr.isInterleavedBufferAttribute) {
         // use the typed array constructor to save on memory
         const arr = new attr.array.constructor(attr.count * attr.itemSize)
         const size = attr.itemSize
+
         for (let i = 0, l = attr.count; i < l; i++) {
           for (let j = 0; j < size; j++) {
             arr[i * size + j] = attr[getFuncs[j]](i)
@@ -196,14 +213,14 @@ ColladaExporter.prototype = {
 
         // serialize uvs
         if ('uv' in bufferGeometry.attributes) {
-          var uvName = `${meshid}-texcoord`
+          const uvName = `${meshid}-texcoord`
           gnode += getAttribute(bufferGeometry.attributes.uv, uvName, ['S', 'T'], 'float')
           triangleInputs += `<input semantic="TEXCOORD" source="#${uvName}" offset="0" set="0" />`
         }
 
         // serialize lightmap uvs
         if ('uv2' in bufferGeometry.attributes) {
-          var uvName = `${meshid}-texcoord2`
+          const uvName = `${meshid}-texcoord2`
           gnode += getAttribute(bufferGeometry.attributes.uv2, uvName, ['S', 'T'], 'float')
           triangleInputs += `<input semantic="TEXCOORD" source="#${uvName}" offset="0" set="1" />`
         }
@@ -404,7 +421,7 @@ ColladaExporter.prototype = {
 
         // ids of the materials to bind to the geometry
         let matids = null
-        let matidsArray = []
+        let matidsArray
 
         // get a list of materials to bind to the sub groups of the geometry.
         // If the amount of subgroups is greater than the materials, than reuse
@@ -440,15 +457,15 @@ ColladaExporter.prototype = {
       return node
     }
 
-    var geometryInfo = new WeakMap()
-    var materialMap = new WeakMap()
-    var imageMap = new WeakMap()
-    var textures = []
+    const geometryInfo = new WeakMap()
+    const materialMap = new WeakMap()
+    const imageMap = new WeakMap()
+    const textures = []
 
-    var libraryImages = []
-    var libraryGeometries = []
-    var libraryEffects = []
-    var libraryMaterials = []
+    const libraryImages = []
+    const libraryGeometries = []
+    const libraryEffects = []
+    const libraryMaterials = []
     const libraryVisualScenes = processObject(object)
 
     const specLink =
@@ -481,7 +498,7 @@ ColladaExporter.prototype = {
     }
 
     return res
-  },
+  }
 }
 
 export { ColladaExporter }
