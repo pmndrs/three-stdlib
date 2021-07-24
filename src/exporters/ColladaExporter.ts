@@ -40,7 +40,7 @@ export interface ColladaExporterResult {
 
 type GeometryInfo = { meshid: string; bufferGeometry: BufferGeometry }
 
-type MaterialPresentation = MeshPhongMaterial | MeshBasicMaterial | MeshLambertMaterial
+type MaterialRepresentation = MeshPhongMaterial | MeshBasicMaterial | MeshLambertMaterial
 
 class ColladaExporter {
   private options: {
@@ -53,7 +53,7 @@ class ColladaExporter {
   }
 
   private geometryInfo: WeakMap<BufferGeometry, GeometryInfo>
-  private materialMap: WeakMap<MaterialPresentation, string>
+  private materialMap: WeakMap<MaterialRepresentation, string>
   private imageMap: WeakMap<Texture, string>
   private textures: {
     directory: string
@@ -425,7 +425,7 @@ class ColladaExporter {
 
   // Process the given material into the material and effect libraries
   // Returns the material id
-  private processMaterial(m: MaterialPresentation): string {
+  private processMaterial(m: MaterialRepresentation): string {
     let matid = this.materialMap.get(m)
 
     if (matid == null) {
@@ -557,7 +557,7 @@ class ColladaExporter {
       // get a list of materials to bind to the sub groups of the geometry.
       // If the amount of subgroups is greater than the materials, than reuse
       // the materials.
-      const mat: MaterialPresentation | MaterialPresentation[] = o.material || new MeshBasicMaterial()
+      const mat: MaterialRepresentation | MaterialRepresentation[] = o.material || new MeshBasicMaterial()
       const materials = Array.isArray(mat) ? mat : [mat]
 
       if (geometry.groups.length > materials.length) {
