@@ -1,3 +1,5 @@
+import { BufferGeometry, Matrix3, Mesh, Object3D, Vector3 } from 'three'
+
 /**
  * https://github.com/gkjohnson/ply-exporter-js
  *
@@ -11,32 +13,24 @@
  * http://paulbourke.net/dataformats/ply/
  */
 
+export interface PLYExporterOptions {
+  binary?: boolean
+  excludeAttributes?: string[]
+  littleEndian?: boolean
+}
+
 class PLYExporter {
-  parse(object, onDone, options) {
+  public parse(
+    object: Object3D,
+    onDone: ((res: string) => void) | undefined,
+    options: PLYExporterOptions,
+  ): string | ArrayBuffer | null {
     if (onDone && typeof onDone === 'object') {
       console.warn(
         'THREE.PLYExporter: The options parameter is now the third argument to the "parse" function. See the documentation for the new API.',
       )
       options = onDone
       onDone = undefined
-    }
-
-    // Iterate over the valid meshes in the object
-    function traverseMeshes(cb) {
-      object.traverse(function (child) {
-        if (child.isMesh === true) {
-          const mesh = child
-          const geometry = mesh.geometry
-
-          if (geometry.isBufferGeometry !== true) {
-            throw new Error('THREE.PLYExporter: Geometry is not of type THREE.BufferGeometry.')
-          }
-
-          if (geometry.hasAttribute('position') === true) {
-            cb(mesh, geometry)
-          }
-        }
-      })
     }
 
     // Default options
@@ -58,11 +52,11 @@ class PLYExporter {
     let vertexCount = 0
     let faceCount = 0
     object.traverse(function (child) {
-      if (child.isMesh === true) {
+      if (child instanceof Mesh && child.isMesh) {
         const mesh = child
         const geometry = mesh.geometry
 
-        if (geometry.isBufferGeometry !== true) {
+        if (!geometry.isBufferGeometry) {
           throw new Error('THREE.PLYExporter: Geometry is not of type THREE.BufferGeometry.')
         }
 
@@ -87,10 +81,10 @@ class PLYExporter {
       }
     })
 
-    const includeIndices = excludeAttributes.indexOf('index') === -1
-    includeNormals = includeNormals && excludeAttributes.indexOf('normal') === -1
-    includeColors = includeColors && excludeAttributes.indexOf('color') === -1
-    includeUVs = includeUVs && excludeAttributes.indexOf('uv') === -1
+    const includeIndices = excludeAttributes?.indexOf('index') === -1
+    includeNormals = includeNormals && excludeAttributes?.indexOf('normal') === -1
+    includeColors = includeColors && excludeAttributes?.indexOf('color') === -1
+    includeUVs = includeUVs && excludeAttributes?.indexOf('uv') === -1
 
     if (includeIndices && faceCount !== Math.floor(faceCount)) {
       // point cloud meshes will not have an index array and may not have a
@@ -117,22 +111,22 @@ class PLYExporter {
       'property float y\n' +
       'property float z\n'
 
-    if (includeNormals === true) {
+    if (includeNormals) {
       // normal
       header += 'property float nx\n' + 'property float ny\n' + 'property float nz\n'
     }
 
-    if (includeUVs === true) {
+    if (includeUVs) {
       // uvs
       header += 'property float s\n' + 'property float t\n'
     }
 
-    if (includeColors === true) {
+    if (includeColors) {
       // colors
       header += 'property uchar red\n' + 'property uchar green\n' + 'property uchar blue\n'
     }
 
-    if (includeIndices === true) {
+    if (includeIndices) {
       // faces
       header += `${`element face ${faceCount}\n`}property list uchar int vertex_index\n`
     }
@@ -142,9 +136,9 @@ class PLYExporter {
     // Generate attribute data
     const vertex = new Vector3()
     const normalMatrixWorld = new Matrix3()
-    let result = null
+    let result: string | ArrayBuffer | null = null
 
-    if (options.binary === true) {
+    if (options.binary) {
       // Binary File Generation
       const headerBin = new TextEncoder().encode(header)
 
@@ -164,7 +158,7 @@ class PLYExporter {
       let vOffset = headerBin.length
       let fOffset = headerBin.length + vertexListLength
       let writtenVertices = 0
-      traverseMeshes(function (mesh, geometry) {
+      this.traverseMeshes(object, function (mesh, geometry) {
         const vertices = geometry.getAttribute('position')
         const normals = geometry.getAttribute('normal')
         const uvs = geometry.getAttribute('uv')
@@ -191,7 +185,7 @@ class PLYExporter {
           vOffset += 4
 
           // Normal information
-          if (includeNormals === true) {
+          if (includeNormals) {
             if (normals != null) {
               vertex.x = normals.getX(i)
               vertex.y = normals.getY(i)
@@ -220,14 +214,14 @@ class PLYExporter {
           }
 
           // UV information
-          if (includeUVs === true) {
+          if (includeUVs) {
             if (uvs != null) {
               output.setFloat32(vOffset, uvs.getX(i), options.littleEndian)
               vOffset += 4
 
               output.setFloat32(vOffset, uvs.getY(i), options.littleEndian)
               vOffset += 4
-            } else if (includeUVs !== false) {
+            } else if (!includeUVs) {
               output.setFloat32(vOffset, 0, options.littleEndian)
               vOffset += 4
 
@@ -237,7 +231,7 @@ class PLYExporter {
           }
 
           // Color information
-          if (includeColors === true) {
+          if (includeColors) {
             if (colors != null) {
               output.setUint8(vOffset, Math.floor(colors.getX(i) * 255))
               vOffset += 1
@@ -260,7 +254,7 @@ class PLYExporter {
           }
         }
 
-        if (includeIndices === true) {
+        if (includeIndices) {
           // Create the face list
 
           if (indices !== null) {
@@ -307,7 +301,7 @@ class PLYExporter {
       let vertexList = ''
       let faceList = ''
 
-      traverseMeshes(function (mesh, geometry) {
+      this.traverseMeshes(object, function (mesh, geometry) {
         const vertices = geometry.getAttribute('position')
         const normals = geometry.getAttribute('normal')
         const uvs = geometry.getAttribute('uv')
@@ -328,7 +322,7 @@ class PLYExporter {
           let line = vertex.x + ' ' + vertex.y + ' ' + vertex.z
 
           // Normal information
-          if (includeNormals === true) {
+          if (includeNormals) {
             if (normals != null) {
               vertex.x = normals.getX(i)
               vertex.y = normals.getY(i)
@@ -343,16 +337,16 @@ class PLYExporter {
           }
 
           // UV information
-          if (includeUVs === true) {
+          if (includeUVs) {
             if (uvs != null) {
               line += ' ' + uvs.getX(i) + ' ' + uvs.getY(i)
-            } else if (includeUVs !== false) {
+            } else if (includeUVs) {
               line += ' 0 0'
             }
           }
 
           // Color information
-          if (includeColors === true) {
+          if (includeColors) {
             if (colors != null) {
               line +=
                 ' ' +
@@ -370,7 +364,7 @@ class PLYExporter {
         }
 
         // Create the face list
-        if (includeIndices === true) {
+        if (includeIndices) {
           if (indices !== null) {
             for (let i = 0, l = indices.count; i < l; i += 3) {
               faceList += `3 ${indices.getX(i + 0) + writtenVertices}`
@@ -392,9 +386,29 @@ class PLYExporter {
       result = `${header}${vertexList}${includeIndices ? `${faceList}\n` : '\n'}`
     }
 
-    if (typeof onDone === 'function') requestAnimationFrame(() => onDone(result))
+    if (typeof onDone === 'function') {
+      requestAnimationFrame(() => onDone && onDone(typeof result === 'string' ? result : ''))
+    }
 
     return result
+  }
+
+  // Iterate over the valid meshes in the object
+  private traverseMeshes(object: Object3D, cb: (mesh: Mesh, geometry: BufferGeometry) => void): void {
+    object.traverse(function (child) {
+      if (child instanceof Mesh && child.isMesh) {
+        const mesh = child
+        const geometry = mesh.geometry
+
+        if (!geometry.isBufferGeometry) {
+          throw new Error('THREE.PLYExporter: Geometry is not of type THREE.BufferGeometry.')
+        }
+
+        if (geometry.hasAttribute('position')) {
+          cb(mesh, geometry)
+        }
+      }
+    })
   }
 }
 
