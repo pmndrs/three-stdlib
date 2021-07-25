@@ -59,7 +59,7 @@ class ColladaExporter {
     directory: string
     name: string
     ext: string
-    data: unknown
+    data: Uint8Array
     original: Texture
   }[]
 
