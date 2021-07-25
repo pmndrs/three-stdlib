@@ -1,10 +1,8 @@
-import { Matrix3, Vector3 } from 'three'
-
 /**
  * https://github.com/gkjohnson/ply-exporter-js
  *
  * Usage:
- *  var exporter = new PLYExporter();
+ *  const exporter = new PLYExporter();
  *
  *  // second argument is a list of options
  *  exporter.parse(mesh, data => console.log(data), { binary: true, excludeAttributes: [ 'color' ], littleEndian: true });
@@ -13,12 +11,8 @@ import { Matrix3, Vector3 } from 'three'
  * http://paulbourke.net/dataformats/ply/
  */
 
-const PLYExporter = () => {}
-
-PLYExporter.prototype = {
-  constructor: PLYExporter,
-
-  parse: function (object, onDone, options) {
+class PLYExporter {
+  parse(object, onDone, options) {
     if (onDone && typeof onDone === 'object') {
       console.warn(
         'THREE.PLYExporter: The options parameter is now the third argument to the "parse" function. See the documentation for the new API.',
@@ -29,7 +23,7 @@ PLYExporter.prototype = {
 
     // Iterate over the valid meshes in the object
     function traverseMeshes(cb) {
-      object.traverse((child) => {
+      object.traverse(function (child) {
         if (child.isMesh === true) {
           const mesh = child
           const geometry = mesh.geometry
@@ -63,7 +57,7 @@ PLYExporter.prototype = {
     // and cache the BufferGeometry
     let vertexCount = 0
     let faceCount = 0
-    object.traverse((child) => {
+    object.traverse(function (child) {
       if (child.isMesh === true) {
         const mesh = child
         const geometry = mesh.geometry
@@ -113,10 +107,15 @@ PLYExporter.prototype = {
     const indexByteCount = 4
 
     let header =
-      // position
-      `ply\n${`format ${
+      'ply\n' +
+      `format ${
         options.binary ? (options.littleEndian ? 'binary_little_endian' : 'binary_big_endian') : 'ascii'
-      } 1.0\n`}${`element vertex ${vertexCount}\n`}property float x\nproperty float y\nproperty float z\n`
+      } 1.0\n` +
+      `element vertex ${vertexCount}\n` +
+      // position
+      'property float x\n' +
+      'property float y\n' +
+      'property float z\n'
 
     if (includeNormals === true) {
       // normal
@@ -164,8 +163,8 @@ PLYExporter.prototype = {
 
       let vOffset = headerBin.length
       let fOffset = headerBin.length + vertexListLength
-      var writtenVertices = 0
-      traverseMeshes((mesh, geometry) => {
+      let writtenVertices = 0
+      traverseMeshes(function (mesh, geometry) {
         const vertices = geometry.getAttribute('position')
         const normals = geometry.getAttribute('normal')
         const uvs = geometry.getAttribute('uv')
@@ -304,11 +303,11 @@ PLYExporter.prototype = {
     } else {
       // Ascii File Generation
       // count the number of vertices
-      var writtenVertices = 0
+      let writtenVertices = 0
       let vertexList = ''
       let faceList = ''
 
-      traverseMeshes((mesh, geometry) => {
+      traverseMeshes(function (mesh, geometry) {
         const vertices = geometry.getAttribute('position')
         const normals = geometry.getAttribute('normal')
         const uvs = geometry.getAttribute('uv')
@@ -326,7 +325,7 @@ PLYExporter.prototype = {
           vertex.applyMatrix4(mesh.matrixWorld)
 
           // Position information
-          let line = `${vertex.x} ${vertex.y} ${vertex.z}`
+          let line = vertex.x + ' ' + vertex.y + ' ' + vertex.z
 
           // Normal information
           if (includeNormals === true) {
@@ -337,7 +336,7 @@ PLYExporter.prototype = {
 
               vertex.applyMatrix3(normalMatrixWorld).normalize()
 
-              line += ` ${vertex.x} ${vertex.y} ${vertex.z}`
+              line += ' ' + vertex.x + ' ' + vertex.y + ' ' + vertex.z
             } else {
               line += ' 0 0 0'
             }
@@ -346,7 +345,7 @@ PLYExporter.prototype = {
           // UV information
           if (includeUVs === true) {
             if (uvs != null) {
-              line += ` ${uvs.getX(i)} ${uvs.getY(i)}`
+              line += ' ' + uvs.getX(i) + ' ' + uvs.getY(i)
             } else if (includeUVs !== false) {
               line += ' 0 0'
             }
@@ -355,15 +354,19 @@ PLYExporter.prototype = {
           // Color information
           if (includeColors === true) {
             if (colors != null) {
-              line += ` ${Math.floor(colors.getX(i) * 255)} ${Math.floor(colors.getY(i) * 255)} ${Math.floor(
-                colors.getZ(i) * 255,
-              )}`
+              line +=
+                ' ' +
+                Math.floor(colors.getX(i) * 255) +
+                ' ' +
+                Math.floor(colors.getY(i) * 255) +
+                ' ' +
+                Math.floor(colors.getZ(i) * 255)
             } else {
               line += ' 255 255 255'
             }
           }
 
-          vertexList += `${line}\n`
+          vertexList += line + '\n'
         }
 
         // Create the face list
@@ -390,8 +393,9 @@ PLYExporter.prototype = {
     }
 
     if (typeof onDone === 'function') requestAnimationFrame(() => onDone(result))
+
     return result
-  },
+  }
 }
 
 export { PLYExporter }
