@@ -83,6 +83,7 @@ class OrbitControls extends EventDispatcher {
   getAzimuthalAngle: () => number
   setPolarAngle: (x: number) => void
   setAzimuthalAngle: (x: number) => void
+  getDistance: () => number
 
   listenToKeyEvents: (domElement: HTMLElement) => void
   saveState: () => void
@@ -149,6 +150,8 @@ class OrbitControls extends EventDispatcher {
       sphericalDelta.theta = theta - currentTheta
       scope.update()
     }
+
+    this.getDistance = (): number => scope.object.position.distanceTo(scope.target)
 
     this.listenToKeyEvents = (domElement: HTMLElement): void => {
       domElement.addEventListener('keydown', onKeyDown)
