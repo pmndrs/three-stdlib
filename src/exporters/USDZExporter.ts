@@ -57,7 +57,7 @@ class USDZExporter {
       }
     })
 
-    output += this.buildMaterials(this.materials, this.textures)
+    output += this.buildMaterials(this.materials)
 
     this.files[modelFileName] = strToU8(output)
     output = null
@@ -295,13 +295,13 @@ def "Geometry"
   }
 
   // Materials
-  private buildMaterials(materials: USDZExporter['materials'], textures: USDZExporter['textures']): string {
+  private buildMaterials(materials: USDZExporter['materials']): string {
     const array: string[] = []
 
     for (const uuid in materials) {
       const material = materials[uuid]
 
-      array.push(this.buildMaterial(material, textures))
+      array.push(this.buildMaterial(material))
     }
 
     return `def "Materials"
@@ -311,7 +311,7 @@ ${array.join('')}
 `
   }
 
-  private buildMaterial(material: MaterialRepresentaion, textures: USDZExporter['textures']): string {
+  private buildMaterial(material: MaterialRepresentaion): string {
     // https://graphics.pixar.com/usd/docs/UsdPreviewSurface-Proposal.html
 
     const pad = '            '
