@@ -29,7 +29,7 @@ class USDZExporter {
     this.files = {}
   }
 
-  public async parse(scene: Object3D): Promise<Uint8Array | undefined> {
+  public async parse(scene: Object3D): Promise<Uint8Array> {
     const modelFileName = 'model.usda'
 
     // model file should be first in USDZ archive so we init it here
@@ -102,13 +102,7 @@ class USDZExporter {
       }
     }
 
-    if (this.isZippable(this.files)) {
-      return zipSync(this.files, { level: 0 })
-    }
-  }
-
-  private isZippable(files: USDZExporter['files']): files is Zippable {
-    return Object.values(files).every((value) => value !== null)
+    return zipSync(this.files as Zippable, { level: 0 })
   }
 
   private imageToCanvas(
