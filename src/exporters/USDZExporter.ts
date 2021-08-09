@@ -247,7 +247,7 @@ def "Geometry"
       return geometry.index.array.join(', ')
     }
 
-    const array = []
+    const array: number[] = []
     const length = geometry.attributes.position.count
 
     for (let i = 0; i < length; i++) {
@@ -263,7 +263,7 @@ def "Geometry"
       return Array(count).fill('(0, 0, 0)').join(', ')
     }
 
-    const array = []
+    const array: string[] = []
     const data = attribute.array
 
     for (let i = 0; i < data.length; i += 3) {
@@ -283,7 +283,7 @@ def "Geometry"
       return Array(count).fill('(0, 0)').join(', ')
     }
 
-    const array = []
+    const array: string[] = []
     const data = attribute.array
 
     for (let i = 0; i < data.length; i += 2) {
@@ -296,7 +296,7 @@ def "Geometry"
 
   // Materials
   private buildMaterials(materials: USDZExporter['materials'], textures: USDZExporter['textures']): string {
-    const array = []
+    const array: string[] = []
 
     for (const uuid in materials) {
       const material = materials[uuid]
