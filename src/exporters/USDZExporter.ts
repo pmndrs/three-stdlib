@@ -10,8 +10,8 @@ import {
   Texture,
   Vector2,
 } from 'three'
+import { Nullable } from 'types/utils'
 
-type Nullable<T> = { [K in keyof T]: T[K] | null }
 type MaterialRepresentaion = MeshStandardMaterial | MeshPhysicalMaterial
 
 class USDZExporter {
