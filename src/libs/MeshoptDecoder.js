@@ -138,7 +138,6 @@ const MeshoptDecoder = (() => {
 
   if (WebAssembly.validate(detector)) {
     wasm = wasm_simd
-    console.log('Warning: meshopt_decoder is using experimental SIMD support')
   }
 
   var instance
