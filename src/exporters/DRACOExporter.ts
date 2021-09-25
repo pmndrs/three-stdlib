@@ -1,3 +1,4 @@
+import type { EncoderModule } from 'draco3d'
 import { BufferGeometry, Mesh, Points } from 'three'
 
 /**
@@ -13,6 +14,8 @@ import { BufferGeometry, Mesh, Points } from 'three'
  *  - exportUvs
  *  - exportNormals
  */
+
+declare const DracoEncoderModule: () => EncoderModule
 
 class DRACOExporter {
   // Encoder methods
@@ -69,6 +72,7 @@ class DRACOExporter {
       dracoObject = new dracoEncoder.Mesh()
 
       const vertices = geometry.getAttribute('position')
+      /// @ts-expect-error
       builder.AddFloatAttributeToMesh(
         dracoObject,
         dracoEncoder.POSITION,
@@ -80,6 +84,7 @@ class DRACOExporter {
       const faces = geometry.getIndex()
 
       if (faces !== null) {
+        /// @ts-expect-error
         builder.AddFacesToMesh(dracoObject, faces.count / 3, faces.array)
       } else {
         const faces = new (vertices.count > 65535 ? Uint32Array : Uint16Array)(vertices.count)
@@ -95,6 +100,7 @@ class DRACOExporter {
         const normals = geometry.getAttribute('normal')
 
         if (normals !== undefined) {
+          /// @ts-expect-error
           builder.AddFloatAttributeToMesh(
             dracoObject,
             dracoEncoder.NORMAL,
@@ -109,6 +115,7 @@ class DRACOExporter {
         const uvs = geometry.getAttribute('uv')
 
         if (uvs !== undefined) {
+          /// @ts-expect-error
           builder.AddFloatAttributeToMesh(dracoObject, dracoEncoder.TEX_COORD, uvs.count, uvs.itemSize, uvs.array)
         }
       }
@@ -117,11 +124,14 @@ class DRACOExporter {
         const colors = geometry.getAttribute('color')
 
         if (colors !== undefined) {
+          /// @ts-expect-error
           builder.AddFloatAttributeToMesh(dracoObject, dracoEncoder.COLOR, colors.count, colors.itemSize, colors.array)
         }
       }
     } else if (object instanceof Points && object.isPoints) {
+      /// @ts-expect-error
       builder = new dracoEncoder.PointCloudBuilder()
+      /// @ts-expect-error
       dracoObject = new dracoEncoder.PointCloud()
 
       const vertices = geometry.getAttribute('position')
@@ -170,6 +180,7 @@ class DRACOExporter {
     if (object instanceof Mesh && object.isMesh) {
       length = encoder.EncodeMeshToDracoBuffer(dracoObject, encodedData)
     } else {
+      /// @ts-expect-error
       length = encoder.EncodePointCloudToDracoBuffer(dracoObject, true, encodedData)
     }
 
