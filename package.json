@@ -1,6 +1,6 @@
 {
   "name": "three-stdlib",
-  "version": "0.0.0",
+  "version": "0.0.0-semantic-released",
   "private": true,
   "description": "stand-alone library of threejs examples",
   "main": "index.cjs.js",
