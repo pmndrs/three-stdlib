@@ -14,8 +14,26 @@ const getBabelOptions = ({ useESModules }, targets) => ({
   extensions,
   exclude: '**/node_modules/**',
   runtimeHelpers: true,
-  presets: [['@babel/preset-env', { loose: true, modules: false, targets }], '@babel/preset-typescript'],
+  presets: [
+    [
+      '@babel/preset-env',
+      {
+        include: [
+          '@babel/plugin-proposal-optional-chaining',
+          '@babel/plugin-proposal-nullish-coalescing-operator',
+          '@babel/plugin-proposal-numeric-separator',
+          '@babel/plugin-proposal-logical-assignment-operators',
+        ],
+        bugfixes: true,
+        loose: true,
+        modules: false,
+        targets,
+      },
+    ],
+    '@babel/preset-typescript',
+  ],
   plugins: [
+    ['@babel/plugin-proposal-private-methods', { loose: false }],
     '@babel/plugin-proposal-class-properties',
     '@babel/plugin-proposal-optional-chaining',
     ['@babel/transform-runtime', { regenerator: false, useESModules }],
