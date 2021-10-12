@@ -86,8 +86,6 @@ class TrackballControls extends EventDispatcher {
     // connect events
     if (domElement !== undefined) this.connect(domElement)
 
-    this.handleResize()
-
     // force an update at start
     this.update()
   }
@@ -246,7 +244,7 @@ class TrackballControls extends EventDispatcher {
     }
   }
 
-  private handleResize = (): void => {
+  public handleResize = (): void => {
     if (!this.domElement) return
     const box = this.domElement.getBoundingClientRect()
     // adjustments come from similar code in the jquery offset() function
@@ -576,6 +574,8 @@ class TrackballControls extends EventDispatcher {
 
     window.addEventListener('keydown', this.keydown)
     window.addEventListener('keyup', this.keyup)
+
+    this.handleResize()
   }
 
   public dispose = (): void => {

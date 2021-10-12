@@ -1681,7 +1681,7 @@ class ArcballControls extends Object3D {
     window.removeEventListener('resize', this.onWindowResize)
     window.removeEventListener('keydown', this.onKeyDown)
 
-    this.scene.remove(this._gizmos)
+    if (this.scene) this.scene.remove(this._gizmos)
     this.disposeGrid()
   }
 
