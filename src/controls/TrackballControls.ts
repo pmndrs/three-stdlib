@@ -72,13 +72,8 @@ class TrackballControls extends EventDispatcher {
   private startEvent = { type: 'start' }
   private endEvent = { type: 'end' }
 
-  constructor(object: PerspectiveCamera | OrthographicCamera, domElement: HTMLElement) {
+  constructor(object: PerspectiveCamera | OrthographicCamera, domElement?: HTMLElement) {
     super()
-
-    if (domElement === undefined) {
-      console.warn('THREE.TrackballControls: The second parameter "domElement" is now mandatory.')
-    }
-
     this.object = object
 
     // for reset
