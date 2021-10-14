@@ -66,6 +66,7 @@ class ArcballControls extends Object3D {
   constructor(camera, domElement, scene = null) {
     super()
     this.camera = null
+    this.domElement = domElement
     this.scene = scene
 
     this.mouseActions = []
@@ -188,7 +189,7 @@ class ArcballControls extends Object3D {
     this.maxZoom = Infinity
 
     //trackball parameters
-    this.target = new Vector3(0, 0, 0)
+    this._tbCenter = new Vector3(0, 0, 0)
     this._tbRadius = 1
 
     //FSA
@@ -200,12 +201,18 @@ class ArcballControls extends Object3D {
       this.scene.add(this._gizmos)
     }
 
-    // connect events
-    if (domElement !== undefined) this.connect(domElement)
-
+    this.domElement.style.touchAction = 'none'
     this._devPxRatio = window.devicePixelRatio
 
     this.initializeMouseActions()
+
+    this.domElement.addEventListener('contextmenu', this.onContextMenu)
+    this.domElement.addEventListener('wheel', this.onWheel)
+    this.domElement.addEventListener('pointerdown', this.onPointerDown)
+    this.domElement.addEventListener('pointercancel', this.onPointerCancel)
+
+    window.addEventListener('keydown', this.onKeyDown)
+    window.addEventListener('resize', this.onWindowResize)
   }
 
   //listeners
@@ -1648,20 +1655,6 @@ class ArcballControls extends Object3D {
     }
   }
 
-  // https://github.com/mrdoob/three.js/issues/20575
-  connect = (domElement) => {
-    this.domElement = domElement
-    this.domElement.style.touchAction = 'none'
-
-    this.domElement.addEventListener('contextmenu', this.onContextMenu)
-    this.domElement.addEventListener('wheel', this.onWheel)
-    this.domElement.addEventListener('pointerdown', this.onPointerDown)
-    this.domElement.addEventListener('pointercancel', this.onPointerCancel)
-
-    window.addEventListener('keydown', this.onKeyDown)
-    window.addEventListener('resize', this.onWindowResize)
-  }
-
   /**
    * Remove all listeners, stop animations and clean scene
    */
@@ -1679,9 +1672,9 @@ class ArcballControls extends Object3D {
     window.removeEventListener('pointerup', this.onPointerUp)
 
     window.removeEventListener('resize', this.onWindowResize)
-    window.removeEventListener('keydown', this.onKeyDown)
+    window.addEventListener('keydown', this.onKeyDown)
 
-    if (this.scene) this.scene.remove(this._gizmos)
+    this.scene.remove(this._gizmos)
     this.disposeGrid()
   }
 
@@ -1757,7 +1750,7 @@ class ArcballControls extends Object3D {
    * @param {Camera} camera The virtual camera to be controlled
    */
   setCamera = (camera) => {
-    camera.lookAt(this.target)
+    camera.lookAt(this._tbCenter)
     camera.updateMatrix()
 
     //setting state
@@ -1773,11 +1766,11 @@ class ArcballControls extends Object3D {
     this._zoomState = this._zoom0
 
     this._initialNear = camera.near
-    this._nearPos0 = camera.position.distanceTo(this.target) - camera.near
+    this._nearPos0 = camera.position.distanceTo(this._tbCenter) - camera.near
     this._nearPos = this._initialNear
 
     this._initialFar = camera.far
-    this._farPos0 = camera.position.distanceTo(this.target) - camera.far
+    this._farPos0 = camera.position.distanceTo(this._tbCenter) - camera.far
     this._farPos = this._initialFar
 
     this._up0.copy(camera.up)
@@ -1788,7 +1781,7 @@ class ArcballControls extends Object3D {
 
     //making gizmos
     this._tbRadius = this.calculateTbRadius(camera)
-    this.makeGizmos(this.target, this._tbRadius)
+    this.makeGizmos(this._tbCenter, this._tbRadius)
   }
 
   /**
@@ -2200,12 +2193,12 @@ class ArcballControls extends Object3D {
    * @param {Number} z Z coordinate
    */
   setTarget = (x, y, z) => {
-    this.target.set(x, y, z)
+    this._tbCenter.set(x, y, z)
     this._gizmos.position.set(x, y, z) //for correct radius calculation
     this._tbRadius = this.calculateTbRadius(this.camera)
 
-    this.makeGizmos(this.target, this._tbRadius)
-    this.camera.lookAt(this.target)
+    this.makeGizmos(this._tbCenter, this._tbRadius)
+    this.camera.lookAt(this._tbCenter)
   }
 
   /**
