@@ -234,7 +234,7 @@ type ExtensionDef = {
   transmissionTexture?: {
     index: number
   }
-  thicknessFactor?: unknown
+  thickness?: unknown
   thicknessTexture?: {
     index: number
   }
@@ -2467,7 +2467,7 @@ class GLTFMaterialsVolumeExtension {
 
     const extensionDef: ExtensionDef = {}
 
-    extensionDef.thicknessFactor =
+    extensionDef.thickness =
       // @ts-expect-error
       material.thickness
 
