@@ -61,6 +61,7 @@ class OrbitControls extends EventDispatcher {
   // If auto-rotate is enabled, you must call controls.update() in your animation loop
   autoRotate = false
   autoRotateSpeed = 2.0 // 30 seconds per orbit when fps is 60
+  reverseOrbit = false // true if you want to reverse the orbit to mouse drag from left to right = orbits left
   // The four arrow keys
   keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40 }
   // Mouse buttons
@@ -331,11 +332,11 @@ class OrbitControls extends EventDispatcher {
     }
 
     function rotateLeft(angle: number): void {
-      sphericalDelta.theta -= angle
+      sphericalDelta.theta += angle * (scope.reverseOrbit ? 1 : -1)
     }
 
     function rotateUp(angle: number): void {
-      sphericalDelta.phi -= angle
+      sphericalDelta.phi += angle * (scope.reverseOrbit ? 1 : -1)
     }
 
     const panLeft = (() => {
