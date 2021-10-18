@@ -72,8 +72,6 @@ class FlyControls extends EventDispatcher {
       return
     }
 
-    //event.preventDefault();
-
     switch (event.code) {
       case 'ShiftLeft':
       case 'ShiftRight':
@@ -182,12 +180,6 @@ class FlyControls extends EventDispatcher {
   }
 
   private mousedown = (event: MouseEvent): void => {
-    if (this.domElement !== document && !(this.domElement instanceof Document)) {
-      this.domElement.focus()
-    }
-
-    event.preventDefault()
-
     if (this.dragToLook) {
       this.mouseStatus++
     } else {
@@ -218,8 +210,6 @@ class FlyControls extends EventDispatcher {
   }
 
   private mouseup = (event: MouseEvent): void => {
-    event.preventDefault()
-
     if (this.dragToLook) {
       this.mouseStatus--
 

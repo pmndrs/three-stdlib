@@ -83,7 +83,7 @@ class LineSegments2 extends Mesh<LineSegmentsGeometry, LineMaterial> {
     // pick a point 1 unit out along the ray to avoid the ray origin
     // sitting at the camera origin which will cause "w" to be 0 when
     // applying the projection matrix.
-    ray.at(1, new Vector3(this.ssOrigin.x, this.ssOrigin.y, this.ssOrigin.z))
+    ray.at(1, (this.ssOrigin as unknown) as Vector3)
 
     // ndc space [ - 1.0, 1.0 ]
     this.ssOrigin.w = 1

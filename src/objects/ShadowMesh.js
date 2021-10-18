@@ -4,38 +4,35 @@ import { Matrix4, Mesh, MeshBasicMaterial } from 'three'
  * A shadow Mesh that follows a shadow-casting Mesh in the scene, but is confined to a single plane.
  */
 
-var ShadowMesh = function (mesh) {
-  var shadowMaterial = new MeshBasicMaterial({
-    color: 0x000000,
-    transparent: true,
-    opacity: 0.6,
-    depthWrite: false,
-  })
+const _shadowMatrix = new Matrix4()
 
-  Mesh.call(this, mesh.geometry, shadowMaterial)
+class ShadowMesh extends Mesh {
+  constructor(mesh) {
+    const shadowMaterial = new MeshBasicMaterial({
+      color: 0x000000,
+      transparent: true,
+      opacity: 0.6,
+      depthWrite: false,
+    })
 
-  this.meshMatrix = mesh.matrixWorld
+    super(mesh.geometry, shadowMaterial)
 
-  this.frustumCulled = false
-  this.matrixAutoUpdate = false
-}
+    this.meshMatrix = mesh.matrixWorld
 
-ShadowMesh.prototype = Object.create(Mesh.prototype)
-ShadowMesh.prototype.constructor = ShadowMesh
+    this.frustumCulled = false
+    this.matrixAutoUpdate = false
+  }
 
-ShadowMesh.prototype.update = (function () {
-  var shadowMatrix = new Matrix4()
-
-  return function (plane, lightPosition4D) {
+  update(plane, lightPosition4D) {
     // based on https://www.opengl.org/archives/resources/features/StencilTalk/tsld021.htm
 
-    var dot =
+    const dot =
       plane.normal.x * lightPosition4D.x +
       plane.normal.y * lightPosition4D.y +
       plane.normal.z * lightPosition4D.z +
       -plane.constant * lightPosition4D.w
 
-    var sme = shadowMatrix.elements
+    const sme = _shadowMatrix.elements
 
     sme[0] = dot - lightPosition4D.x * plane.normal.x
     sme[4] = -lightPosition4D.x * plane.normal.y
@@ -57,8 +54,10 @@ ShadowMesh.prototype.update = (function () {
     sme[11] = -lightPosition4D.w * plane.normal.z
     sme[15] = dot - lightPosition4D.w * -plane.constant
 
-    this.matrix.multiplyMatrices(shadowMatrix, this.meshMatrix)
+    this.matrix.multiplyMatrices(_shadowMatrix, this.meshMatrix)
   }
-})()
+}
+
+ShadowMesh.prototype.isShadowMesh = true
 
 export { ShadowMesh }

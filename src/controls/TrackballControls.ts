@@ -19,7 +19,7 @@ class TrackballControls extends EventDispatcher {
   public minDistance = 0
   public maxDistance = Infinity
 
-  public keys: [number, number, number] = [65 /*A*/, 83 /*S*/, 68 /*D*/]
+  public keys: [string, string, string] = ['KeyA' /*A*/, 'KeyS' /*S*/, 'KeyD' /*D*/]
 
   public mouseButtons = {
     LEFT: MOUSE.ROTATE,
@@ -28,7 +28,7 @@ class TrackballControls extends EventDispatcher {
   }
 
   public object: PerspectiveCamera | OrthographicCamera
-  public domElement: HTMLElement
+  public domElement: HTMLElement | undefined
 
   private target = new Vector3()
 
@@ -72,15 +72,9 @@ class TrackballControls extends EventDispatcher {
   private startEvent = { type: 'start' }
   private endEvent = { type: 'end' }
 
-  constructor(object: PerspectiveCamera | OrthographicCamera, domElement: HTMLElement) {
+  constructor(object: PerspectiveCamera | OrthographicCamera, domElement?: HTMLElement) {
     super()
-
-    if (domElement === undefined) {
-      console.warn('THREE.TrackballControls: The second parameter "domElement" is now mandatory.')
-    }
-
     this.object = object
-    this.domElement = domElement
 
     // for reset
 
@@ -89,24 +83,8 @@ class TrackballControls extends EventDispatcher {
     this.up0 = this.object.up.clone()
     this.zoom0 = this.object.zoom
 
-    // listeners
-
-    this.domElement.addEventListener('contextmenu', this.contextmenu)
-
-    this.domElement.addEventListener('pointerdown', this.onPointerDown)
-    this.domElement.addEventListener('wheel', this.mousewheel)
-
-    this.domElement.addEventListener('touchstart', this.touchstart)
-    this.domElement.addEventListener('touchend', this.touchend)
-    this.domElement.addEventListener('touchmove', this.touchmove)
-
-    this.domElement.ownerDocument.addEventListener('pointermove', this.onPointerMove)
-    this.domElement.ownerDocument.addEventListener('pointerup', this.onPointerUp)
-
-    window.addEventListener('keydown', this.keydown)
-    window.addEventListener('keyup', this.keyup)
-
-    this.handleResize()
+    // connect events
+    if (domElement !== undefined) this.connect(domElement)
 
     // force an update at start
     this.update()
@@ -221,6 +199,7 @@ class TrackballControls extends EventDispatcher {
   private pan = new Vector3()
 
   private panCamera = (): void => {
+    if (!this.domElement) return
     this.mouseChange.copy(this._panEnd).sub(this._panStart)
 
     if (this.mouseChange.lengthSq()) {
@@ -265,7 +244,8 @@ class TrackballControls extends EventDispatcher {
     }
   }
 
-  private handleResize = (): void => {
+  public handleResize = (): void => {
+    if (!this.domElement) return
     const box = this.domElement.getBoundingClientRect()
     // adjustments come from similar code in the jquery offset() function
     const d = this.domElement.ownerDocument.documentElement
@@ -344,11 +324,11 @@ class TrackballControls extends EventDispatcher {
 
     if (this._keyState !== this.STATE.NONE) {
       return
-    } else if (event.keyCode === this.keys[this.STATE.ROTATE] && !this.noRotate) {
+    } else if (event.code === this.keys[this.STATE.ROTATE] && !this.noRotate) {
       this._keyState = this.STATE.ROTATE
-    } else if (event.keyCode === this.keys[this.STATE.ZOOM] && !this.noZoom) {
+    } else if (event.code === this.keys[this.STATE.ZOOM] && !this.noZoom) {
       this._keyState = this.STATE.ZOOM
-    } else if (event.keyCode === this.keys[this.STATE.PAN] && !this.noPan) {
+    } else if (event.code === this.keys[this.STATE.PAN] && !this.noPan) {
       this._keyState = this.STATE.PAN
     }
   }
@@ -385,7 +365,7 @@ class TrackballControls extends EventDispatcher {
     switch (event.pointerType) {
       case 'mouse':
       case 'pen':
-        this.onMouseUp(event)
+        this.onMouseUp()
         break
 
       // TODO touch
@@ -401,8 +381,7 @@ class TrackballControls extends EventDispatcher {
   }
 
   private onMouseDown = (event: MouseEvent): void => {
-    event.preventDefault()
-
+    if (!this.domElement) return
     if (this._state === this.STATE.NONE) {
       switch (event.button) {
         case this.mouseButtons.LEFT:
@@ -444,8 +423,6 @@ class TrackballControls extends EventDispatcher {
   private onMouseMove = (event: MouseEvent): void => {
     if (this.enabled === false) return
 
-    event.preventDefault()
-
     const state = this._keyState !== this.STATE.NONE ? this._keyState : this._state
 
     if (state === this.STATE.ROTATE && !this.noRotate) {
@@ -458,10 +435,9 @@ class TrackballControls extends EventDispatcher {
     }
   }
 
-  private onMouseUp = (event: MouseEvent): void => {
+  private onMouseUp = (): void => {
+    if (!this.domElement) return
     if (this.enabled === false) return
-
-    event.preventDefault()
 
     this._state = this.STATE.NONE
 
@@ -576,7 +552,34 @@ class TrackballControls extends EventDispatcher {
     event.preventDefault()
   }
 
+  // https://github.com/mrdoob/three.js/issues/20575
+  public connect = (domElement: HTMLElement): void => {
+    if ((domElement as any) === document) {
+      console.error(
+        'THREE.OrbitControls: "document" should not be used as the target "domElement". Please use "renderer.domElement" instead.',
+      )
+    }
+    this.domElement = domElement
+    this.domElement.addEventListener('contextmenu', this.contextmenu)
+
+    this.domElement.addEventListener('pointerdown', this.onPointerDown)
+    this.domElement.addEventListener('wheel', this.mousewheel)
+
+    this.domElement.addEventListener('touchstart', this.touchstart)
+    this.domElement.addEventListener('touchend', this.touchend)
+    this.domElement.addEventListener('touchmove', this.touchmove)
+
+    this.domElement.ownerDocument.addEventListener('pointermove', this.onPointerMove)
+    this.domElement.ownerDocument.addEventListener('pointerup', this.onPointerUp)
+
+    window.addEventListener('keydown', this.keydown)
+    window.addEventListener('keyup', this.keyup)
+
+    this.handleResize()
+  }
+
   public dispose = (): void => {
+    if (!this.domElement) return
     this.domElement.removeEventListener('contextmenu', this.contextmenu)
 
     this.domElement.removeEventListener('pointerdown', this.onPointerDown)

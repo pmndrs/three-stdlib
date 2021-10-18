@@ -14,8 +14,26 @@ const getBabelOptions = ({ useESModules }, targets) => ({
   extensions,
   exclude: '**/node_modules/**',
   runtimeHelpers: true,
-  presets: [['@babel/preset-env', { loose: true, modules: false, targets }], '@babel/preset-typescript'],
+  presets: [
+    [
+      '@babel/preset-env',
+      {
+        include: [
+          '@babel/plugin-proposal-optional-chaining',
+          '@babel/plugin-proposal-nullish-coalescing-operator',
+          '@babel/plugin-proposal-numeric-separator',
+          '@babel/plugin-proposal-logical-assignment-operators',
+        ],
+        bugfixes: true,
+        loose: true,
+        modules: false,
+        targets,
+      },
+    ],
+    '@babel/preset-typescript',
+  ],
   plugins: [
+    ['@babel/plugin-proposal-private-methods', { loose: false }],
     '@babel/plugin-proposal-class-properties',
     '@babel/plugin-proposal-optional-chaining',
     ['@babel/transform-runtime', { regenerator: false, useESModules }],
@@ -54,7 +72,7 @@ export default [
         transformOutputPath: (output) => output.replace(/\.[^/.]+$/, '.cjs.js'),
       }),
       json(),
-      babel(getBabelOptions({ useESModules: false })),
+      babel(getBabelOptions({ useESModules: false }, '>1%, not dead, not ie 11, not op_mini all')),
       resolve({ extensions }),
       terser(),
     ],
@@ -63,6 +81,11 @@ export default [
     input: `./src/index.ts`,
     output: { file: `dist/index.cjs.js`, format: 'cjs' },
     external,
-    plugins: [json(), babel(getBabelOptions({ useESModules: false })), resolve({ extensions }), terser()],
+    plugins: [
+      json(),
+      babel(getBabelOptions({ useESModules: false }, '>1%, not dead, not ie 11, not op_mini all')),
+      resolve({ extensions }),
+      terser(),
+    ],
   },
 ]

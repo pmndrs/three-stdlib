@@ -1271,13 +1271,13 @@ class TransformControlsGizmo extends Object3D {
       // highlight selected axis
 
       //@ts-ignore
-      handle.material.opacity = handle.material.opacity || handle.material.opacity
+      handle.material.tempOpacity = handle.material.tempOpacity || handle.material.opacity
       //@ts-ignore
-      handle.material.color = handle.material.color || handle.material.color.clone()
+      handle.material.tempColor = handle.material.tempColor || handle.material.color.clone()
       //@ts-ignore
-      handle.material.color.copy(handle.material.color)
+      handle.material.color.copy(handle.material.tempColor)
       //@ts-ignore
-      handle.material.opacity = handle.material.opacity
+      handle.material.opacity = handle.material.tempOpacity
 
       if (!this.enabled) {
         //@ts-ignore

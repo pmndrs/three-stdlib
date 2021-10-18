@@ -40,16 +40,6 @@ export const Line = React.forwardRef<Line2, LineProps>(function Line(
     line2.computeLineDistances()
   }, [points, line2])
 
-  React.useLayoutEffect(() => {
-    if (dashed) {
-      lineMaterial.defines.USE_DASH = ''
-    } else {
-      // Setting lineMaterial.defines.USE_DASH to undefined is apparently not sufficient.
-      delete lineMaterial.defines.USE_DASH
-    }
-    lineMaterial.needsUpdate = true
-  }, [dashed, lineMaterial])
-
   return (
     <primitive dispose={undefined} object={line2} ref={ref} {...rest}>
       <primitive dispose={undefined} object={lineGeom} attach="geometry" />

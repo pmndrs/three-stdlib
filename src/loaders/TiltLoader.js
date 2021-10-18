@@ -443,14 +443,14 @@ const shaders = {
     blendSrc: 201,
     blendSrcAlpha: 201,
   },
-}
+})
 
 function getMaterial(GUID) {
   const name = BRUSH_LIST_ARRAY[GUID]
 
   switch (name) {
     case 'Light':
-      return new RawShaderMaterial(shaders.Light)
+      return new RawShaderMaterial(shaders().Light)
 
     default:
       return new MeshBasicMaterial({ vertexColors: true, side: DoubleSide })
