@@ -73,15 +73,13 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
     this.setAttribute('instanceStart', new InterleavedBufferAttribute(instanceBuffer, 3, 0)) // xyz
     this.setAttribute('instanceEnd', new InterleavedBufferAttribute(instanceBuffer, 3, 3)) // xyz
 
-    //
-
     this.computeBoundingBox()
     this.computeBoundingSphere()
 
     return this
   }
 
-  public setColors(array: number[] | Float32Array): this {
+  public setColors(array: number[] | Float32Array, itemSize: 3 | 4 = 3): this {
     let colors
 
     if (array instanceof Float32Array) {
@@ -92,11 +90,10 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
       console.error('LineSegmentsGeometry.setColors requires either a Float32Array or regular array of numbers')
       return this
     }
+    const instanceColorBuffer = new InstancedInterleavedBuffer(colors, itemSize * 2, 1) // rgb(a), rgb(a)
 
-    const instanceColorBuffer = new InstancedInterleavedBuffer(colors, 6, 1) // rgb, rgb
-
-    this.setAttribute('instanceColorStart', new InterleavedBufferAttribute(instanceColorBuffer, 3, 0)) // rgb
-    this.setAttribute('instanceColorEnd', new InterleavedBufferAttribute(instanceColorBuffer, 3, 3)) // rgb
+    this.setAttribute('instanceColorStart', new InterleavedBufferAttribute(instanceColorBuffer, itemSize, 0)) // rgb(a)
+    this.setAttribute('instanceColorEnd', new InterleavedBufferAttribute(instanceColorBuffer, itemSize, itemSize)) // rgb(a)
 
     return this
   }

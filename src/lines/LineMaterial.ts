@@ -51,12 +51,16 @@ ShaderLib['line'] = {
 
 		attribute vec3 instanceStart;
 		attribute vec3 instanceEnd;
-
-		attribute vec3 instanceColorStart;
-		attribute vec3 instanceColorEnd;
-
+		#ifdef USE_COLOR_ALPHA
+			attribute vec4 instanceColorStart;
+			attribute vec4 instanceColorEnd;
+		#else
+			attribute vec3 instanceColorStart;
+			attribute vec3 instanceColorEnd;
+		#endif
 		varying vec2 vUv;
-
+		// TODO: Find a way to use 4th vColor component for alpha
+		varying float vAlpha;
 		#ifdef USE_DASH
 
 			uniform float dashScale;
@@ -83,7 +87,16 @@ ShaderLib['line'] = {
 
 		void main() {
 
-			#ifdef USE_COLOR
+			#ifdef USE_COLOR_ALPHA
+
+				vColor.xyz = ( position.y < 0.5 ) ? instanceColorStart.xyz : instanceColorEnd.xyz;
+
+				// TODO: Why instanceColorStart and instanceColorEnd suddenly Vector3 here?
+				// vColor.xyzw = ( position.y < 0.5 ) ? instanceColorStart.xyzw : instanceColorEnd.xyzw;
+
+				vAlpha = ( position.y < 0.5 ) ? instanceColorStart.w : instanceColorEnd.w;
+
+			#elif defined(USE_COLOR) 
 
 				vColor.xyz = ( position.y < 0.5 ) ? instanceColorStart : instanceColorEnd;
 
@@ -188,6 +201,7 @@ ShaderLib['line'] = {
   fragmentShader: /* glsl */ `
 		uniform vec3 diffuse;
 		uniform float opacity;
+		vec4 diffuseColor;
 
 		#ifdef USE_DASH
 
@@ -206,6 +220,7 @@ ShaderLib['line'] = {
 		#include <clipping_planes_pars_fragment>
 
 		varying vec2 vUv;
+		varying float vAlpha;
 
 		void main() {
 
@@ -218,8 +233,12 @@ ShaderLib['line'] = {
 				if ( mod( vLineDistance + dashOffset, dashSize + gapSize ) > dashSize ) discard; // todo - FIX
 
 			#endif
-
-			float alpha = opacity;
+			// TODO: Find a way to use alpha from vertex colors as well as opacity from uniform
+			#ifdef USE_COLOR_ALPHA
+				float alpha = vAlpha;
+			#else
+				float alpha = opacity;
+			#endif
 
 			#ifdef ALPHA_TO_COVERAGE
 
