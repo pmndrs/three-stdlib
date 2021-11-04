@@ -167,7 +167,7 @@ class TrackballControls extends EventDispatcher {
       if ((this.object as PerspectiveCamera).isPerspectiveCamera) {
         this._eye.multiplyScalar(factor)
       } else if ((this.object as OrthographicCamera).isOrthographicCamera) {
-        this.object.zoom *= factor
+        this.object.zoom /= factor
         this.object.updateProjectionMatrix()
       } else {
         console.warn('THREE.TrackballControls: Unsupported camera type')
