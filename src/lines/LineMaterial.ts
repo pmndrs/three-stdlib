@@ -235,7 +235,7 @@ ShaderLib['line'] = {
 			#endif
 			// TODO: Find a way to use alpha from vertex colors as well as opacity from uniform
 			#ifdef USE_COLOR_ALPHA
-				float alpha = vAlpha;
+				float alpha = vAlpha * opacity;
 			#else
 				float alpha = opacity;
 			#endif
