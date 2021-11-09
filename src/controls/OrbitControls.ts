@@ -688,12 +688,12 @@ class OrbitControls extends EventDispatcher {
     function onPointerDown(event: PointerEvent) {
       if (scope.enabled === false) return
 
-      addPointer(event)
-
       if (pointers.length === 0) {
         scope.domElement?.ownerDocument.addEventListener('pointermove', onPointerMove)
         scope.domElement?.ownerDocument.addEventListener('pointerup', onPointerUp)
       }
+
+      addPointer(event)
 
       if (event.pointerType === 'touch') {
         onTouchStart(event)
