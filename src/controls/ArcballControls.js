@@ -189,6 +189,8 @@ class ArcballControls extends Object3D {
 
     //trackball parameters
     this.target = new Vector3(0, 0, 0)
+    this._prevTarget = new Vector3(0, 0, 0)
+
     this._tbRadius = 1
 
     //FSA
@@ -521,9 +523,9 @@ class ArcballControls extends Object3D {
                   .add(this._gizmos.position)
               }
 
-              this.applyTransformMatrix(this.scale(size, scalePoint))
+              this.applyTransformMatrix(this.setScale(size, scalePoint))
             } else {
-              this.applyTransformMatrix(this.scale(size, this._gizmos.position))
+              this.applyTransformMatrix(this.setScale(size, this._gizmos.position))
             }
 
             if (this._grid != null) {
@@ -590,7 +592,7 @@ class ArcballControls extends Object3D {
               size = x / newDistance
 
               this.setFov(newFov)
-              this.applyTransformMatrix(this.scale(size, this._gizmos.position, false))
+              this.applyTransformMatrix(this.setScale(size, this._gizmos.position, false))
             }
 
             if (this._grid != null) {
@@ -838,7 +840,7 @@ class ArcballControls extends Object3D {
                 size = Math.pow(this.scaleFactor, movement * screenNotches)
               }
 
-              this.applyTransformMatrix(this.scale(size, this._gizmos.position))
+              this.applyTransformMatrix(this.setScale(size, this._gizmos.position))
             }
           }
 
@@ -896,7 +898,7 @@ class ArcballControls extends Object3D {
               this._v3_2.setFromMatrixPosition(this._gizmoMatrixState)
 
               this.setFov(newFov)
-              this.applyTransformMatrix(this.scale(size, this._v3_2, false))
+              this.applyTransformMatrix(this.setScale(size, this._v3_2, false))
 
               //adjusting distance
               const direction = this._gizmos.position
@@ -1140,7 +1142,7 @@ class ArcballControls extends Object3D {
         }
       }
 
-      this.applyTransformMatrix(this.scale(amount, scalePoint))
+      this.applyTransformMatrix(this.setScale(amount, scalePoint))
       this.dispatchEvent(_changeEvent)
     }
   }
@@ -1230,7 +1232,7 @@ class ArcballControls extends Object3D {
       this._v3_2.setFromMatrixPosition(this._gizmoMatrixState)
 
       this.setFov(newFov)
-      this.applyTransformMatrix(this.scale(size, this._v3_2, false))
+      this.applyTransformMatrix(this.setScale(size, this._v3_2, false))
 
       //adjusting distance
       const direction = this._gizmos.position
@@ -1599,7 +1601,7 @@ class ArcballControls extends Object3D {
 
     //apply zoom
     if (this.enableZoom) {
-      this.applyTransformMatrix(this.scale(size, this._gizmos.position))
+      this.applyTransformMatrix(this.setScale(size, this._gizmos.position))
     }
 
     this._gizmoMatrixState.copy(gizmoStateTemp)
@@ -2094,7 +2096,7 @@ class ArcballControls extends Object3D {
    * @param {Boolean} scaleGizmos If gizmos should be scaled (Perspective only)
    * @returns {Object} Object with 'camera' and 'gizmo' fields containing transformation matrices resulting from the operation to be applied to the camera and gizmos
    */
-  scale = (size, point, scaleGizmos = true) => {
+  setScale = (size, point, scaleGizmos = true) => {
     const scalePoint = point.clone()
     let sizeInverse = 1 / size
 
@@ -2191,21 +2193,6 @@ class ArcballControls extends Object3D {
       this.camera.fov = MathUtils.clamp(value, this.minFov, this.maxFov)
       this.camera.updateProjectionMatrix()
     }
-  }
-
-  /**
-   * Set the trackball's center point
-   * @param {Number} x X coordinate
-   * @param {Number} y Y coordinate
-   * @param {Number} z Z coordinate
-   */
-  setTarget = (x, y, z) => {
-    this.target.set(x, y, z)
-    this._gizmos.position.set(x, y, z) //for correct radius calculation
-    this._tbRadius = this.calculateTbRadius(this.camera)
-
-    this.makeGizmos(this.target, this._tbRadius)
-    this.camera.lookAt(this.target)
   }
 
   /**
@@ -2497,12 +2484,23 @@ class ArcballControls extends Object3D {
   update = () => {
     const EPS = 0.000001
 
+    if (
+      this.target.x !== this._prevTarget.x ||
+      this.target.y !== this._prevTarget.y ||
+      this.target.z !== this._prevTarget.z
+    ) {
+      this._gizmos.position.set(this.target.x, this.target.y, this.target.z) //for correct radius calculation
+      this._tbRadius = this.calculateTbRadius(this.camera)
+      this.makeGizmos(this.target, this._tbRadius)
+      this._prevTarget.copy(this.target)
+    }
+
     //check min/max parameters
     if (this.camera.isOrthographicCamera) {
       //check zoom
       if (this.camera.zoom > this.maxZoom || this.camera.zoom < this.minZoom) {
         const newZoom = MathUtils.clamp(this.camera.zoom, this.minZoom, this.maxZoom)
-        this.applyTransformMatrix(this.scale(newZoom / this.camera.zoom, this._gizmos.position, true))
+        this.applyTransformMatrix(this.setScale(newZoom / this.camera.zoom, this._gizmos.position, true))
       }
     } else if (this.camera.isPerspectiveCamera) {
       //check distance
@@ -2510,7 +2508,7 @@ class ArcballControls extends Object3D {
 
       if (distance > this.maxDistance + EPS || distance < this.minDistance - EPS) {
         const newDistance = MathUtils.clamp(distance, this.minDistance, this.maxDistance)
-        this.applyTransformMatrix(this.scale(newDistance / distance, this._gizmos.position))
+        this.applyTransformMatrix(this.setScale(newDistance / distance, this._gizmos.position))
         this.updateMatrixState()
       }
 
