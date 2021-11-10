@@ -189,7 +189,7 @@ class ArcballControls extends EventDispatcher {
 
     //trackball parameters
     this.target = new Vector3(0, 0, 0)
-    this._prevTarget = new Vector3(0, 0, 0)
+    this._currentTarget = new Vector3(0, 0, 0)
 
     this._tbRadius = 1
 
@@ -2484,15 +2484,12 @@ class ArcballControls extends EventDispatcher {
   update = () => {
     const EPS = 0.000001
 
-    if (
-      this.target.x !== this._prevTarget.x ||
-      this.target.y !== this._prevTarget.y ||
-      this.target.z !== this._prevTarget.z
-    ) {
+    // Update target and gizmos state
+    if (!this.target.equals(this._currentTarget)) {
       this._gizmos.position.set(this.target.x, this.target.y, this.target.z) //for correct radius calculation
       this._tbRadius = this.calculateTbRadius(this.camera)
       this.makeGizmos(this.target, this._tbRadius)
-      this._prevTarget.copy(this.target)
+      this._currentTarget.copy(this.target)
     }
 
     //check min/max parameters
