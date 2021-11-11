@@ -297,7 +297,7 @@ class TransformControls<TCamera extends Camera = Camera> extends Object3D {
       }
 
       this.dragging = true
-      this.mouseDownEvent.type = this.mode
+      this.mouseDownEvent.mode = this.mode
       this.dispatchEvent(this.mouseDownEvent)
     }
   }
