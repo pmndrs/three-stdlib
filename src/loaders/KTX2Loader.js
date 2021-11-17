@@ -38,6 +38,9 @@ const KTX2_ALPHA_PREMULTIPLIED = 1
 const _taskCache = new WeakMap()
 
 let _activeLoaders = 0
+let _workerPool = null
+let jsContent = null
+let binaryContent = null
 
 class KTX2Loader extends Loader {
   constructor(manager) {
@@ -47,7 +50,7 @@ class KTX2Loader extends Loader {
     this.transcoderBinary = null
     this.transcoderPending = null
 
-    this.workerPool = new WorkerPool()
+    this.workerPool = _workerPool = _workerPool || new WorkerPool()
     this.workerSourceURL = ''
     this.workerConfig = null
 
@@ -95,18 +98,20 @@ class KTX2Loader extends Loader {
 
   init() {
     if (!this.transcoderPending) {
-      // Load transcoder wrapper.
-      const jsLoader = new FileLoader(this.manager)
-      jsLoader.setPath(this.transcoderPath)
-      jsLoader.setWithCredentials(this.withCredentials)
-      const jsContent = jsLoader.loadAsync('basis_transcoder.js')
+      if (_activeLoaders === 0) {
+        // Load transcoder wrapper.
+        const jsLoader = new FileLoader(this.manager)
+        jsLoader.setPath(this.transcoderPath)
+        jsLoader.setWithCredentials(this.withCredentials)
+        jsContent = jsLoader.loadAsync('basis_transcoder.js')
 
-      // Load transcoder WASM binary.
-      const binaryLoader = new FileLoader(this.manager)
-      binaryLoader.setPath(this.transcoderPath)
-      binaryLoader.setResponseType('arraybuffer')
-      binaryLoader.setWithCredentials(this.withCredentials)
-      const binaryContent = binaryLoader.loadAsync('basis_transcoder.wasm')
+        // Load transcoder WASM binary.
+        const binaryLoader = new FileLoader(this.manager)
+        binaryLoader.setPath(this.transcoderPath)
+        binaryLoader.setResponseType('arraybuffer')
+        binaryLoader.setWithCredentials(this.withCredentials)
+        binaryContent = binaryLoader.loadAsync('basis_transcoder.wasm')
+      }
 
       this.transcoderPending = Promise.all([jsContent, binaryContent]).then(([jsContent, binaryContent]) => {
         const fn = KTX2Loader.BasisWorker.toString()
@@ -125,24 +130,26 @@ class KTX2Loader extends Loader {
         this.workerSourceURL = URL.createObjectURL(new Blob([body]))
         this.transcoderBinary = binaryContent
 
-        this.workerPool.setWorkerCreator(() => {
-          const worker = new Worker(this.workerSourceURL)
-          const transcoderBinary = this.transcoderBinary.slice(0)
+        if (_activeLoaders === 0) {
+          this.workerPool.setWorkerCreator(() => {
+            const worker = new Worker(this.workerSourceURL)
+            const transcoderBinary = this.transcoderBinary.slice(0)
 
-          worker.postMessage({ type: 'init', config: this.workerConfig, transcoderBinary }, [transcoderBinary])
+            worker.postMessage({ type: 'init', config: this.workerConfig, transcoderBinary }, [transcoderBinary])
 
-          return worker
-        })
+            return worker
+          })
+        }
       })
 
-      if (_activeLoaders > 0) {
-        // Each instance loads a transcoder and allocates workers, increasing network and memory cost.
+      // if (_activeLoaders > 0) {
+      //   // Each instance loads a transcoder and allocates workers, increasing network and memory cost.
 
-        console.warn(
-          'THREE.KTX2Loader: Multiple active KTX2 loaders may cause performance issues.' +
-            ' Use a single KTX2Loader instance, or call .dispose() on old instances.',
-        )
-      }
+      //   console.warn(
+      //     'THREE.KTX2Loader: Multiple active KTX2 loaders may cause performance issues.' +
+      //       ' Use a single KTX2Loader instance, or call .dispose() on old instances.',
+      //   )
+      // }
 
       _activeLoaders++
     }
@@ -226,9 +233,11 @@ class KTX2Loader extends Loader {
 
   dispose() {
     URL.revokeObjectURL(this.workerSourceURL)
-    this.workerPool.dispose()
 
     _activeLoaders--
+    if (_activeLoaders === 0) {
+      this.workerPool.dispose()
+    }
 
     return this
   }
