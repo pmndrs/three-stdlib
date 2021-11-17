@@ -130,16 +130,14 @@ class KTX2Loader extends Loader {
         this.workerSourceURL = URL.createObjectURL(new Blob([body]))
         this.transcoderBinary = binaryContent
 
-        if (_activeLoaders === 0) {
-          this.workerPool.setWorkerCreator(() => {
-            const worker = new Worker(this.workerSourceURL)
-            const transcoderBinary = this.transcoderBinary.slice(0)
+        this.workerPool.setWorkerCreator(() => {
+          const worker = new Worker(this.workerSourceURL)
+          const transcoderBinary = this.transcoderBinary.slice(0)
 
-            worker.postMessage({ type: 'init', config: this.workerConfig, transcoderBinary }, [transcoderBinary])
+          worker.postMessage({ type: 'init', config: this.workerConfig, transcoderBinary }, [transcoderBinary])
 
-            return worker
-          })
-        }
+          return worker
+        })
       })
 
       // if (_activeLoaders > 0) {
