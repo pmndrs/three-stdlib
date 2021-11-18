@@ -14,7 +14,27 @@ import {
   Vector3,
   Matrix4,
   MathUtils,
+  Camera,
+  Scene,
+  PerspectiveCamera,
+  OrthographicCamera,
+  Mesh,
+  Material,
 } from 'three'
+
+type Operation = 'PAN' | 'ROTATE' | 'ZOOM' | 'FOV'
+type MouseButtonType = number | 'WHEEL'
+type ModifierKey = 'CTRL' | 'SHIFT'
+type MouseAction = {
+  operation: Operation
+  mouse: MouseButtonType
+  key: ModifierKey | null
+}
+
+type Transformation = {
+  camera: Matrix4 | null
+  gizmos: Matrix4 | null
+}
 
 //trackball state
 const STATE = {
@@ -46,7 +66,7 @@ const _center = {
 }
 
 //transformation matrices for gizmos and camera
-const _transformation = {
+const _transformation: Transformation = {
   camera: new Matrix4(),
   gizmos: new Matrix4(),
 }
@@ -63,7 +83,121 @@ const _endEvent = { type: 'end' }
  * @param {Scene} scene The scene to be rendered
  */
 class ArcballControls extends Object3D {
-  constructor(camera, domElement, scene = null) {
+  private camera: Camera | null
+  private domElement: HTMLElement
+  private scene: Scene | null | undefined
+
+  private mouseActions: (MouseAction & { state: Symbol })[]
+  private _mouseOp: Operation | null
+
+  private _v2_1: Vector2
+  private _v3_1: Vector3
+  private _v3_2: Vector3
+
+  private _m4_1: Matrix4
+  private _m4_2: Matrix4
+
+  private _quat: Quaternion
+
+  private _translationMatrix: Matrix4
+  private _rotationMatrix: Matrix4
+  private _scaleMatrix: Matrix4
+
+  private _rotationAxis: Vector3
+
+  private _cameraMatrixState: Matrix4
+  private _cameraProjectionState: Matrix4
+
+  private _fovState: number
+  private _upState: Vector3
+  private _zoomState: number
+  private _nearPos: number
+  private _farPos: number
+
+  private _gizmoMatrixState: Matrix4
+
+  private _up0: Vector3
+  private _zoom0: number
+  private _fov0: number
+  private _initialNear: number
+  private _nearPos0: number
+  private _initialFar: number
+  private _farPos0: number
+  private _cameraMatrixState0: Matrix4
+  private _gizmoMatrixState0: Matrix4
+
+  private _button: MouseButtonType
+  private _touchStart: PointerEvent[]
+  private _touchCurrent: PointerEvent[]
+  private _input: Symbol
+
+  private _switchSensibility: number
+  private _startFingerDistance: number
+  private _currentFingerDistance: number
+  private _startFingerRotation: number
+  private _currentFingerRotation: number
+
+  private _devPxRatio: number
+  private _downValid: boolean
+  private _nclicks: number
+  private _downEvents: PointerEvent[]
+  private _downStart: number
+  private _clickStart: number
+  private _maxDownTime: number
+  private _maxInterval: number
+  private _posThreshold: number
+  private _movementThreshold: number
+
+  private _currentCursorPosition: Vector3
+  private _startCursorPosition: Vector3
+
+  private _grid: GridHelper | null
+  private _gridPosition: Vector3
+
+  private _gizmos: Group
+  private _curvePts: number
+
+  private _timeStart: number
+  private _animationId: number
+
+  public focusAnimationTime: number
+
+  private _timePrev: number
+  private _timeCurrent: number
+  private _anglePrev: number
+  private _angleCurrent: number
+  private _cursorPosPrev: Vector3
+  private _cursorPosCurr: Vector3
+  private _wPrev: number
+  private _wCurr: number
+
+  public adjustNearFar: boolean
+  public scaleFactor: number
+  public dampingFactor: number
+  public wMax: number
+  public enableAnimations: boolean
+  public enableGrid: boolean
+  public cursorZoom: boolean
+  public minFov: number
+  public maxFov: number
+
+  public enabled: boolean
+  public enablePan: boolean
+  public enableRotate: boolean
+  public enableZoom: boolean
+  public enableGizmos: boolean
+
+  public minDistance: number
+  public maxDistance: number
+  public minZoom: number
+  public maxZoom: number
+
+  private _tbCenter: Vector3
+  private _tbRadius: number
+
+  private _state: Symbol
+
+  constructor(camera: Camera | null, domElement: HTMLElement, scene: Scene | null | undefined = null) {
     super()
     this.camera = null
     this.domElement = domElement
@@ -217,23 +351,32 @@ class ArcballControls extends Object3D {
 
   //listeners
 
-  onWindowResize = () => {
+  private onWindowResize = (): void => {
     const scale = (this._gizmos.scale.x + this._gizmos.scale.y + this._gizmos.scale.z) / 3
-    this._tbRadius = this.calculateTbRadius(this.camera)
+    if (this.camera !== null) {
+      const tbRadius = this.calculateTbRadius(this.camera)
+      if (tbRadius !== undefined) {
+        this._tbRadius = tbRadius
+      }
+    }
 
     const newRadius = this._tbRadius / scale
+    // @ts-expect-error
     const curve = new EllipseCurve(0, 0, newRadius, newRadius)
     const points = curve.getPoints(this._curvePts)
     const curveGeometry = new BufferGeometry().setFromPoints(points)
 
     for (const gizmo in this._gizmos.children) {
-      this._gizmos.children[gizmo].geometry = curveGeometry
+      const child = this._gizmos.children[gizmo]
+      if (child instanceof Mesh) {
+        child.geometry = curveGeometry
+      }
     }
 
     this.dispatchEvent(_changeEvent)
   }
 
-  onContextMenu = (event) => {
+  private onContextMenu = (event: MouseEvent): void => {
     if (!this.enabled) {
       return
     }
@@ -247,13 +390,13 @@ class ArcballControls extends Object3D {
     }
   }
 
-  onPointerCancel = () => {
+  private onPointerCancel = (): void => {
     this._touchStart.splice(0, this._touchStart.length)
     this._touchCurrent.splice(0, this._touchCurrent.length)
     this._input = INPUT.NONE
   }
 
-  onPointerDown = (event) => {
+  private onPointerDown = (event: PointerEvent): void => {
     if (event.button == 0 && event.isPrimary) {
       this._downValid = true
       this._downEvents.push(event)
@@ -291,11 +434,11 @@ class ArcballControls extends Object3D {
         case INPUT.TWO_FINGER:
           //multipleStart
           this._input = INPUT.MULT_FINGER
-          this.onTriplePanStart(event)
+          this.onTriplePanStart()
           break
       }
     } else if (event.pointerType != 'touch' && this._input == INPUT.NONE) {
-      let modifier = null
+      let modifier: ModifierKey | null = null
 
       if (event.ctrlKey || event.metaKey) {
         modifier = 'CTRL'
@@ -316,7 +459,7 @@ class ArcballControls extends Object3D {
     }
   }
 
-  onPointerMove = (event) => {
+  private onPointerMove = (event: PointerEvent): void => {
     if (event.pointerType == 'touch' && this._input != INPUT.CURSOR) {
       switch (this._input) {
         case INPUT.ONE_FINGER:
@@ -354,11 +497,11 @@ class ArcballControls extends Object3D {
           //multMove
           this.updateTouchEvent(event)
 
-          this.onTriplePanMove(event)
+          this.onTriplePanMove()
           break
       }
     } else if (event.pointerType != 'touch' && this._input == INPUT.CURSOR) {
-      let modifier = null
+      let modifier: ModifierKey | null = null
 
       if (event.ctrlKey || event.metaKey) {
         modifier = 'CTRL'
@@ -383,7 +526,7 @@ class ArcballControls extends Object3D {
     }
   }
 
-  onPointerUp = (event) => {
+  private onPointerUp = (event: PointerEvent): void => {
     if (event.pointerType == 'touch' && this._input != INPUT.CURSOR) {
       const nTouch = this._touchCurrent.length
 
@@ -409,9 +552,9 @@ class ArcballControls extends Object3D {
 
         case INPUT.TWO_FINGER:
           //doubleEnd
-          this.onDoublePanEnd(event)
-          this.onPinchEnd(event)
-          this.onRotateEnd(event)
+          this.onDoublePanEnd()
+          this.onPinchEnd()
+          this.onRotateEnd()
 
           //switching to singleStart
           this._input = INPUT.ONE_FINGER_SWITCHED
@@ -477,9 +620,9 @@ class ArcballControls extends Object3D {
     }
   }
 
-  onWheel = (event) => {
+  private onWheel = (event: WheelEvent): void => {
     if (this.enabled && this.enableZoom) {
-      let modifier = null
+      let modifier: ModifierKey | null = null
 
       if (event.ctrlKey || event.metaKey) {
         modifier = 'CTRL'
@@ -517,18 +660,18 @@ class ArcballControls extends Object3D {
             if (this.cursorZoom && this.enablePan) {
               let scalePoint
 
-              if (this.camera.isOrthographicCamera) {
+              if (this.camera instanceof OrthographicCamera && this.camera.isOrthographicCamera) {
                 scalePoint = this.unprojectOnTbPlane(this.camera, event.clientX, event.clientY, this.domElement)
-                  .applyQuaternion(this.camera.quaternion)
+                  ?.applyQuaternion(this.camera.quaternion)
                   .multiplyScalar(1 / this.camera.zoom)
                   .add(this._gizmos.position)
-              } else if (this.camera.isPerspectiveCamera) {
+              } else if (this.camera instanceof PerspectiveCamera && this.camera.isPerspectiveCamera) {
                 scalePoint = this.unprojectOnTbPlane(this.camera, event.clientX, event.clientY, this.domElement)
-                  .applyQuaternion(this.camera.quaternion)
+                  ?.applyQuaternion(this.camera.quaternion)
                   .add(this._gizmos.position)
               }
 
-              this.applyTransformMatrix(this.scale(size, scalePoint))
+              if (scalePoint !== undefined) this.applyTransformMatrix(this.scale(size, scalePoint))
             } else {
               this.applyTransformMatrix(this.scale(size, this._gizmos.position))
             }
@@ -546,7 +689,7 @@ class ArcballControls extends Object3D {
             break
 
           case 'FOV':
-            if (this.camera.isPerspectiveCamera) {
+            if (this.camera instanceof PerspectiveCamera && this.camera.isPerspectiveCamera) {
               this.updateTbState(STATE.FOV, true)
 
               //Vertigo effect
@@ -616,7 +759,7 @@ class ArcballControls extends Object3D {
     }
   }
 
-  onKeyDown = (event) => {
+  private onKeyDown = (event: KeyboardEvent): void => {
     if (event.key == 'c') {
       if (event.ctrlKey || event.metaKey) {
         this.copyState()
@@ -628,7 +771,7 @@ class ArcballControls extends Object3D {
     }
   }
 
-  onSinglePanStart = (event, operation) => {
+  private onSinglePanStart = (event: PointerEvent, operation: Operation): void => {
     if (this.enabled) {
       this.dispatchEvent(_startEvent)
 
@@ -649,11 +792,16 @@ class ArcballControls extends Object3D {
             this.dispatchEvent(_changeEvent)
           }
 
-          this.updateTbState(STATE.PAN, true)
-          this._startCursorPosition.copy(this.unprojectOnTbPlane(this.camera, _center.x, _center.y, this.domElement))
-          if (this.enableGrid) {
-            this.drawGrid()
-            this.dispatchEvent(_changeEvent)
+          if (this.camera !== null) {
+            this.updateTbState(STATE.PAN, true)
+            const rayDir = this.unprojectOnTbPlane(this.camera, _center.x, _center.y, this.domElement)
+            if (rayDir !== undefined) {
+              this._startCursorPosition.copy(rayDir)
+            }
+            if (this.enableGrid) {
+              this.drawGrid()
+              this.dispatchEvent(_changeEvent)
+            }
           }
 
           break
@@ -669,25 +817,28 @@ class ArcballControls extends Object3D {
             this._timeStart = -1
           }
 
-          this.updateTbState(STATE.ROTATE, true)
-          this._startCursorPosition.copy(
-            this.unprojectOnTbSurface(this.camera, _center.x, _center.y, this.domElement, this._tbRadius),
-          )
-          this.activateGizmos(true)
-          if (this.enableAnimations) {
-            this._timePrev = this._timeCurrent = performance.now()
-            this._angleCurrent = this._anglePrev = 0
-            this._cursorPosPrev.copy(this._startCursorPosition)
-            this._cursorPosCurr.copy(this._cursorPosPrev)
-            this._wCurr = 0
-            this._wPrev = this._wCurr
+          if (this.camera !== null) {
+            this.updateTbState(STATE.ROTATE, true)
+            const rayDir = this.unprojectOnTbSurface(this.camera, _center.x, _center.y, this.domElement, this._tbRadius)
+            if (rayDir !== undefined) {
+              this._startCursorPosition.copy(rayDir)
+            }
+            this.activateGizmos(true)
+            if (this.enableAnimations) {
+              this._timePrev = this._timeCurrent = performance.now()
+              this._angleCurrent = this._anglePrev = 0
+              this._cursorPosPrev.copy(this._startCursorPosition)
+              this._cursorPosCurr.copy(this._cursorPosPrev)
+              this._wCurr = 0
+              this._wPrev = this._wCurr
+            }
           }
 
           this.dispatchEvent(_changeEvent)
           break
 
         case 'FOV':
-          if (!this.camera.isPerspectiveCamera || !this.enableZoom) {
+          if (!(this.camera instanceof PerspectiveCamera && this.camera.isPerspectiveCamera) || !this.enableZoom) {
             return
           }
 
@@ -727,14 +878,14 @@ class ArcballControls extends Object3D {
     }
   }
 
-  onSinglePanMove = (event, opState) => {
+  private onSinglePanMove = (event: PointerEvent, opState: Symbol): void => {
     if (this.enabled) {
       const restart = opState != this._state
       this.setCenter(event.clientX, event.clientY)
 
       switch (opState) {
         case STATE.PAN:
-          if (this.enablePan) {
+          if (this.enablePan && this.camera !== null) {
             if (restart) {
               //switch to pan operation
 
@@ -742,9 +893,10 @@ class ArcballControls extends Object3D {
               this.dispatchEvent(_startEvent)
 
               this.updateTbState(opState, true)
-              this._startCursorPosition.copy(
-                this.unprojectOnTbPlane(this.camera, _center.x, _center.y, this.domElement),
-              )
+              const rayDir = this.unprojectOnTbPlane(this.camera, _center.x, _center.y, this.domElement)
+              if (rayDir !== undefined) {
+                this._startCursorPosition.copy(rayDir)
+              }
               if (this.enableGrid) {
                 this.drawGrid()
               }
@@ -752,9 +904,10 @@ class ArcballControls extends Object3D {
               this.activateGizmos(false)
             } else {
               //continue with pan operation
-              this._currentCursorPosition.copy(
-                this.unprojectOnTbPlane(this.camera, _center.x, _center.y, this.domElement),
-              )
+              const rayDir = this.unprojectOnTbPlane(this.camera, _center.x, _center.y, this.domElement)
+              if (rayDir !== undefined) {
+                this._currentCursorPosition.copy(rayDir)
+              }
               this.applyTransformMatrix(this.pan(this._startCursorPosition, this._currentCursorPosition))
             }
           }
@@ -762,7 +915,7 @@ class ArcballControls extends Object3D {
           break
 
         case STATE.ROTATE:
-          if (this.enableRotate) {
+          if (this.enableRotate && this.camera !== null) {
             if (restart) {
               //switch to rotate operation
 
@@ -770,9 +923,16 @@ class ArcballControls extends Object3D {
               this.dispatchEvent(_startEvent)
 
               this.updateTbState(opState, true)
-              this._startCursorPosition.copy(
-                this.unprojectOnTbSurface(this.camera, _center.x, _center.y, this.domElement, this._tbRadius),
+              const rayDir = this.unprojectOnTbSurface(
+                this.camera,
+                _center.x,
+                _center.y,
+                this.domElement,
+                this._tbRadius,
               )
+              if (rayDir !== undefined) {
+                this._startCursorPosition.copy(rayDir)
+              }
 
               if (this.enableGrid) {
                 this.disposeGrid()
@@ -781,9 +941,16 @@ class ArcballControls extends Object3D {
               this.activateGizmos(true)
             } else {
               //continue with rotate operation
-              this._currentCursorPosition.copy(
-                this.unprojectOnTbSurface(this.camera, _center.x, _center.y, this.domElement, this._tbRadius),
+              const rayDir = this.unprojectOnTbSurface(
+                this.camera,
+                _center.x,
+                _center.y,
+                this.domElement,
+                this._tbRadius,
               )
+              if (rayDir !== undefined) {
+                this._currentCursorPosition.copy(rayDir)
+              }
 
               const distance = this._startCursorPosition.distanceTo(this._currentCursorPosition)
               const angle = this._startCursorPosition.angleTo(this._currentCursorPosition)
@@ -852,7 +1019,7 @@ class ArcballControls extends Object3D {
           break
 
         case STATE.FOV:
-          if (this.enableZoom && this.camera.isPerspectiveCamera) {
+          if (this.enableZoom && this.camera instanceof PerspectiveCamera && this.camera.isPerspectiveCamera) {
             if (restart) {
               //switch to fov operation
 
@@ -922,7 +1089,7 @@ class ArcballControls extends Object3D {
     }
   }
 
-  onSinglePanEnd = () => {
+  private onSinglePanEnd = (): void => {
     if (this._state == STATE.ROTATE) {
       if (!this.enableRotate) {
         return
@@ -966,8 +1133,8 @@ class ArcballControls extends Object3D {
     this.dispatchEvent(_endEvent)
   }
 
-  onDoubleTap = (event) => {
-    if (this.enabled && this.enablePan && this.scene != null) {
+  private onDoubleTap = (event: PointerEvent): void => {
+    if (this.enabled && this.enablePan && this.scene != null && this.camera !== null) {
       this.dispatchEvent(_startEvent)
 
       this.setCenter(event.clientX, event.clientY)
@@ -995,8 +1162,8 @@ class ArcballControls extends Object3D {
     this.dispatchEvent(_endEvent)
   }
 
-  onDoublePanStart = () => {
-    if (this.enabled && this.enablePan) {
+  private onDoublePanStart = (): void => {
+    if (this.enabled && this.enablePan && this.camera !== null) {
       this.dispatchEvent(_startEvent)
 
       this.updateTbState(STATE.PAN, true)
@@ -1005,15 +1172,19 @@ class ArcballControls extends Object3D {
         (this._touchCurrent[0].clientX + this._touchCurrent[1].clientX) / 2,
         (this._touchCurrent[0].clientY + this._touchCurrent[1].clientY) / 2,
       )
-      this._startCursorPosition.copy(this.unprojectOnTbPlane(this.camera, _center.x, _center.y, this.domElement, true))
+
+      const rayDir = this.unprojectOnTbPlane(this.camera, _center.x, _center.y, this.domElement, true)
+      if (rayDir !== undefined) {
+        this._startCursorPosition.copy(rayDir)
+      }
       this._currentCursorPosition.copy(this._startCursorPosition)
 
       this.activateGizmos(false)
     }
   }
 
-  onDoublePanMove = () => {
-    if (this.enabled && this.enablePan) {
+  private onDoublePanMove = (): void => {
+    if (this.enabled && this.enablePan && this.camera !== null) {
       this.setCenter(
         (this._touchCurrent[0].clientX + this._touchCurrent[1].clientX) / 2,
         (this._touchCurrent[0].clientY + this._touchCurrent[1].clientY) / 2,
@@ -1024,20 +1195,19 @@ class ArcballControls extends Object3D {
         this._startCursorPosition.copy(this._currentCursorPosition)
       }
 
-      this._currentCursorPosition.copy(
-        this.unprojectOnTbPlane(this.camera, _center.x, _center.y, this.domElement, true),
-      )
+      const rayDir = this.unprojectOnTbPlane(this.camera, _center.x, _center.y, this.domElement, true)
+      if (rayDir !== undefined) this._currentCursorPosition.copy(rayDir)
       this.applyTransformMatrix(this.pan(this._startCursorPosition, this._currentCursorPosition, true))
       this.dispatchEvent(_changeEvent)
     }
   }
 
-  onDoublePanEnd = () => {
+  private onDoublePanEnd = (): void => {
     this.updateTbState(STATE.IDLE, false)
     this.dispatchEvent(_endEvent)
   }
 
-  onRotateStart = () => {
+  private onRotateStart = (): void => {
     if (this.enabled && this.enableRotate) {
       this.dispatchEvent(_startEvent)
 
@@ -1050,7 +1220,7 @@ class ArcballControls extends Object3D {
         this.getAngle(this._touchStart[1], this._touchStart[0])
       this._currentFingerRotation = this._startFingerRotation
 
-      this.camera.getWorldDirection(this._rotationAxis) //rotation axis
+      this.camera?.getWorldDirection(this._rotationAxis) //rotation axis
 
       if (!this.enablePan && !this.enableZoom) {
         this.activateGizmos(true)
@@ -1058,8 +1228,8 @@ class ArcballControls extends Object3D {
     }
   }
 
-  onRotateMove = () => {
-    if (this.enabled && this.enableRotate) {
+  private onRotateMove = (): void => {
+    if (this.enabled && this.enableRotate && this.camera !== null) {
       this.setCenter(
         (this._touchCurrent[0].clientX + this._touchCurrent[1].clientX) / 2,
         (this._touchCurrent[0].clientY + this._touchCurrent[1].clientY) / 2,
@@ -1078,28 +1248,30 @@ class ArcballControls extends Object3D {
 
       if (!this.enablePan) {
         rotationPoint = new Vector3().setFromMatrixPosition(this._gizmoMatrixState)
-      } else {
+      } else if (this.camera instanceof PerspectiveCamera || this.camera instanceof OrthographicCamera) {
         this._v3_2.setFromMatrixPosition(this._gizmoMatrixState)
         rotationPoint = this.unprojectOnTbPlane(this.camera, _center.x, _center.y, this.domElement)
-          .applyQuaternion(this.camera.quaternion)
+          ?.applyQuaternion(this.camera.quaternion)
           .multiplyScalar(1 / this.camera.zoom)
           .add(this._v3_2)
       }
 
       const amount = MathUtils.DEG2RAD * (this._startFingerRotation - this._currentFingerRotation)
 
-      this.applyTransformMatrix(this.zRotate(rotationPoint, amount))
+      if (rotationPoint !== undefined) {
+        this.applyTransformMatrix(this.zRotate(rotationPoint, amount))
+      }
       this.dispatchEvent(_changeEvent)
     }
   }
 
-  onRotateEnd = () => {
+  private onRotateEnd = (): void => {
     this.updateTbState(STATE.IDLE, false)
     this.activateGizmos(false)
     this.dispatchEvent(_endEvent)
   }
 
-  onPinchStart = () => {
+  private onPinchStart = (): void => {
     if (this.enabled && this.enableZoom) {
       this.dispatchEvent(_startEvent)
       this.updateTbState(STATE.SCALE, true)
@@ -1111,7 +1283,7 @@ class ArcballControls extends Object3D {
     }
   }
 
-  onPinchMove = () => {
+  private onPinchMove = (): void => {
     if (this.enabled && this.enableZoom) {
       this.setCenter(
         (this._touchCurrent[0].clientX + this._touchCurrent[1].clientX) / 2,
@@ -1135,29 +1307,31 @@ class ArcballControls extends Object3D {
       if (!this.enablePan) {
         scalePoint = this._gizmos.position
       } else {
-        if (this.camera.isOrthographicCamera) {
+        if (this.camera instanceof OrthographicCamera && this.camera.isOrthographicCamera) {
           scalePoint = this.unprojectOnTbPlane(this.camera, _center.x, _center.y, this.domElement)
-            .applyQuaternion(this.camera.quaternion)
+            ?.applyQuaternion(this.camera.quaternion)
             .multiplyScalar(1 / this.camera.zoom)
             .add(this._gizmos.position)
-        } else if (this.camera.isPerspectiveCamera) {
+        } else if (this.camera instanceof PerspectiveCamera && this.camera.isPerspectiveCamera) {
           scalePoint = this.unprojectOnTbPlane(this.camera, _center.x, _center.y, this.domElement)
-            .applyQuaternion(this.camera.quaternion)
+            ?.applyQuaternion(this.camera.quaternion)
             .add(this._gizmos.position)
         }
       }
 
-      this.applyTransformMatrix(this.scale(amount, scalePoint))
+      if (scalePoint !== undefined) {
+        this.applyTransformMatrix(this.scale(amount, scalePoint))
+      }
       this.dispatchEvent(_changeEvent)
     }
   }
 
-  onPinchEnd = () => {
+  private onPinchEnd = (): void => {
     this.updateTbState(STATE.IDLE, false)
     this.dispatchEvent(_endEvent)
   }
 
-  onTriplePanStart = () => {
+  private onTriplePanStart = (): void => {
     if (this.enabled && this.enableZoom) {
       this.dispatchEvent(_startEvent)
 
@@ -1180,8 +1354,8 @@ class ArcballControls extends Object3D {
     }
   }
 
-  onTriplePanMove = () => {
-    if (this.enabled && this.enableZoom) {
+  private onTriplePanMove = (): void => {
+    if (this.enabled && this.enableZoom && this.camera !== null) {
       //	  fov / 2
       //		|\
       //		| \
@@ -1251,7 +1425,7 @@ class ArcballControls extends Object3D {
     }
   }
 
-  onTriplePanEnd = () => {
+  private onTriplePanEnd = (): void => {
     this.updateTbState(STATE.IDLE, false)
     this.dispatchEvent(_endEvent)
     //this.dispatchEvent( _changeEvent );
@@ -1262,7 +1436,7 @@ class ArcballControls extends Object3D {
    * @param {Number} clientX
    * @param {Number} clientY
    */
-  setCenter = (clientX, clientY) => {
+  private setCenter = (clientX: number, clientY: number): void => {
     _center.x = clientX
     _center.y = clientY
   }
@@ -1270,7 +1444,7 @@ class ArcballControls extends Object3D {
   /**
    * Set default mouse actions
    */
-  initializeMouseActions = () => {
+  private initializeMouseActions = (): void => {
     this.setMouseAction('PAN', 0, 'CTRL')
     this.setMouseAction('PAN', 2)
 
@@ -1289,7 +1463,7 @@ class ArcballControls extends Object3D {
    * @param {Object} action2
    * @returns {Boolean} True if action1 and action 2 are the same mouse action, false otherwise
    */
-  compareMouseAction = (action1, action2) => {
+  private compareMouseAction = (action1: MouseAction, action2: MouseAction): boolean => {
     if (action1.operation == action2.operation) {
       if (action1.mouse == action2.mouse && action1.key == action2.key) {
         return true
@@ -1308,7 +1482,7 @@ class ArcballControls extends Object3D {
    * @param {*} key The keyboard modifier ('CTRL', 'SHIFT') or null if key is not needed
    * @returns {Boolean} True if the mouse action has been successfully added, false otherwise
    */
-  setMouseAction = (operation, mouse, key = null) => {
+  private setMouseAction = (operation: Operation, mouse: MouseButtonType, key: ModifierKey | null = null): boolean => {
     const operationInput = ['PAN', 'ROTATE', 'ZOOM', 'FOV']
     const mouseInput = [0, 1, 2, 'WHEEL']
     const keyInput = ['CTRL', 'SHIFT', null]
@@ -1368,7 +1542,7 @@ class ArcballControls extends Object3D {
    * @param {*} key The keyboard modifier ('CTRL', 'SHIFT') or null if key is not needed
    * @returns {Boolean} True if the operation has been succesfully removed, false otherwise
    */
-  unsetMouseAction = (mouse, key = null) => {
+  private unsetMouseAction = (mouse: MouseButtonType, key: ModifierKey | null = null): boolean => {
     for (let i = 0; i < this.mouseActions.length; i++) {
       if (this.mouseActions[i].mouse == mouse && this.mouseActions[i].key == key) {
         this.mouseActions.splice(i, 1)
@@ -1385,7 +1559,7 @@ class ArcballControls extends Object3D {
    * @param {*} key The keyboard modifier ('CTRL', 'SHIFT') or null if key is not needed
    * @returns The operation if it has been found, null otherwise
    */
-  getOpFromAction = (mouse, key) => {
+  private getOpFromAction = (mouse: MouseButtonType, key: ModifierKey | null): Operation | null => {
     let action
 
     for (let i = 0; i < this.mouseActions.length; i++) {
@@ -1413,7 +1587,7 @@ class ArcballControls extends Object3D {
    * @param {String} key Keyboard modifier
    * @returns The FSA state obtained from the operation associated to mouse/keyboard combination
    */
-  getOpStateFromAction = (mouse, key) => {
+  private getOpStateFromAction = (mouse: MouseButtonType, key: ModifierKey | null): Symbol | null => {
     let action
 
     for (let i = 0; i < this.mouseActions.length; i++) {
@@ -1441,7 +1615,7 @@ class ArcballControls extends Object3D {
    * @param {PointerEvent} p2
    * @returns {Number} The angle between two pointers in degrees
    */
-  getAngle = (p1, p2) => {
+  private getAngle = (p1: PointerEvent, p2: PointerEvent): number => {
     return (Math.atan2(p2.clientY - p1.clientY, p2.clientX - p1.clientX) * 180) / Math.PI
   }
 
@@ -1449,7 +1623,7 @@ class ArcballControls extends Object3D {
    * Update a PointerEvent inside current pointerevents array
    * @param {PointerEvent} event
    */
-  updateTouchEvent = (event) => {
+  private updateTouchEvent = (event: PointerEvent): void => {
     for (let i = 0; i < this._touchCurrent.length; i++) {
       if (this._touchCurrent[i].pointerId == event.pointerId) {
         this._touchCurrent.splice(i, 1, event)
@@ -1462,8 +1636,8 @@ class ArcballControls extends Object3D {
    * Apply a transformation matrix, to the camera and gizmos
    * @param {Object} transformation Object containing matrices to apply to camera and gizmos
    */
-  applyTransformMatrix(transformation) {
-    if (transformation.camera != null) {
+  private applyTransformMatrix(transformation: Transformation | undefined): void {
+    if (transformation?.camera != null && this.camera !== null) {
       this._m4_1.copy(this._cameraMatrixState).premultiply(transformation.camera)
       this._m4_1.decompose(this.camera.position, this.camera.quaternion, this.camera.scale)
       this.camera.updateMatrix()
@@ -1474,14 +1648,20 @@ class ArcballControls extends Object3D {
       }
     }
 
-    if (transformation.gizmos != null) {
+    if (transformation?.gizmos != null) {
       this._m4_1.copy(this._gizmoMatrixState).premultiply(transformation.gizmos)
       this._m4_1.decompose(this._gizmos.position, this._gizmos.quaternion, this._gizmos.scale)
       this._gizmos.updateMatrix()
     }
 
-    if (this._state == STATE.SCALE || this._state == STATE.FOCUS || this._state == STATE.ANIMATION_FOCUS) {
-      this._tbRadius = this.calculateTbRadius(this.camera)
+    if (
+      (this._state == STATE.SCALE || this._state == STATE.FOCUS || this._state == STATE.ANIMATION_FOCUS) &&
+      (this.camera instanceof PerspectiveCamera || this.camera instanceof OrthographicCamera)
+    ) {
+      const tbRadius = this.calculateTbRadius(this.camera)
+      if (tbRadius !== undefined) {
+        this._tbRadius = tbRadius
+      }
 
       if (this.adjustNearFar) {
         const cameraDistance = this.camera.position.distanceTo(this._gizmos.position)
@@ -1531,7 +1711,7 @@ class ArcballControls extends Object3D {
    * @param {Number} t0 Initial time in milliseconds
    * @param {Number} t1 Ending time in milliseconds
    */
-  calculateAngularSpeed = (p0, p1, t0, t1) => {
+  private calculateAngularSpeed = (p0: number, p1: number, t0: number, t1: number): number => {
     const s = p1 - p0
     const t = (t1 - t0) / 1000
     if (t == 0) {
@@ -1547,7 +1727,7 @@ class ArcballControls extends Object3D {
    * @param {PointerEvent} p1 The second pointer
    * @returns {number} The distance between the two pointers
    */
-  calculatePointersDistance = (p0, p1) => {
+  private calculatePointersDistance = (p0: PointerEvent, p1: PointerEvent): number => {
     return Math.sqrt(Math.pow(p1.clientX - p0.clientX, 2) + Math.pow(p1.clientY - p0.clientY, 2))
   }
 
@@ -1557,7 +1737,7 @@ class ArcballControls extends Object3D {
    * @param {Vector3} vec2 The second vector
    * @returns {Vector3} The normalized rotation axis
    */
-  calculateRotationAxis = (vec1, vec2) => {
+  private calculateRotationAxis = (vec1: Vector3, vec2: Vector3): Vector3 => {
     this._rotationMatrix.extractRotation(this._cameraMatrixState)
     this._quat.setFromRotationMatrix(this._rotationMatrix)
 
@@ -1570,15 +1750,15 @@ class ArcballControls extends Object3D {
    * @param {Camera} camera
    * @returns {Number} The trackball radius
    */
-  calculateTbRadius = (camera) => {
+  private calculateTbRadius = (camera: Camera): number | undefined => {
     const factor = 0.67
     const distance = camera.position.distanceTo(this._gizmos.position)
 
-    if (camera.type == 'PerspectiveCamera') {
+    if (camera.type == 'PerspectiveCamera' && camera instanceof PerspectiveCamera) {
       const halfFovV = MathUtils.DEG2RAD * camera.fov * 0.5 //vertical fov/2 in radians
       const halfFovH = Math.atan(camera.aspect * Math.tan(halfFovV)) //horizontal fov/2 in radians
       return Math.tan(Math.min(halfFovV, halfFovH)) * distance * factor
-    } else if (camera.type == 'OrthographicCamera') {
+    } else if (camera.type == 'OrthographicCamera' && camera instanceof OrthographicCamera) {
       return Math.min(camera.top, camera.right) * factor
     }
   }
@@ -1589,40 +1769,42 @@ class ArcballControls extends Object3D {
    * @param {Number} size Scale factor
    * @param {Number} amount Amount of operation to be completed (used for focus animations, default is complete full operation)
    */
-  focus = (point, size, amount = 1) => {
-    const focusPoint = point.clone()
+  private focus = (point: Vector3, size: number, amount = 1): void => {
+    if (this.camera !== null) {
+      const focusPoint = point.clone()
 
-    //move center of camera (along with gizmos) towards point of interest
-    focusPoint.sub(this._gizmos.position).multiplyScalar(amount)
-    this._translationMatrix.makeTranslation(focusPoint.x, focusPoint.y, focusPoint.z)
+      //move center of camera (along with gizmos) towards point of interest
+      focusPoint.sub(this._gizmos.position).multiplyScalar(amount)
+      this._translationMatrix.makeTranslation(focusPoint.x, focusPoint.y, focusPoint.z)
 
-    const gizmoStateTemp = this._gizmoMatrixState.clone()
-    this._gizmoMatrixState.premultiply(this._translationMatrix)
-    this._gizmoMatrixState.decompose(this._gizmos.position, this._gizmos.quaternion, this._gizmos.scale)
+      const gizmoStateTemp = this._gizmoMatrixState.clone()
+      this._gizmoMatrixState.premultiply(this._translationMatrix)
+      this._gizmoMatrixState.decompose(this._gizmos.position, this._gizmos.quaternion, this._gizmos.scale)
 
-    const cameraStateTemp = this._cameraMatrixState.clone()
-    this._cameraMatrixState.premultiply(this._translationMatrix)
-    this._cameraMatrixState.decompose(this.camera.position, this.camera.quaternion, this.camera.scale)
+      const cameraStateTemp = this._cameraMatrixState.clone()
+      this._cameraMatrixState.premultiply(this._translationMatrix)
+      this._cameraMatrixState.decompose(this.camera.position, this.camera.quaternion, this.camera.scale)
 
-    //apply zoom
-    if (this.enableZoom) {
-      this.applyTransformMatrix(this.scale(size, this._gizmos.position))
+      //apply zoom
+      if (this.enableZoom) {
+        this.applyTransformMatrix(this.scale(size, this._gizmos.position))
+      }
+
+      this._gizmoMatrixState.copy(gizmoStateTemp)
+      this._cameraMatrixState.copy(cameraStateTemp)
     }
-
-    this._gizmoMatrixState.copy(gizmoStateTemp)
-    this._cameraMatrixState.copy(cameraStateTemp)
   }
 
   /**
    * Draw a grid and add it to the scene
    */
-  drawGrid = () => {
+  private drawGrid = (): void => {
     if (this.scene != null) {
       const color = 0x888888
       const multiplier = 3
       let size, divisions, maxLength, tick
 
-      if (this.camera.isOrthographicCamera) {
+      if (this.camera instanceof OrthographicCamera && this.camera.isOrthographicCamera) {
         const width = this.camera.right - this.camera.left
         const height = this.camera.bottom - this.camera.top
 
@@ -1631,7 +1813,7 @@ class ArcballControls extends Object3D {
 
         size = (maxLength / this.camera.zoom) * multiplier
         divisions = (size / tick) * this.camera.zoom
-      } else if (this.camera.isPerspectiveCamera) {
+      } else if (this.camera instanceof PerspectiveCamera && this.camera.isPerspectiveCamera) {
         const distance = this.camera.position.distanceTo(this._gizmos.position)
         const halfFovV = MathUtils.DEG2RAD * this.camera.fov * 0.5
         const halfFovH = Math.atan(this.camera.aspect * Math.tan(halfFovV))
@@ -1643,7 +1825,7 @@ class ArcballControls extends Object3D {
         divisions = size / tick
       }
 
-      if (this._grid == null) {
+      if (this._grid == null && this.camera !== null) {
         this._grid = new GridHelper(size, divisions, color, color)
         this._grid.position.copy(this._gizmos.position)
         this._gridPosition.copy(this._grid.position)
@@ -1658,7 +1840,7 @@ class ArcballControls extends Object3D {
   /**
    * Remove all listeners, stop animations and clean scene
    */
-  dispose = () => {
+  public dispose = (): void => {
     if (this._animationId != -1) {
       window.cancelAnimationFrame(this._animationId)
     }
@@ -1674,14 +1856,14 @@ class ArcballControls extends Object3D {
     window.removeEventListener('resize', this.onWindowResize)
     window.addEventListener('keydown', this.onKeyDown)
 
-    this.scene.remove(this._gizmos)
+    this.scene?.remove(this._gizmos)
     this.disposeGrid()
   }
 
   /**
    * remove the grid from the scene
    */
-  disposeGrid = () => {
+  private disposeGrid = (): void => {
     if (this._grid != null && this.scene != null) {
       this.scene.remove(this._grid)
       this._grid = null
@@ -1693,7 +1875,7 @@ class ArcballControls extends Object3D {
    * @param {Number} t The absolute progress of the animation in the bound of 0 (beginning of the) and 1 (ending of animation)
    * @returns {Number} Result of easing out cubic at time t
    */
-  easeOutCubic = (t) => {
+  private easeOutCubic = (t: number): number => {
     return 1 - Math.pow(1 - t, 3)
   }
 
@@ -1701,10 +1883,10 @@ class ArcballControls extends Object3D {
    * Make rotation gizmos more or less visible
    * @param {Boolean} isActive If true, make gizmos more visible
    */
-  activateGizmos = (isActive) => {
-    const gizmoX = this._gizmos.children[0]
-    const gizmoY = this._gizmos.children[1]
-    const gizmoZ = this._gizmos.children[2]
+  private activateGizmos = (isActive: boolean): void => {
+    const gizmoX = this._gizmos.children[0] as Mesh<BufferGeometry, Material>
+    const gizmoY = this._gizmos.children[1] as Mesh<BufferGeometry, Material>
+    const gizmoZ = this._gizmos.children[2] as Mesh<BufferGeometry, Material>
 
     if (isActive) {
       gizmoX.material.setValues({ opacity: 1 })
@@ -1724,7 +1906,7 @@ class ArcballControls extends Object3D {
    * @param {HTMLElement} canvas The canvas where the renderer draws its output
    * @returns {Vector2} Cursor normalized position inside the canvas
    */
-  getCursorNDC = (cursorX, cursorY, canvas) => {
+  private getCursorNDC = (cursorX: number, cursorY: number, canvas: HTMLElement): Vector2 => {
     const canvasRect = canvas.getBoundingClientRect()
     this._v2_1.setX(((cursorX - canvasRect.left) / canvasRect.width) * 2 - 1)
     this._v2_1.setY(((canvasRect.bottom - cursorY) / canvasRect.height) * 2 - 1)
@@ -1738,10 +1920,12 @@ class ArcballControls extends Object3D {
    * @param {HTMLElement} canvas The canvas where the renderer draws its output
    * @returns {Vector2} Cursor position inside the canvas
    */
-  getCursorPosition = (cursorX, cursorY, canvas) => {
+  private getCursorPosition = (cursorX: number, cursorY: number, canvas: HTMLElement): Vector2 => {
     this._v2_1.copy(this.getCursorNDC(cursorX, cursorY, canvas))
-    this._v2_1.x *= (this.camera.right - this.camera.left) * 0.5
-    this._v2_1.y *= (this.camera.top - this.camera.bottom) * 0.5
+    if (this.camera instanceof OrthographicCamera) {
+      this._v2_1.x *= (this.camera.right - this.camera.left) * 0.5
+      this._v2_1.y *= (this.camera.top - this.camera.bottom) * 0.5
+    }
     return this._v2_1.clone()
   }
 
@@ -1749,46 +1933,53 @@ class ArcballControls extends Object3D {
    * Set the camera to be controlled
    * @param {Camera} camera The virtual camera to be controlled
    */
-  setCamera = (camera) => {
-    camera.lookAt(this._tbCenter)
-    camera.updateMatrix()
+  private setCamera = (camera: Camera | null): void => {
+    if (camera instanceof PerspectiveCamera || camera instanceof OrthographicCamera) {
+      camera.lookAt(this._tbCenter)
+      camera.updateMatrix()
 
-    //setting state
-    if (camera.type == 'PerspectiveCamera') {
-      this._fov0 = camera.fov
-      this._fovState = camera.fov
+      //setting state
+      if (camera?.type == 'PerspectiveCamera' && camera instanceof PerspectiveCamera) {
+        this._fov0 = camera.fov
+        this._fovState = camera.fov
+      }
+
+      this._cameraMatrixState0.copy(camera.matrix)
+      this._cameraMatrixState.copy(this._cameraMatrixState0)
+      this._cameraProjectionState.copy(camera.projectionMatrix)
+      this._zoom0 = camera.zoom
+      this._zoomState = this._zoom0
+
+      this._initialNear = camera.near
+      this._nearPos0 = camera.position.distanceTo(this._tbCenter) - camera.near
+      this._nearPos = this._initialNear
+
+      this._initialFar = camera.far
+      this._farPos0 = camera.position.distanceTo(this._tbCenter) - camera.far
+      this._farPos = this._initialFar
+
+      this._up0.copy(camera.up)
+      this._upState.copy(camera.up)
+
+      this.camera = camera
+      if (this.camera instanceof PerspectiveCamera || this.camera instanceof OrthographicCamera) {
+        this.camera.updateProjectionMatrix()
+      }
+
+      //making gizmos
+      const tbRadius = this.calculateTbRadius(camera)
+      if (tbRadius !== undefined) {
+        this._tbRadius = tbRadius
+      }
+      this.makeGizmos(this._tbCenter, this._tbRadius)
     }
-
-    this._cameraMatrixState0.copy(camera.matrix)
-    this._cameraMatrixState.copy(this._cameraMatrixState0)
-    this._cameraProjectionState.copy(camera.projectionMatrix)
-    this._zoom0 = camera.zoom
-    this._zoomState = this._zoom0
-
-    this._initialNear = camera.near
-    this._nearPos0 = camera.position.distanceTo(this._tbCenter) - camera.near
-    this._nearPos = this._initialNear
-
-    this._initialFar = camera.far
-    this._farPos0 = camera.position.distanceTo(this._tbCenter) - camera.far
-    this._farPos = this._initialFar
-
-    this._up0.copy(camera.up)
-    this._upState.copy(camera.up)
-
-    this.camera = camera
-    this.camera.updateProjectionMatrix()
-
-    //making gizmos
-    this._tbRadius = this.calculateTbRadius(camera)
-    this.makeGizmos(this._tbCenter, this._tbRadius)
   }
 
   /**
    * Set gizmos visibility
    * @param {Boolean} value Value of gizmos visibility
    */
-  setGizmosVisible(value) {
+  public setGizmosVisible(value: boolean): void {
     this._gizmos.visible = value
     this.dispatchEvent(_changeEvent)
   }
@@ -1798,7 +1989,8 @@ class ArcballControls extends Object3D {
    * @param {Vector3} tbCenter The trackball center
    * @param {number} tbRadius The trackball radius
    */
-  makeGizmos = (tbCenter, tbRadius) => {
+  private makeGizmos = (tbCenter: Vector3, tbRadius: number): void => {
+    // @ts-expect-error
     const curve = new EllipseCurve(0, 0, tbRadius, tbRadius)
     const points = curve.getPoints(this._curvePts)
 
@@ -1823,7 +2015,10 @@ class ArcballControls extends Object3D {
     this._gizmoMatrixState0.identity().setPosition(tbCenter)
     this._gizmoMatrixState.copy(this._gizmoMatrixState0)
 
-    if (this.camera.zoom != 1) {
+    if (
+      (this.camera instanceof PerspectiveCamera || this.camera instanceof OrthographicCamera) &&
+      this.camera.zoom != 1
+    ) {
       //adapt gizmos size to camera zoom
       const size = 1 / this.camera.zoom
       this._scaleMatrix.makeScale(size, size, size)
@@ -1850,7 +2045,7 @@ class ArcballControls extends Object3D {
    * @param {Matrix4} cameraMatrix Camera matrix
    * @param {Matrix4} gizmoMatrix Gizmos matrix
    */
-  onFocusAnim = (time, point, cameraMatrix, gizmoMatrix) => {
+  private onFocusAnim = (time: number, point: Vector3, cameraMatrix: Matrix4, gizmoMatrix: Matrix4): void => {
     if (this._timeStart == -1) {
       //animation start
       this._timeStart = time
@@ -1901,7 +2096,7 @@ class ArcballControls extends Object3D {
    * @param {Vector3} rotationAxis Rotation axis
    * @param {number} w0 Initial angular velocity
    */
-  onRotationAnim = (time, rotationAxis, w0) => {
+  private onRotationAnim = (time: number, rotationAxis: Vector3, w0: number): void => {
     if (this._timeStart == -1) {
       //animation start
       this._anglePrev = 0
@@ -1951,59 +2146,67 @@ class ArcballControls extends Object3D {
    * @param {Vector3} p1 Ending point
    * @param {Boolean} adjust If movement should be adjusted considering camera distance (Perspective only)
    */
-  pan = (p0, p1, adjust = false) => {
-    const movement = p0.clone().sub(p1)
+  private pan = (p0: Vector3, p1: Vector3, adjust = false): Transformation => {
+    if (this.camera !== null) {
+      const movement = p0.clone().sub(p1)
 
-    if (this.camera.isOrthographicCamera) {
-      //adjust movement amount
-      movement.multiplyScalar(1 / this.camera.zoom)
-    } else if (this.camera.isPerspectiveCamera && adjust) {
-      //adjust movement amount
-      this._v3_1.setFromMatrixPosition(this._cameraMatrixState0) //camera's initial position
-      this._v3_2.setFromMatrixPosition(this._gizmoMatrixState0) //gizmo's initial position
-      const distanceFactor = this._v3_1.distanceTo(this._v3_2) / this.camera.position.distanceTo(this._gizmos.position)
-      movement.multiplyScalar(1 / distanceFactor)
+      if (this.camera instanceof OrthographicCamera && this.camera.isOrthographicCamera) {
+        //adjust movement amount
+        movement.multiplyScalar(1 / this.camera.zoom)
+      } else if (this.camera instanceof PerspectiveCamera && this.camera.isPerspectiveCamera && adjust) {
+        //adjust movement amount
+        this._v3_1.setFromMatrixPosition(this._cameraMatrixState0) //camera's initial position
+        this._v3_2.setFromMatrixPosition(this._gizmoMatrixState0) //gizmo's initial position
+        const distanceFactor =
+          this._v3_1.distanceTo(this._v3_2) / this.camera.position.distanceTo(this._gizmos.position)
+        movement.multiplyScalar(1 / distanceFactor)
+      }
+
+      this._v3_1.set(movement.x, movement.y, 0).applyQuaternion(this.camera.quaternion)
+
+      this._m4_1.makeTranslation(this._v3_1.x, this._v3_1.y, this._v3_1.z)
+
+      this.setTransformationMatrices(this._m4_1, this._m4_1)
     }
-
-    this._v3_1.set(movement.x, movement.y, 0).applyQuaternion(this.camera.quaternion)
-
-    this._m4_1.makeTranslation(this._v3_1.x, this._v3_1.y, this._v3_1.z)
-
-    this.setTransformationMatrices(this._m4_1, this._m4_1)
     return _transformation
   }
 
   /**
    * Reset trackball
    */
-  reset = () => {
-    this.camera.zoom = this._zoom0
+  public reset = (): void => {
+    if (this.camera instanceof PerspectiveCamera || this.camera instanceof OrthographicCamera) {
+      this.camera.zoom = this._zoom0
 
-    if (this.camera.isPerspectiveCamera) {
-      this.camera.fov = this._fov0
+      if (this.camera instanceof PerspectiveCamera && this.camera.isPerspectiveCamera) {
+        this.camera.fov = this._fov0
+      }
+
+      this.camera.near = this._nearPos
+      this.camera.far = this._farPos
+      this._cameraMatrixState.copy(this._cameraMatrixState0)
+      this._cameraMatrixState.decompose(this.camera.position, this.camera.quaternion, this.camera.scale)
+      this.camera.up.copy(this._up0)
+
+      this.camera.updateMatrix()
+      this.camera.updateProjectionMatrix()
+
+      this._gizmoMatrixState.copy(this._gizmoMatrixState0)
+      this._gizmoMatrixState0.decompose(this._gizmos.position, this._gizmos.quaternion, this._gizmos.scale)
+      this._gizmos.updateMatrix()
+
+      const tbRadius = this.calculateTbRadius(this.camera)
+      if (tbRadius !== undefined) {
+        this._tbRadius = tbRadius
+      }
+      this.makeGizmos(this._gizmos.position, this._tbRadius)
+
+      this.camera.lookAt(this._gizmos.position)
+
+      this.updateTbState(STATE.IDLE, false)
+
+      this.dispatchEvent(_changeEvent)
     }
-
-    this.camera.near = this._nearPos
-    this.camera.far = this._farPos
-    this._cameraMatrixState.copy(this._cameraMatrixState0)
-    this._cameraMatrixState.decompose(this.camera.position, this.camera.quaternion, this.camera.scale)
-    this.camera.up.copy(this._up0)
-
-    this.camera.updateMatrix()
-    this.camera.updateProjectionMatrix()
-
-    this._gizmoMatrixState.copy(this._gizmoMatrixState0)
-    this._gizmoMatrixState0.decompose(this._gizmos.position, this._gizmos.quaternion, this._gizmos.scale)
-    this._gizmos.updateMatrix()
-
-    this._tbRadius = this.calculateTbRadius(this.camera)
-    this.makeGizmos(this._gizmos.position, this._tbRadius)
-
-    this.camera.lookAt(this._gizmos.position)
-
-    this.updateTbState(STATE.IDLE, false)
-
-    this.dispatchEvent(_changeEvent)
   }
 
   /**
@@ -2012,7 +2215,7 @@ class ArcballControls extends Object3D {
    * @param {number} angle Angle in radians
    * @returns {Object} Object with 'camera' field containing transformation matrix resulting from the operation to be applied to the camera
    */
-  rotate = (axis, angle) => {
+  private rotate = (axis: Vector3, angle: number): Transformation => {
     const point = this._gizmos.position //rotation center
     this._translationMatrix.makeTranslation(-point.x, -point.y, -point.z)
     this._rotationMatrix.makeRotationAxis(axis, -angle)
@@ -2027,9 +2230,9 @@ class ArcballControls extends Object3D {
     return _transformation
   }
 
-  copyState = () => {
+  private copyState = (): void => {
     let state
-    if (this.camera.isOrthographicCamera) {
+    if (this.camera instanceof OrthographicCamera && this.camera.isOrthographicCamera) {
       state = JSON.stringify({
         arcballState: {
           cameraFar: this.camera.far,
@@ -2040,7 +2243,7 @@ class ArcballControls extends Object3D {
           gizmoMatrix: this._gizmos.matrix,
         },
       })
-    } else if (this.camera.isPerspectiveCamera) {
+    } else if (this.camera instanceof PerspectiveCamera && this.camera.isPerspectiveCamera) {
       state = JSON.stringify({
         arcballState: {
           cameraFar: this.camera.far,
@@ -2054,10 +2257,12 @@ class ArcballControls extends Object3D {
       })
     }
 
-    navigator.clipboard.writeText(state)
+    if (state !== undefined) {
+      navigator.clipboard.writeText(state)
+    }
   }
 
-  pasteState = () => {
+  private pasteState = (): void => {
     const self = this
     navigator.clipboard.readText().then(function resolved(value) {
       self.setStateFromJSON(value)
@@ -2067,16 +2272,18 @@ class ArcballControls extends Object3D {
   /**
    * Save the current state of the control. This can later be recover with .reset
    */
-  saveState = () => {
-    this._cameraMatrixState0.copy(this.camera.matrix)
-    this._gizmoMatrixState0.copy(this._gizmos.matrix)
-    this._nearPos = this.camera.near
-    this._farPos = this.camera.far
-    this._zoom0 = this.camera.zoom
-    this._up0.copy(this.camera.up)
+  public saveState = (): void => {
+    if (this.camera instanceof PerspectiveCamera || this.camera instanceof OrthographicCamera) {
+      this._cameraMatrixState0.copy(this.camera.matrix)
+      this._gizmoMatrixState0.copy(this._gizmos.matrix)
+      this._nearPos = this.camera.near
+      this._farPos = this.camera.far
+      this._zoom0 = this.camera.zoom
+      this._up0.copy(this.camera.up)
 
-    if (this.camera.isPerspectiveCamera) {
-      this._fov0 = this.camera.fov
+      if (this.camera instanceof PerspectiveCamera && this.camera.isPerspectiveCamera) {
+        this._fov0 = this.camera.fov
+      }
     }
   }
 
@@ -2087,11 +2294,12 @@ class ArcballControls extends Object3D {
    * @param {Boolean} scaleGizmos If gizmos should be scaled (Perspective only)
    * @returns {Object} Object with 'camera' and 'gizmo' fields containing transformation matrices resulting from the operation to be applied to the camera and gizmos
    */
-  scale = (size, point, scaleGizmos = true) => {
+  // @ts-expect-error
+  private scale = (size: number, point: Vector3, scaleGizmos = true): Transformation | undefined => {
     const scalePoint = point.clone()
     let sizeInverse = 1 / size
 
-    if (this.camera.isOrthographicCamera) {
+    if (this.camera instanceof OrthographicCamera && this.camera.isOrthographicCamera) {
       //camera zoom
       this.camera.zoom = this._zoomState
       this.camera.zoom *= size
@@ -2127,7 +2335,7 @@ class ArcballControls extends Object3D {
 
       this.setTransformationMatrices(this._m4_1, this._m4_2)
       return _transformation
-    } else if (this.camera.isPerspectiveCamera) {
+    } else if (this.camera instanceof PerspectiveCamera && this.camera.isPerspectiveCamera) {
       this._v3_1.setFromMatrixPosition(this._cameraMatrixState)
       this._v3_2.setFromMatrixPosition(this._gizmoMatrixState)
 
@@ -2179,8 +2387,8 @@ class ArcballControls extends Object3D {
    * Set camera fov
    * @param {Number} value fov to be setted
    */
-  setFov = (value) => {
-    if (this.camera.isPerspectiveCamera) {
+  private setFov = (value: number): void => {
+    if (this.camera instanceof PerspectiveCamera && this.camera.isPerspectiveCamera) {
       this.camera.fov = MathUtils.clamp(value, this.minFov, this.maxFov)
       this.camera.updateProjectionMatrix()
     }
@@ -2192,13 +2400,17 @@ class ArcballControls extends Object3D {
    * @param {Number} y Y coordinate
    * @param {Number} z Z coordinate
    */
-  setTarget = (x, y, z) => {
-    this._tbCenter.set(x, y, z)
-    this._gizmos.position.set(x, y, z) //for correct radius calculation
-    this._tbRadius = this.calculateTbRadius(this.camera)
-
-    this.makeGizmos(this._tbCenter, this._tbRadius)
-    this.camera.lookAt(this._tbCenter)
+  public setTarget = (x: number, y: number, z: number): void => {
+    if (this.camera !== null) {
+      this._tbCenter.set(x, y, z)
+      this._gizmos.position.set(x, y, z) //for correct radius calculation
+      const tbRadius = this.calculateTbRadius(this.camera)
+      if (tbRadius !== undefined) {
+        this._tbRadius = tbRadius
+      }
+      this.makeGizmos(this._tbCenter, this._tbRadius)
+      this.camera.lookAt(this._tbCenter)
+    }
   }
 
   /**
@@ -2206,7 +2418,7 @@ class ArcballControls extends Object3D {
    * @param {Matrix4} camera Transformation to be applied to the camera
    * @param {Matrix4} gizmos Transformation to be applied to gizmos
    */
-  setTransformationMatrices(camera = null, gizmos = null) {
+  private setTransformationMatrices(camera: Matrix4 | null = null, gizmos: Matrix4 | null = null): void {
     if (camera != null) {
       if (_transformation.camera != null) {
         _transformation.camera.copy(camera)
@@ -2234,7 +2446,7 @@ class ArcballControls extends Object3D {
    * @param {Number} angle Angle in radians
    * @returns The computed transormation matix
    */
-  zRotate = (point, angle) => {
+  private zRotate = (point: Vector3, angle: number): Transformation => {
     this._rotationMatrix.makeRotationAxis(this._rotationAxis, angle)
     this._translationMatrix.makeTranslation(-point.x, -point.y, -point.z)
 
@@ -2258,17 +2470,18 @@ class ArcballControls extends Object3D {
    * @param {Camera} camera Virtual camera
    * @returns {Vector3} The point of intersection with the model, if exist, null otherwise
    */
-  unprojectOnObj = (cursor, camera) => {
-    const raycaster = new Raycaster()
-    raycaster.near = camera.near
-    raycaster.far = camera.far
-    raycaster.setFromCamera(cursor, camera)
+  private unprojectOnObj = (cursor: Vector2, camera: Camera): Vector3 | null => {
+    if ((camera instanceof PerspectiveCamera || camera instanceof OrthographicCamera) && this.scene != null) {
+      const raycaster = new Raycaster()
+      raycaster.near = camera.near
+      raycaster.far = camera.far
+      raycaster.setFromCamera(cursor, camera)
 
-    const intersect = raycaster.intersectObjects(this.scene.children, true)
-
-    for (let i = 0; i < intersect.length; i++) {
-      if (intersect[i].object.uuid != this._gizmos.uuid && intersect[i].face != null) {
-        return intersect[i].point.clone()
+      const intersect = raycaster.intersectObjects(this.scene.children, true)
+      for (let i = 0; i < intersect.length; i++) {
+        if (intersect[i].object.uuid != this._gizmos.uuid && intersect[i].face != null) {
+          return intersect[i].point.clone()
+        }
       }
     }
 
@@ -2284,7 +2497,13 @@ class ArcballControls extends Object3D {
    * @param {number} tbRadius The trackball radius
    * @returns {Vector3} The unprojected point on the trackball surface
    */
-  unprojectOnTbSurface = (camera, cursorX, cursorY, canvas, tbRadius) => {
+  private unprojectOnTbSurface = (
+    camera: Camera,
+    cursorX: number,
+    cursorY: number,
+    canvas: HTMLElement,
+    tbRadius: number,
+  ): Vector3 | undefined => {
     if (camera.type == 'OrthographicCamera') {
       this._v2_1.copy(this.getCursorPosition(cursorX, cursorY, canvas))
       this._v3_1.set(this._v2_1.x, this._v2_1.y, 0)
@@ -2397,7 +2616,13 @@ class ArcballControls extends Object3D {
    * @param {Boolean} initialDistance If initial distance between camera and gizmos should be used for calculations instead of current (Perspective only)
    * @returns {Vector3} The unprojected point on the trackball plane
    */
-  unprojectOnTbPlane = (camera, cursorX, cursorY, canvas, initialDistance = false) => {
+  private unprojectOnTbPlane = (
+    camera: Camera,
+    cursorX: number,
+    cursorY: number,
+    canvas: HTMLElement,
+    initialDistance = false,
+  ): Vector3 | undefined => {
     if (camera.type == 'OrthographicCamera') {
       this._v2_1.copy(this.getCursorPosition(cursorX, cursorY, canvas))
       this._v3_1.set(this._v2_1.x, this._v2_1.y, 0)
@@ -2461,17 +2686,19 @@ class ArcballControls extends Object3D {
   /**
    * Update camera and gizmos state
    */
-  updateMatrixState = () => {
-    //update camera and gizmos state
-    this._cameraMatrixState.copy(this.camera.matrix)
-    this._gizmoMatrixState.copy(this._gizmos.matrix)
+  private updateMatrixState = (): void => {
+    if (this.camera !== null) {
+      //update camera and gizmos state
+      this._cameraMatrixState.copy(this.camera.matrix)
+      this._gizmoMatrixState.copy(this._gizmos.matrix)
 
-    if (this.camera.isOrthographicCamera) {
-      this._cameraProjectionState.copy(this.camera.projectionMatrix)
-      this.camera.updateProjectionMatrix()
-      this._zoomState = this.camera.zoom
-    } else if (this.camera.isPerspectiveCamera) {
-      this._fovState = this.camera.fov
+      if (this.camera instanceof OrthographicCamera && this.camera.isOrthographicCamera) {
+        this._cameraProjectionState.copy(this.camera.projectionMatrix)
+        this.camera.updateProjectionMatrix()
+        this._zoomState = this.camera.zoom
+      } else if (this.camera instanceof PerspectiveCamera && this.camera.isPerspectiveCamera) {
+        this._fovState = this.camera.fov
+      }
     }
   }
 
@@ -2480,24 +2707,24 @@ class ArcballControls extends Object3D {
    * @param {STATE} newState New state of the FSA
    * @param {Boolean} updateMatrices If matriices state should be updated
    */
-  updateTbState = (newState, updateMatrices) => {
+  private updateTbState = (newState: Symbol, updateMatrices: boolean): void => {
     this._state = newState
     if (updateMatrices) {
       this.updateMatrixState()
     }
   }
 
-  update = () => {
+  public update = (): void => {
     const EPS = 0.000001
 
     //check min/max parameters
-    if (this.camera.isOrthographicCamera) {
+    if (this.camera instanceof OrthographicCamera && this.camera.isOrthographicCamera) {
       //check zoom
       if (this.camera.zoom > this.maxZoom || this.camera.zoom < this.minZoom) {
         const newZoom = MathUtils.clamp(this.camera.zoom, this.minZoom, this.maxZoom)
         this.applyTransformMatrix(this.scale(newZoom / this.camera.zoom, this._gizmos.position, true))
       }
-    } else if (this.camera.isPerspectiveCamera) {
+    } else if (this.camera instanceof PerspectiveCamera && this.camera.isPerspectiveCamera) {
       //check distance
       const distance = this.camera.position.distanceTo(this._gizmos.position)
 
@@ -2514,28 +2741,38 @@ class ArcballControls extends Object3D {
       }
 
       const oldRadius = this._tbRadius
-      this._tbRadius = this.calculateTbRadius(this.camera)
+      const tbRadius = this.calculateTbRadius(this.camera)
+      if (tbRadius !== undefined) {
+        this._tbRadius = tbRadius
+      }
 
       if (oldRadius < this._tbRadius - EPS || oldRadius > this._tbRadius + EPS) {
         const scale = (this._gizmos.scale.x + this._gizmos.scale.y + this._gizmos.scale.z) / 3
         const newRadius = this._tbRadius / scale
+        // @ts-expect-error
         const curve = new EllipseCurve(0, 0, newRadius, newRadius)
         const points = curve.getPoints(this._curvePts)
         const curveGeometry = new BufferGeometry().setFromPoints(points)
 
         for (const gizmo in this._gizmos.children) {
-          this._gizmos.children[gizmo].geometry = curveGeometry
+          const child = this._gizmos.children[gizmo]
+          if (child instanceof Mesh) {
+            child.geometry = curveGeometry
+          }
         }
       }
     }
 
-    this.camera.lookAt(this._gizmos.position)
+    this.camera?.lookAt(this._gizmos.position)
   }
 
-  setStateFromJSON = (json) => {
+  private setStateFromJSON = (json: string): void => {
     const state = JSON.parse(json)
 
-    if (state.arcballState != undefined) {
+    if (
+      state.arcballState != undefined &&
+      (this.camera instanceof PerspectiveCamera || this.camera instanceof OrthographicCamera)
+    ) {
       this._cameraMatrixState.fromArray(state.arcballState.cameraMatrix.elements)
       this._cameraMatrixState.decompose(this.camera.position, this.camera.quaternion, this.camera.scale)
 
@@ -2545,7 +2782,7 @@ class ArcballControls extends Object3D {
 
       this.camera.zoom = state.arcballState.cameraZoom
 
-      if (this.camera.isPerspectiveCamera) {
+      if (this.camera instanceof PerspectiveCamera && this.camera.isPerspectiveCamera) {
         this.camera.fov = state.arcballState.cameraFov
       }
 
@@ -2557,7 +2794,10 @@ class ArcballControls extends Object3D {
 
       this._gizmos.updateMatrix()
 
-      this._tbRadius = this.calculateTbRadius(this.camera)
+      const tbRadius = this.calculateTbRadius(this.camera)
+      if (tbRadius !== undefined) {
+        this._tbRadius = tbRadius
+      }
       const gizmoTmp = new Matrix4().copy(this._gizmoMatrixState0)
       this.makeGizmos(this._gizmos.position, this._tbRadius)
       this._gizmoMatrixState0.copy(gizmoTmp)
