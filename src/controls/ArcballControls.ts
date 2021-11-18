@@ -6,7 +6,6 @@ import {
   LineBasicMaterial,
   Raycaster,
   Group,
-  Object3D,
   Box3,
   Sphere,
   Quaternion,
@@ -20,6 +19,7 @@ import {
   OrthographicCamera,
   Mesh,
   Material,
+  EventDispatcher,
 } from 'three'
 
 type Operation = 'PAN' | 'ROTATE' | 'ZOOM' | 'FOV'
@@ -82,7 +82,7 @@ const _endEvent = { type: 'end' }
  * @param {HTMLElement} domElement Renderer's dom element
  * @param {Scene} scene The scene to be rendered
  */
-class ArcballControls extends Object3D {
+class ArcballControls extends EventDispatcher {
   private camera: Camera | null
   private domElement: HTMLElement
   private scene: Scene | null | undefined
@@ -192,7 +192,9 @@ class ArcballControls extends Object3D {
   public minZoom: number
   public maxZoom: number
 
-  private _tbCenter: Vector3
+  private target: Vector3
+  private _currentTarget: Vector3
+
   private _tbRadius: number
 
   private _state: Symbol
@@ -323,7 +325,9 @@ class ArcballControls extends Object3D {
     this.maxZoom = Infinity
 
     //trackball parameters
-    this._tbCenter = new Vector3(0, 0, 0)
+    this.target = new Vector3(0, 0, 0)
+    this._currentTarget = new Vector3(0, 0, 0)
+
     this._tbRadius = 1
 
     //FSA
@@ -671,9 +675,9 @@ class ArcballControls extends Object3D {
                   .add(this._gizmos.position)
               }
 
-              if (scalePoint !== undefined) this.applyTransformMatrix(this.scale(size, scalePoint))
+              if (scalePoint !== undefined) this.applyTransformMatrix(this.applyScale(size, scalePoint))
             } else {
-              this.applyTransformMatrix(this.scale(size, this._gizmos.position))
+              this.applyTransformMatrix(this.applyScale(size, this._gizmos.position))
             }
 
             if (this._grid != null) {
@@ -740,7 +744,7 @@ class ArcballControls extends Object3D {
               size = x / newDistance
 
               this.setFov(newFov)
-              this.applyTransformMatrix(this.scale(size, this._gizmos.position, false))
+              this.applyTransformMatrix(this.applyScale(size, this._gizmos.position, false))
             }
 
             if (this._grid != null) {
@@ -1012,7 +1016,7 @@ class ArcballControls extends Object3D {
                 size = Math.pow(this.scaleFactor, movement * screenNotches)
               }
 
-              this.applyTransformMatrix(this.scale(size, this._gizmos.position))
+              this.applyTransformMatrix(this.applyScale(size, this._gizmos.position))
             }
           }
 
@@ -1070,7 +1074,7 @@ class ArcballControls extends Object3D {
               this._v3_2.setFromMatrixPosition(this._gizmoMatrixState)
 
               this.setFov(newFov)
-              this.applyTransformMatrix(this.scale(size, this._v3_2, false))
+              this.applyTransformMatrix(this.applyScale(size, this._v3_2, false))
 
               //adjusting distance
               const direction = this._gizmos.position
@@ -1320,7 +1324,7 @@ class ArcballControls extends Object3D {
       }
 
       if (scalePoint !== undefined) {
-        this.applyTransformMatrix(this.scale(amount, scalePoint))
+        this.applyTransformMatrix(this.applyScale(amount, scalePoint))
       }
       this.dispatchEvent(_changeEvent)
     }
@@ -1411,7 +1415,7 @@ class ArcballControls extends Object3D {
       this._v3_2.setFromMatrixPosition(this._gizmoMatrixState)
 
       this.setFov(newFov)
-      this.applyTransformMatrix(this.scale(size, this._v3_2, false))
+      this.applyTransformMatrix(this.applyScale(size, this._v3_2, false))
 
       //adjusting distance
       const direction = this._gizmos.position
@@ -1787,7 +1791,7 @@ class ArcballControls extends Object3D {
 
       //apply zoom
       if (this.enableZoom) {
-        this.applyTransformMatrix(this.scale(size, this._gizmos.position))
+        this.applyTransformMatrix(this.applyScale(size, this._gizmos.position))
       }
 
       this._gizmoMatrixState.copy(gizmoStateTemp)
@@ -1935,7 +1939,7 @@ class ArcballControls extends Object3D {
    */
   private setCamera = (camera: Camera | null): void => {
     if (camera instanceof PerspectiveCamera || camera instanceof OrthographicCamera) {
-      camera.lookAt(this._tbCenter)
+      camera.lookAt(this.target)
       camera.updateMatrix()
 
       //setting state
@@ -1951,11 +1955,11 @@ class ArcballControls extends Object3D {
       this._zoomState = this._zoom0
 
       this._initialNear = camera.near
-      this._nearPos0 = camera.position.distanceTo(this._tbCenter) - camera.near
+      this._nearPos0 = camera.position.distanceTo(this.target) - camera.near
       this._nearPos = this._initialNear
 
       this._initialFar = camera.far
-      this._farPos0 = camera.position.distanceTo(this._tbCenter) - camera.far
+      this._farPos0 = camera.position.distanceTo(this.target) - camera.far
       this._farPos = this._initialFar
 
       this._up0.copy(camera.up)
@@ -1971,7 +1975,7 @@ class ArcballControls extends Object3D {
       if (tbRadius !== undefined) {
         this._tbRadius = tbRadius
       }
-      this.makeGizmos(this._tbCenter, this._tbRadius)
+      this.makeGizmos(this.target, this._tbRadius)
     }
   }
 
@@ -2294,8 +2298,7 @@ class ArcballControls extends Object3D {
    * @param {Boolean} scaleGizmos If gizmos should be scaled (Perspective only)
    * @returns {Object} Object with 'camera' and 'gizmo' fields containing transformation matrices resulting from the operation to be applied to the camera and gizmos
    */
-  // @ts-expect-error
-  private scale = (size: number, point: Vector3, scaleGizmos = true): Transformation | undefined => {
+  private applyScale = (size: number, point: Vector3, scaleGizmos = true): Transformation | undefined => {
     const scalePoint = point.clone()
     let sizeInverse = 1 / size
 
@@ -2402,14 +2405,14 @@ class ArcballControls extends Object3D {
    */
   public setTarget = (x: number, y: number, z: number): void => {
     if (this.camera !== null) {
-      this._tbCenter.set(x, y, z)
+      this.target.set(x, y, z)
       this._gizmos.position.set(x, y, z) //for correct radius calculation
       const tbRadius = this.calculateTbRadius(this.camera)
       if (tbRadius !== undefined) {
         this._tbRadius = tbRadius
       }
-      this.makeGizmos(this._tbCenter, this._tbRadius)
-      this.camera.lookAt(this._tbCenter)
+      this.makeGizmos(this.target, this._tbRadius)
+      this.camera.lookAt(this.target)
     }
   }
 
@@ -2717,12 +2720,23 @@ class ArcballControls extends Object3D {
   public update = (): void => {
     const EPS = 0.000001
 
+    // Update target and gizmos state
+    if (!this.target.equals(this._currentTarget) && this.camera !== null) {
+      this._gizmos.position.set(this.target.x, this.target.y, this.target.z) //for correct radius calculation
+      const tbRadius = this.calculateTbRadius(this.camera)
+      if (tbRadius !== undefined) {
+        this._tbRadius = tbRadius
+      }
+      this.makeGizmos(this.target, this._tbRadius)
+      this._currentTarget.copy(this.target)
+    }
+
     //check min/max parameters
     if (this.camera instanceof OrthographicCamera && this.camera.isOrthographicCamera) {
       //check zoom
       if (this.camera.zoom > this.maxZoom || this.camera.zoom < this.minZoom) {
         const newZoom = MathUtils.clamp(this.camera.zoom, this.minZoom, this.maxZoom)
-        this.applyTransformMatrix(this.scale(newZoom / this.camera.zoom, this._gizmos.position, true))
+        this.applyTransformMatrix(this.applyScale(newZoom / this.camera.zoom, this._gizmos.position, true))
       }
     } else if (this.camera instanceof PerspectiveCamera && this.camera.isPerspectiveCamera) {
       //check distance
@@ -2730,7 +2744,7 @@ class ArcballControls extends Object3D {
 
       if (distance > this.maxDistance + EPS || distance < this.minDistance - EPS) {
         const newDistance = MathUtils.clamp(distance, this.minDistance, this.maxDistance)
-        this.applyTransformMatrix(this.scale(newDistance / distance, this._gizmos.position))
+        this.applyTransformMatrix(this.applyScale(newDistance / distance, this._gizmos.position))
         this.updateMatrixState()
       }
 
