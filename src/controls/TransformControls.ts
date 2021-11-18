@@ -102,7 +102,7 @@ class TransformControls<TCamera extends Camera = Camera> extends Object3D {
 
   // events
   private changeEvent = { type: 'change' }
-  private mouseDownEvent = { type: 'mouseDown' }
+  private mouseDownEvent = { type: 'mouseDown', mode: this.mode }
   private mouseUpEvent = { type: 'mouseUp', mode: this.mode }
   private objectChangeEvent = { type: 'objectChange' }
 
