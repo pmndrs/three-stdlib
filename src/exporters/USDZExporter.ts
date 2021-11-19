@@ -383,8 +383,8 @@ ${array.join('')}
     }
 
     return `
-  {
-      def Material "Material_${material.id}"
+    def Material "Material_${material.id}"
+    {
         def Shader "PreviewSurface"
         {
             uniform token info:id = "UsdPreviewSurface"
