@@ -74,13 +74,9 @@ class TrackballControls extends EventDispatcher {
   private startEvent = { type: 'start' }
   private endEvent = { type: 'end' }
 
-  constructor(object: PerspectiveCamera | OrthographicCamera, cursorZoom?: boolean, domElement?: HTMLElement) {
+  constructor(object: PerspectiveCamera | OrthographicCamera, domElement?: HTMLElement) {
     super()
     this.object = object
-
-    if (cursorZoom) {
-      this.cursorZoom = cursorZoom
-    }
 
     // for reset
 
