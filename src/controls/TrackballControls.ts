@@ -29,8 +29,10 @@ class TrackballControls extends EventDispatcher {
 
   public object: PerspectiveCamera | OrthographicCamera
   public domElement: HTMLElement | undefined
+  public cursorZoom: boolean = false
 
   private target = new Vector3()
+  private mousePosition = new Vector2()
 
   // internals
   private STATE = {
@@ -72,9 +74,13 @@ class TrackballControls extends EventDispatcher {
   private startEvent = { type: 'start' }
   private endEvent = { type: 'end' }
 
-  constructor(object: PerspectiveCamera | OrthographicCamera, domElement?: HTMLElement) {
+  constructor(object: PerspectiveCamera | OrthographicCamera, cursorZoom?: boolean, domElement?: HTMLElement) {
     super()
     this.object = object
+
+    if (cursorZoom) {
+      this.cursorZoom = cursorZoom
+    }
 
     // for reset
 
@@ -93,10 +99,7 @@ class TrackballControls extends EventDispatcher {
   private onScreenVector = new Vector2()
 
   private getMouseOnScreen = (pageX: number, pageY: number): Vector2 => {
-    this.onScreenVector.set(
-      (pageX - this.screen.left) / this.screen.width,
-      (pageY - this.screen.top) / this.screen.height,
-    )
+    this.onScreenVector.set((pageX - this.screen.left) / this.screen.width, (pageY - this.screen.top) / this.screen.height)
 
     return this.onScreenVector
   }
@@ -191,6 +194,18 @@ class TrackballControls extends EventDispatcher {
       } else {
         this._zoomStart.y += (this._zoomEnd.y - this._zoomStart.y) * this.dynamicDampingFactor
       }
+
+      if (this.cursorZoom) {
+        let point = this.mousePosition.clone()
+
+        //determine 3D position of mouse cursor (on target plane)
+        let target = this.target.clone().project(this.object)
+        let pos = new Vector3(point.x, point.y, target.z)
+        let worldPos = pos.clone().unproject(this.object)
+
+        //adjust target point so that "point" stays in place
+        this.target.lerpVectors(worldPos, this.target, factor)
+      }
     }
   }
 
@@ -223,9 +238,7 @@ class TrackballControls extends EventDispatcher {
       if (this.staticMoving) {
         this._panStart.copy(this._panEnd)
       } else {
-        this._panStart.add(
-          this.mouseChange.subVectors(this._panEnd, this._panStart).multiplyScalar(this.dynamicDampingFactor),
-        )
+        this._panStart.add(this.mouseChange.subVectors(this._panEnd, this._panStart).multiplyScalar(this.dynamicDampingFactor))
       }
     }
   }
@@ -471,6 +484,9 @@ class TrackballControls extends EventDispatcher {
         break
     }
 
+    this.mousePosition.x = (event.offsetX / this.screen.width) * 2 - 1
+    this.mousePosition.y = -(event.offsetY / this.screen.height) * 2 + 1
+
     this.dispatchEvent(this.startEvent)
     this.dispatchEvent(this.endEvent)
   }
@@ -555,9 +571,7 @@ class TrackballControls extends EventDispatcher {
   // https://github.com/mrdoob/three.js/issues/20575
   public connect = (domElement: HTMLElement): void => {
     if ((domElement as any) === document) {
-      console.error(
-        'THREE.OrbitControls: "document" should not be used as the target "domElement". Please use "renderer.domElement" instead.',
-      )
+      console.error('THREE.OrbitControls: "document" should not be used as the target "domElement". Please use "renderer.domElement" instead.')
     }
     this.domElement = domElement
     this.domElement.addEventListener('contextmenu', this.contextmenu)
