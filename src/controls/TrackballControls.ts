@@ -48,6 +48,7 @@ class TrackballControls extends EventDispatcher {
 
   private lastPosition = new Vector3()
   private lastZoom = 1
+  private cursorVector = new Vector3()
 
   private _state = this.STATE.NONE
   private _keyState = this.STATE.NONE
@@ -196,8 +197,7 @@ class TrackballControls extends EventDispatcher {
 
         //determine 3D position of mouse cursor (on target plane)
         let target = this.target.clone().project(this.object)
-        let pos = new Vector3(point.x, point.y, target.z)
-        let worldPos = pos.clone().unproject(this.object)
+        let worldPos = cursorVector.set(point.x, point.y, target.z).unproject(this.object)
 
         //adjust target point so that "point" stays in place
         this.target.lerpVectors(worldPos, this.target, factor)
