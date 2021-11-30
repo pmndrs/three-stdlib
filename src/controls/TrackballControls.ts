@@ -45,10 +45,11 @@ class TrackballControls extends EventDispatcher {
   }
 
   private EPS = 0.000001
+  private lastZoom = 1
 
   private lastPosition = new Vector3()
-  private lastZoom = 1
   private cursorVector = new Vector3()
+  private targetVector = new Vector3()
 
   private _state = this.STATE.NONE
   private _keyState = this.STATE.NONE
@@ -96,7 +97,10 @@ class TrackballControls extends EventDispatcher {
   private onScreenVector = new Vector2()
 
   private getMouseOnScreen = (pageX: number, pageY: number): Vector2 => {
-    this.onScreenVector.set((pageX - this.screen.left) / this.screen.width, (pageY - this.screen.top) / this.screen.height)
+    this.onScreenVector.set(
+      (pageX - this.screen.left) / this.screen.width,
+      (pageY - this.screen.top) / this.screen.height,
+    )
 
     return this.onScreenVector
   }
@@ -193,11 +197,11 @@ class TrackballControls extends EventDispatcher {
       }
 
       if (this.cursorZoom) {
-        let point = this.mousePosition.clone()
-
         //determine 3D position of mouse cursor (on target plane)
-        let target = this.target.clone().project(this.object)
-        let worldPos = this.cursorVector.set(point.x, point.y, target.z).unproject(this.object)
+        this.targetVector.copy(this.target).project(this.object)
+        let worldPos = this.cursorVector
+          .set(this.mousePosition.x, this.mousePosition.y, this.targetVector.z)
+          .unproject(this.object)
 
         //adjust target point so that "point" stays in place
         this.target.lerpVectors(worldPos, this.target, factor)
@@ -234,7 +238,9 @@ class TrackballControls extends EventDispatcher {
       if (this.staticMoving) {
         this._panStart.copy(this._panEnd)
       } else {
-        this._panStart.add(this.mouseChange.subVectors(this._panEnd, this._panStart).multiplyScalar(this.dynamicDampingFactor))
+        this._panStart.add(
+          this.mouseChange.subVectors(this._panEnd, this._panStart).multiplyScalar(this.dynamicDampingFactor),
+        )
       }
     }
   }
@@ -567,7 +573,9 @@ class TrackballControls extends EventDispatcher {
   // https://github.com/mrdoob/three.js/issues/20575
   public connect = (domElement: HTMLElement): void => {
     if ((domElement as any) === document) {
-      console.error('THREE.OrbitControls: "document" should not be used as the target "domElement". Please use "renderer.domElement" instead.')
+      console.error(
+        'THREE.OrbitControls: "document" should not be used as the target "domElement". Please use "renderer.domElement" instead.',
+      )
     }
     this.domElement = domElement
     this.domElement.addEventListener('contextmenu', this.contextmenu)
