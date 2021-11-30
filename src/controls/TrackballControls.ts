@@ -197,7 +197,7 @@ class TrackballControls extends EventDispatcher {
 
         //determine 3D position of mouse cursor (on target plane)
         let target = this.target.clone().project(this.object)
-        let worldPos = cursorVector.set(point.x, point.y, target.z).unproject(this.object)
+        let worldPos = this.cursorVector.set(point.x, point.y, target.z).unproject(this.object)
 
         //adjust target point so that "point" stays in place
         this.target.lerpVectors(worldPos, this.target, factor)
