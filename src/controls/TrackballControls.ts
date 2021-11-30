@@ -29,8 +29,10 @@ class TrackballControls extends EventDispatcher {
 
   public object: PerspectiveCamera | OrthographicCamera
   public domElement: HTMLElement | undefined
+  public cursorZoom: boolean = false
 
   private target = new Vector3()
+  private mousePosition = new Vector2()
 
   // internals
   private STATE = {
@@ -43,9 +45,11 @@ class TrackballControls extends EventDispatcher {
   }
 
   private EPS = 0.000001
+  private lastZoom = 1
 
   private lastPosition = new Vector3()
-  private lastZoom = 1
+  private cursorVector = new Vector3()
+  private targetVector = new Vector3()
 
   private _state = this.STATE.NONE
   private _keyState = this.STATE.NONE
@@ -190,6 +194,17 @@ class TrackballControls extends EventDispatcher {
         this._zoomStart.copy(this._zoomEnd)
       } else {
         this._zoomStart.y += (this._zoomEnd.y - this._zoomStart.y) * this.dynamicDampingFactor
+      }
+
+      if (this.cursorZoom) {
+        //determine 3D position of mouse cursor (on target plane)
+        this.targetVector.copy(this.target).project(this.object)
+        let worldPos = this.cursorVector
+          .set(this.mousePosition.x, this.mousePosition.y, this.targetVector.z)
+          .unproject(this.object)
+
+        //adjust target point so that "point" stays in place
+        this.target.lerpVectors(worldPos, this.target, factor)
       }
     }
   }
@@ -470,6 +485,9 @@ class TrackballControls extends EventDispatcher {
         this._zoomStart.y -= event.deltaY * 0.00025
         break
     }
+
+    this.mousePosition.x = (event.offsetX / this.screen.width) * 2 - 1
+    this.mousePosition.y = -(event.offsetY / this.screen.height) * 2 + 1
 
     this.dispatchEvent(this.startEvent)
     this.dispatchEvent(this.endEvent)
