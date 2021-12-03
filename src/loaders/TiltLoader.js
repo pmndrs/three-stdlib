@@ -443,7 +443,7 @@ const shaders = {
     blendSrc: 201,
     blendSrcAlpha: 201,
   },
-})
+}
 
 function getMaterial(GUID) {
   const name = BRUSH_LIST_ARRAY[GUID]
