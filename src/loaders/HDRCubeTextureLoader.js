@@ -7,11 +7,7 @@ import {
   LinearEncoding,
   LinearFilter,
   Loader,
-  NearestFilter,
-  RGBAFormat,
-  RGBEEncoding,
   RGBFormat,
-  UnsignedByteType,
 } from 'three'
 import { RGBELoader } from '../loaders/RGBELoader.js'
 
@@ -40,14 +36,6 @@ class HDRCubeTextureLoader extends Loader {
     texture.type = this.type
 
     switch (texture.type) {
-      case UnsignedByteType:
-        texture.encoding = RGBEEncoding
-        texture.format = RGBAFormat
-        texture.minFilter = NearestFilter
-        texture.magFilter = NearestFilter
-        texture.generateMipmaps = false
-        break
-
       case FloatType:
         texture.encoding = LinearEncoding
         texture.format = RGBFormat
