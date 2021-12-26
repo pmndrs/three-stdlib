@@ -1,9 +1,8 @@
-import { GammaEncoding, LinearEncoding, sRGBEncoding } from 'three'
+import { LinearEncoding, sRGBEncoding } from 'three'
 
 import { TempNode } from '../core/TempNode'
 import { ConstNode } from '../core/ConstNode'
 import { FunctionNode } from '../core/FunctionNode'
-import { ExpressionNode } from '../core/ExpressionNode'
 
 function ColorSpaceNode(input, method) {
   TempNode.call(this, 'v4')
@@ -14,29 +13,7 @@ function ColorSpaceNode(input, method) {
 }
 
 ColorSpaceNode.Nodes = (function () {
-  // For a discussion of what this is, please read this: http://lousodrome.net/blog/light/2013/05/26/gamma-correct-and-hdr-rendering-in-a-32-bits-buffer/
-
   var LinearToLinear = new FunctionNode(['vec4 LinearToLinear( in vec4 value ) {', '	return value;', '}'].join('\n'))
-
-  var GammaToLinear = new FunctionNode(
-    [
-      'vec4 GammaToLinear( in vec4 value, in float gammaFactor ) {',
-
-      '	return vec4( pow( value.xyz, vec3( gammaFactor ) ), value.w );',
-
-      '}',
-    ].join('\n'),
-  )
-
-  var LinearToGamma = new FunctionNode(
-    [
-      'vec4 LinearToGamma( in vec4 value, in float gammaFactor ) {',
-
-      '	return vec4( pow( value.xyz, vec3( 1.0 / gammaFactor ) ), value.w );',
-
-      '}',
-    ].join('\n'),
-  )
 
   var sRGBToLinear = new FunctionNode(
     [
@@ -109,8 +86,6 @@ ColorSpaceNode.Nodes = (function () {
 
   return {
     LinearToLinear: LinearToLinear,
-    GammaToLinear: GammaToLinear,
-    LinearToGamma: LinearToGamma,
     sRGBToLinear: sRGBToLinear,
     LinearTosRGB: LinearTosRGB,
     cLogLuvM: cLogLuvM,
@@ -121,9 +96,6 @@ ColorSpaceNode.Nodes = (function () {
 })()
 
 ColorSpaceNode.LINEAR_TO_LINEAR = 'LinearToLinear'
-
-ColorSpaceNode.GAMMA_TO_LINEAR = 'GammaToLinear'
-ColorSpaceNode.LINEAR_TO_GAMMA = 'LinearToGamma'
 
 ColorSpaceNode.SRGB_TO_LINEAR = 'sRGBToLinear'
 ColorSpaceNode.LINEAR_TO_SRGB = 'LinearTosRGB'
@@ -140,8 +112,6 @@ ColorSpaceNode.getEncodingComponents = function (encoding) {
       return ['Linear']
     case sRGBEncoding:
       return ['sRGB']
-    case GammaEncoding:
-      return ['Gamma', new ExpressionNode('float( GAMMA_FACTOR )', 'f')]
   }
 }
 

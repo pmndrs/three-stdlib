@@ -4,7 +4,7 @@ import {
   CubeUVReflectionMapping,
   CubeUVRefractionMapping,
   LinearEncoding,
-  GammaEncoding,
+  sRGBEncoding,
 } from 'three'
 
 import { NodeUniform } from './NodeUniform'
@@ -775,7 +775,7 @@ NodeBuilder.prototype = {
     }
 
     if (encoding === LinearEncoding && this.context.gamma) {
-      encoding = GammaEncoding
+      encoding = sRGBEncoding
     }
 
     return encoding
