@@ -1,8 +1,7 @@
-import { GammaEncoding, LinearEncoding, RGBEEncoding, RGBDEncoding, sRGBEncoding } from 'three'
+import { GammaEncoding, LinearEncoding, RGBEEncoding, sRGBEncoding } from 'three'
 
 import { TempNode } from '../core/TempNode'
 import { ConstNode } from '../core/ConstNode'
-import { FloatNode } from '../inputs/FloatNode'
 import { FunctionNode } from '../core/FunctionNode'
 import { ExpressionNode } from '../core/ExpressionNode'
 
@@ -82,31 +81,6 @@ ColorSpaceNode.Nodes = (function () {
     ].join('\n'),
   )
 
-  // reference: http://iwasbeingirony.blogspot.ca/2010/06/difference-between-rgbm-and-rgbd.html
-
-  var RGBDToLinear = new FunctionNode(
-    [
-      'vec3 RGBDToLinear( in vec4 value, in float maxRange ) {',
-
-      '	return vec4( value.rgb * ( ( maxRange / 255.0 ) / value.a ), 1.0 );',
-
-      '}',
-    ].join('\n'),
-  )
-
-  var LinearToRGBD = new FunctionNode(
-    [
-      'vec3 LinearToRGBD( in vec4 value, in float maxRange ) {',
-
-      '	float maxRGB = max( value.x, max( value.g, value.b ) );',
-      '	float D      = max( maxRange / maxRGB, 1.0 );',
-      '	D            = clamp( floor( D ) / 255.0, 0.0, 1.0 );',
-      '	return vec4( value.rgb * ( D * ( 255.0 / maxRange ) ), D );',
-
-      '}',
-    ].join('\n'),
-  )
-
   // LogLuv reference: http://graphicrants.blogspot.ca/2009/04/rgbm-color-encoding.html
 
   // M matrix, for encoding
@@ -164,8 +138,6 @@ ColorSpaceNode.Nodes = (function () {
     LinearTosRGB: LinearTosRGB,
     RGBEToLinear: RGBEToLinear,
     LinearToRGBE: LinearToRGBE,
-    RGBDToLinear: RGBDToLinear,
-    LinearToRGBD: LinearToRGBD,
     cLogLuvM: cLogLuvM,
     LinearToLogLuv: LinearToLogLuv,
     cLogLuvInverseM: cLogLuvInverseM,
@@ -184,9 +156,6 @@ ColorSpaceNode.LINEAR_TO_SRGB = 'LinearTosRGB'
 ColorSpaceNode.RGBE_TO_LINEAR = 'RGBEToLinear'
 ColorSpaceNode.LINEAR_TO_RGBE = 'LinearToRGBE'
 
-ColorSpaceNode.RGBD_TO_LINEAR = 'RGBDToLinear'
-ColorSpaceNode.LINEAR_TO_RGBD = 'LinearToRGBD'
-
 ColorSpaceNode.LINEAR_TO_LOG_LUV = 'LinearToLogLuv'
 ColorSpaceNode.LOG_LUV_TO_LINEAR = 'LogLuvToLinear'
 
@@ -198,8 +167,6 @@ ColorSpaceNode.getEncodingComponents = function (encoding) {
       return ['sRGB']
     case RGBEEncoding:
       return ['RGBE']
-    case RGBDEncoding:
-      return ['RGBD', new FloatNode(256.0).setReadonly(true)]
     case GammaEncoding:
       return ['Gamma', new ExpressionNode('float( GAMMA_FACTOR )', 'f')]
   }
