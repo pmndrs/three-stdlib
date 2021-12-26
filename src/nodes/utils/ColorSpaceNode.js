@@ -1,12 +1,4 @@
-import {
-  GammaEncoding,
-  LinearEncoding,
-  RGBEEncoding,
-  RGBM7Encoding,
-  RGBM16Encoding,
-  RGBDEncoding,
-  sRGBEncoding,
-} from 'three'
+import { GammaEncoding, LinearEncoding, RGBEEncoding, RGBDEncoding, sRGBEncoding } from 'three'
 
 import { TempNode } from '../core/TempNode'
 import { ConstNode } from '../core/ConstNode'
@@ -85,31 +77,6 @@ ColorSpaceNode.Nodes = (function () {
       '	float fExp = clamp( ceil( log2( maxComponent ) ), -128.0, 127.0 );',
       '	return vec4( value.rgb / exp2( fExp ), ( fExp + 128.0 ) / 255.0 );',
       //  return vec4( value.brg, ( 3.0 + 128.0 ) / 256.0 );
-
-      '}',
-    ].join('\n'),
-  )
-
-  // reference: http://iwasbeingirony.blogspot.ca/2010/06/difference-between-rgbm-and-rgbd.html
-
-  var RGBMToLinear = new FunctionNode(
-    [
-      'vec3 RGBMToLinear( in vec4 value, in float maxRange ) {',
-
-      '	return vec4( value.xyz * value.w * maxRange, 1.0 );',
-
-      '}',
-    ].join('\n'),
-  )
-
-  var LinearToRGBM = new FunctionNode(
-    [
-      'vec3 LinearToRGBM( in vec4 value, in float maxRange ) {',
-
-      '	float maxRGB = max( value.x, max( value.g, value.b ) );',
-      '	float M      = clamp( maxRGB / maxRange, 0.0, 1.0 );',
-      '	M            = ceil( M * 255.0 ) / 255.0;',
-      '	return vec4( value.rgb / ( M * maxRange ), M );',
 
       '}',
     ].join('\n'),
@@ -197,8 +164,6 @@ ColorSpaceNode.Nodes = (function () {
     LinearTosRGB: LinearTosRGB,
     RGBEToLinear: RGBEToLinear,
     LinearToRGBE: LinearToRGBE,
-    RGBMToLinear: RGBMToLinear,
-    LinearToRGBM: LinearToRGBM,
     RGBDToLinear: RGBDToLinear,
     LinearToRGBD: LinearToRGBD,
     cLogLuvM: cLogLuvM,
@@ -219,9 +184,6 @@ ColorSpaceNode.LINEAR_TO_SRGB = 'LinearTosRGB'
 ColorSpaceNode.RGBE_TO_LINEAR = 'RGBEToLinear'
 ColorSpaceNode.LINEAR_TO_RGBE = 'LinearToRGBE'
 
-ColorSpaceNode.RGBM_TO_LINEAR = 'RGBMToLinear'
-ColorSpaceNode.LINEAR_TO_RGBM = 'LinearToRGBM'
-
 ColorSpaceNode.RGBD_TO_LINEAR = 'RGBDToLinear'
 ColorSpaceNode.LINEAR_TO_RGBD = 'LinearToRGBD'
 
@@ -236,10 +198,6 @@ ColorSpaceNode.getEncodingComponents = function (encoding) {
       return ['sRGB']
     case RGBEEncoding:
       return ['RGBE']
-    case RGBM7Encoding:
-      return ['RGBM', new FloatNode(7.0).setReadonly(true)]
-    case RGBM16Encoding:
-      return ['RGBM', new FloatNode(16.0).setReadonly(true)]
     case RGBDEncoding:
       return ['RGBD', new FloatNode(256.0).setReadonly(true)]
     case GammaEncoding:
