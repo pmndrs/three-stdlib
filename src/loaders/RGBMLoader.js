@@ -104,7 +104,7 @@ var UPNG = {}
 UPNG.toRGBA8 = function (out) {
   var w = out.width,
     h = out.height
-      f (out.tabs,.acTL == null) return [UPNG.toRGBA8.decodeImage(out.data, w, h, out).buffer]
+  if (out.tabs.acTL == null) return [UPNG.toRGBA8.decodeImage(out.data, w, h, out).buffer]
 
   var frms = []
   if (out.frames[0].data == null) out.frames[0].data = out.data
