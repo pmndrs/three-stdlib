@@ -10,6 +10,7 @@ import {
   Euler,
   FileLoader,
   Float32BufferAttribute,
+  FrontSide,
   Group,
   Line,
   LineBasicMaterial,
@@ -33,6 +34,7 @@ import {
   SkinnedMesh,
   SpotLight,
   TextureLoader,
+  Vector2,
   Vector3,
   VectorKeyframeTrack,
 } from 'three'
@@ -462,9 +464,8 @@ class ColladaLoader extends Loader {
       }
 
       if (positionData.length > 0) tracks.push(new VectorKeyframeTrack(name + '.position', times, positionData))
-      if (quaternionData.length > 0) {
+      if (quaternionData.length > 0)
         tracks.push(new QuaternionKeyframeTrack(name + '.quaternion', times, quaternionData))
-      }
       if (scaleData.length > 0) tracks.push(new VectorKeyframeTrack(name + '.scale', times, scaleData))
 
       return tracks
@@ -989,6 +990,10 @@ class ColladaLoader extends Loader {
             data.type = child.nodeName
             data.parameters = parseEffectParameters(child)
             break
+
+          case 'extra':
+            data.extra = parseEffectExtra(child)
+            break
         }
       }
 
@@ -1015,7 +1020,7 @@ class ColladaLoader extends Loader {
             break
           case 'transparent':
             data[child.nodeName] = {
-              opaque: child.getAttribute('opaque'),
+              opaque: child.hasAttribute('opaque') ? child.getAttribute('opaque') : 'A_ONE',
               data: parseEffectParameter(child),
             }
             break
@@ -1112,6 +1117,10 @@ class ColladaLoader extends Loader {
             }
 
             break
+
+          case 'bump':
+            data[child.nodeName] = parseEffectExtraTechniqueBump(child)
+            break
         }
       }
     }
@@ -1145,6 +1154,32 @@ class ColladaLoader extends Loader {
         switch (child.nodeName) {
           case 'double_sided':
             data[child.nodeName] = parseInt(child.textContent)
+            break
+
+          case 'bump':
+            data[child.nodeName] = parseEffectExtraTechniqueBump(child)
+            break
+        }
+      }
+
+      return data
+    }
+
+    function parseEffectExtraTechniqueBump(xml) {
+      var data = {}
+
+      for (var i = 0, l = xml.childNodes.length; i < l; i++) {
+        var child = xml.childNodes[i]
+
+        if (child.nodeType !== 1) continue
+
+        switch (child.nodeName) {
+          case 'texture':
+            data[child.nodeName] = {
+              id: child.getAttribute('texture'),
+              texcoord: child.getAttribute('texcoord'),
+              extra: parseEffectParameterTexture(child),
+            }
             break
         }
       }
@@ -1203,7 +1238,6 @@ class ColladaLoader extends Loader {
     function buildMaterial(data) {
       const effect = getEffect(data.url)
       const technique = effect.profile.technique
-      const extra = effect.profile.extra
 
       let material
 
@@ -1361,8 +1395,23 @@ class ColladaLoader extends Loader {
 
       //
 
-      if (extra !== undefined && extra.technique !== undefined && extra.technique.double_sided === 1) {
-        material.side = DoubleSide
+      if (technique.extra !== undefined && technique.extra.technique !== undefined) {
+        const techniques = technique.extra.technique
+
+        for (const k in techniques) {
+          const v = techniques[k]
+
+          switch (k) {
+            case 'double_sided':
+              material.side = v === 1 ? DoubleSide : FrontSide
+              break
+
+            case 'bump':
+              material.normalMap = getTexture(v.texture)
+              material.normalScale = new Vector2(1, 1)
+              break
+          }
+        }
       }
 
       return material
@@ -1967,22 +2016,18 @@ class ColladaLoader extends Loader {
 
       // build geometry
 
-      if (position.array.length > 0) {
+      if (position.array.length > 0)
         geometry.setAttribute('position', new Float32BufferAttribute(position.array, position.stride))
-      }
-      if (normal.array.length > 0) {
+      if (normal.array.length > 0)
         geometry.setAttribute('normal', new Float32BufferAttribute(normal.array, normal.stride))
-      }
       if (color.array.length > 0) geometry.setAttribute('color', new Float32BufferAttribute(color.array, color.stride))
       if (uv.array.length > 0) geometry.setAttribute('uv', new Float32BufferAttribute(uv.array, uv.stride))
       if (uv2.array.length > 0) geometry.setAttribute('uv2', new Float32BufferAttribute(uv2.array, uv2.stride))
 
-      if (skinIndex.array.length > 0) {
+      if (skinIndex.array.length > 0)
         geometry.setAttribute('skinIndex', new Float32BufferAttribute(skinIndex.array, skinIndex.stride))
-      }
-      if (skinWeight.array.length > 0) {
+      if (skinWeight.array.length > 0)
         geometry.setAttribute('skinWeight', new Float32BufferAttribute(skinWeight.array, skinWeight.stride))
-      }
 
       build.data = geometry
       build.type = primitives[0].type
@@ -2972,12 +3017,6 @@ class ColladaLoader extends Loader {
         // regard skinning
 
         const skinning = geometry.data.attributes.skinIndex !== undefined
-
-        if (skinning) {
-          for (let i = 0, l = materials.length; i < l; i++) {
-            materials[i].skinning = true
-          }
-        }
 
         // choose between a single or multi materials (material array)
 
