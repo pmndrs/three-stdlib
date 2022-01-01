@@ -205,7 +205,7 @@ class SVGLoader extends Loader {
                 path.lineTo(point.x, point.y)
               }
 
-              if (j === 0 && doSetFirstPoint === true) firstPoint.copy(point)
+              if (j === 0) firstPoint.copy(point)
             }
 
             break
@@ -372,7 +372,7 @@ class SVGLoader extends Loader {
                 path.lineTo(point.x, point.y)
               }
 
-              if (j === 0 && doSetFirstPoint === true) firstPoint.copy(point)
+              if (j === 0) firstPoint.copy(point)
             }
 
             break
@@ -652,27 +652,42 @@ class SVGLoader extends Loader {
     function parseRectNode(node) {
       const x = parseFloatWithUnits(node.getAttribute('x') || 0)
       const y = parseFloatWithUnits(node.getAttribute('y') || 0)
-      const rx = parseFloatWithUnits(node.getAttribute('rx') || 0)
-      const ry = parseFloatWithUnits(node.getAttribute('ry') || 0)
+      const rx = parseFloatWithUnits(node.getAttribute('rx') || node.getAttribute('ry') || 0)
+      const ry = parseFloatWithUnits(node.getAttribute('ry') || node.getAttribute('rx') || 0)
       const w = parseFloatWithUnits(node.getAttribute('width'))
       const h = parseFloatWithUnits(node.getAttribute('height'))
 
-      const path = new ShapePath()
-      path.moveTo(x + 2 * rx, y)
-      path.lineTo(x + w - 2 * rx, y)
-      if (rx !== 0 || ry !== 0) path.bezierCurveTo(x + w, y, x + w, y, x + w, y + 2 * ry)
-      path.lineTo(x + w, y + h - 2 * ry)
-      if (rx !== 0 || ry !== 0) path.bezierCurveTo(x + w, y + h, x + w, y + h, x + w - 2 * rx, y + h)
-      path.lineTo(x + 2 * rx, y + h)
+      // Ellipse arc to Bezier approximation Coefficient (Inversed). See:
+      // https://spencermortensen.com/articles/bezier-circle/
+      const bci = 1 - 0.551915024494
 
+      const path = new ShapePath()
+
+      // top left
+      path.moveTo(x + rx, y)
+
+      // top right
+      path.lineTo(x + w - rx, y)
       if (rx !== 0 || ry !== 0) {
-        path.bezierCurveTo(x, y + h, x, y + h, x, y + h - 2 * ry)
+        path.bezierCurveTo(x + w - rx * bci, y, x + w, y + ry * bci, x + w, y + ry)
       }
 
-      path.lineTo(x, y + 2 * ry)
-
+      // bottom right
+      path.lineTo(x + w, y + h - ry)
       if (rx !== 0 || ry !== 0) {
-        path.bezierCurveTo(x, y, x, y, x + 2 * rx, y)
+        path.bezierCurveTo(x + w, y + h - ry * bci, x + w - rx * bci, y + h, x + w - rx, y + h)
+      }
+
+      // bottom left
+      path.lineTo(x + rx, y + h)
+      if (rx !== 0 || ry !== 0) {
+        path.bezierCurveTo(x + rx * bci, y + h, x, y + h - ry * bci, x, y + h - ry)
+      }
+
+      // back to top left
+      path.lineTo(x, y + ry)
+      if (rx !== 0 || ry !== 0) {
+        path.bezierCurveTo(x, y + ry * bci, x + rx * bci, y, x + rx, y)
       }
 
       return path
@@ -799,13 +814,12 @@ class SVGLoader extends Loader {
       }
 
       function addStyle(svgName, jsName, adjustFunction) {
-        if (adjustFunction === undefined) {
+        if (adjustFunction === undefined)
           adjustFunction = function copy(v) {
             if (v.startsWith('url')) console.warn('SVGLoader: url access in attributes is not implemented.')
 
             return v
           }
-        }
 
         if (node.hasAttribute(svgName)) style[jsName] = adjustFunction(node.getAttribute(svgName))
         if (stylesheetStyles[svgName]) style[jsName] = adjustFunction(stylesheetStyles[svgName])
@@ -822,6 +836,7 @@ class SVGLoader extends Loader {
 
       addStyle('fill', 'fill')
       addStyle('fill-opacity', 'fillOpacity', clamp)
+      addStyle('fill-rule', 'fillRule')
       addStyle('opacity', 'opacity', clamp)
       addStyle('stroke', 'stroke')
       addStyle('stroke-opacity', 'strokeOpacity', clamp)
@@ -1644,6 +1659,7 @@ class SVGLoader extends Loader {
       }
 
       return {
+        curves: p.curves,
         points: points,
         isCW: ShapeUtils.isClockWise(points),
         identifier: identifier++,
@@ -1651,7 +1667,7 @@ class SVGLoader extends Loader {
       }
     })
 
-    simplePaths = simplePaths.filter((sp) => sp.points.length > 0)
+    simplePaths = simplePaths.filter((sp) => sp.points.length > 1)
 
     // check if path is solid or a hole
     const isAHole = simplePaths.map((p) =>
@@ -1663,11 +1679,14 @@ class SVGLoader extends Loader {
       const amIAHole = isAHole[p.identifier]
 
       if (!amIAHole.isHole) {
-        const shape = new Shape(p.points)
+        const shape = new Shape()
+        shape.curves = p.curves
         const holes = isAHole.filter((h) => h.isHole && h.for === p.identifier)
         holes.forEach((h) => {
-          const path = simplePaths[h.identifier]
-          shape.holes.push(new Path(path.points))
+          const hole = simplePaths[h.identifier]
+          const path = new Path()
+          path.curves = hole.curves
+          shape.holes.push(path)
         })
         shapesToReturn.push(shape)
       }
@@ -1797,9 +1816,7 @@ class SVGLoader extends Loader {
         if (isClosed) {
           // Skip duplicated initial point
           nextPoint = points[1]
-        } else {
-          nextPoint = undefined
-        }
+        } else nextPoint = undefined
       } else {
         nextPoint = points[iPoint + 1]
       }

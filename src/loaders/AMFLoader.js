@@ -15,8 +15,6 @@ import { unzipSync } from 'fflate'
  * Description: Early release of an AMF Loader following the pattern of the
  * example loaders in the three.js project.
  *
- * More information about the AMF format: http://amf.wikispaces.com
- *
  * Usage:
  *	const loader = new AMFLoader();
  *	loader.load('/path/to/project.amf', function(objecttree) {
@@ -74,7 +72,7 @@ class AMFLoader extends Loader {
         console.log('THREE.AMFLoader: Loading Zip')
 
         try {
-          zip = unzipSync(new Uint8Array(data)) // eslint-disable-line no-undef
+          zip = unzipSync(new Uint8Array(data))
         } catch (e) {
           if (e instanceof ReferenceError) {
             console.log('THREE.AMFLoader: fflate missing and file is compressed.')
