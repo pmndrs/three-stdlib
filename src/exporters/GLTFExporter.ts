@@ -15,7 +15,6 @@ import {
   NearestMipmapNearestFilter,
   PropertyBinding,
   RGBAFormat,
-  RGBFormat,
   RepeatWrapping,
   Scene,
   Vector3,
@@ -1139,7 +1138,7 @@ class GLTFWriter {
   /**
    * Process image
    * @param  {Image} image to process
-   * @param  {Integer} format of the image (e.g. RGBFormat, RGBAFormat etc)
+   * @param  {Integer} format of the image (RGBAFormat)
    * @param  {Boolean} flipY before writing out the image
    * @return {Integer}     Index of the processed texture in the "images" array
    */
@@ -1183,8 +1182,8 @@ class GLTFWriter {
       ) {
         ctx?.drawImage(image, 0, 0, canvas.width, canvas.height)
       } else {
-        if (format !== RGBAFormat && format !== RGBFormat) {
-          console.error('GLTFExporter: Only RGB and RGBA formats are supported.')
+        if (format !== RGBAFormat) {
+          console.error('GLTFExporter: Only RGBA format is supported.')
         }
 
         if (image.width > options.maxTextureSize || image.height > options.maxTextureSize) {
@@ -1194,20 +1193,11 @@ class GLTFWriter {
         const data = new Uint8ClampedArray(image.height * image.width * 4)
 
         if (image instanceof ImageData) {
-          if (format === RGBAFormat) {
-            for (let i = 0; i < data.length; i += 4) {
-              data[i + 0] = image.data[i + 0]
-              data[i + 1] = image.data[i + 1]
-              data[i + 2] = image.data[i + 2]
-              data[i + 3] = image.data[i + 3]
-            }
-          } else {
-            for (let i = 0, j = 0; i < data.length; i += 4, j += 3) {
-              data[i + 0] = image.data[j + 0]
-              data[i + 1] = image.data[j + 1]
-              data[i + 2] = image.data[j + 2]
-              data[i + 3] = 255
-            }
+          for (let i = 0; i < data.length; i += 4) {
+            data[i + 0] = image.data[i + 0]
+            data[i + 1] = image.data[i + 1]
+            data[i + 2] = image.data[i + 2]
+            data[i + 3] = image.data[i + 3]
           }
         }
 

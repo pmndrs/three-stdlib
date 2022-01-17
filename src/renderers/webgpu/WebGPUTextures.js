@@ -8,7 +8,6 @@ import {
   LinearFilter,
   RepeatWrapping,
   MirroredRepeatWrapping,
-  RGBFormat,
   RGBAFormat,
   RedFormat,
   RGFormat,
@@ -485,7 +484,6 @@ class WebGPUTextures {
         formatGPU = encoding === sRGBEncoding ? GPUTextureFormat.BC3RGBAUnormSRGB : GPUTextureFormat.BC3RGBAUnorm
         break
 
-      case RGBFormat:
       case RGBAFormat:
         switch (type) {
           case UnsignedByteType:
