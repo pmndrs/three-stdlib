@@ -14,10 +14,9 @@ interface useFrameProps {
 
 interface useThreeProps {
   useFrame?: ({ clock, renderer }: useFrameProps, delta: number) => void
-  orbit?: boolean
 }
 
-export const useThree = ({ useFrame, orbit = true }: useThreeProps = {}): useThreeReturn => {
+export const useThree = ({ useFrame }: useThreeProps = {}): useThreeReturn => {
   const container = document.getElementById('canvas-root') as HTMLCanvasElement
 
   const renderer = new WebGLRenderer({
