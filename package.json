@@ -20,11 +20,6 @@
     "typegen": "tsc --emitDeclarationOnly"
   },
   "sideEffects": false,
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
       "prettier --write",
@@ -77,9 +72,9 @@
     "eslint-plugin-prettier": "^3.4.0",
     "eslint-plugin-react": "^7.24.0",
     "eslint-plugin-react-hooks": "^4.2.0",
-    "husky": "^4.2.5",
+    "husky": "^7.0.4",
     "json": "^10.0.0",
-    "lint-staged": "^10.5.4",
+    "lint-staged": "^12.1.5",
     "prettier": "^2.2.1",
     "recrawl": "^2.2.1",
     "rimraf": "^3.0.2",
