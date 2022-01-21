@@ -345,7 +345,6 @@ class ArcballControls extends EventDispatcher {
 
     if (this.domElement) this.connect(this.domElement)
 
-    window.addEventListener('keydown', this.onKeyDown)
     window.addEventListener('resize', this.onWindowResize)
   }
 
@@ -754,18 +753,6 @@ class ArcballControls extends EventDispatcher {
 
             break
         }
-      }
-    }
-  }
-
-  private onKeyDown = (event: KeyboardEvent): void => {
-    if (event.key == 'c') {
-      if (event.ctrlKey || event.metaKey) {
-        this.copyState()
-      }
-    } else if (event.key == 'v') {
-      if (event.ctrlKey || event.metaKey) {
-        this.pasteState()
       }
     }
   }
@@ -1831,7 +1818,6 @@ class ArcballControls extends EventDispatcher {
     window.removeEventListener('pointerup', this.onPointerUp)
 
     window.removeEventListener('resize', this.onWindowResize)
-    window.addEventListener('keydown', this.onKeyDown)
 
     this.scene?.remove(this._gizmos)
     this.disposeGrid()
@@ -2195,7 +2181,7 @@ class ArcballControls extends EventDispatcher {
     return _transformation
   }
 
-  private copyState = (): void => {
+  public copyState = (): void => {
     if (this.camera) {
       const state = JSON.stringify(
         this.camera?.type === 'OrthographicCamera'
@@ -2226,7 +2212,7 @@ class ArcballControls extends EventDispatcher {
     }
   }
 
-  private pasteState = (): void => {
+  public pasteState = (): void => {
     const self = this
     navigator.clipboard.readText().then(function resolved(value) {
       self.setStateFromJSON(value)
@@ -2234,7 +2220,7 @@ class ArcballControls extends EventDispatcher {
   }
 
   /**
-   * Save the current state of the control. This can later be recover with .reset
+   * Save the current state of the control. This can later be recovered with .reset
    */
   public saveState = (): void => {
     if (!this.camera) return
