@@ -3,26 +3,20 @@ import { useEffect } from '@storybook/client-api'
 
 import { useThree } from '../setup'
 
-import { OrbitControls } from '../../src'
+import { FirstPersonControls } from '../../src'
 
-const Template = ({ azimuthalAngle = 0, enabled = true, polarAngle = 0 }) => {
+const Template = ({ enabled = true }) => {
   // must run in this so the canvas has mounted in the iframe & can be accessed by `three`
   useEffect(() => {
     const { renderer, scene, camera } = useThree({
-      useFrame: () => {
-        if (controls && enabled) {
-          controls.update()
-        }
-        if (!enabled && controls) {
-          controls.setAzimuthalAngle(azimuthalAngle)
-          controls.setPolarAngle(polarAngle)
-        }
+      useFrame: (_, deltaTime) => {
+        controls?.update(deltaTime)
       },
     })
 
-    const controls = new OrbitControls(camera, renderer.domElement)
+    const controls = new FirstPersonControls(camera)
     controls.enabled = enabled
-    controls.enableDamping = true
+    controls.connect(renderer.domElement)
 
     const geometry = new BoxGeometry(2, 2)
     const material = new MeshBasicMaterial({ wireframe: true })
@@ -35,9 +29,10 @@ const Template = ({ azimuthalAngle = 0, enabled = true, polarAngle = 0 }) => {
     scene.background = new Color(0x000000).convertSRGBToLinear()
 
     return () => {
+      controls.dispose()
       renderer.dispose()
     }
-  }, [enabled, azimuthalAngle, polarAngle])
+  }, [enabled])
 
   return ''
 }
@@ -45,7 +40,7 @@ const Template = ({ azimuthalAngle = 0, enabled = true, polarAngle = 0 }) => {
 export const Default = Template.bind({})
 
 export default {
-  title: 'Controls/Orbit',
+  title: 'Controls/FirstPerson',
   argTypes: {
     enabled: {
       name: 'enabled',
@@ -54,13 +49,5 @@ export default {
       },
       defaultValue: true,
     },
-    polarAngle: { name: 'polar', control: { type: 'range', min: 0, max: 3.14, step: 0.01 }, defaultValue: 0 },
-    azimuthalAngle: { name: 'azimuthal', control: { type: 'range', min: 0, max: 3.14, step: 0.01 }, defaultValue: 0 },
   },
 }
-
-export const ProgrammaticAngle = Template.bind({})
-ProgrammaticAngle.args = {
-  enabled: false,
-}
-ProgrammaticAngle.storyName = 'Programmatic Angle'
