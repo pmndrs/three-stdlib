@@ -1421,8 +1421,14 @@ class EXRLoader extends DataTextureLoader {
       return Uint8
     }
 
-    function parseInt64(dataView, offset) {
-      var int = Number(dataView.getBigInt64(offset.value, true))
+    const parseInt64 = function (dataView, offset) {
+      let int
+
+      if ('getBigInt64' in DataView.prototype) {
+        int = Number(dataView.getBigInt64(offset.value, true))
+      } else {
+        int = dataView.getUint32(offset.value + 4, true) + Number(dataView.getUint32(offset.value, true) << 32)
+      }
 
       offset.value += ULONG_SIZE
 
@@ -1606,19 +1612,20 @@ class EXRLoader extends DataTextureLoader {
     function parseHeader(dataView, buffer, offset) {
       const EXRHeader = {}
 
-      if (dataView.getUint32(0, true) != 20000630)
+      if (dataView.getUint32(0, true) != 20000630) {
         // magic
         throw "THREE.EXRLoader: provided file doesn't appear to be in OpenEXR format."
+      }
 
-      EXRHeader.version = dataView.getUint8(4, true)
+      EXRHeader.version = dataView.getUint8(4)
 
-      const spec = dataView.getUint8(5, true) // fullMask
+      const spec = dataView.getUint8(5) // fullMask
 
       EXRHeader.spec = {
-        singleTile: !!(spec & 1),
-        longName: !!(spec & 2),
-        deepFormat: !!(spec & 4),
-        multiPart: !!(spec & 8),
+        singleTile: !!(spec & 2),
+        longName: !!(spec & 4),
+        deepFormat: !!(spec & 8),
+        multiPart: !!(spec & 16),
       }
 
       // start of header
