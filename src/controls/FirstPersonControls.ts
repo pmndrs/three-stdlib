@@ -1,8 +1,10 @@
 import { MathUtils, Spherical, Vector3, EventDispatcher, Camera } from 'three'
 
-class FirstPersonControls extends EventDispatcher {
+const targetPosition = new Vector3()
+
+export class FirstPersonControls extends EventDispatcher {
   public object: Camera
-  public domElement: HTMLElement | Document
+  public domElement?: HTMLElement | null
 
   public enabled = true
 
@@ -49,58 +51,54 @@ class FirstPersonControls extends EventDispatcher {
   private spherical = new Spherical()
   private target = new Vector3()
 
-  constructor(object: Camera, domElement: HTMLElement | Document) {
+  constructor(object: Camera, domElement?: HTMLElement | null) {
     super()
-
-    if (domElement === undefined) {
-      console.warn('THREE.FirstPersonControls: The second parameter "domElement" is now mandatory.')
-      domElement = document
-    }
 
     this.object = object
     this.domElement = domElement
 
-    if (this.domElement instanceof HTMLElement) {
-      this.domElement.setAttribute('tabindex', '-1')
-    }
+    this.setOrientation()
 
-    this.handleResize()
+    if (domElement) this.connect(domElement)
+  }
 
-    this.setOrientation(this)
+  public connect = (domElement: HTMLElement): void => {
+    domElement.setAttribute('tabindex', '-1')
 
-    this.domElement.addEventListener('contextmenu', this.contextmenu)
-    ;(this.domElement as HTMLElement).addEventListener('mousemove', this.onMouseMove)
-    ;(this.domElement as HTMLElement).addEventListener('mousedown', this.onMouseDown)
-    ;(this.domElement as HTMLElement).addEventListener('mouseup', this.onMouseUp)
+    domElement.style.touchAction = 'none'
+
+    domElement.addEventListener('contextmenu', this.contextmenu)
+    domElement.addEventListener('mousemove', this.onMouseMove)
+    domElement.addEventListener('mousedown', this.onMouseDown)
+    domElement.addEventListener('mouseup', this.onMouseUp)
+
+    this.domElement = domElement
 
     window.addEventListener('keydown', this.onKeyDown)
     window.addEventListener('keyup', this.onKeyUp)
+
+    this.handleResize()
   }
 
   public dispose = (): void => {
-    this.domElement.removeEventListener('contextmenu', this.contextmenu)
-    ;(this.domElement as HTMLElement).removeEventListener('mousedown', this.onMouseDown)
-    ;(this.domElement as HTMLElement).removeEventListener('mousemove', this.onMouseMove)
-    ;(this.domElement as HTMLElement).removeEventListener('mouseup', this.onMouseUp)
+    this.domElement?.removeEventListener('contextmenu', this.contextmenu)
+    this.domElement?.removeEventListener('mousedown', this.onMouseDown)
+    this.domElement?.removeEventListener('mousemove', this.onMouseMove)
+    this.domElement?.removeEventListener('mouseup', this.onMouseUp)
 
     window.removeEventListener('keydown', this.onKeyDown)
     window.removeEventListener('keyup', this.onKeyUp)
   }
 
   public handleResize = (): void => {
-    if (this.domElement instanceof Document) {
-      this.viewHalfX = window.innerWidth / 2
-      this.viewHalfY = window.innerHeight / 2
-    } else {
+    if (this.domElement) {
       this.viewHalfX = this.domElement.offsetWidth / 2
       this.viewHalfY = this.domElement.offsetHeight / 2
     }
   }
 
   private onMouseDown = (event: MouseEvent): void => {
-    if (this.domElement instanceof HTMLElement) {
-      this.domElement.focus()
-    }
+    this.domElement?.focus()
 
     if (this.activeLook) {
       switch (event.button) {
@@ -132,10 +130,7 @@ class FirstPersonControls extends EventDispatcher {
   }
 
   private onMouseMove = (event: MouseEvent): void => {
-    if (this.domElement instanceof Document) {
-      this.mouseX = event.pageX - this.viewHalfX
-      this.mouseY = event.pageY - this.viewHalfY
-    } else {
+    if (this.domElement) {
       this.mouseX = event.pageX - this.domElement.offsetLeft - this.viewHalfX
       this.mouseY = event.pageY - this.domElement.offsetTop - this.viewHalfY
     }
@@ -212,15 +207,13 @@ class FirstPersonControls extends EventDispatcher {
 
     this.object.lookAt(this.target)
 
-    this.setOrientation(this)
+    this.setOrientation()
 
     return this
   }
 
-  private targetPosition = new Vector3()
-
   public update = (delta: number): void => {
-    if (this.enabled === false) return
+    if (!this.enabled) return
 
     if (this.heightSpeed) {
       const y = MathUtils.clamp(this.object.position.y, this.heightMin, this.heightMax)
@@ -270,21 +263,17 @@ class FirstPersonControls extends EventDispatcher {
 
     const position = this.object.position
 
-    this.targetPosition.setFromSphericalCoords(1, phi, theta).add(position)
+    targetPosition.setFromSphericalCoords(1, phi, theta).add(position)
 
-    this.object.lookAt(this.targetPosition)
+    this.object.lookAt(targetPosition)
   }
 
   private contextmenu = (event: Event): void => event.preventDefault()
 
-  private setOrientation = (controls: FirstPersonControls): void => {
-    const quaternion = controls.object.quaternion
-
-    this.lookDirection.set(0, 0, -1).applyQuaternion(quaternion)
+  private setOrientation = (): void => {
+    this.lookDirection.set(0, 0, -1).applyQuaternion(this.object.quaternion)
     this.spherical.setFromVector3(this.lookDirection)
     this.lat = 90 - MathUtils.radToDeg(this.spherical.phi)
     this.lon = MathUtils.radToDeg(this.spherical.theta)
   }
 }
-
-export { FirstPersonControls }
