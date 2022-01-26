@@ -5,7 +5,7 @@ import {
   FileLoader,
   DataTexture,
   DataTexture3D,
-  RGBFormat,
+  RGBAFormat,
   UnsignedByteType,
   ClampToEdgeWrapping,
   LinearFilter,
@@ -59,7 +59,7 @@ export class LUT3dlLoader extends Loader {
       }
     }
 
-    const dataArray = new Array(size * size * size * 3)
+    const dataArray = new Array(size * size * size * 4)
     let index = 0
     let maxOutputValue = 0.0
     for (let i = 1, l = lines.length; i < l; i++) {
@@ -77,19 +77,24 @@ export class LUT3dlLoader extends Loader {
 
       // b grows first, then g, then r
       const pixelIndex = bLayer * size * size + gLayer * size + rLayer
-      dataArray[3 * pixelIndex + 0] = r
-      dataArray[3 * pixelIndex + 1] = g
-      dataArray[3 * pixelIndex + 2] = b
+      dataArray[4 * pixelIndex + 0] = r
+      dataArray[4 * pixelIndex + 1] = g
+      dataArray[4 * pixelIndex + 2] = b
+      dataArray[4 * pixelIndex + 3] = 1.0
       index += 1
     }
 
-    // Find the apparent bit depth of the stored RGB values and scale the
+    // Find the apparent bit depth of the stored RGB values and map the
     // values to [ 0, 255 ].
     const bits = Math.ceil(Math.log2(maxOutputValue))
     const maxBitValue = Math.pow(2.0, bits)
-    for (let i = 0, l = dataArray.length; i < l; i++) {
-      const val = dataArray[i]
-      dataArray[i] = (255 * val) / maxBitValue
+    for (let i = 0, l = dataArray.length; i < l; i += 4) {
+      const r = dataArray[i + 0]
+      const g = dataArray[i + 1]
+      const b = dataArray[i + 2]
+      dataArray[i + 0] = (255 * r) / maxBitValue // r
+      dataArray[i + 1] = (255 * g) / maxBitValue // g
+      dataArray[i + 2] = (255 * b) / maxBitValue // b
     }
 
     const data = new Uint8Array(dataArray)
@@ -97,7 +102,7 @@ export class LUT3dlLoader extends Loader {
     texture.image.data = data
     texture.image.width = size
     texture.image.height = size * size
-    texture.format = RGBFormat
+    texture.format = RGBAFormat
     texture.type = UnsignedByteType
     texture.magFilter = LinearFilter
     texture.minFilter = LinearFilter
@@ -110,7 +115,7 @@ export class LUT3dlLoader extends Loader {
     texture3D.image.width = size
     texture3D.image.height = size
     texture3D.image.depth = size
-    texture3D.format = RGBFormat
+    texture3D.format = RGBAFormat
     texture3D.type = UnsignedByteType
     texture3D.magFilter = LinearFilter
     texture3D.minFilter = LinearFilter

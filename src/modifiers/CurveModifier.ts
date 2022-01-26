@@ -1,11 +1,11 @@
 // Original src: https://github.com/zz85/threejs-path-flow
-const BITS = 3
+const CHANNELS = 3
 const TEXTURE_WIDTH = 1024
 const TEXTURE_HEIGHT = 4
 
 import {
   DataTexture,
-  RGBFormat,
+  RGBAFormat,
   FloatType,
   RepeatWrapping,
   Mesh,
@@ -27,8 +27,8 @@ import { TUniform } from 'types/shared'
  * @param { number } numberOfCurves the number of curves needed to be described by this texture.
  */
 export const initSplineTexture = (numberOfCurves = 1): DataTexture => {
-  const dataArray = new Float32Array(TEXTURE_WIDTH * TEXTURE_HEIGHT * numberOfCurves * BITS)
-  const dataTexture = new DataTexture(dataArray, TEXTURE_WIDTH, TEXTURE_HEIGHT * numberOfCurves, RGBFormat, FloatType)
+  const dataArray = new Float32Array(TEXTURE_WIDTH * TEXTURE_HEIGHT * numberOfCurves * CHANNELS)
+  const dataTexture = new DataTexture(dataArray, TEXTURE_WIDTH, TEXTURE_HEIGHT * numberOfCurves, RGBAFormat, FloatType)
 
   dataTexture.wrapS = RepeatWrapping
   dataTexture.wrapT = RepeatWrapping
@@ -76,10 +76,11 @@ export const updateSplineTexture = <TCurve extends Curve<any>>(
 const setTextureValue = (texture: DataTexture, index: number, x: number, y: number, z: number, o: number): void => {
   const image = texture.image
   const { data } = image
-  const i = BITS * TEXTURE_WIDTH * o // Row Offset
-  data[index * BITS + i + 0] = x
-  data[index * BITS + i + 1] = y
-  data[index * BITS + i + 2] = z
+  const i = CHANNELS * TEXTURE_WIDTH * o // Row Offset
+  data[index * CHANNELS + i + 0] = x
+  data[index * CHANNELS + i + 1] = y
+  data[index * CHANNELS + i + 2] = z
+  data[index * CHANNELS + i + 3] = 1
 }
 
 export interface CurveModifierUniforms {

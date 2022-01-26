@@ -47,7 +47,6 @@ import {
   PropertyBinding,
   Quaternion,
   QuaternionKeyframeTrack,
-  RGBFormat,
   RepeatWrapping,
   Skeleton,
   SkinnedMesh,
@@ -1149,7 +1148,6 @@ class GLTFMeshStandardSGMaterial extends MeshStandardMaterial {
       'vec3 specularFactor = specular;',
       '#ifdef USE_SPECULARMAP',
       '	vec4 texelSpecular = texture2D( specularMap, vUv );',
-      '	texelSpecular = sRGBToLinear( texelSpecular );',
       '	// reads channel RGB, compatible with a glTF Specular-Glossiness (RGBA) texture',
       '	specularFactor *= texelSpecular.rgb;',
       '#endif',
@@ -1792,7 +1790,10 @@ class GLTFParser {
 
     // Use an ImageBitmapLoader if imageBitmaps are supported. Moves much of the
     // expensive work of uploading a texture to the GPU off the main thread.
-    if (typeof createImageBitmap !== 'undefined' && /Firefox|Safari/.test(navigator.userAgent) === false) {
+    if (
+      typeof createImageBitmap !== 'undefined' &&
+      /Firefox|^((?!chrome|android).)*safari/i.test(navigator.userAgent) === false
+    ) {
       this.textureLoader = new ImageBitmapLoader(this.options.manager)
     } else {
       this.textureLoader = new TextureLoader(this.options.manager)
@@ -2559,6 +2560,7 @@ class GLTFParser {
     } else {
       materialParams.format = RGBFormat
       materialParams.transparent = false
+      materialParams.alphaWrite = false
 
       if (alphaMode === ALPHA_MODES.MASK) {
         materialParams.alphaTest = materialDef.alphaCutoff !== undefined ? materialDef.alphaCutoff : 0.5

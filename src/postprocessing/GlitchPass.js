@@ -1,34 +1,35 @@
-import { DataTexture, FloatType, MathUtils, RGBFormat, ShaderMaterial, UniformsUtils } from 'three'
-import { Pass, FullScreenQuad } from '../postprocessing/Pass'
+import { DataTexture, FloatType, MathUtils, RedFormat, LuminanceFormat, ShaderMaterial, UniformsUtils } from 'three'
+import { Pass, FullScreenQuad } from './Pass'
 import { DigitalGlitch } from '../shaders/DigitalGlitch'
 
-var GlitchPass = function (dt_size) {
-  if (DigitalGlitch === undefined) console.error('THREE.GlitchPass relies on DigitalGlitch')
+class GlitchPass extends Pass {
+  constructor(dt_size = 64) {
+    super()
 
-  var shader = DigitalGlitch
-  this.uniforms = UniformsUtils.clone(shader.uniforms)
+    if (DigitalGlitch === undefined) console.error('THREE.GlitchPass relies on DigitalGlitch')
 
-  if (dt_size == undefined) dt_size = 64
+    const shader = DigitalGlitch
 
-  this.uniforms['tDisp'].value = this.generateHeightmap(dt_size)
+    this.uniforms = UniformsUtils.clone(shader.uniforms)
 
-  this.material = new ShaderMaterial({
-    uniforms: this.uniforms,
-    vertexShader: shader.vertexShader,
-    fragmentShader: shader.fragmentShader,
-  })
+    this.uniforms['tDisp'].value = this.generateHeightmap(dt_size)
 
-  this.fsQuad = new FullScreenQuad(this.material)
+    this.material = new ShaderMaterial({
+      uniforms: this.uniforms,
+      vertexShader: shader.vertexShader,
+      fragmentShader: shader.fragmentShader,
+    })
 
-  this.goWild = false
-  this.curF = 0
-  this.generateTrigger()
-}
+    this.fsQuad = new FullScreenQuad(this.material)
 
-GlitchPass.prototype = Object.assign(Object.create(Pass.prototype), {
-  constructor: GlitchPass,
+    this.goWild = false
+    this.curF = 0
+    this.generateTrigger()
+  }
 
-  render: function (renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */) {
+  render(renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */) {
+    if (renderer.capabilities.isWebGL2 === false) this.uniforms['tDisp'].value.format = LuminanceFormat
+
     this.uniforms['tDiffuse'].value = readBuffer.texture
     this.uniforms['seed'].value = Math.random() //default seeding
     this.uniforms['byp'].value = 0
@@ -63,25 +64,25 @@ GlitchPass.prototype = Object.assign(Object.create(Pass.prototype), {
       if (this.clear) renderer.clear()
       this.fsQuad.render(renderer)
     }
-  },
+  }
 
-  generateTrigger: function () {
+  generateTrigger() {
     this.randX = MathUtils.randInt(120, 240)
-  },
+  }
 
-  generateHeightmap: function (dt_size) {
-    var data_arr = new Float32Array(dt_size * dt_size * 3)
-    var length = dt_size * dt_size
+  generateHeightmap(dt_size) {
+    const data_arr = new Float32Array(dt_size * dt_size)
+    const length = dt_size * dt_size
 
     for (let i = 0; i < length; i++) {
-      var val = MathUtils.randFloat(0, 1)
-      data_arr[i * 3 + 0] = val
-      data_arr[i * 3 + 1] = val
-      data_arr[i * 3 + 2] = val
+      const val = MathUtils.randFloat(0, 1)
+      data_arr[i] = val
     }
 
-    return new DataTexture(data_arr, dt_size, dt_size, RGBFormat, FloatType)
-  },
-})
+    const texture = new DataTexture(data_arr, dt_size, dt_size, RedFormat, FloatType)
+    texture.needsUpdate = true
+    return texture
+  }
+}
 
 export { GlitchPass }
