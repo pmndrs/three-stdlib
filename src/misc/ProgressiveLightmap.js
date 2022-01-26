@@ -1,7 +1,6 @@
 import {
   Scene,
   WebGLRenderTarget,
-  HalfFloatType,
   FloatType,
   MeshBasicMaterial,
   MeshPhongMaterial,

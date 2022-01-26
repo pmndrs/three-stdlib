@@ -579,18 +579,24 @@ AssimpLoader.prototype = Object.assign(Object.create(Loader.prototype), {
         else mat = new MeshLambertMaterial()
         geometry.setIndex(new BufferAttribute(new Uint32Array(this.mIndexArray), 1))
         geometry.setAttribute('position', new BufferAttribute(this.mVertexBuffer, 3))
-        if (this.mNormalBuffer && this.mNormalBuffer.length > 0)
+        if (this.mNormalBuffer && this.mNormalBuffer.length > 0) {
           geometry.setAttribute('normal', new BufferAttribute(this.mNormalBuffer, 3))
-        if (this.mColorBuffer && this.mColorBuffer.length > 0)
+        }
+        if (this.mColorBuffer && this.mColorBuffer.length > 0) {
           geometry.setAttribute('color', new BufferAttribute(this.mColorBuffer, 4))
-        if (this.mTexCoordsBuffers[0] && this.mTexCoordsBuffers[0].length > 0)
+        }
+        if (this.mTexCoordsBuffers[0] && this.mTexCoordsBuffers[0].length > 0) {
           geometry.setAttribute('uv', new BufferAttribute(new Float32Array(this.mTexCoordsBuffers[0]), 2))
-        if (this.mTexCoordsBuffers[1] && this.mTexCoordsBuffers[1].length > 0)
+        }
+        if (this.mTexCoordsBuffers[1] && this.mTexCoordsBuffers[1].length > 0) {
           geometry.setAttribute('uv1', new BufferAttribute(new Float32Array(this.mTexCoordsBuffers[1]), 2))
-        if (this.mTangentBuffer && this.mTangentBuffer.length > 0)
+        }
+        if (this.mTangentBuffer && this.mTangentBuffer.length > 0) {
           geometry.setAttribute('tangents', new BufferAttribute(this.mTangentBuffer, 3))
-        if (this.mBitangentBuffer && this.mBitangentBuffer.length > 0)
+        }
+        if (this.mBitangentBuffer && this.mBitangentBuffer.length > 0) {
           geometry.setAttribute('bitangents', new BufferAttribute(this.mBitangentBuffer, 3))
+        }
         if (this.mBones.length > 0) {
           var weights = []
           var bones = []
@@ -833,14 +839,18 @@ AssimpLoader.prototype = Object.assign(Object.create(Loader.prototype), {
         var mat = new MeshPhongMaterial()
 
         for (let i = 0; i < this.mProperties.length; i++) {
-          if (nameTypeMapping[this.mProperties[i].mKey] == 'float')
+          if (nameTypeMapping[this.mProperties[i].mKey] == 'float') {
             mat[namePropMapping[this.mProperties[i].mKey]] = this.mProperties[i].dataAsFloat()
-          if (nameTypeMapping[this.mProperties[i].mKey] == 'color')
+          }
+          if (nameTypeMapping[this.mProperties[i].mKey] == 'color') {
             mat[namePropMapping[this.mProperties[i].mKey]] = this.mProperties[i].dataAsColor()
-          if (nameTypeMapping[this.mProperties[i].mKey] == 'bool')
+          }
+          if (nameTypeMapping[this.mProperties[i].mKey] == 'bool') {
             mat[namePropMapping[this.mProperties[i].mKey]] = this.mProperties[i].dataAsBool()
-          if (nameTypeMapping[this.mProperties[i].mKey] == 'string')
+          }
+          if (nameTypeMapping[this.mProperties[i].mKey] == 'string') {
             mat[namePropMapping[this.mProperties[i].mKey]] = this.mProperties[i].dataAsString()
+          }
           if (nameTypeMapping[this.mProperties[i].mKey] == 'map') {
             var prop = this.mProperties[i]
             if (prop.mSemantic == aiTextureType_DIFFUSE) mat.map = this.mProperties[i].dataAsMap()

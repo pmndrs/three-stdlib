@@ -814,12 +814,13 @@ class SVGLoader extends Loader {
       }
 
       function addStyle(svgName, jsName, adjustFunction) {
-        if (adjustFunction === undefined)
+        if (adjustFunction === undefined) {
           adjustFunction = function copy(v) {
             if (v.startsWith('url')) console.warn('SVGLoader: url access in attributes is not implemented.')
 
             return v
           }
+        }
 
         if (node.hasAttribute(svgName)) style[jsName] = adjustFunction(node.getAttribute(svgName))
         if (stylesheetStyles[svgName]) style[jsName] = adjustFunction(stylesheetStyles[svgName])
@@ -1816,7 +1817,9 @@ class SVGLoader extends Loader {
         if (isClosed) {
           // Skip duplicated initial point
           nextPoint = points[1]
-        } else nextPoint = undefined
+        } else {
+          nextPoint = undefined
+        }
       } else {
         nextPoint = points[iPoint + 1]
       }

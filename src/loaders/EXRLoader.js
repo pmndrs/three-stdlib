@@ -1190,8 +1190,9 @@ class EXRLoader extends DataTextureLoader {
         acCompression: parseInt64(inDataView, inOffset),
       }
 
-      if (dwaHeader.version < 2)
+      if (dwaHeader.version < 2) {
         throw 'EXRLoader.parse: ' + EXRHeader.compression + ' version ' + dwaHeader.version + ' is unsupported'
+      }
 
       // Read channel ruleset information
       var channelRules = new Array()

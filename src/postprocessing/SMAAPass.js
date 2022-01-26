@@ -1,8 +1,6 @@
 import { LinearFilter, NearestFilter, ShaderMaterial, Texture, UniformsUtils, WebGLRenderTarget } from 'three'
 import { Pass, FullScreenQuad } from './Pass'
-import { SMAAEdgesShader } from '../shaders/SMAAShader'
-import { SMAAWeightsShader } from '../shaders/SMAAShader'
-import { SMAABlendShader } from '../shaders/SMAAShader'
+import { SMAAEdgesShader, SMAAWeightsShader, SMAABlendShader } from '../shaders/SMAAShader'
 
 class SMAAPass extends Pass {
   constructor(width, height) {

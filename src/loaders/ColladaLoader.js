@@ -464,8 +464,9 @@ class ColladaLoader extends Loader {
       }
 
       if (positionData.length > 0) tracks.push(new VectorKeyframeTrack(name + '.position', times, positionData))
-      if (quaternionData.length > 0)
+      if (quaternionData.length > 0) {
         tracks.push(new QuaternionKeyframeTrack(name + '.quaternion', times, quaternionData))
+      }
       if (scaleData.length > 0) tracks.push(new VectorKeyframeTrack(name + '.scale', times, scaleData))
 
       return tracks
@@ -2016,18 +2017,22 @@ class ColladaLoader extends Loader {
 
       // build geometry
 
-      if (position.array.length > 0)
+      if (position.array.length > 0) {
         geometry.setAttribute('position', new Float32BufferAttribute(position.array, position.stride))
-      if (normal.array.length > 0)
+      }
+      if (normal.array.length > 0) {
         geometry.setAttribute('normal', new Float32BufferAttribute(normal.array, normal.stride))
+      }
       if (color.array.length > 0) geometry.setAttribute('color', new Float32BufferAttribute(color.array, color.stride))
       if (uv.array.length > 0) geometry.setAttribute('uv', new Float32BufferAttribute(uv.array, uv.stride))
       if (uv2.array.length > 0) geometry.setAttribute('uv2', new Float32BufferAttribute(uv2.array, uv2.stride))
 
-      if (skinIndex.array.length > 0)
+      if (skinIndex.array.length > 0) {
         geometry.setAttribute('skinIndex', new Float32BufferAttribute(skinIndex.array, skinIndex.stride))
-      if (skinWeight.array.length > 0)
+      }
+      if (skinWeight.array.length > 0) {
         geometry.setAttribute('skinWeight', new Float32BufferAttribute(skinWeight.array, skinWeight.stride))
+      }
 
       build.data = geometry
       build.type = primitives[0].type
