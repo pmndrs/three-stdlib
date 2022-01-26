@@ -2558,7 +2558,6 @@ class GLTFParser {
       // See: https://github.com/mrdoob/three.js/issues/17706
       materialParams.depthWrite = false
     } else {
-      materialParams.format = RGBFormat
       materialParams.transparent = false
       materialParams.alphaWrite = false
 
