@@ -2446,7 +2446,6 @@ class GLTFMaterialsVolumeExtension {
         // @ts-expect-error
         material.isMeshPhysicalMaterial
       ) ||
-      // @ts-expect-error
       material.thickness === 0
     ) {
       return
@@ -2457,29 +2456,17 @@ class GLTFMaterialsVolumeExtension {
 
     const extensionDef: ExtensionDef = {}
 
-    extensionDef.thickness =
-      // @ts-expect-error
-      material.thickness
+    extensionDef.thickness = material.thickness
 
-    // @ts-expect-error
     if (material.thicknessMap) {
       const thicknessMapDef = {
-        index: writer.processTexture(
-          // @ts-expect-error
-          material.thicknessMap,
-        ),
+        index: writer.processTexture(material.thicknessMap),
       }
-      writer.applyTextureTransform(
-        thicknessMapDef,
-        // @ts-expect-error
-        material.thicknessMap,
-      )
+      writer.applyTextureTransform(thicknessMapDef, material.thicknessMap)
       extensionDef.thicknessTexture = thicknessMapDef
     }
 
-    extensionDef.attenuationDistance =
-      //@ts-expect-error
-      material.attenuationDistance
+    extensionDef.attenuationDistance = material.attenuationDistance
     extensionDef.attenuationColor =
       //@ts-expect-error
       material.attenuationTint.toArray()

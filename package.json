@@ -61,7 +61,7 @@
     "@storybook/preset-typescript": "^3.0.0",
     "@types/draco3d": "^1.4.0",
     "@types/offscreencanvas": "^2019.6.4",
-    "@types/three": "^0.127.1",
+    "@types/three": "^0.137.0",
     "@typescript-eslint/eslint-plugin": "^4.28.0",
     "@typescript-eslint/parser": "^4.28.0",
     "babel-loader": "^8.2.3",
@@ -90,7 +90,7 @@
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-size-snapshot": "^0.12.0",
     "rollup-plugin-terser": "^7.0.2",
-    "three": "^0.126.0",
+    "three": "^0.137.4",
     "tslib": "^2.2.0",
     "typescript": "^4.2.4",
     "webpack": "^5.65.0"

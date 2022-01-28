@@ -2684,10 +2684,10 @@
   resolved "https://registry.yarnpkg.com/@types/tapable/-/tapable-1.0.8.tgz#b94a4391c85666c7b73299fd3ad79d4faa435310"
   integrity sha512-ipixuVrh2OdNmauvtT51o3d8z12p6LtFW9in7U79der/kwejjdNchQC5UMn5u/KxNoM7VHHOs/l8KS8uHxhODQ==
 
-"@types/three@^0.127.1":
-  version "0.127.1"
-  resolved "https://registry.yarnpkg.com/@types/three/-/three-0.127.1.tgz#0978054e5daa6485946a3f1518a76412186ae81f"
-  integrity sha512-e90iYq3zde3axANg7BPZY0fKrez1AzveamIIFk23PMh9WtCx91geokDy+yEAIymdIldgUpvezAP6+zCV3oekXw==
+"@types/three@^0.137.0":
+  version "0.137.0"
+  resolved "https://registry.yarnpkg.com/@types/three/-/three-0.137.0.tgz#6047e0658262b4de7c464a40288f9071ddd9a6d5"
+  integrity sha512-Xc5EAlfYmgrCLI/VlSVqiRJAtzhWF0Rw2jSq48nqJy+Hcb5sfDOXyfZn1+RNcHyi9l8CeCAXCZygO8IyeOJVEA==
 
 "@types/uglify-js@*":
   version "3.13.1"
@@ -11077,10 +11077,10 @@ text-table@0.2.0, text-table@^0.2.0:
   resolved "https://registry.yarnpkg.com/text-table/-/text-table-0.2.0.tgz#7f5ee823ae805207c00af2df4a84ec3fcfa570b4"
   integrity sha1-f17oI66AUgfACvLfSoTsP8+lcLQ=
 
-three@^0.126.0:
-  version "0.126.0"
-  resolved "https://registry.yarnpkg.com/three/-/three-0.126.0.tgz#924818341cd4441ef247e3cbf236f6160b90a216"
-  integrity sha512-/MecvboUefStCkUfXLImoJxthN+FoLPcEP7pz1r1Dd9i8BPGGuj+S1sOPRvW4Z+ViZjP2oWWm1inNC/MT52ybA==
+three@^0.137.4:
+  version "0.137.4"
+  resolved "https://registry.yarnpkg.com/three/-/three-0.137.4.tgz#ec73b6a6c40b733d56544b13d0c3cdb0bce5d0a7"
+  integrity sha512-kUyOZNX+dMbvaS0mGYM1BaXHkHVNQdpryWH8dBg3mn725dJcTo9/5rjyH+OJ8V0r+XbZPz7sncV+c3Gjpc9UBA==
 
 throttle-debounce@^3.0.1:
   version "3.0.1"
