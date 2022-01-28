@@ -13,7 +13,6 @@ import {
   Points,
   Material,
   SkinnedMesh,
-  MeshStandardMaterial,
 } from 'three'
 
 import { getWithKey } from '../types/helpers'
@@ -606,7 +605,12 @@ export function computeMorphedAttributes(object: Mesh | Line | Points): Computed
 
     const morphInfluences = object.morphTargetInfluences
 
-    if ((material as MeshStandardMaterial).morphTargets && morphAttribute && morphInfluences) {
+    if (
+      // @ts-expect-error
+      material.morphTargets &&
+      morphAttribute &&
+      morphInfluences
+    ) {
       _morphA.set(0, 0, 0)
       _morphB.set(0, 0, 0)
       _morphC.set(0, 0, 0)
