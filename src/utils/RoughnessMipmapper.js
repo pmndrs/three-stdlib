@@ -46,8 +46,9 @@ RoughnessMipmapper.prototype = {
       normalMap === null ||
       !roughnessMap.generateMipmaps ||
       material.userData.roughnessUpdated
-    )
+    ) {
       return
+    }
 
     material.userData.roughnessUpdated = true
 

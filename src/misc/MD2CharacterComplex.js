@@ -357,10 +357,12 @@ var MD2CharacterComplex = function () {
 
     this.maxReverseSpeed = -this.maxSpeed
 
-    if (controls.moveForward)
+    if (controls.moveForward) {
       this.speed = MathUtils.clamp(this.speed + delta * this.frontAcceleration, this.maxReverseSpeed, this.maxSpeed)
-    if (controls.moveBackward)
+    }
+    if (controls.moveBackward) {
       this.speed = MathUtils.clamp(this.speed - delta * this.backAcceleration, this.maxReverseSpeed, this.maxSpeed)
+    }
 
     // orientation based on controls
     // (don't just stand while turning)

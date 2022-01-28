@@ -590,8 +590,9 @@ class FBXTreeParser {
           const skeleton = this.parseSkeleton(relationships, DeformerNodes)
           skeleton.ID = nodeID
 
-          if (relationships.parents.length > 1)
+          if (relationships.parents.length > 1) {
             console.warn('THREE.FBXLoader: skeleton attached to more than one geometry is not supported.')
+          }
           skeleton.geometryID = relationships.parents[0].ID
 
           skeletons[nodeID] = skeleton
@@ -603,8 +604,9 @@ class FBXTreeParser {
           morphTarget.rawTargets = this.parseMorphTargets(relationships, DeformerNodes)
           morphTarget.id = nodeID
 
-          if (relationships.parents.length > 1)
+          if (relationships.parents.length > 1) {
             console.warn('THREE.FBXLoader: morph target attached to more than one geometry is not supported.')
+          }
 
           morphTargets[nodeID] = morphTarget
         }

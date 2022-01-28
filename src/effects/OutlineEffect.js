@@ -263,8 +263,9 @@ const OutlineEffect = function (renderer, parameters) {
     material.uniforms.outlineAlpha.value = originalMaterial.opacity
 
     if (outlineParameters !== undefined) {
-      if (outlineParameters.thickness !== undefined)
+      if (outlineParameters.thickness !== undefined) {
         material.uniforms.outlineThickness.value = outlineParameters.thickness
+      }
       if (outlineParameters.color !== undefined) material.uniforms.outlineColor.value.fromArray(outlineParameters.color)
       if (outlineParameters.alpha !== undefined) material.uniforms.outlineAlpha.value = outlineParameters.alpha
     }
@@ -299,8 +300,9 @@ const OutlineEffect = function (renderer, parameters) {
       material.transparent =
         outlineParameters.alpha !== undefined && outlineParameters.alpha < 1.0 ? true : originalMaterial.transparent
 
-      if (outlineParameters.keepAlive !== undefined)
+      if (outlineParameters.keepAlive !== undefined) {
         cache[originalMaterial.uuid].keepAlive = outlineParameters.keepAlive
+      }
     } else {
       material.transparent = originalMaterial.transparent
       material.visible = originalMaterial.visible
