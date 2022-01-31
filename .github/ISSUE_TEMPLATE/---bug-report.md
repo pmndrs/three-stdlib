@@ -17,6 +17,7 @@ assignees: ''
 -->
 
 - `three` version:
+- `@types/three` version:
 - `three-stdlib` version:
 
 ### Problem description:
