@@ -109,6 +109,6 @@
     "zstddec": "^0.0.2"
   },
   "peerDependencies": {
-    "three": ">=0.128.0"
+    "three": ">=0.137.0"
   }
 }
