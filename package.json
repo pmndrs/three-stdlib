@@ -98,7 +98,6 @@
   "dependencies": {
     "@babel/runtime": "^7.16.7",
     "@webgpu/glslang": "^0.0.15",
-    "@webxr-input-profiles/motion-controllers": "^1.0.0",
     "chevrotain": "^9.0.2",
     "draco3d": "^1.4.1",
     "fflate": "^0.6.9",
