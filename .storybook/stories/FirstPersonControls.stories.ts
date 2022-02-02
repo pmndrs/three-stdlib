@@ -47,7 +47,6 @@ export default {
       control: {
         type: 'boolean',
       },
-      defaultValue: true,
     },
   },
 }

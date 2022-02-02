@@ -5,7 +5,17 @@ import { useThree } from '../setup'
 
 import { OrbitControls } from '../../src'
 
-const Template = ({ azimuthalAngle = 0, enabled = true, polarAngle = 0 }) => {
+type Args = {
+  azimuthalAngle?: number
+  enabled?: boolean
+  polarAngle?: number
+}
+
+const Template: {
+  (args: Args): string
+  args?: Args
+  storyName?: string
+} = ({ azimuthalAngle = 0, enabled = true, polarAngle = 0 }) => {
   // must run in this so the canvas has mounted in the iframe & can be accessed by `three`
   useEffect(() => {
     const { renderer, scene, camera } = useThree({
@@ -14,8 +24,8 @@ const Template = ({ azimuthalAngle = 0, enabled = true, polarAngle = 0 }) => {
           controls.update()
         }
         if (!enabled && controls) {
-          controls.setAzimuthalAngle(azimuthalAngle)
-          controls.setPolarAngle(polarAngle)
+          controls.setAzimuthalAngle(azimuthalAngle * Math.PI)
+          controls.setPolarAngle(polarAngle * Math.PI)
         }
       },
     })
@@ -43,6 +53,7 @@ const Template = ({ azimuthalAngle = 0, enabled = true, polarAngle = 0 }) => {
 }
 
 export const Default = Template.bind({})
+Default.args = { azimuthalAngle: 0, enabled: true, polarAngle: 0 }
 
 export default {
   title: 'Controls/Orbit',
@@ -52,15 +63,12 @@ export default {
       control: {
         type: 'boolean',
       },
-      defaultValue: true,
     },
-    polarAngle: { name: 'polar', control: { type: 'range', min: 0, max: 3.14, step: 0.01 }, defaultValue: 0 },
-    azimuthalAngle: { name: 'azimuthal', control: { type: 'range', min: 0, max: 3.14, step: 0.01 }, defaultValue: 0 },
+    polarAngle: { name: 'polar', control: { type: 'range', min: 0, max: 1, step: 0.01 } },
+    azimuthalAngle: { name: 'azimuthal', control: { type: 'range', min: 0, max: 1, step: 0.01 } },
   },
 }
 
 export const ProgrammaticAngle = Template.bind({})
-ProgrammaticAngle.args = {
-  enabled: false,
-}
+ProgrammaticAngle.args = { azimuthalAngle: 0, enabled: false, polarAngle: 0 }
 ProgrammaticAngle.storyName = 'Programmatic Angle'
