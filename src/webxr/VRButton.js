@@ -55,9 +55,7 @@ class VRButton {
           // ('local' is always available for immersive sessions and doesn't need to
           // be requested separately.)
 
-          const sessionInit = {
-            optionalFeatures: ['local-floor', 'bounded-floor', 'hand-tracking'],
-          }
+          const sessionInit = { optionalFeatures: ['local-floor', 'bounded-floor', 'hand-tracking', 'layers'] }
           navigator.xr.requestSession('immersive-vr', sessionInit).then(onSessionStarted)
         } else {
           currentSession.end()
@@ -107,6 +105,10 @@ class VRButton {
 
       navigator.xr.isSessionSupported('immersive-vr').then(function (supported) {
         supported ? showEnterVR() : showWebXRNotFound()
+
+        if (supported && VRButton.xrSessionIsGranted) {
+          button.click()
+        }
       })
 
       return button
@@ -128,6 +130,16 @@ class VRButton {
       stylizeElement(message)
 
       return message
+    }
+  }
+
+  static xrSessionIsGranted = false
+
+  static registerSessionGrantedListener() {
+    if ('xr' in navigator) {
+      navigator.xr.addEventListener('sessiongranted', () => {
+        VRButton.xrSessionIsGranted = true
+      })
     }
   }
 }
