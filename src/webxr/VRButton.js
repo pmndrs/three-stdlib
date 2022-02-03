@@ -144,6 +144,4 @@ class VRButton {
   }
 }
 
-VRButton.registerSessionGrantedListener()
-
 export { VRButton }
