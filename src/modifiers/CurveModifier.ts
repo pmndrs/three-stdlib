@@ -1,5 +1,5 @@
 // Original src: https://github.com/zz85/threejs-path-flow
-const CHANNELS = 3
+const CHANNELS = 4
 const TEXTURE_WIDTH = 1024
 const TEXTURE_HEIGHT = 4
 
