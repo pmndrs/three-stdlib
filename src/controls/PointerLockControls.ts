@@ -2,7 +2,7 @@ import { Camera, Euler, EventDispatcher, Vector3 } from 'three'
 
 class PointerLockControls extends EventDispatcher {
   private camera: Camera
-  public domElement: HTMLElement
+  public domElement?: HTMLElement
 
   public isLocked = false
 
@@ -16,51 +16,37 @@ class PointerLockControls extends EventDispatcher {
   private unlockEvent = { type: 'unlock' }
 
   private euler = new Euler(0, 0, 0, 'YXZ')
-
   private PI_2 = Math.PI / 2
-
   private vec = new Vector3()
 
-  constructor(camera: Camera, domElement: HTMLElement) {
+  constructor(camera: Camera, domElement?: HTMLElement) {
     super()
-
-    if (domElement === undefined) {
-      console.warn('THREE.PointerLockControls: The second parameter "domElement" is now mandatory.')
-      domElement = document.body
-    }
-
     this.domElement = domElement
     this.camera = camera
-
-    this.connect()
+    if (this.domElement) this.connect()
   }
 
   private onMouseMove = (event: MouseEvent): void => {
-    if (this.isLocked === false) return
+    if (!this.domElement || this.isLocked === false) return
 
     const movementX = event.movementX || (event as any).mozMovementX || (event as any).webkitMovementX || 0
     const movementY = event.movementY || (event as any).mozMovementY || (event as any).webkitMovementY || 0
 
     this.euler.setFromQuaternion(this.camera.quaternion)
-
     this.euler.y -= movementX * 0.002
     this.euler.x -= movementY * 0.002
-
     this.euler.x = Math.max(this.PI_2 - this.maxPolarAngle, Math.min(this.PI_2 - this.minPolarAngle, this.euler.x))
-
     this.camera.quaternion.setFromEuler(this.euler)
-
     this.dispatchEvent(this.changeEvent)
   }
 
   private onPointerlockChange = (): void => {
+    if (!this.domElement) return
     if (this.domElement.ownerDocument.pointerLockElement === this.domElement) {
       this.dispatchEvent(this.lockEvent)
-
       this.isLocked = true
     } else {
       this.dispatchEvent(this.unlockEvent)
-
       this.isLocked = false
     }
   }
@@ -70,12 +56,14 @@ class PointerLockControls extends EventDispatcher {
   }
 
   public connect = (): void => {
+    if (!this.domElement) return
     this.domElement.ownerDocument.addEventListener('mousemove', this.onMouseMove)
     this.domElement.ownerDocument.addEventListener('pointerlockchange', this.onPointerlockChange)
     this.domElement.ownerDocument.addEventListener('pointerlockerror', this.onPointerlockError)
   }
 
   public disconnect = (): void => {
+    if (!this.domElement) return
     this.domElement.ownerDocument.removeEventListener('mousemove', this.onMouseMove)
     this.domElement.ownerDocument.removeEventListener('pointerlockchange', this.onPointerlockChange)
     this.domElement.ownerDocument.removeEventListener('pointerlockerror', this.onPointerlockError)
@@ -95,26 +83,22 @@ class PointerLockControls extends EventDispatcher {
   public moveForward = (distance: number): void => {
     // move forward parallel to the xz-plane
     // assumes this.camera.up is y-up
-
     this.vec.setFromMatrixColumn(this.camera.matrix, 0)
-
     this.vec.crossVectors(this.camera.up, this.vec)
-
     this.camera.position.addScaledVector(this.vec, distance)
   }
 
   public moveRight = (distance: number): void => {
     this.vec.setFromMatrixColumn(this.camera.matrix, 0)
-
     this.camera.position.addScaledVector(this.vec, distance)
   }
 
   public lock = (): void => {
-    this.domElement.requestPointerLock()
+    this.domElement?.requestPointerLock()
   }
 
   public unlock = (): void => {
-    this.domElement.ownerDocument.exitPointerLock()
+    this.domElement?.ownerDocument.exitPointerLock()
   }
 }
 
