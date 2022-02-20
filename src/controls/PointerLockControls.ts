@@ -23,11 +23,11 @@ class PointerLockControls extends EventDispatcher {
     super()
     this.domElement = domElement
     this.camera = camera
-    if (this.domElement) this.connect()
+    if (this.domElement) this.connect(this.domElement)
   }
 
   private onMouseMove = (event: MouseEvent): void => {
-    if (!this.domElement || this.isLocked === false) return
+    if (!this.domElement || this.isLocked === false) return
 
     const movementX = event.movementX || (event as any).mozMovementX || (event as any).webkitMovementX || 0
     const movementY = event.movementY || (event as any).mozMovementY || (event as any).webkitMovementY || 0
@@ -55,7 +55,8 @@ class PointerLockControls extends EventDispatcher {
     console.error('THREE.PointerLockControls: Unable to use Pointer Lock API')
   }
 
-  public connect = (): void => {
+  public connect = (domElement?: HTMLElement): void => {
+    this.domElement = domElement || this.domElement
     if (!this.domElement) return
     this.domElement.ownerDocument.addEventListener('mousemove', this.onMouseMove)
     this.domElement.ownerDocument.addEventListener('pointerlockchange', this.onPointerlockChange)
@@ -94,11 +95,13 @@ class PointerLockControls extends EventDispatcher {
   }
 
   public lock = (): void => {
-    this.domElement?.requestPointerLock()
+    if (!this.domElement) return
+    this.domElement.requestPointerLock()
   }
 
   public unlock = (): void => {
-    this.domElement?.ownerDocument.exitPointerLock()
+    if (!this.domElement) return
+    this.domElement.ownerDocument.exitPointerLock()
   }
 }
 
