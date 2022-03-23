@@ -136,11 +136,11 @@ class RGBELoader extends DataTextureLoader {
           }
 
           if ((match = line.match(gamma_re))) {
-            header.gamma = parseFloat(match[1], 10)
+            header.gamma = parseFloat(match[1])
           }
 
           if ((match = line.match(exposure_re))) {
-            header.exposure = parseFloat(match[1], 10)
+            header.exposure = parseFloat(match[1])
           }
 
           if ((match = line.match(format_re))) {
@@ -318,7 +318,7 @@ class RGBELoader extends DataTextureLoader {
             const halfArray = new Uint16Array(numElements * 4)
 
             for (let j = 0; j < numElements; j++) {
-              RGBEByteToRGBHalf(image_rgba_data, j * 4, halfArray, j * 3)
+              RGBEByteToRGBHalf(image_rgba_data, j * 4, halfArray, j * 4)
             }
 
             data = halfArray
