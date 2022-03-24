@@ -1,175 +1,188 @@
+import { NodeUpdateType } from './constants.js'
+import { getNodesKeys } from './NodeUtils.js'
 import { MathUtils } from 'three'
 
-function Node(type) {
-  this.uuid = MathUtils.generateUUID()
+let _nodeId = 0
 
-  this.name = ''
+class Node {
+  constructor(nodeType = null) {
+    this.nodeType = nodeType
 
-  this.type = type
+    this.updateType = NodeUpdateType.None
 
-  this.userData = {}
-}
+    this.uuid = MathUtils.generateUUID()
 
-Node.prototype = {
-  constructor: Node,
+    Object.defineProperty(this, 'id', { value: _nodeId++ })
+  }
 
-  isNode: true,
+  get type() {
+    return this.constructor.name
+  }
 
-  hashProperties: undefined,
+  getHash(/*builder*/) {
+    return this.uuid
+  }
 
-  analyze: function (builder, settings) {
-    settings = settings || {}
+  getUpdateType(/*builder*/) {
+    return this.updateType
+  }
 
-    builder.analyzing = true
+  getNodeType(/*builder*/) {
+    return this.nodeType
+  }
 
-    this.build(builder.addFlow(settings.slot, settings.cache, settings.context), 'v4')
+  update(/*frame*/) {
+    console.warn('Abstract function.')
+  }
 
-    builder.clearVertexNodeCode()
-    builder.clearFragmentNodeCode()
+  generate(/*builder, output*/) {
+    console.warn('Abstract function.')
+  }
 
-    builder.removeFlow()
+  analyze(builder) {
+    const hash = this.getHash(builder)
+    const sharedNode = builder.getNodeFromHash(hash)
 
-    builder.analyzing = false
-  },
-
-  analyzeAndFlow: function (builder, output, settings) {
-    settings = settings || {}
-
-    this.analyze(builder, settings)
-
-    return this.flow(builder, output, settings)
-  },
-
-  flow: function (builder, output, settings) {
-    settings = settings || {}
-
-    builder.addFlow(settings.slot, settings.cache, settings.context)
-
-    var flow = {}
-    flow.result = this.build(builder, output)
-    flow.code = builder.clearNodeCode()
-    flow.extra = builder.context.extra
-
-    builder.removeFlow()
-
-    return flow
-  },
-
-  build: function (builder, output, uuid) {
-    output = output || this.getType(builder, output)
-
-    var data = builder.getNodeData(uuid || this)
-
-    if (builder.analyzing) {
-      this.appendDepsNode(builder, data, output)
+    if (sharedNode !== undefined && this !== sharedNode) {
+      return sharedNode.analyze(builder)
     }
 
-    if (builder.nodes.indexOf(this) === -1) {
-      builder.nodes.push(this)
+    const nodeData = builder.getDataFromNode(this)
+    nodeData.dependenciesCount = nodeData.dependenciesCount === undefined ? 1 : nodeData.dependenciesCount + 1
+
+    const nodeKeys = getNodesKeys(this)
+
+    for (const property of nodeKeys) {
+      this[property].analyze(builder)
+    }
+  }
+
+  build(builder, output = null) {
+    const hash = this.getHash(builder)
+    const sharedNode = builder.getNodeFromHash(hash)
+
+    if (sharedNode !== undefined && this !== sharedNode) {
+      return sharedNode.build(builder, output)
     }
 
-    if (this.updateFrame !== undefined && builder.updaters.indexOf(this) === -1) {
-      builder.updaters.push(this)
+    builder.addNode(this)
+    builder.addStack(this)
+
+    const nodeData = builder.getDataFromNode(this)
+    const isGenerateOnce = this.generate.length === 1
+
+    let snippet = null
+
+    if (isGenerateOnce) {
+      const type = this.getNodeType(builder)
+
+      snippet = nodeData.snippet
+
+      if (snippet === undefined) {
+        snippet = this.generate(builder) || ''
+
+        nodeData.snippet = snippet
+      }
+
+      snippet = builder.format(snippet, type, output)
+    } else {
+      snippet = this.generate(builder, output) || ''
     }
 
-    return this.generate(builder, output, uuid)
-  },
+    builder.removeStack(this)
 
-  generate: function (/* builder, output, uuid, type, ns */) {
-    // This method needs to be implemented in subclasses
-  },
+    return snippet
+  }
 
-  getHash: function () {
-    var hash = '{'
-    var prop, obj
+  serialize(json) {
+    const nodeKeys = getNodesKeys(this)
 
-    for (prop in this) {
-      obj = this[prop]
+    if (nodeKeys.length > 0) {
+      const inputNodes = {}
 
-      if (obj instanceof Node) {
-        hash += '"' + prop + '":' + obj.getHash() + ','
+      for (const property of nodeKeys) {
+        inputNodes[property] = this[property].toJSON(json.meta).uuid
+      }
+
+      json.inputNodes = inputNodes
+    }
+  }
+
+  deserialize(json) {
+    if (json.inputNodes !== undefined) {
+      const nodes = json.meta.nodes
+
+      for (const property in json.inputNodes) {
+        const uuid = json.inputNodes[property]
+
+        this[property] = nodes[uuid]
+      }
+    }
+  }
+
+  toJSON(meta) {
+    const { uuid, type } = this
+    const isRoot = meta === undefined || typeof meta === 'string'
+
+    if (isRoot) {
+      meta = {
+        textures: {},
+        images: {},
+        nodes: {},
       }
     }
 
-    if (this.hashProperties) {
-      for (let i = 0; i < this.hashProperties.length; i++) {
-        prop = this.hashProperties[i]
-        obj = this[prop]
+    // serialize
 
-        hash += '"' + prop + '":"' + String(obj) + '",'
+    let data = meta.nodes[uuid]
+
+    if (data === undefined) {
+      data = {
+        uuid,
+        type,
+        meta,
+        metadata: {
+          version: 4.5,
+          type: 'Node',
+          generator: 'Node.toJSON',
+        },
       }
+
+      meta.nodes[data.uuid] = data
+
+      this.serialize(data)
+
+      delete data.meta
     }
 
-    hash += '"id":"' + this.uuid + '"}'
+    // TODO: Copied from Object3D.toJSON
 
-    return hash
-  },
+    function extractFromCache(cache) {
+      const values = []
 
-  appendDepsNode: function (builder, data, output) {
-    data.deps = (data.deps || 0) + 1
+      for (const key in cache) {
+        const data = cache[key]
+        delete data.metadata
+        values.push(data)
+      }
 
-    var outputLen = builder.getTypeLength(output)
-
-    if (outputLen > (data.outputMax || 0) || this.getType(builder, output)) {
-      data.outputMax = outputLen
-      data.output = output
+      return values
     }
-  },
 
-  setName: function (name) {
-    this.name = name
+    if (isRoot) {
+      const textures = extractFromCache(meta.textures)
+      const images = extractFromCache(meta.images)
+      const nodes = extractFromCache(meta.nodes)
 
-    return this
-  },
-
-  getName: function (/* builder */) {
-    return this.name
-  },
-
-  getType: function (builder, output) {
-    return output === 'sampler2D' || output === 'samplerCube' ? output : this.type
-  },
-
-  getJSONNode: function (meta) {
-    var isRootObject = meta === undefined || typeof meta === 'string'
-
-    if (!isRootObject && meta.nodes[this.uuid] !== undefined) {
-      return meta.nodes[this.uuid]
-    }
-  },
-
-  copy: function (source) {
-    if (source.name !== undefined) this.name = source.name
-
-    if (source.userData !== undefined) this.userData = JSON.parse(JSON.stringify(source.userData))
-
-    return this
-  },
-
-  createJSONNode: function (meta) {
-    var isRootObject = meta === undefined || typeof meta === 'string'
-
-    var data = {}
-
-    if (typeof this.nodeType !== 'string') throw new Error('Node does not allow serialization.')
-
-    data.uuid = this.uuid
-    data.nodeType = this.nodeType
-
-    if (this.name !== '') data.name = this.name
-
-    if (JSON.stringify(this.userData) !== '{}') data.userData = this.userData
-
-    if (!isRootObject) {
-      meta.nodes[this.uuid] = data
+      if (textures.length > 0) data.textures = textures
+      if (images.length > 0) data.images = images
+      if (nodes.length > 0) data.nodes = nodes
     }
 
     return data
-  },
-
-  toJSON: function (meta) {
-    return this.getJSONNode(meta) || this.createJSONNode(meta)
-  },
+  }
 }
 
-export { Node }
+Node.prototype.isNode = true
+
+export default Node

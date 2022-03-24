@@ -1,68 +1,140 @@
-import { TempNode } from '../core/TempNode'
+import TempNode from '../core/TempNode.js'
 
-function OperatorNode(a, b, op) {
-  TempNode.call(this)
+class OperatorNode extends TempNode {
+  constructor(op, aNode, bNode, ...params) {
+    super()
 
-  this.a = a
-  this.b = b
-  this.op = op
-}
+    this.op = op
 
-OperatorNode.ADD = '+'
-OperatorNode.SUB = '-'
-OperatorNode.MUL = '*'
-OperatorNode.DIV = '/'
+    if (params.length > 0) {
+      let finalBNode = bNode
 
-OperatorNode.prototype = Object.create(TempNode.prototype)
-OperatorNode.prototype.constructor = OperatorNode
-OperatorNode.prototype.nodeType = 'Operator'
+      for (let i = 0; i < params.length; i++) {
+        finalBNode = new OperatorNode(op, finalBNode, params[i])
+      }
 
-OperatorNode.prototype.getType = function (builder) {
-  var a = this.a.getType(builder),
-    b = this.b.getType(builder)
+      bNode = finalBNode
+    }
 
-  if (builder.isTypeMatrix(a)) {
-    return 'v4'
-  } else if (builder.getTypeLength(b) > builder.getTypeLength(a)) {
-    // use the greater length vector
-
-    return b
+    this.aNode = aNode
+    this.bNode = bNode
   }
 
-  return a
-}
+  getNodeType(builder, output) {
+    const op = this.op
 
-OperatorNode.prototype.generate = function (builder, output) {
-  var type = this.getType(builder)
+    const aNode = this.aNode
+    const bNode = this.bNode
 
-  var a = this.a.build(builder, type),
-    b = this.b.build(builder, type)
+    const typeA = aNode.getNodeType(builder)
+    const typeB = bNode.getNodeType(builder)
 
-  return builder.format('( ' + a + ' ' + this.op + ' ' + b + ' )', type, output)
-}
+    if (typeA === 'void' || typeB === 'void') {
+      return 'void'
+    } else if (op === '=' || op === '%') {
+      return typeA
+    } else if (op === '&' || op === '|' || op === '^' || op === '>>' || op === '<<') {
+      return 'int'
+    } else if (op === '==' || op === '&&' || op === '||' || op === '^^') {
+      return 'bool'
+    } else if (op === '<' || op === '>' || op === '<=' || op === '>=') {
+      const typeLength = builder.getTypeLength(output)
 
-OperatorNode.prototype.copy = function (source) {
-  TempNode.prototype.copy.call(this, source)
+      return typeLength > 1 ? `bvec${typeLength}` : 'bool'
+    } else {
+      if (typeA === 'float' && builder.isMatrix(typeB)) {
+        return typeB
+      } else if (builder.isMatrix(typeA) && builder.isVector(typeB)) {
+        // matrix x vector
 
-  this.a = source.a
-  this.b = source.b
-  this.op = source.op
+        return builder.getVectorFromMatrix(typeA)
+      } else if (builder.isVector(typeA) && builder.isMatrix(typeB)) {
+        // vector x matrix
 
-  return this
-}
+        return builder.getVectorFromMatrix(typeB)
+      } else if (builder.getTypeLength(typeB) > builder.getTypeLength(typeA)) {
+        // anytype x anytype: use the greater length vector
 
-OperatorNode.prototype.toJSON = function (meta) {
-  var data = this.getJSONNode(meta)
+        return typeB
+      }
 
-  if (!data) {
-    data = this.createJSONNode(meta)
+      return typeA
+    }
+  }
 
-    data.a = this.a.toJSON(meta).uuid
-    data.b = this.b.toJSON(meta).uuid
+  generate(builder, output) {
+    const op = this.op
+
+    const aNode = this.aNode
+    const bNode = this.bNode
+
+    const type = this.getNodeType(builder, output)
+
+    let typeA = null
+    let typeB = null
+
+    if (type !== 'void') {
+      typeA = aNode.getNodeType(builder)
+      typeB = bNode.getNodeType(builder)
+
+      if (op === '=') {
+        typeB = typeA
+      } else if (op === '<' || op === '>' || op === '<=' || op === '>=') {
+        if (builder.isVector(typeA)) {
+          typeB = typeA
+        } else {
+          typeA = typeB = 'float'
+        }
+      } else if (builder.isMatrix(typeA) && builder.isVector(typeB)) {
+        // matrix x vector
+
+        typeB = builder.getVectorFromMatrix(typeA)
+      } else if (builder.isVector(typeA) && builder.isMatrix(typeB)) {
+        // vector x matrix
+
+        typeA = builder.getVectorFromMatrix(typeB)
+      } else {
+        // anytype x anytype
+
+        typeA = typeB = type
+      }
+    } else {
+      typeA = typeB = type
+    }
+
+    const a = aNode.build(builder, typeA)
+    const b = bNode.build(builder, typeB)
+
+    const outputLength = builder.getTypeLength(output)
+
+    if (output !== 'void') {
+      if (op === '=') {
+        builder.addFlowCode(`${a} ${this.op} ${b}`)
+
+        return a
+      } else if (op === '>' && outputLength > 1) {
+        return builder.format(`${builder.getMethod('greaterThan')}( ${a}, ${b} )`, type, output)
+      } else if (op === '<=' && outputLength > 1) {
+        return builder.format(`${builder.getMethod('lessThanEqual')}( ${a}, ${b} )`, type, output)
+      } else {
+        return builder.format(`( ${a} ${this.op} ${b} )`, type, output)
+      }
+    } else if (typeA !== 'void') {
+      return builder.format(`${a} ${this.op} ${b}`, type, output)
+    }
+  }
+
+  serialize(data) {
+    super.serialize(data)
+
     data.op = this.op
   }
 
-  return data
+  deserialize(data) {
+    super.deserialize(data)
+
+    this.op = data.op
+  }
 }
 
-export { OperatorNode }
+export default OperatorNode

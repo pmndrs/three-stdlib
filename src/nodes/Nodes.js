@@ -1,109 +1,251 @@
-// TODO: all nodes
-
 // core
-
-export { Node } from './core/Node'
-export { TempNode } from './core/TempNode'
-export { InputNode } from './core/InputNode'
-export { ConstNode } from './core/ConstNode'
-export { VarNode } from './core/VarNode'
-export { StructNode } from './core/StructNode'
-export { AttributeNode } from './core/AttributeNode'
-export { FunctionNode } from './core/FunctionNode'
-export { ExpressionNode } from './core/ExpressionNode'
-export { FunctionCallNode } from './core/FunctionCallNode'
-export { NodeLib } from './core/NodeLib'
-export { NodeUtils } from './core/NodeUtils'
-export { NodeFrame } from './core/NodeFrame'
-export { NodeUniform } from './core/NodeUniform'
-export { NodeBuilder } from './core/NodeBuilder'
-
-// inputs
-
-export { BoolNode } from './inputs/BoolNode'
-export { IntNode } from './inputs/IntNode'
-export { FloatNode } from './inputs/FloatNode'
-export { Vector2Node } from './inputs/Vector2Node'
-export { Vector3Node } from './inputs/Vector3Node'
-export { Vector4Node } from './inputs/Vector4Node'
-export { ColorNode } from './inputs/ColorNode'
-export { Matrix3Node } from './inputs/Matrix3Node'
-export { Matrix4Node } from './inputs/Matrix4Node'
-export { TextureNode } from './inputs/TextureNode'
-export { CubeTextureNode } from './inputs/CubeTextureNode'
-export { ScreenNode } from './inputs/ScreenNode'
-export { ReflectorNode } from './inputs/ReflectorNode'
-export { PropertyNode } from './inputs/PropertyNode'
-export { RTTNode } from './inputs/RTTNode'
+import ArrayUniformNode from './core/ArrayUniformNode.js'
+import AttributeNode from './core/AttributeNode.js'
+import BypassNode from './core/BypassNode.js'
+import CodeNode from './core/CodeNode.js'
+import ConstNode from './core/ConstNode.js'
+import ContextNode from './core/ContextNode.js'
+import ExpressionNode from './core/ExpressionNode.js'
+import FunctionCallNode from './core/FunctionCallNode.js'
+import FunctionNode from './core/FunctionNode.js'
+import Node from './core/Node.js'
+import NodeAttribute from './core/NodeAttribute.js'
+import NodeBuilder from './core/NodeBuilder.js'
+import NodeCode from './core/NodeCode.js'
+import NodeFrame from './core/NodeFrame.js'
+import NodeFunctionInput from './core/NodeFunctionInput.js'
+import NodeKeywords from './core/NodeKeywords.js'
+import NodeUniform from './core/NodeUniform.js'
+import NodeVar from './core/NodeVar.js'
+import NodeVary from './core/NodeVary.js'
+import PropertyNode from './core/PropertyNode.js'
+import TempNode from './core/TempNode.js'
+import UniformNode from './core/UniformNode.js'
+import VarNode from './core/VarNode.js'
+import VaryNode from './core/VaryNode.js'
 
 // accessors
+import BufferNode from './accessors/BufferNode.js'
+import CameraNode from './accessors/CameraNode.js'
+import CubeTextureNode from './accessors/CubeTextureNode.js'
+import MaterialNode from './accessors/MaterialNode.js'
+import MaterialReferenceNode from './accessors/MaterialReferenceNode.js'
+import ModelNode from './accessors/ModelNode.js'
+import ModelViewProjectionNode from './accessors/ModelViewProjectionNode.js'
+import NormalNode from './accessors/NormalNode.js'
+import Object3DNode from './accessors/Object3DNode.js'
+import PointUVNode from './accessors/PointUVNode.js'
+import PositionNode from './accessors/PositionNode.js'
+import ReferenceNode from './accessors/ReferenceNode.js'
+import ReflectNode from './accessors/ReflectNode.js'
+import SkinningNode from './accessors/SkinningNode.js'
+import TextureNode from './accessors/TextureNode.js'
+import UVNode from './accessors/UVNode.js'
 
-export { UVNode } from './accessors/UVNode'
-export { ColorsNode } from './accessors/ColorsNode'
-export { PositionNode } from './accessors/PositionNode'
-export { NormalNode } from './accessors/NormalNode'
-export { CameraNode } from './accessors/CameraNode'
-export { LightNode } from './accessors/LightNode'
-export { ReflectNode } from './accessors/ReflectNode'
-export { ScreenUVNode } from './accessors/ScreenUVNode'
-export { ResolutionNode } from './accessors/ResolutionNode'
+// display
+import ColorSpaceNode from './display/ColorSpaceNode.js'
+import NormalMapNode from './display/NormalMapNode.js'
 
 // math
+import MathNode from './math/MathNode.js'
+import OperatorNode from './math/OperatorNode.js'
+import CondNode from './math/CondNode.js'
 
-export { MathNode } from './math/MathNode'
-export { OperatorNode } from './math/OperatorNode'
-export { CondNode } from './math/CondNode'
-
-// procedural
-
-export { NoiseNode } from './procedural/NoiseNode'
-export { CheckerNode } from './procedural/CheckerNode'
-
-// misc
-
-export { TextureCubeUVNode } from './misc/TextureCubeUVNode'
-export { TextureCubeNode } from './misc/TextureCubeNode'
-export { NormalMapNode } from './misc/NormalMapNode'
-export { BumpMapNode } from './misc/BumpMapNode'
+// lights
+import LightContextNode from './lights/LightContextNode.js'
+import LightNode from './lights/LightNode.js'
+import LightsNode from './lights/LightsNode.js'
 
 // utils
+import ArrayElementNode from './utils/ArrayElementNode.js'
+import ConvertNode from './utils/ConvertNode.js'
+import JoinNode from './utils/JoinNode.js'
+import SplitNode from './utils/SplitNode.js'
+import SpriteSheetUVNode from './utils/SpriteSheetUVNode.js'
+import MatcapUVNode from './utils/MatcapUVNode.js'
+import OscNode from './utils/OscNode.js'
+import TimerNode from './utils/TimerNode.js'
 
-export { BypassNode } from './utils/BypassNode'
-export { JoinNode } from './utils/JoinNode'
-export { SwitchNode } from './utils/SwitchNode'
-export { TimerNode } from './utils/TimerNode'
-export { VelocityNode } from './utils/VelocityNode'
-export { UVTransformNode } from './utils/UVTransformNode'
-export { MaxMIPLevelNode } from './utils/MaxMIPLevelNode'
-export { SpecularMIPLevelNode } from './utils/SpecularMIPLevelNode'
-export { ColorSpaceNode } from './utils/ColorSpaceNode'
-export { SubSlotNode } from './utils/SubSlotNode'
+// loaders
+import NodeLoader from './loaders/NodeLoader.js'
+import NodeObjectLoader from './loaders/NodeObjectLoader.js'
+import NodeMaterialLoader from './loaders/NodeMaterialLoader.js'
 
-// effects
+// procedural
+import CheckerNode from './procedural/CheckerNode.js'
 
-export { BlurNode } from './effects/BlurNode'
-export { ColorAdjustmentNode } from './effects/ColorAdjustmentNode'
-export { LuminanceNode } from './effects/LuminanceNode'
+// fog
+import FogNode from './fog/FogNode.js'
+import FogRangeNode from './fog/FogRangeNode.js'
 
-// material nodes
+// core
+export * from './core/constants.js'
 
-export { RawNode } from './materials/nodes/RawNode'
-export { BasicNode } from './materials/nodes/BasicNode'
-export { SpriteNode } from './materials/nodes/SpriteNode'
-export { PhongNode } from './materials/nodes/PhongNode'
-export { StandardNode } from './materials/nodes/StandardNode'
-export { MeshStandardNode } from './materials/nodes/MeshStandardNode'
+// functions
+export * from './functions/BSDFs.js'
 
 // materials
+export * from './materials/Materials.js'
 
-export { NodeMaterial } from './materials/NodeMaterial'
-export { BasicNodeMaterial } from './materials/BasicNodeMaterial'
-export { SpriteNodeMaterial } from './materials/SpriteNodeMaterial'
-export { PhongNodeMaterial } from './materials/PhongNodeMaterial'
-export { StandardNodeMaterial } from './materials/StandardNodeMaterial'
-export { MeshStandardNodeMaterial } from './materials/MeshStandardNodeMaterial'
+// shader node
+export * from './ShaderNode.js'
 
-// postprocessing
+const nodeLib = {
+  // core
+  ArrayUniformNode,
+  AttributeNode,
+  BypassNode,
+  CodeNode,
+  ContextNode,
+  ConstNode,
+  ExpressionNode,
+  FunctionCallNode,
+  FunctionNode,
+  Node,
+  NodeAttribute,
+  NodeBuilder,
+  NodeCode,
+  NodeFrame,
+  NodeFunctionInput,
+  NodeKeywords,
+  NodeUniform,
+  NodeVar,
+  NodeVary,
+  PropertyNode,
+  TempNode,
+  UniformNode,
+  VarNode,
+  VaryNode,
 
-export { NodePostProcessing } from './postprocessing/NodePostProcessing'
-//export { NodePass } from './postprocessing/NodePass';
+  // accessors
+  BufferNode,
+  CameraNode,
+  CubeTextureNode,
+  MaterialNode,
+  MaterialReferenceNode,
+  ModelNode,
+  ModelViewProjectionNode,
+  NormalNode,
+  Object3DNode,
+  PointUVNode,
+  PositionNode,
+  ReferenceNode,
+  ReflectNode,
+  SkinningNode,
+  TextureNode,
+  UVNode,
+
+  // display
+  ColorSpaceNode,
+  NormalMapNode,
+
+  // math
+  MathNode,
+  OperatorNode,
+  CondNode,
+
+  // lights
+  LightContextNode,
+  LightNode,
+  LightsNode,
+
+  // utils
+  ArrayElementNode,
+  ConvertNode,
+  JoinNode,
+  SplitNode,
+  SpriteSheetUVNode,
+  MatcapUVNode,
+  OscNode,
+  TimerNode,
+
+  // procedural
+  CheckerNode,
+
+  // fog
+  FogNode,
+  FogRangeNode,
+
+  // loaders
+  NodeLoader,
+  NodeObjectLoader,
+  NodeMaterialLoader,
+}
+
+export const fromType = (type) => {
+  return new nodeLib[type]()
+}
+
+export {
+  // core
+  ArrayUniformNode,
+  AttributeNode,
+  BypassNode,
+  CodeNode,
+  ContextNode,
+  ConstNode,
+  ExpressionNode,
+  FunctionCallNode,
+  FunctionNode,
+  Node,
+  NodeAttribute,
+  NodeBuilder,
+  NodeCode,
+  NodeFrame,
+  NodeFunctionInput,
+  NodeKeywords,
+  NodeUniform,
+  NodeVar,
+  NodeVary,
+  PropertyNode,
+  TempNode,
+  UniformNode,
+  VarNode,
+  VaryNode,
+  // accessors
+  BufferNode,
+  CameraNode,
+  CubeTextureNode,
+  MaterialNode,
+  MaterialReferenceNode,
+  ModelNode,
+  ModelViewProjectionNode,
+  NormalNode,
+  Object3DNode,
+  PointUVNode,
+  PositionNode,
+  ReferenceNode,
+  ReflectNode,
+  SkinningNode,
+  TextureNode,
+  UVNode,
+  // display
+  ColorSpaceNode,
+  NormalMapNode,
+  // math
+  MathNode,
+  OperatorNode,
+  CondNode,
+  // lights
+  LightContextNode,
+  LightNode,
+  LightsNode,
+  // utils
+  ArrayElementNode,
+  ConvertNode,
+  JoinNode,
+  SplitNode,
+  SpriteSheetUVNode,
+  MatcapUVNode,
+  OscNode,
+  TimerNode,
+  // procedural
+  CheckerNode,
+  // fog
+  FogNode,
+  FogRangeNode,
+  // loaders
+  NodeLoader,
+  NodeObjectLoader,
+  NodeMaterialLoader,
+}

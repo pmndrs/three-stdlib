@@ -1,42 +1,45 @@
-function NodeFrame(time) {
-  this.time = time !== undefined ? time : 0
+import { NodeUpdateType } from './constants.js'
 
-  this.id = 0
+class NodeFrame {
+  constructor() {
+    this.time = 0
+    this.deltaTime = 0
+
+    this.frameId = 0
+
+    this.startTime = null
+
+    this.updateMap = new WeakMap()
+
+    this.renderer = null
+    this.material = null
+    this.camera = null
+    this.object = null
+  }
+
+  updateNode(node) {
+    if (node.updateType === NodeUpdateType.Frame) {
+      if (this.updateMap.get(node) !== this.frameId) {
+        this.updateMap.set(node, this.frameId)
+
+        node.update(this)
+      }
+    } else if (node.updateType === NodeUpdateType.Object) {
+      node.update(this)
+    }
+  }
+
+  update() {
+    this.frameId++
+
+    if (this.lastTime === undefined) this.lastTime = performance.now()
+
+    this.deltaTime = (performance.now() - this.lastTime) / 1000
+
+    this.lastTime = performance.now()
+
+    this.time += this.deltaTime
+  }
 }
 
-NodeFrame.prototype = {
-  constructor: NodeFrame,
-
-  update: function (delta) {
-    ++this.id
-
-    this.time += delta
-    this.delta = delta
-
-    return this
-  },
-
-  setRenderer: function (renderer) {
-    this.renderer = renderer
-
-    return this
-  },
-
-  setRenderTexture: function (renderTexture) {
-    this.renderTexture = renderTexture
-
-    return this
-  },
-
-  updateNode: function (node) {
-    if (node.frameId === this.id) return this
-
-    node.updateFrame(this)
-
-    node.frameId = this.id
-
-    return this
-  },
-}
-
-export { NodeFrame }
+export default NodeFrame

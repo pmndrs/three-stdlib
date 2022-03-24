@@ -1,208 +1,79 @@
-import { TempNode } from './TempNode'
-import { NodeLib } from './NodeLib'
+import CodeNode from './CodeNode.js'
+import FunctionCallNode from './FunctionCallNode.js'
 
-var declarationRegexp = /^\s*([a-z_0-9]+)\s([a-z_0-9]+)\s*\((.*?)\)/i,
-  propertiesRegexp = /[a-z_0-9]+/gi
+class FunctionNode extends CodeNode {
+  constructor(code = '') {
+    super(code)
 
-function FunctionNode(src, includes, extensions, keywords, type) {
-  this.isMethod = type === undefined
-  this.isInterface = false
+    this.keywords = {}
+  }
 
-  TempNode.call(this, type)
+  getNodeType(builder) {
+    return this.getNodeFunction(builder).type
+  }
 
-  this.parse(src, includes, extensions, keywords)
-}
+  getInputs(builder) {
+    return this.getNodeFunction(builder).inputs
+  }
 
-FunctionNode.prototype = Object.create(TempNode.prototype)
-FunctionNode.prototype.constructor = FunctionNode
-FunctionNode.prototype.nodeType = 'Function'
+  getNodeFunction(builder) {
+    const nodeData = builder.getDataFromNode(this)
 
-FunctionNode.prototype.useKeywords = true
+    let nodeFunction = nodeData.nodeFunction
 
-FunctionNode.prototype.getShared = function (/* builder, output */) {
-  return !this.isMethod
-}
+    if (nodeFunction === undefined) {
+      nodeFunction = builder.parser.parseFunction(this.code)
 
-FunctionNode.prototype.getType = function (builder) {
-  return builder.getTypeByFormat(this.type)
-}
-
-FunctionNode.prototype.getInputByName = function (name) {
-  var i = this.inputs.length
-
-  while (i--) {
-    if (this.inputs[i].name === name) {
-      return this.inputs[i]
+      nodeData.nodeFunction = nodeFunction
     }
+
+    return nodeFunction
   }
-}
 
-FunctionNode.prototype.getIncludeByName = function (name) {
-  var i = this.includes.length
+  call(parameters = {}) {
+    return new FunctionCallNode(this, parameters)
+  }
 
-  while (i--) {
-    if (this.includes[i].name === name) {
-      return this.includes[i]
+  generate(builder, output) {
+    super.generate(builder)
+
+    const nodeFunction = this.getNodeFunction(builder)
+
+    const name = nodeFunction.name
+    const type = nodeFunction.type
+
+    const nodeCode = builder.getCodeFromNode(this, type)
+
+    if (name !== '') {
+      // use a custom property name
+
+      nodeCode.name = name
     }
-  }
-}
 
-FunctionNode.prototype.generate = function (builder, output) {
-  var match,
-    offset = 0,
-    src = this.src
+    const propertyName = builder.getPropertyName(nodeCode)
 
-  for (let i = 0; i < this.includes.length; i++) {
-    builder.include(this.includes[i], this)
-  }
+    let code = this.getNodeFunction(builder).getCode(propertyName)
 
-  for (let ext in this.extensions) {
-    builder.extensions[ext] = true
-  }
+    const keywords = this.keywords
+    const keywordsProperties = Object.keys(keywords)
 
-  var matches = []
+    if (keywordsProperties.length > 0) {
+      for (const property of keywordsProperties) {
+        const propertyRegExp = new RegExp(`\\b${property}\\b`, 'g')
+        const nodeProperty = keywords[property].build(builder, 'property')
 
-  while ((match = propertiesRegexp.exec(this.src))) matches.push(match)
-
-  for (let i = 0; i < matches.length; i++) {
-    var match = matches[i]
-
-    var prop = match[0],
-      isGlobal = this.isMethod ? !this.getInputByName(prop) : true,
-      reference = prop
-
-    if (this.keywords[prop] || (this.useKeywords && isGlobal && NodeLib.containsKeyword(prop))) {
-      var node = this.keywords[prop]
-
-      if (!node) {
-        var keyword = NodeLib.getKeywordData(prop)
-
-        if (keyword.cache) node = builder.keywords[prop]
-
-        node = node || NodeLib.getKeyword(prop, builder)
-
-        if (keyword.cache) builder.keywords[prop] = node
+        code = code.replace(propertyRegExp, nodeProperty)
       }
-
-      reference = node.build(builder)
     }
 
-    if (prop !== reference) {
-      src = src.substring(0, match.index + offset) + reference + src.substring(match.index + prop.length + offset)
+    nodeCode.code = code
 
-      offset += reference.length - prop.length
-    }
-
-    if (this.getIncludeByName(reference) === undefined && NodeLib.contains(reference)) {
-      builder.include(NodeLib.get(reference))
-    }
-  }
-
-  if (output === 'source') {
-    return src
-  } else if (this.isMethod) {
-    if (!this.isInterface) {
-      builder.include(this, false, src)
-    }
-
-    return this.name
-  } else {
-    return builder.format('( ' + src + ' )', this.getType(builder), output)
-  }
-}
-
-FunctionNode.prototype.parse = function (src, includes, extensions, keywords) {
-  this.src = src || ''
-
-  this.includes = includes || []
-  this.extensions = extensions || {}
-  this.keywords = keywords || {}
-
-  if (this.isMethod) {
-    var match = this.src.match(declarationRegexp)
-
-    this.inputs = []
-
-    if (match && match.length == 4) {
-      this.type = match[1]
-      this.name = match[2]
-
-      var inputs = match[3].match(propertiesRegexp)
-
-      if (inputs) {
-        var i = 0
-
-        while (i < inputs.length) {
-          var qualifier = inputs[i++]
-          var type, name
-
-          if (qualifier === 'in' || qualifier === 'out' || qualifier === 'inout') {
-            type = inputs[i++]
-          } else {
-            type = qualifier
-            qualifier = ''
-          }
-
-          name = inputs[i++]
-
-          this.inputs.push({
-            name: name,
-            type: type,
-            qualifier: qualifier,
-          })
-        }
-      }
-
-      this.isInterface = this.src.indexOf('{') === -1
+    if (output === 'property') {
+      return propertyName
     } else {
-      this.type = ''
-      this.name = ''
+      return builder.format(`${propertyName}()`, type, output)
     }
   }
 }
 
-FunctionNode.prototype.copy = function (source) {
-  TempNode.prototype.copy.call(this, source)
-
-  this.isMethod = source.isMethod
-  this.useKeywords = source.useKeywords
-
-  this.parse(source.src, source.includes, source.extensions, source.keywords)
-
-  if (source.type !== undefined) this.type = source.type
-
-  return this
-}
-
-FunctionNode.prototype.toJSON = function (meta) {
-  var data = this.getJSONNode(meta)
-
-  if (!data) {
-    data = this.createJSONNode(meta)
-
-    data.src = this.src
-    data.isMethod = this.isMethod
-    data.useKeywords = this.useKeywords
-
-    if (!this.isMethod) data.type = this.type
-
-    data.extensions = JSON.parse(JSON.stringify(this.extensions))
-    data.keywords = {}
-
-    for (let keyword in this.keywords) {
-      data.keywords[keyword] = this.keywords[keyword].toJSON(meta).uuid
-    }
-
-    if (this.includes.length) {
-      data.includes = []
-
-      for (let i = 0; i < this.includes.length; i++) {
-        data.includes.push(this.includes[i].toJSON(meta).uuid)
-      }
-    }
-  }
-
-  return data
-}
-
-export { FunctionNode }
+export default FunctionNode
