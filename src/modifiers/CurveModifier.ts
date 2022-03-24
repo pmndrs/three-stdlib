@@ -19,7 +19,7 @@ import {
   BufferGeometry,
 } from 'three'
 
-import { TUniform } from 'types/shared'
+import { TUniform } from '../types/shared'
 
 /**
  * Make a new DataTexture to store the descriptions of the curves.
