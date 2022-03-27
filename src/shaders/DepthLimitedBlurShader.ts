@@ -1,7 +1,31 @@
 import { Vector2 } from 'three'
-import type { IUniform } from 'three'
+import type { IUniform, Texture } from 'three'
+import type { IShader } from './types'
 
-export const DepthLimitedBlurShader = {
+export type DepthLimitedBlurShaderDefines = {
+  DEPTH_PACKING: number
+  KERNEL_RADIUS: number
+  PERSPECTIVE_CAMERA: number
+}
+
+export type DepthLimitedBlurShaderUniforms = {
+  cameraFar: IUniform<number>
+  cameraNear: IUniform<number>
+  depthCutoff: IUniform<number>
+  sampleUvOffsets: IUniform<Vector2[]>
+  sampleWeights: IUniform<number[]>
+  size: IUniform<Vector2>
+  tDepth: IUniform<Texture | null>
+  tDiffuse: IUniform<Texture | null>
+}
+
+export interface IDepthLimitedBlurShader
+  extends IShader<DepthLimitedBlurShaderUniforms, DepthLimitedBlurShaderDefines> {
+  defines: DepthLimitedBlurShaderDefines
+  needsUpdate?: boolean
+}
+
+export const DepthLimitedBlurShader: IDepthLimitedBlurShader = {
   defines: {
     KERNEL_RADIUS: 4,
     DEPTH_PACKING: 1,
@@ -134,19 +158,10 @@ export const BlurShaderUtils = {
     return offsets
   },
 
-  configure: function (material: MaterialLike, kernelRadius: number, stdDev: number, uvIncrement: Vector2) {
-    material.defines['KERNEL_RADIUS'] = kernelRadius
-    material.uniforms['sampleUvOffsets'].value = BlurShaderUtils.createSampleOffsets(kernelRadius, uvIncrement)
-    material.uniforms['sampleWeights'].value = BlurShaderUtils.createSampleWeights(kernelRadius, stdDev)
-    material.needsUpdate = true
+  configure: function (shader: IDepthLimitedBlurShader, kernelRadius: number, stdDev: number, uvIncrement: Vector2) {
+    shader.defines['KERNEL_RADIUS'] = kernelRadius
+    shader.uniforms['sampleUvOffsets'].value = BlurShaderUtils.createSampleOffsets(kernelRadius, uvIncrement)
+    shader.uniforms['sampleWeights'].value = BlurShaderUtils.createSampleWeights(kernelRadius, stdDev)
+    shader.needsUpdate = true
   },
-}
-
-export type MaterialLike = {
-  defines: { KERNEL_RADIUS: number }
-  needsUpdate: boolean
-  uniforms: {
-    sampleUvOffsets: IUniform<Vector2[]>
-    sampleWeights: IUniform<number[]>
-  }
 }

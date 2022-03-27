@@ -6,7 +6,25 @@ import { Vector2 } from 'three'
  * http://o3d.googlecode.com/svn/trunk/samples/convolution.html
  */
 
-export const ConvolutionShader = {
+import type { IUniform, Texture } from 'three'
+import type { IShader } from './types'
+
+export type ConvolutionShaderDefines = {
+  KERNEL_SIZE_FLOAT: string
+  KERNEL_SIZE_INT: string
+}
+
+export type ConvolutionShaderUniforms = {
+  cKernel: IUniform<number[]>
+  tDiffuse: IUniform<Texture | null>
+  uImageIncrement: IUniform<Vector2>
+}
+
+export interface IConvolutionShader extends IShader<ConvolutionShaderUniforms, ConvolutionShaderDefines> {
+  buildKernel: (sigma: number) => number[]
+}
+
+export const ConvolutionShader: IConvolutionShader = {
   defines: {
     KERNEL_SIZE_FLOAT: '25.0',
     KERNEL_SIZE_INT: '25',
@@ -56,7 +74,7 @@ export const ConvolutionShader = {
     '}',
   ].join('\n'),
 
-  buildKernel: function (sigma: number) {
+  buildKernel: function (sigma) {
     // We lop off the sqrt(2 * pi) * sigma term, since we're going to normalize anyway.
 
     function gauss(x: number, sigma: number) {
@@ -69,7 +87,7 @@ export const ConvolutionShader = {
 
     const halfWidth = (kernelSize - 1) * 0.5
 
-    const values = new Array(kernelSize)
+    const values: number[] = new Array(kernelSize)
 
     let sum = 0.0
 

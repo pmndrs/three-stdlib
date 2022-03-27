@@ -12,7 +12,10 @@ function replaceAll(string: string, find: string, replace: string) {
   return string.split(find).join(replace)
 }
 
-const meshphong_frag_head = ShaderChunk['meshphong_frag'].slice(0, ShaderChunk['meshphong_frag'].indexOf('void main() {'))
+const meshphong_frag_head = ShaderChunk['meshphong_frag'].slice(
+  0,
+  ShaderChunk['meshphong_frag'].indexOf('void main() {'),
+)
 const meshphong_frag_body = ShaderChunk['meshphong_frag'].slice(ShaderChunk['meshphong_frag'].indexOf('void main() {'))
 
 export const SubsurfaceScatteringShader = {
