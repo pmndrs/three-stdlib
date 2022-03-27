@@ -1,15 +1,16 @@
-import { ShaderLib, ShaderMaterial, UniformsLib, UniformsUtils, Vector2, ShaderMaterialParameters, Color } from 'three'
+import { ShaderLib, ShaderMaterial, UniformsLib, UniformsUtils, Vector2, Color } from 'three'
+import type { ShaderMaterialParameters } from 'three'
 
-import { ColorOptions } from '../types/shared'
+export type ColorOptions = Color | string | number
 
-export type LineMaterialParameters = ShaderMaterialParameters & {
+export interface LineMaterialParameters extends ShaderMaterialParameters {
   color?: ColorOptions
-  linewidth?: number
   dashed?: boolean
+  dashOffset?: number
   dashScale?: number
   dashSize?: number
-  dashOffset?: number
   gapSize?: number
+  linewidth?: number
   resolution?: Vector2
 }
 

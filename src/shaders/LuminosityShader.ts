@@ -1,21 +1,11 @@
 /**
- * Full-screen textured quad shader
+ * Luminosity
+ * http://en.wikipedia.org/wiki/Luminosity
  */
 
-import type { IUniform, Texture } from 'three'
-import type { IShader } from './types'
-
-export type CopyShaderUniforms = {
-  opacity: IUniform<number>
-  tDiffuse: IUniform<Texture | null>
-}
-
-export interface ICopyShader extends IShader<CopyShaderUniforms> {}
-
-export const CopyShader: ICopyShader = {
+export const LuminosityShader = {
   uniforms: {
     tDiffuse: { value: null },
-    opacity: { value: 1.0 },
   },
 
   vertexShader: [
@@ -24,13 +14,14 @@ export const CopyShader: ICopyShader = {
     'void main() {',
 
     '	vUv = uv;',
+
     '	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
 
     '}',
   ].join('\n'),
 
   fragmentShader: [
-    'uniform float opacity;',
+    '#include <common>',
 
     'uniform sampler2D tDiffuse;',
 
@@ -39,7 +30,10 @@ export const CopyShader: ICopyShader = {
     'void main() {',
 
     '	vec4 texel = texture2D( tDiffuse, vUv );',
-    '	gl_FragColor = opacity * texel;',
+
+    '	float l = linearToRelativeLuminance( texel.rgb );',
+
+    '	gl_FragColor = vec4( l, l, l, texel.w );',
 
     '}',
   ].join('\n'),

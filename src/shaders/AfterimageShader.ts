@@ -1,10 +1,21 @@
 /**
- * Afterimage shader
+* Afterimage shader
  * I created this effect inspired by a demo on codepen:
  * https://codepen.io/brunoimbrizi/pen/MoRJaN?page=1&
  */
 
-const AfterimageShader = {
+import type { IUniform, Texture } from 'three'
+import type { IShader } from './types'
+
+export type AfterimageShaderUniforms = {
+  damp: IUniform<number>
+  tNew: IUniform<Texture | null>
+  tOld: IUniform<Texture | null>
+}
+
+export interface IAfterimageShader extends IShader<AfterimageShaderUniforms> {}
+
+export const AfterimageShader: IAfterimageShader = {
   uniforms: {
     damp: { value: 0.96 },
     tOld: { value: null },
@@ -48,5 +59,3 @@ const AfterimageShader = {
     '}',
   ].join('\n'),
 }
-
-export { AfterimageShader }

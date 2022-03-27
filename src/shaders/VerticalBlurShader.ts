@@ -8,17 +8,17 @@
  * - "h" and "v" parameters should be set to "1 / width" and "1 / height"
  */
 
-import { Texture } from 'three'
-import { TUniform, GenericShader } from 'types/shared'
+import type { IUniform, Texture } from 'three'
+import type { IShader } from './types'
 
-export interface VerticalBlurShaderUniforms {
-  tDiffuse: TUniform<Texture | null>
-  v: TUniform<number>
+export type VerticalBlurShaderUniforms = {
+  tDiffuse: IUniform<Texture | null>
+  v: IUniform<number>
 }
 
-export type VerticalBlurShaderImpl = GenericShader<VerticalBlurShaderUniforms>
+export interface IVerticalBlurShader extends IShader<VerticalBlurShaderUniforms> {}
 
-const VerticalBlurShader: VerticalBlurShaderImpl = {
+export const VerticalBlurShader: IVerticalBlurShader = {
   uniforms: {
     tDiffuse: { value: null },
     v: { value: 1.0 / 512.0 },
@@ -34,7 +34,7 @@ const VerticalBlurShader: VerticalBlurShaderImpl = {
     }
   `,
   fragmentShader: /* glsl */ `
-  
+
   uniform sampler2D tDiffuse;
   uniform float v;
 
@@ -59,5 +59,3 @@ const VerticalBlurShader: VerticalBlurShaderImpl = {
   }
   `,
 }
-
-export { VerticalBlurShader }

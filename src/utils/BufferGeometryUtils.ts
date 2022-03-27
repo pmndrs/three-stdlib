@@ -16,7 +16,7 @@ import {
 } from 'three'
 
 import { getWithKey } from '../types/helpers'
-import { TypedArrayConstructors, TypedArray } from '../types/shared'
+import type { TypedArrayConstructors, TypedArray } from '../types/shared'
 
 /**
  * @param  {Array<BufferGeometry>} geometries

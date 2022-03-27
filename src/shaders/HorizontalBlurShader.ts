@@ -8,17 +8,17 @@
  * - "h" and "v" parameters should be set to "1 / width" and "1 / height"
  */
 
-import { Texture } from 'three'
-import { TUniform, GenericShader } from 'types/shared'
+import type { IUniform, Texture } from 'three'
+import type { IShader } from './types'
 
-export interface HorizontalBlurShaderUniforms {
-  tDiffuse: TUniform<Texture | null>
-  h: TUniform<number>
+export type HorizontalBlurShaderUniforms = {
+  tDiffuse: IUniform<Texture | null>
+  h: IUniform<number>
 }
 
-export type HorizontalBlurShaderImpl = GenericShader<HorizontalBlurShaderUniforms>
+export interface IHorizontalBlurShader extends IShader<HorizontalBlurShaderUniforms> {}
 
-const HorizontalBlurShader: HorizontalBlurShaderImpl = {
+export const HorizontalBlurShader: IHorizontalBlurShader = {
   uniforms: {
     tDiffuse: { value: null },
     h: { value: 1.0 / 512.0 },
@@ -58,5 +58,3 @@ const HorizontalBlurShader: HorizontalBlurShaderImpl = {
     }
   `,
 }
-
-export { HorizontalBlurShader }
