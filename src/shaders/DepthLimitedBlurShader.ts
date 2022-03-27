@@ -134,12 +134,12 @@ export const DepthLimitedBlurShader: IDepthLimitedBlurShader = {
 }
 
 export const BlurShaderUtils = {
-  createSampleWeights: function (kernelRadius: number, stdDev: number) {
-    var gaussian = function (x: number, stdDev: number) {
+  createSampleWeights: (kernelRadius: number, stdDev: number): number[] => {
+    const gaussian = (x: number, stdDev: number): number => {
       return Math.exp(-(x * x) / (2.0 * (stdDev * stdDev))) / (Math.sqrt(2.0 * Math.PI) * stdDev)
     }
 
-    var weights = []
+    const weights: number[] = []
 
     for (let i = 0; i <= kernelRadius; i++) {
       weights.push(gaussian(i, stdDev))
@@ -148,8 +148,8 @@ export const BlurShaderUtils = {
     return weights
   },
 
-  createSampleOffsets: function (kernelRadius: number, uvIncrement: Vector2) {
-    var offsets = []
+  createSampleOffsets: (kernelRadius: number, uvIncrement: Vector2): Vector2[] => {
+    const offsets: Vector2[] = []
 
     for (let i = 0; i <= kernelRadius; i++) {
       offsets.push(uvIncrement.clone().multiplyScalar(i))
@@ -158,7 +158,7 @@ export const BlurShaderUtils = {
     return offsets
   },
 
-  configure: function (shader: IDepthLimitedBlurShader, kernelRadius: number, stdDev: number, uvIncrement: Vector2) {
+  configure: (shader: IDepthLimitedBlurShader, kernelRadius: number, stdDev: number, uvIncrement: Vector2): void => {
     shader.defines['KERNEL_RADIUS'] = kernelRadius
     shader.uniforms['sampleUvOffsets'].value = BlurShaderUtils.createSampleOffsets(kernelRadius, uvIncrement)
     shader.uniforms['sampleWeights'].value = BlurShaderUtils.createSampleWeights(kernelRadius, stdDev)

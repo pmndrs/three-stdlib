@@ -8,7 +8,7 @@ import { Color, ShaderChunk, ShaderLib, UniformsUtils } from 'three'
  *------------------------------------------------------------------------------------------
  */
 
-function replaceAll(string: string, find: string, replace: string) {
+function replaceAll(string: string, find: string, replace: string): string {
   return string.split(find).join(replace)
 }
 
