@@ -1,18 +1,9 @@
 /**
- * Full-screen textured quad shader
+ * Unpack RGBA depth shader
+ * - show RGBA encoded depth as monochrome color
  */
 
-import type { IUniform, Texture } from 'three'
-import type { IShader } from './types'
-
-export type CopyShaderUniforms = {
-  opacity: IUniform<number>
-  tDiffuse: IUniform<Texture | null>
-}
-
-export interface ICopyShader extends IShader<CopyShaderUniforms> {}
-
-export const CopyShader: ICopyShader = {
+export const UnpackDepthRGBAShader = {
   uniforms: {
     tDiffuse: { value: null },
     opacity: { value: 1.0 },
@@ -36,10 +27,12 @@ export const CopyShader: ICopyShader = {
 
     'varying vec2 vUv;',
 
+    '#include <packing>',
+
     'void main() {',
 
-    '	vec4 texel = texture2D( tDiffuse, vUv );',
-    '	gl_FragColor = opacity * texel;',
+    '	float depth = 1.0 - unpackRGBAToDepth( texture2D( tDiffuse, vUv ) );',
+    '	gl_FragColor = vec4( vec3( depth ), opacity );',
 
     '}',
   ].join('\n'),

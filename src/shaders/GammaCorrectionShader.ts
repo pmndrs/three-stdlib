@@ -3,16 +3,16 @@
  * http://en.wikipedia.org/wiki/gamma_correction
  */
 
-import { Texture } from 'three'
-import { TUniform, GenericShader } from 'types/shared'
+import type { IUniform, Texture } from 'three'
+import type { IShader } from './types'
 
-export interface GammaCorrectionShaderUniforms {
-  tDiffuse: TUniform<Texture | null>
+export type GammaCorrectionShaderUniforms = {
+  tDiffuse: IUniform<Texture | null>
 }
 
-export type GammaCorrectionShaderImpl = GenericShader<GammaCorrectionShaderUniforms>
+export interface IGammaCorrectionShader extends IShader<GammaCorrectionShaderUniforms> {}
 
-const GammaCorrectionShader: GammaCorrectionShaderImpl = {
+export const GammaCorrectionShader: IGammaCorrectionShader = {
   uniforms: {
     tDiffuse: { value: null },
   },
@@ -42,5 +42,3 @@ const GammaCorrectionShader: GammaCorrectionShaderImpl = {
     '}',
   ].join('\n'),
 }
-
-export { GammaCorrectionShader }

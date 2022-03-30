@@ -1,25 +1,3 @@
-import { BufferAttribute, Color } from 'three'
-
-export type TUniform<TValue = any> = {
-  type?: string
-  value: TValue
-}
-
-export type GenericUniforms = { [key: string]: TUniform<any> }
-
-export type GenericAttibutes = { [key: string]: BufferAttribute }
-
-export type GenericShader<TShaderUniforms = GenericUniforms> = {
-  defines?: {
-    [key: string]: any
-  }
-  uniforms?: TShaderUniforms
-  fragmentShader: string
-  vertexShader: string
-}
-
-export type ColorOptions = Color | string | number
-
 export type TypedArray =
   | Int8Array
   | Uint8Array

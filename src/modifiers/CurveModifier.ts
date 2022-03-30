@@ -19,7 +19,7 @@ import {
   BufferGeometry,
 } from 'three'
 
-import { TUniform } from 'types/shared'
+import type { IUniform } from 'three'
 
 /**
  * Make a new DataTexture to store the descriptions of the curves.
@@ -83,13 +83,18 @@ const setTextureValue = (texture: DataTexture, index: number, x: number, y: numb
   data[index * CHANNELS + i + 3] = 1
 }
 
-export interface CurveModifierUniforms {
-  spineTexture: TUniform<DataTexture>
-  pathOffset: TUniform<number>
-  pathSegment: TUniform<number>
-  spineOffset: TUniform<number>
-  spineLength: TUniform<number>
-  flow: TUniform<number>
+export interface INumericUniform extends IUniform {
+  type: 'f' | 'i'
+  value: number
+}
+
+export type CurveModifierUniforms = {
+  spineTexture: IUniform<DataTexture>
+  pathOffset: INumericUniform
+  pathSegment: INumericUniform
+  spineOffset: INumericUniform
+  spineLength: INumericUniform
+  flow: INumericUniform
 }
 
 /**
@@ -97,17 +102,14 @@ export interface CurveModifierUniforms {
  *
  * @param { DataTexture } Texture which holds the curve description
  */
-export function getUniforms(splineTexture: DataTexture): CurveModifierUniforms {
-  const uniforms = {
-    spineTexture: { value: splineTexture },
-    pathOffset: { type: 'f', value: 0 }, // time of path curve
-    pathSegment: { type: 'f', value: 1 }, // fractional length of path
-    spineOffset: { type: 'f', value: 161 },
-    spineLength: { type: 'f', value: 400 },
-    flow: { type: 'i', value: 1 },
-  }
-  return uniforms
-}
+export const getUniforms = (splineTexture: DataTexture): CurveModifierUniforms => ({
+  spineTexture: { value: splineTexture },
+  pathOffset: { type: 'f', value: 0 }, // time of path curve
+  pathSegment: { type: 'f', value: 1 }, // fractional length of path
+  spineOffset: { type: 'f', value: 161 },
+  spineLength: { type: 'f', value: 400 },
+  flow: { type: 'i', value: 1 },
+})
 
 export type ModifiedMaterial<TMaterial extends Material> = TMaterial & {
   __ok: boolean

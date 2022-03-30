@@ -13,7 +13,7 @@ import {
   Object3D,
   Texture,
 } from 'three'
-import { TypedArray, TypedArrayConstructors } from 'types/shared'
+import type { TypedArray, TypedArrayConstructors } from '../types/shared'
 
 /**
  * https://github.com/gkjohnson/collada-exporter-js
