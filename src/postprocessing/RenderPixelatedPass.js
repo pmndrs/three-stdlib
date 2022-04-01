@@ -9,7 +9,7 @@ import {
   DepthTexture,
   NearestFilter,
 } from 'three'
-import { Pass, FullScreenQuad } from './Pass.js'
+import { Pass, FullScreenQuad } from './Pass'
 
 class RenderPixelatedPass extends Pass {
   constructor(resolution, pixelSize, scene, camera, options = {}) {
