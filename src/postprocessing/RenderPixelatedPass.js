@@ -1,7 +1,6 @@
 import {
   WebGLRenderTarget,
   RGBAFormat,
-  RGBFormat,
   MeshNormalMaterial,
   ShaderMaterial,
   Vector2,
@@ -28,7 +27,7 @@ class RenderPixelatedPass extends Pass {
     this.depthEdgeStrength = options.depthEdgeStrength ?? 0.4
 
     this.rgbRenderTarget = pixelRenderTarget(this.renderResolution, RGBAFormat, true)
-    this.normalRenderTarget = pixelRenderTarget(this.renderResolution, RGBFormat, false)
+    this.normalRenderTarget = pixelRenderTarget(this.renderResolution, RGBAFormat, false)
 
     this.normalMaterial = new MeshNormalMaterial()
   }
