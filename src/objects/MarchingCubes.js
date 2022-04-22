@@ -1,10 +1,10 @@
-import { BufferAttribute, BufferGeometry, Color, ImmediateRenderObject, NoColors } from 'three'
+import { BufferAttribute, BufferGeometry, Color, Mesh, NoColors } from 'three'
 
 /**
  * Port of http://webglsamples.org/blob/blob.html
  */
 
-class MarchingCubes extends ImmediateRenderObject {
+class MarchingCubes extends Mesh {
   constructor(resolution, material, enableUvs, enableColors) {
     super(material)
 
