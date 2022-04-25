@@ -1,8 +1,25 @@
-import { DataTexture, FloatType, MathUtils, RedFormat, LuminanceFormat, ShaderMaterial, UniformsUtils } from 'three'
-import { Pass, FullScreenQuad } from './Pass'
-import { DigitalGlitch } from '../shaders/DigitalGlitch'
+import { DigitalGlitch, FullScreenQuad, Pass } from 'index'
+import {
+  DataTexture,
+  FloatType,
+  MathUtils,
+  RedFormat,
+  LuminanceFormat,
+  ShaderMaterial,
+  UniformsUtils,
+  WebGLRenderTarget,
+  WebGLRenderer,
+} from 'three'
 
 class GlitchPass extends Pass {
+  public material: ShaderMaterial
+  public fsQuad: FullScreenQuad
+  public goWild: boolean
+  public curF: number
+  public randX!: number
+
+  public uniforms
+
   constructor(dt_size = 64) {
     super()
 
@@ -27,7 +44,12 @@ class GlitchPass extends Pass {
     this.generateTrigger()
   }
 
-  render(renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */) {
+  public render(
+    renderer: WebGLRenderer,
+    writeBuffer: WebGLRenderTarget,
+    readBuffer: WebGLRenderTarget,
+    /*, deltaTime, maskActive */
+  ): void {
     if (renderer.capabilities.isWebGL2 === false) this.uniforms['tDisp'].value.format = LuminanceFormat
 
     this.uniforms['tDiffuse'].value = readBuffer.texture
@@ -66,11 +88,11 @@ class GlitchPass extends Pass {
     }
   }
 
-  generateTrigger() {
+  generateTrigger(): void {
     this.randX = MathUtils.randInt(120, 240)
   }
 
-  generateHeightmap(dt_size) {
+  generateHeightmap(dt_size: number): DataTexture {
     const data_arr = new Float32Array(dt_size * dt_size)
     const length = dt_size * dt_size
 
