@@ -2,7 +2,7 @@
  * Depth-of-field post-process with bokeh shader
  */
 
-import { BokehShader, FullScreenQuad, Pass } from 'index'
+import { Pass, FullScreenQuad } from './Pass'
 import {
   Color,
   MeshDepthMaterial,
@@ -16,6 +16,7 @@ import {
   WebGLRenderer,
   WebGLRenderTarget,
 } from 'three'
+import { BokehShader } from '../shaders/BokehShader'
 
 type BokehPassParams = {
   focus?: number

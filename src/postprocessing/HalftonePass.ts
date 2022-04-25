@@ -1,5 +1,6 @@
-import { FullScreenQuad, HalftoneShader, Pass } from 'index'
+import { Pass, FullScreenQuad } from './Pass'
 import { ShaderMaterial, UniformsUtils, WebGLRenderer, WebGLRenderTarget } from 'three'
+import { HalftoneShader } from '../shaders/HalftoneShader'
 
 type HalftonePassParams = {
   shape?: number

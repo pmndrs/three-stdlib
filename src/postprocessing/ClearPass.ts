@@ -1,4 +1,4 @@
-import { Pass } from 'index'
+import { Pass } from './Pass'
 import { Color, ColorRepresentation, WebGLRenderer, WebGLRenderTarget } from 'three'
 
 class ClearPass extends Pass {

@@ -1,5 +1,6 @@
-import { DotScreenShader, FullScreenQuad, Pass } from 'index'
+import { Pass, FullScreenQuad } from './Pass'
 import { ShaderMaterial, UniformsUtils, Vector2, WebGLRenderer, WebGLRenderTarget } from 'three'
+import { DotScreenShader } from '../shaders/DotScreenShader'
 
 class DotScreenPass extends Pass {
   public material: ShaderMaterial

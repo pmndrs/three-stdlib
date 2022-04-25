@@ -1,5 +1,6 @@
-import { FilmShader, FullScreenQuad, Pass } from 'index'
+import { Pass, FullScreenQuad } from './Pass'
 import { ShaderMaterial, UniformsUtils, WebGLRenderer, WebGLRenderTarget } from 'three'
+import { FilmShader } from '../shaders/FilmShader'
 
 class FilmPass extends Pass {
   public material: ShaderMaterial

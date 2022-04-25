@@ -1,4 +1,4 @@
-import { CopyShader, FullScreenQuad, Pass } from 'index'
+import { Pass, FullScreenQuad } from './Pass'
 import {
   AdditiveBlending,
   Camera,
@@ -23,6 +23,7 @@ import {
   WebGLRenderer,
   WebGLRenderTarget,
 } from 'three'
+import { CopyShader } from '../shaders/CopyShader'
 
 class OutlinePass extends Pass {
   public renderScene: Scene

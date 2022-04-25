@@ -1,4 +1,4 @@
-import { DigitalGlitch, FullScreenQuad, Pass } from 'index'
+import { Pass, FullScreenQuad } from './Pass'
 import {
   DataTexture,
   FloatType,
@@ -10,6 +10,7 @@ import {
   WebGLRenderTarget,
   WebGLRenderer,
 } from 'three'
+import { DigitalGlitch } from '../shaders/DigitalGlitch'
 
 class GlitchPass extends Pass {
   public material: ShaderMaterial

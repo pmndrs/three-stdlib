@@ -1,5 +1,6 @@
-import { ConvolutionShader, FullScreenQuad, Pass } from 'index'
+import { Pass, FullScreenQuad } from './Pass'
 import { AdditiveBlending, ShaderMaterial, UniformsUtils, Vector2, WebGLRenderer, WebGLRenderTarget } from 'three'
+import { ConvolutionShader } from '../shaders/ConvolutionShader'
 
 class BloomPass extends Pass {
   public renderTargetX: WebGLRenderTarget
