@@ -46,7 +46,7 @@ class BloomPass extends Pass {
       },
     })
     this.needsSwap = false
-    this.fsQuad = new FullScreenQuad(null)
+    this.fsQuad = new FullScreenQuad(this.materialConvolution)
   }
 
   public render(

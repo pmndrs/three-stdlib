@@ -164,7 +164,7 @@ class OutlinePass extends Pass {
     this._oldClearColor = new Color()
     this.oldClearAlpha = 1
 
-    this.fsQuad = new FullScreenQuad(null)
+    this.fsQuad = new FullScreenQuad(this.materialCopy)
 
     this.tempPulseColor1 = new Color()
     this.tempPulseColor2 = new Color()
