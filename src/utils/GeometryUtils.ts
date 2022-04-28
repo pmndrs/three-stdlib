@@ -21,10 +21,10 @@ const hilbert2D = (
   v0 = 0,
   v1 = 1,
   v2 = 2,
-  v3 = 3
-) => {
+  v3 = 3,
+): Vector3[] => {
   // Default Vars
-  const half = size / 2;
+  const half = size / 2
   const vec_s = [
     new Vector3(center.x - half, center.y, center.z - half),
     new Vector3(center.x - half, center.y, center.z + half),
@@ -81,9 +81,9 @@ const hilbert3D = (
   v5 = 5,
   v6 = 6,
   v7 = 7,
-) => {
+): Vector3[] => {
   // Default Vars
-  const half = size / 2;
+  const half = size / 2
   const vec_s = [
     new Vector3(center.x - half, center.y + half, center.z - half),
     new Vector3(center.x - half, center.y + half, center.z + half),
@@ -125,13 +125,9 @@ const hilbert3D = (
  *
  * @param size The size of a single gosper island.
  */
-const gosper = (size = 1) => {
-  function fractalize(config: {
-    axiom: string;
-    steps: number;
-    rules: Record<string, string>;
-  }) {
-    let output = '';
+const gosper = (size = 1): number[] => {
+  function fractalize(config: { axiom: string; steps: number; rules: Record<string, string> }): string {
+    let output = ''
     let input = config.axiom
 
     for (let i = 0, il = config.steps; 0 <= il ? i < il : i > il; 0 <= il ? i++ : i--) {
@@ -153,11 +149,7 @@ const gosper = (size = 1) => {
     return output
   }
 
-  function toPoints(config: {
-    fractal: string;
-    size: number;
-    angle: number;
-  }) {
+  function toPoints(config: { fractal: string; size: number; angle: number }): number[] {
     let currX = 0
     let currY = 0
     let angle = 0
