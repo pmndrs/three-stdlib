@@ -14,28 +14,29 @@ import { Vector3 } from 'three'
  * @param v2         Corner index +X, +Z.
  * @param v3         Corner index +X, -Z.
  */
-const hilbert2D = (center, size, iterations, v0, v1, v2, v3) => {
+const hilbert2D = (
+  center = new Vector3(0, 0, 0),
+  size = 10,
+  iterations = 1,
+  v0 = 0,
+  v1 = 1,
+  v2 = 2,
+  v3 = 3,
+): Vector3[] => {
   // Default Vars
-  var center = center !== undefined ? center : new Vector3(0, 0, 0),
-    size = size !== undefined ? size : 10,
-    half = size / 2,
-    iterations = iterations !== undefined ? iterations : 1,
-    v0 = v0 !== undefined ? v0 : 0,
-    v1 = v1 !== undefined ? v1 : 1,
-    v2 = v2 !== undefined ? v2 : 2,
-    v3 = v3 !== undefined ? v3 : 3
-  var vec_s = [
+  const half = size / 2
+  const vec_s = [
     new Vector3(center.x - half, center.y, center.z - half),
     new Vector3(center.x - half, center.y, center.z + half),
     new Vector3(center.x + half, center.y, center.z + half),
     new Vector3(center.x + half, center.y, center.z - half),
   ]
 
-  var vec = [vec_s[v0], vec_s[v1], vec_s[v2], vec_s[v3]]
+  const vec = [vec_s[v0], vec_s[v1], vec_s[v2], vec_s[v3]]
 
   // Recurse iterations
   if (0 <= --iterations) {
-    var tmp = []
+    const tmp: Vector3[] = []
 
     Array.prototype.push.apply(tmp, hilbert2D(vec[0], half, iterations, v0, v3, v2, v1))
     Array.prototype.push.apply(tmp, hilbert2D(vec[1], half, iterations, v0, v1, v2, v3))
@@ -68,21 +69,22 @@ const hilbert2D = (center, size, iterations, v0, v1, v2, v3) => {
  * @param v6         Corner index +X, +Y, +Z.
  * @param v7         Corner index +X, +Y, -Z.
  */
-const hilbert3D = (center, size, iterations, v0, v1, v2, v3, v4, v5, v6, v7) => {
+const hilbert3D = (
+  center = new Vector3(0, 0, 0),
+  size = 10,
+  iterations = 1,
+  v0 = 0,
+  v1 = 1,
+  v2 = 2,
+  v3 = 3,
+  v4 = 4,
+  v5 = 5,
+  v6 = 6,
+  v7 = 7,
+): Vector3[] => {
   // Default Vars
-  var center = center !== undefined ? center : new Vector3(0, 0, 0),
-    size = size !== undefined ? size : 10,
-    half = size / 2,
-    iterations = iterations !== undefined ? iterations : 1,
-    v0 = v0 !== undefined ? v0 : 0,
-    v1 = v1 !== undefined ? v1 : 1,
-    v2 = v2 !== undefined ? v2 : 2,
-    v3 = v3 !== undefined ? v3 : 3,
-    v4 = v4 !== undefined ? v4 : 4,
-    v5 = v5 !== undefined ? v5 : 5,
-    v6 = v6 !== undefined ? v6 : 6,
-    v7 = v7 !== undefined ? v7 : 7
-  var vec_s = [
+  const half = size / 2
+  const vec_s = [
     new Vector3(center.x - half, center.y + half, center.z - half),
     new Vector3(center.x - half, center.y + half, center.z + half),
     new Vector3(center.x - half, center.y - half, center.z + half),
@@ -93,11 +95,11 @@ const hilbert3D = (center, size, iterations, v0, v1, v2, v3, v4, v5, v6, v7) => 
     new Vector3(center.x + half, center.y + half, center.z - half),
   ]
 
-  var vec = [vec_s[v0], vec_s[v1], vec_s[v2], vec_s[v3], vec_s[v4], vec_s[v5], vec_s[v6], vec_s[v7]]
+  const vec = [vec_s[v0], vec_s[v1], vec_s[v2], vec_s[v3], vec_s[v4], vec_s[v5], vec_s[v6], vec_s[v7]]
 
   // Recurse iterations
   if (--iterations >= 0) {
-    var tmp = []
+    const tmp: Vector3[] = []
 
     Array.prototype.push.apply(tmp, hilbert3D(vec[0], half, iterations, v0, v3, v4, v7, v6, v5, v2, v1))
     Array.prototype.push.apply(tmp, hilbert3D(vec[1], half, iterations, v0, v7, v6, v1, v2, v5, v4, v3))
@@ -123,18 +125,16 @@ const hilbert3D = (center, size, iterations, v0, v1, v2, v3, v4, v5, v6, v7) => 
  *
  * @param size The size of a single gosper island.
  */
-const gosper = (size) => {
-  size = size !== undefined ? size : 1
-
-  function fractalize(config) {
-    var output
-    var input = config.axiom
+const gosper = (size = 1): number[] => {
+  function fractalize(config: { axiom: string; steps: number; rules: Record<string, string> }): string {
+    let output = ''
+    let input = config.axiom
 
     for (let i = 0, il = config.steps; 0 <= il ? i < il : i > il; 0 <= il ? i++ : i--) {
       output = ''
 
       for (let j = 0, jl = input.length; j < jl; j++) {
-        var char = input[j]
+        const char = input[j]
 
         if (char in config.rules) {
           output += config.rules[char]
@@ -149,15 +149,15 @@ const gosper = (size) => {
     return output
   }
 
-  function toPoints(config) {
-    var currX = 0,
-      currY = 0
-    var angle = 0
-    var path = [0, 0, 0]
-    var fractal = config.fractal
+  function toPoints(config: { fractal: string; size: number; angle: number }): number[] {
+    let currX = 0
+    let currY = 0
+    let angle = 0
+    const path = [0, 0, 0]
+    const fractal = config.fractal
 
     for (let i = 0, l = fractal.length; i < l; i++) {
-      var char = fractal[i]
+      const char = fractal[i]
 
       if (char === '+') {
         angle += config.angle
@@ -175,7 +175,7 @@ const gosper = (size) => {
 
   //
 
-  var gosper = fractalize({
+  const gosper = fractalize({
     axiom: 'A',
     steps: 4,
     rules: {
@@ -184,7 +184,7 @@ const gosper = (size) => {
     },
   })
 
-  var points = toPoints({
+  const points = toPoints({
     fractal: gosper,
     size: size,
     angle: Math.PI / 3, // 60 degrees
@@ -193,4 +193,8 @@ const gosper = (size) => {
   return points
 }
 
-export { hilbert2D, hilbert3D, gosper }
+export const GeometryUtils = {
+  hilbert3D,
+  gosper,
+  hilbert2D,
+}
