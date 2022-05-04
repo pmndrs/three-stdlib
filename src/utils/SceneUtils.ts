@@ -1,4 +1,5 @@
-import { BufferGeometry, Group, InstancedMesh, Material, Mesh, Object3D, Scene } from 'three'
+import { Group, Mesh } from 'three'
+import type { BufferGeometry, InstancedMesh, Material, Object3D, Scene } from 'three'
 
 const SceneUtils = {
   createMeshesFromInstancedMesh: function (instancedMesh: InstancedMesh): Group {
