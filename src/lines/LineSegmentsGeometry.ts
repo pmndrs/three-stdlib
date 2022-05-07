@@ -84,11 +84,11 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
     return this
   }
 
-  public getPositionAt(index: number, position: Vector3) {
+  public getPositionAt(index: number, position: Vector3): void {
     position.fromArray(this.instanceBuffer!.array, index * 3)
   }
 
-  public setPositionAt(index: number, position: Vector3) {
+  public setPositionAt(index: number, position: Vector3): void {
     position.toArray(this.instanceBuffer!.array, index * 3)
     this.instanceBuffer!.needsUpdate = true
   }
@@ -113,11 +113,11 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
     return this
   }
 
-  public getColorAt(index: number, color: Color) {
+  public getColorAt(index: number, color: Color): void {
     color.fromArray(this.instanceColorBuffer!.array, index * 3)
   }
 
-  public setColorAt(index: number, color: Color) {
+  public setColorAt(index: number, color: Color): void {
     color.toArray(this.instanceColorBuffer!.array, index * 3)
     this.instanceColorBuffer!.needsUpdate = true
   }
