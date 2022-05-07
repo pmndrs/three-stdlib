@@ -12,12 +12,15 @@ import {
   Sphere,
   Vector3,
   WireframeGeometry,
+  Color,
 } from 'three'
 
 class LineSegmentsGeometry extends InstancedBufferGeometry {
   public readonly isLineSegmentsGeometry = true
   public type = 'LineSegmentsGeometry'
 
+  public instanceBuffer: InstancedInterleavedBuffer | null = null
+  public instanceColorBuffer: InstancedInterleavedBuffer | null = null
   public boundingBox: Box3 | null = null
   public boundingSphere: Sphere | null = null
 
@@ -68,10 +71,10 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
       return this
     }
 
-    const instanceBuffer = new InstancedInterleavedBuffer(lineSegments, 6, 1) // xyz, xyz
+    this.instanceBuffer = new InstancedInterleavedBuffer(lineSegments, 6, 1) // xyz, xyz
 
-    this.setAttribute('instanceStart', new InterleavedBufferAttribute(instanceBuffer, 3, 0)) // xyz
-    this.setAttribute('instanceEnd', new InterleavedBufferAttribute(instanceBuffer, 3, 3)) // xyz
+    this.setAttribute('instanceStart', new InterleavedBufferAttribute(this.instanceBuffer, 3, 0)) // xyz
+    this.setAttribute('instanceEnd', new InterleavedBufferAttribute(this.instanceBuffer, 3, 3)) // xyz
 
     //
 
@@ -79,6 +82,15 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
     this.computeBoundingSphere()
 
     return this
+  }
+
+  public getPositionAt(index: number, position: Vector3) {
+    position.fromArray(this.instanceBuffer!.array, index * 3);
+  }
+
+  public setPositionAt(index: number, position: Vector3) {
+    position.toArray(this.instanceBuffer!.array, index * 3)
+    this.instanceBuffer!.needsUpdate = true
   }
 
   public setColors(array: number[] | Float32Array): this {
@@ -93,12 +105,21 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
       return this
     }
 
-    const instanceColorBuffer = new InstancedInterleavedBuffer(colors, 6, 1) // rgb, rgb
+    this.instanceColorBuffer = new InstancedInterleavedBuffer(colors, 6, 1) // rgb, rgb
 
-    this.setAttribute('instanceColorStart', new InterleavedBufferAttribute(instanceColorBuffer, 3, 0)) // rgb
-    this.setAttribute('instanceColorEnd', new InterleavedBufferAttribute(instanceColorBuffer, 3, 3)) // rgb
+    this.setAttribute('instanceColorStart', new InterleavedBufferAttribute(this.instanceColorBuffer, 3, 0)) // rgb
+    this.setAttribute('instanceColorEnd', new InterleavedBufferAttribute(this.instanceColorBuffer, 3, 3)) // rgb
 
     return this
+  }
+
+   public getColorAt(index: number, color: Color) {
+    color.fromArray(this.instanceColorBuffer!.array, index * 3);
+  }
+
+  public setColorAt(index: number, color: Color) {
+    color.toArray(this.instanceColorBuffer!.array, index * 3)
+    this.instanceColorBuffer!.needsUpdate = true
   }
 
   public fromWireframeGeometry(geometry: BufferGeometry): this {
