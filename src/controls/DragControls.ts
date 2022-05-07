@@ -57,6 +57,8 @@ class DragControls extends EventDispatcher {
 
   public getObjects = (): Object3D[] => this._objects
 
+  public getRaycaster = (): Raycaster => this._raycaster
+
   private onMouseMove = (event: MouseEvent): void => {
     const rect = this._domElement.getBoundingClientRect()
 
