@@ -66,7 +66,7 @@ export default [
   },
   {
     input: ['src/**/*.ts', 'src/**/*.js', '!src/index.js'],
-    output: { dir: `dist`, format: 'cjs' },
+    output: { dir: `dist`, format: 'cjs', exports: 'named' },
     external,
     plugins: [
       multiInput({
@@ -80,7 +80,7 @@ export default [
   },
   {
     input: `./src/index.ts`,
-    output: { file: `dist/index.cjs`, format: 'cjs' },
+    output: { file: `dist/index.cjs`, format: 'cjs', exports: 'named' },
     external,
     plugins: [
       json(),
