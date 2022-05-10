@@ -70,7 +70,7 @@ export default [
     external,
     plugins: [
       multiInput({
-        transformOutputPath: (output) => output.replace(/\.[^/.]+$/, '.cjs.js'),
+        transformOutputPath: (output) => output.replace(/\.[^/.]+$/, '.cjs'),
       }),
       json(),
       babel(getBabelOptions({ useESModules: false }, '>1%, not dead, not ie 11, not op_mini all')),
@@ -80,7 +80,7 @@ export default [
   },
   {
     input: `./src/index.ts`,
-    output: { file: `dist/index.cjs.js`, format: 'cjs' },
+    output: { file: `dist/index.cjs`, format: 'cjs' },
     external,
     plugins: [
       json(),

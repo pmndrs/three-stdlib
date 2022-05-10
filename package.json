@@ -3,7 +3,8 @@
   "version": "0.0.0-semantic-released",
   "private": true,
   "description": "stand-alone library of threejs examples",
-  "main": "index.cjs.js",
+  "type": "module",
+  "main": "index.cjs",
   "module": "index.js",
   "scripts": {
     "build": "rollup -c && node ./scripts/createDeclarations.js && npm run copy",
