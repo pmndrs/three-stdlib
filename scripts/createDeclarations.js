@@ -1,5 +1,5 @@
-import fs from 'fs'
-import { recrawl } from 'recrawl'
+const fs = require('fs')
+const { recrawl } = require('recrawl')
 
 const THREE_TYPES_ROOT = 'node_modules/@types/three'
 const STDLIB_BUILD_ROOT = 'dist'
