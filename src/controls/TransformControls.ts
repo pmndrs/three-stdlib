@@ -209,10 +209,9 @@ class TransformControls<TCamera extends Camera = Camera> extends Object3D {
 
     return this
   }
-  
-  // Reset 
-  public reset = (): this => {
 
+  // Reset
+  public reset = (): this => {
     if (!this.enabled) return this
 
     if (this.dragging) {
@@ -222,7 +221,8 @@ class TransformControls<TCamera extends Camera = Camera> extends Object3D {
         this.object.scale.copy(this.scaleStart)
         this.dispatchEvent(this.changeEvent)
         this.dispatchEvent(this.objectChangeEvent)
-        this.pointStart.copy(this.pointEnd)}
+        this.pointStart.copy(this.pointEnd)
+      }
     }
 
     return this
