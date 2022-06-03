@@ -9,10 +9,15 @@ export default {
   title: 'Controls/Transform',
 }
 
+function onEscKey(e: KeyboardEvent, controls: TransformControls) {
+  controls.reset()
+}
+
 export const Default = () => {
   // must run in this so the canvas has mounted in the iframe & can be accessed by `three`
   useEffect(() => {
     const { renderer, scene, camera, render } = useThree({
+      // @ts-ignore
       orbit: false,
       //   useFrame: (_, delta) => {},
     })
@@ -31,7 +36,11 @@ export const Default = () => {
     camera.lookAt(mesh.position)
     scene.background = new Color(0x000000).convertSRGBToLinear()
 
+    const cb = (e: KeyboardEvent) => e.key === 'Escape' && control.reset()
+    document.addEventListener('keydown', cb)
+
     return () => {
+      document.removeEventListener('keydown', cb)
       renderer.dispose()
     }
   }, [])
@@ -62,7 +71,11 @@ export const RotateStory = () => {
     camera.lookAt(mesh.position)
     scene.background = new Color(0x000000).convertSRGBToLinear()
 
+    const cb = (e: KeyboardEvent) => e.key === 'Escape' && control.reset()
+    document.addEventListener('keydown', cb)
+
     return () => {
+      document.removeEventListener('keydown', cb)
       renderer.dispose()
     }
   }, [])
@@ -75,6 +88,7 @@ export const ScaleStory = () => {
   // must run in this so the canvas has mounted in the iframe & can be accessed by `three`
   useEffect(() => {
     const { renderer, scene, camera, render } = useThree({
+      // @ts-ignore
       orbit: false,
       //   useFrame: (_, delta) => {},
     })
@@ -95,7 +109,11 @@ export const ScaleStory = () => {
     camera.lookAt(mesh.position)
     scene.background = new Color(0x000000).convertSRGBToLinear()
 
+    const cb = (e: KeyboardEvent) => e.key === 'Escape' && control.reset()
+    document.addEventListener('keydown', cb)
+
     return () => {
+      document.removeEventListener('keydown', cb)
       renderer.dispose()
     }
   }, [])
