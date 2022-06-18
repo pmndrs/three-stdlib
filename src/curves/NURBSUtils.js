@@ -94,8 +94,8 @@ export function calcBasisFunctions(span, u, p, U) {
 	returns point for given u
 	*/
 export function calcBSplinePoint(p, U, P, u) {
-  const span = this.findSpan(p, u, U)
-  const N = this.calcBasisFunctions(span, u, p, U)
+  const span = findSpan(p, u, U)
+  const N = calcBasisFunctions(span, u, p, U)
   const C = new Vector4(0, 0, 0, 0)
 
   for (let j = 0; j <= p; ++j) {
@@ -229,8 +229,8 @@ export function calcBasisFunctionDerivatives(span, u, p, n, U) {
 export function calcBSplineDerivatives(p, U, P, u, nd) {
   const du = nd < p ? nd : p
   const CK = []
-  const span = this.findSpan(p, u, U)
-  const nders = this.calcBasisFunctionDerivatives(span, u, p, du, U)
+  const span = findSpan(p, u, U)
+  const nders = calcBasisFunctionDerivatives(span, u, p, du, U)
   const Pw = []
 
   for (let i = 0; i < P.length; ++i) {
@@ -310,7 +310,7 @@ export function calcRationalCurveDerivatives(Pders) {
     const v = Aders[k].clone()
 
     for (let i = 1; i <= k; ++i) {
-      v.sub(CK[k - i].clone().multiplyScalar(this.calcKoverI(k, i) * wders[i]))
+      v.sub(CK[k - i].clone().multiplyScalar(calcKoverI(k, i) * wders[i]))
     }
 
     CK[k] = v.divideScalar(wders[0])
@@ -331,8 +331,8 @@ export function calcRationalCurveDerivatives(Pders) {
 	returns array with derivatives.
 	*/
 export function calcNURBSDerivatives(p, U, P, u, nd) {
-  const Pders = this.calcBSplineDerivatives(p, U, P, u, nd)
-  return this.calcRationalCurveDerivatives(Pders)
+  const Pders = calcBSplineDerivatives(p, U, P, u, nd)
+  return calcRationalCurveDerivatives(Pders)
 }
 
 /*
@@ -346,10 +346,10 @@ export function calcNURBSDerivatives(p, U, P, u, nd) {
 	returns point for given (u, v)
 	*/
 export function calcSurfacePoint(p, q, U, V, P, u, v, target) {
-  const uspan = this.findSpan(p, u, U)
-  const vspan = this.findSpan(q, v, V)
-  const Nu = this.calcBasisFunctions(uspan, u, p, U)
-  const Nv = this.calcBasisFunctions(vspan, v, q, V)
+  const uspan = findSpan(p, u, U)
+  const vspan = findSpan(q, v, V)
+  const Nu = calcBasisFunctions(uspan, u, p, U)
+  const Nv = calcBasisFunctions(vspan, v, q, V)
   const temp = []
 
   for (let l = 0; l <= q; ++l) {
