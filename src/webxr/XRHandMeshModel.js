@@ -4,15 +4,15 @@ const DEFAULT_HAND_PROFILE_PATH =
   'https://cdn.jsdelivr.net/npm/@webxr-input-profiles/assets@1.0/dist/profiles/generic-hand/'
 
 class XRHandMeshModel {
-  constructor(handModel, controller, path, handedness) {
+  constructor(handModel, controller, path, handedness, customModel) {
     this.controller = controller
     this.handModel = handModel
 
     this.bones = []
 
     const loader = new GLTFLoader()
-    loader.setPath(path || DEFAULT_HAND_PROFILE_PATH)
-    loader.load(`${handedness}.glb`, (gltf) => {
+    if (!customModel) loader.setPath(path || DEFAULT_HAND_PROFILE_PATH)
+    loader.load(customModel ?? `${handedness}.glb`, (gltf) => {
       const object = gltf.scene.children[0]
       this.handModel.add(object)
 

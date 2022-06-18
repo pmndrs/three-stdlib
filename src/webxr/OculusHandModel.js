@@ -5,7 +5,7 @@ const TOUCH_RADIUS = 0.01
 const POINTING_JOINT = 'index-finger-tip'
 
 class OculusHandModel extends Object3D {
-  constructor(controller) {
+  constructor(controller, customModels) {
     super()
 
     this.controller = controller
@@ -20,13 +20,18 @@ class OculusHandModel extends Object3D {
       if (xrInputSource.hand && !this.motionController) {
         this.xrInputSource = xrInputSource
 
-        this.motionController = new XRHandMeshModel(this, controller, this.path, xrInputSource.handedness)
+        this.motionController = new XRHandMeshModel(
+          this,
+          controller,
+          this.path,
+          xrInputSource.handedness,
+          xrInputSource.handedness === 'left' ? customModels[0] : customModels[1],
+        )
       }
     })
 
     controller.addEventListener('disconnected', () => {
-      this.clear()
-      this.motionController = null
+      this.dispose()
     })
   }
 
@@ -68,6 +73,26 @@ class OculusHandModel extends Object3D {
     if (button.isPressed()) {
       button.whilePressed()
     }
+  }
+
+  dispose() {
+    this.clear()
+    if (this.motionController) {
+      this.motionController.traverse((node) => {
+        if (!node) return
+
+        if (node.type !== 'Scene') {
+          node.dispose?.()
+
+          // Dispose of its properties as well
+          for (const property in node) {
+            property.dispose?.()
+            delete node[property]
+          }
+        }
+      })
+    }
+    this.motionController = null
   }
 }
 
