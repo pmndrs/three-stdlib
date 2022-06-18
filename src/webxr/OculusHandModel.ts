@@ -1,4 +1,4 @@
-import { Object3D, Sphere, Box3, Mesh, Texture, XRInputSource } from 'three'
+import { Object3D, Sphere, Box3, Mesh, Texture, XRInputSource, Vector3 } from 'three'
 import { XRHandMeshModel } from './XRHandMeshModel'
 
 const TOUCH_RADIUS = 0.01
@@ -49,7 +49,7 @@ class OculusHandModel extends Object3D {
     })
   }
 
-  updateMatrixWorld(force?: boolean) {
+  updateMatrixWorld(force?: boolean): void {
     super.updateMatrixWorld(force)
 
     if (this.motionController) {
@@ -57,7 +57,7 @@ class OculusHandModel extends Object3D {
     }
   }
 
-  getPointerPosition() {
+  getPointerPosition(): Vector3 | null {
     // @ts-ignore XRController needs to extend Group
     const indexFingerTip = this.controller.joints[POINTING_JOINT]
     if (indexFingerTip) {
@@ -67,7 +67,7 @@ class OculusHandModel extends Object3D {
     }
   }
 
-  intersectBoxObject(boxObject: Object3D) {
+  intersectBoxObject(boxObject: Object3D): boolean {
     const pointerPosition = this.getPointerPosition()
     if (pointerPosition) {
       const indexSphere = new Sphere(pointerPosition, TOUCH_RADIUS)
@@ -78,7 +78,7 @@ class OculusHandModel extends Object3D {
     }
   }
 
-  checkButton(button: XRButton) {
+  checkButton(button: XRButton): void {
     if (this.intersectBoxObject(button)) {
       button.onPress()
     } else {
@@ -90,7 +90,7 @@ class OculusHandModel extends Object3D {
     }
   }
 
-  dispose() {
+  dispose(): void {
     this.clear()
     this.motionController = null
   }

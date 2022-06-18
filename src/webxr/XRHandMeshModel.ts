@@ -75,7 +75,7 @@ class XRHandMeshModel {
     })
   }
 
-  updateMesh() {
+  updateMesh(): void {
     // XR Joints
     const XRJoints = (this.controller as any).joints
 
