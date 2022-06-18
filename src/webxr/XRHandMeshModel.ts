@@ -1,18 +1,29 @@
-import { GLTFLoader } from '../loaders/GLTFLoader'
+import { Object3D } from 'three'
+import { GLTFLoader, GLTF } from '../loaders/GLTFLoader'
 
 const DEFAULT_HAND_PROFILE_PATH =
   'https://cdn.jsdelivr.net/npm/@webxr-input-profiles/assets@1.0/dist/profiles/generic-hand/'
 
 class XRHandMeshModel {
-  constructor(handModel, controller, path, handedness, customModel) {
+  controller: Object3D
+  handModel: Object3D
+  bones: Object3D[]
+
+  constructor(
+    handModel: Object3D,
+    controller: Object3D,
+    path: string = DEFAULT_HAND_PROFILE_PATH,
+    handedness: string,
+    customModel?: string,
+  ) {
     this.controller = controller
     this.handModel = handModel
 
     this.bones = []
 
     const loader = new GLTFLoader()
-    if (!customModel) loader.setPath(path || DEFAULT_HAND_PROFILE_PATH)
-    loader.load(customModel ?? `${handedness}.glb`, (gltf) => {
+    if (!customModel) loader.setPath(path)
+    loader.load(customModel ?? `${handedness}.glb`, (gltf: GLTF) => {
       const object = gltf.scene.children[0]
       this.handModel.add(object)
 
@@ -65,13 +76,13 @@ class XRHandMeshModel {
 
   updateMesh() {
     // XR Joints
-    const XRJoints = this.controller.joints
+    const XRJoints = (this.controller as any).joints
 
     for (let i = 0; i < this.bones.length; i++) {
       const bone = this.bones[i]
 
       if (bone) {
-        const XRJoint = XRJoints[bone.jointName]
+        const XRJoint = XRJoints[(bone as any).jointName]
 
         if (XRJoint.visible) {
           const position = XRJoint.position
