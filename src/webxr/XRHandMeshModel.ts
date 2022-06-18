@@ -1,5 +1,6 @@
 import { Object3D } from 'three'
-import { GLTFLoader, GLTF } from '../loaders/GLTFLoader'
+// @ts-ignore
+import { GLTFLoader } from '../loaders/GLTFLoader'
 
 const DEFAULT_HAND_PROFILE_PATH =
   'https://cdn.jsdelivr.net/npm/@webxr-input-profiles/assets@1.0/dist/profiles/generic-hand/'
@@ -23,11 +24,11 @@ class XRHandMeshModel {
 
     const loader = new GLTFLoader()
     if (!customModel) loader.setPath(path)
-    loader.load(customModel ?? `${handedness}.glb`, (gltf: GLTF) => {
+    loader.load(customModel ?? `${handedness}.glb`, (gltf: { scene: Object3D }) => {
       const object = gltf.scene.children[0]
       this.handModel.add(object)
 
-      const mesh = object.getObjectByProperty('type', 'SkinnedMesh')
+      const mesh = object.getObjectByProperty('type', 'SkinnedMesh')!
       mesh.frustumCulled = false
       mesh.castShadow = true
       mesh.receiveShadow = true
@@ -61,7 +62,7 @@ class XRHandMeshModel {
       ]
 
       joints.forEach((jointName) => {
-        const bone = object.getObjectByName(jointName)
+        const bone = object.getObjectByName(jointName) as any
 
         if (bone !== undefined) {
           bone.jointName = jointName
