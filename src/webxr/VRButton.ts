@@ -1,17 +1,13 @@
-class VRButton {
-  static createButton(renderer, options) {
-    if (options) {
-      console.error(
-        'THREE.VRButton: The "options" parameter has been removed. Please set the reference space type via renderer.xr.setReferenceSpaceType() instead.',
-      )
-    }
+import { Navigator, WebGLRenderer, XRSession, XRSessionInit } from 'three'
 
+class VRButton {
+  static createButton(renderer: WebGLRenderer, sessionInit: XRSessionInit = {}) {
     const button = document.createElement('button')
 
     function showEnterVR(/*device*/) {
-      let currentSession = null
+      let currentSession: XRSession | null = null
 
-      async function onSessionStarted(session) {
+      async function onSessionStarted(session: XRSession) {
         session.addEventListener('end', onSessionEnded)
 
         await renderer.xr.setSession(session)
@@ -21,7 +17,7 @@ class VRButton {
       }
 
       function onSessionEnded(/*event*/) {
-        currentSession.removeEventListener('end', onSessionEnded)
+        currentSession!.removeEventListener('end', onSessionEnded)
 
         button.textContent = 'ENTER VR'
 
@@ -55,8 +51,13 @@ class VRButton {
           // ('local' is always available for immersive sessions and doesn't need to
           // be requested separately.)
 
-          const sessionInit = { optionalFeatures: ['local-floor', 'bounded-floor', 'hand-tracking', 'layers'] }
-          navigator.xr.requestSession('immersive-vr', sessionInit).then(onSessionStarted)
+          const optionalFeatures = [sessionInit.optionalFeatures, 'local-floor', 'bounded-floor', 'hand-tracking']
+            .flat()
+            .filter(Boolean) as string[]
+
+          ;(navigator as Navigator).xr
+            ?.requestSession('immersive-vr', { ...sessionInit, optionalFeatures })
+            .then(onSessionStarted)
         } else {
           currentSession.end()
         }
@@ -82,7 +83,7 @@ class VRButton {
       button.textContent = 'VR NOT SUPPORTED'
     }
 
-    function stylizeElement(element) {
+    function stylizeElement(element: HTMLElement) {
       element.style.position = 'absolute'
       element.style.bottom = '20px'
       element.style.padding = '12px 6px'
@@ -98,12 +99,12 @@ class VRButton {
     }
 
     if ('xr' in navigator) {
+      stylizeElement(button)
       button.id = 'VRButton'
       button.style.display = 'none'
 
-      stylizeElement(button)
-
-      navigator.xr.isSessionSupported('immersive-vr').then(function (supported) {
+      // Query for session mode
+      ;(navigator as Navigator).xr!.isSessionSupported('immersive-vr').then((supported) => {
         supported ? showEnterVR() : showWebXRNotFound()
 
         if (supported && VRButton.xrSessionIsGranted) {
@@ -135,9 +136,9 @@ class VRButton {
 
   static xrSessionIsGranted = false
 
-  static registerSessionGrantedListener() {
+  static registerSessionGrantedListener(): void {
     if ('xr' in navigator) {
-      navigator.xr.addEventListener('sessiongranted', () => {
+      ;(navigator as Navigator).xr!.addEventListener('sessiongranted', () => {
         VRButton.xrSessionIsGranted = true
       })
     }
