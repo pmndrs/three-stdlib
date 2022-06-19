@@ -11,7 +11,7 @@ class ARButton {
   ): HTMLButtonElement | HTMLAnchorElement {
     const button = document.createElement('button')
 
-    function showStartAR(/*device*/) {
+    function showStartAR(/*device*/): void {
       if (sessionInit.domOverlay === undefined) {
         const overlay = document.createElement('div')
         overlay.style.display = 'none'
@@ -46,7 +46,7 @@ class ARButton {
 
       let currentSession: XRSession | null = null
 
-      async function onSessionStarted(session: XRSession) {
+      async function onSessionStarted(session: XRSession): Promise<void> {
         session.addEventListener('end', onSessionEnded)
 
         renderer.xr.setReferenceSpaceType('local')
@@ -59,7 +59,7 @@ class ARButton {
         currentSession = session
       }
 
-      function onSessionEnded(/*event*/) {
+      function onSessionEnded(/*event*/): void {
         currentSession!.removeEventListener('end', onSessionEnded)
 
         button.textContent = 'START AR'
@@ -78,15 +78,15 @@ class ARButton {
 
       button.textContent = 'START AR'
 
-      button.onmouseenter = function () {
+      button.onmouseenter = (): void => {
         button.style.opacity = '1.0'
       }
 
-      button.onmouseleave = function () {
+      button.onmouseleave = (): void => {
         button.style.opacity = '0.5'
       }
 
-      button.onclick = function () {
+      button.onclick = (): void => {
         if (currentSession === null) {
           ;(navigator as Navigator).xr!.requestSession('immersive-ar', sessionInit).then(onSessionStarted)
         } else {
@@ -95,7 +95,7 @@ class ARButton {
       }
     }
 
-    function disableButton() {
+    function disableButton(): void {
       button.style.display = ''
 
       button.style.cursor = 'auto'
@@ -108,13 +108,13 @@ class ARButton {
       button.onclick = null
     }
 
-    function showARNotSupported() {
+    function showARNotSupported(): void {
       disableButton()
 
       button.textContent = 'AR NOT SUPPORTED'
     }
 
-    function stylizeElement(element: HTMLElement) {
+    function stylizeElement(element: HTMLElement): void {
       element.style.position = 'absolute'
       element.style.bottom = '20px'
       element.style.padding = '12px 6px'

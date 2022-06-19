@@ -1,13 +1,13 @@
 import { Navigator, WebGLRenderer, XRSession, XRSessionInit } from 'three'
 
 class VRButton {
-  static createButton(renderer: WebGLRenderer, sessionInit: XRSessionInit = {}) {
+  static createButton(renderer: WebGLRenderer, sessionInit: XRSessionInit = {}): HTMLButtonElement | HTMLAnchorElement {
     const button = document.createElement('button')
 
-    function showEnterVR(/*device*/) {
+    function showEnterVR(/*device*/): void {
       let currentSession: XRSession | null = null
 
-      async function onSessionStarted(session: XRSession) {
+      async function onSessionStarted(session: XRSession): Promise<void> {
         session.addEventListener('end', onSessionEnded)
 
         await renderer.xr.setSession(session)
@@ -16,7 +16,7 @@ class VRButton {
         currentSession = session
       }
 
-      function onSessionEnded(/*event*/) {
+      function onSessionEnded(/*event*/): void {
         currentSession!.removeEventListener('end', onSessionEnded)
 
         button.textContent = 'ENTER VR'
@@ -34,15 +34,15 @@ class VRButton {
 
       button.textContent = 'ENTER VR'
 
-      button.onmouseenter = function () {
+      button.onmouseenter = (): void => {
         button.style.opacity = '1.0'
       }
 
-      button.onmouseleave = function () {
+      button.onmouseleave = (): void => {
         button.style.opacity = '0.5'
       }
 
-      button.onclick = function () {
+      button.onclick = (): void => {
         if (currentSession === null) {
           // WebXR's requestReferenceSpace only works if the corresponding feature
           // was requested at session creation time. For simplicity, just ask for
@@ -64,7 +64,7 @@ class VRButton {
       }
     }
 
-    function disableButton() {
+    function disableButton(): void {
       button.style.display = ''
 
       button.style.cursor = 'auto'
@@ -77,13 +77,13 @@ class VRButton {
       button.onclick = null
     }
 
-    function showWebXRNotFound() {
+    function showWebXRNotFound(): void {
       disableButton()
 
       button.textContent = 'VR NOT SUPPORTED'
     }
 
-    function stylizeElement(element: HTMLElement) {
+    function stylizeElement(element: HTMLElement): void {
       element.style.position = 'absolute'
       element.style.bottom = '20px'
       element.style.padding = '12px 6px'
