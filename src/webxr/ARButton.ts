@@ -1,18 +1,11 @@
 import { Navigator, WebGLRenderer, XRSession, XRSessionInit } from 'three'
 
-export interface ARButtonSessionInit extends XRSessionInit {
-  domOverlay?: { root: HTMLElement }
-}
-
 class ARButton {
-  static createButton(
-    renderer: WebGLRenderer,
-    sessionInit: ARButtonSessionInit = {},
-  ): HTMLButtonElement | HTMLAnchorElement {
+  static createButton(renderer: WebGLRenderer, sessionInit: XRSessionInit = {}): HTMLButtonElement | HTMLAnchorElement {
     const button = document.createElement('button')
 
     function showStartAR(/*device*/): void {
-      if (sessionInit.domOverlay === undefined) {
+      if ((sessionInit as any).domOverlay === undefined) {
         const overlay = document.createElement('div')
         overlay.style.display = 'none'
         document.body.appendChild(overlay)
@@ -39,7 +32,7 @@ class ARButton {
         }
 
         sessionInit.optionalFeatures.push('dom-overlay')
-        sessionInit.domOverlay = { root: overlay }
+        ;(sessionInit as any).domOverlay = { root: overlay }
       }
 
       //
@@ -54,7 +47,7 @@ class ARButton {
         await renderer.xr.setSession(session)
 
         button.textContent = 'STOP AR'
-        sessionInit.domOverlay!.root.style.display = ''
+        ;(sessionInit as any).domOverlay!.root.style.display = ''
 
         currentSession = session
       }
@@ -63,7 +56,7 @@ class ARButton {
         currentSession!.removeEventListener('end', onSessionEnded)
 
         button.textContent = 'START AR'
-        sessionInit.domOverlay!.root.style.display = 'none'
+        ;(sessionInit as any).domOverlay!.root.style.display = 'none'
 
         currentSession = null
       }
