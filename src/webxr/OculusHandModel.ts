@@ -18,7 +18,7 @@ class OculusHandModel extends Object3D {
   mesh: Mesh | null
   xrInputSource: XRInputSource | null
 
-  constructor(controller: Object3D, customModels?: string[]) {
+  constructor(controller: Object3D, leftModelPath?: string, rightModelPath?: string) {
     super()
 
     this.controller = controller
@@ -39,7 +39,7 @@ class OculusHandModel extends Object3D {
           controller,
           undefined,
           xrInputSource.handedness,
-          xrInputSource.handedness === 'left' ? customModels?.[0] : customModels?.[1],
+          xrInputSource.handedness === 'left' ? leftModelPath : rightModelPath,
         )
       }
     })

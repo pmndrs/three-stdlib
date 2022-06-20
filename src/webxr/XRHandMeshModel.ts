@@ -15,7 +15,7 @@ class XRHandMeshModel {
     controller: Object3D,
     path: string = DEFAULT_HAND_PROFILE_PATH,
     handedness: string,
-    customModel?: string,
+    customModelPath?: string,
   ) {
     this.controller = controller
     this.handModel = handModel
@@ -23,8 +23,8 @@ class XRHandMeshModel {
     this.bones = []
 
     const loader = new GLTFLoader()
-    if (!customModel) loader.setPath(path)
-    loader.load(customModel ?? `${handedness}.glb`, (gltf: { scene: Object3D }) => {
+    if (!customModelPath) loader.setPath(path)
+    loader.load(customModelPath ?? `${handedness}.glb`, (gltf: { scene: Object3D }) => {
       const object = gltf.scene.children[0]
       this.handModel.add(object)
 
