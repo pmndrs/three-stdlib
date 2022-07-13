@@ -49,7 +49,10 @@ import {
   Vector3Tuple,
   DirectionalLight,
   PointLight,
+  Source,
   SpotLight,
+  sRGBEncoding,
+  LinearEncoding,
 } from 'three'
 
 export interface GLTFExporterOptions {
@@ -544,12 +547,11 @@ class GLTFWriter {
     trs?: boolean
     onlyVisible?: boolean
     truncateDrawRange?: boolean
-    embedImages?: boolean
     maxTextureSize?: number
     animations?: AnimationClip[]
     includeCustomExtensions?: boolean
   } & GLTFExporterOptions
-  private pending: Promise<never>[]
+  private pending: Promise<void>[]
   private buffers: ArrayBuffer[]
 
   private byteOffset: number
@@ -695,7 +697,7 @@ class GLTFWriter {
       if (options.binary) {
         // https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#glb-file-format-specification
 
-        const reader = new window.FileReader()
+        const reader = new FileReader()
         reader.readAsArrayBuffer(blob)
         reader.onloadend = (): void => {
           if (reader.result !== null && typeof reader.result !== 'string') {
@@ -728,7 +730,7 @@ class GLTFWriter {
               type: 'application/octet-stream',
             })
 
-            const glbReader = new window.FileReader()
+            const glbReader = new FileReader()
             glbReader.readAsArrayBuffer(glbBlob)
             glbReader.onloadend = function (): void {
               if (glbReader.result !== null && typeof glbReader.result !== 'string') {
@@ -739,7 +741,7 @@ class GLTFWriter {
         }
       } else {
         if (json.buffers && json.buffers.length > 0) {
-          const reader = new window.FileReader()
+          const reader = new FileReader()
           reader.readAsDataURL(blob)
           reader.onloadend = function (): void {
             const base64data = reader.result
@@ -796,15 +798,23 @@ class GLTFWriter {
   }
 
   /**
-   * Assign and return a temporal unique id for an object
-   * especially which doesn't have .uuid
+   * Return ids for buffer attributes.
    * @param  {Object} object
    * @return {Integer}
    */
-  private getUID(object: { [key: string]: any }): number {
-    if (!this.uids.has(object)) this.uids.set(object, this.uid++)
+  private getUID(attribute: any, isRelativeCopy?: any): any {
+    if (this.uids.has(attribute) === false) {
+      const uids: any = new Map()
 
-    return this.uids.get(object)!
+      uids.set(true, this.uid++)
+      uids.set(false, this.uid++)
+
+      this.uids.set(attribute, uids)
+    }
+
+    const uids: any = this.uids.get(attribute)
+
+    return uids.get(isRelativeCopy)
   }
 
   /**
@@ -900,6 +910,78 @@ class GLTFWriter {
       mapDef.extensions['KHR_texture_transform'] = transformDef
       this.extensionsUsed['KHR_texture_transform'] = true
     }
+  }
+
+  public buildMetalRoughTexture(metalnessMap: Texture, roughnessMap: Texture): Texture {
+    if (metalnessMap === roughnessMap) return metalnessMap
+
+    function getEncodingConversion(map: Texture): (c: number) => number {
+      if (map.encoding === sRGBEncoding) {
+        return function SRGBToLinear(c: number): number {
+          return c < 0.04045 ? c * 0.0773993808 : Math.pow(c * 0.9478672986 + 0.0521327014, 2.4)
+        }
+      }
+
+      return function LinearToLinear(c: number): number {
+        return c
+      }
+    }
+
+    console.warn('THREE.GLTFExporter: Merged metalnessMap and roughnessMap textures.')
+
+    const metalness = metalnessMap?.image
+    const roughness = roughnessMap?.image
+
+    const width = Math.max(metalness?.width || 0, roughness?.width || 0)
+    const height = Math.max(metalness?.height || 0, roughness?.height || 0)
+
+    const canvas = this.getCanvas()
+    canvas.width = width
+    canvas.height = height
+
+    const context = canvas.getContext('2d')
+
+    if (!context) throw new Error('No context')
+
+    context.fillStyle = '#00ffff'
+    context.fillRect(0, 0, width, height)
+
+    const composite = context.getImageData(0, 0, width, height)
+
+    if (metalness) {
+      context.drawImage(metalness, 0, 0, width, height)
+
+      const convert = getEncodingConversion(metalnessMap)
+      const data = context.getImageData(0, 0, width, height).data
+
+      for (let i = 2; i < data.length; i += 4) {
+        composite.data[i] = convert(data[i] / 256) * 256
+      }
+    }
+
+    if (roughness) {
+      context.drawImage(roughness, 0, 0, width, height)
+
+      const convert = getEncodingConversion(roughnessMap)
+      const data = context.getImageData(0, 0, width, height).data
+
+      for (let i = 1; i < data.length; i += 4) {
+        composite.data[i] = convert(data[i] / 256) * 256
+      }
+    }
+
+    context.putImageData(composite, 0, 0)
+
+    //
+
+    const reference = metalnessMap || roughnessMap
+
+    const texture = reference.clone()
+
+    texture.source = new Source(canvas)
+    texture.encoding = LinearEncoding
+
+    return texture
   }
 
   /**
@@ -1028,7 +1110,7 @@ class GLTFWriter {
     if (!json.bufferViews) json.bufferViews = []
 
     return new Promise((resolve) => {
-      const reader = new window.FileReader()
+      const reader = new FileReader()
       reader.readAsArrayBuffer(blob)
       reader.onloadend = (): void => {
         if (reader.result !== null && typeof reader.result !== 'string' && json.bufferViews !== undefined) {
@@ -1142,7 +1224,12 @@ class GLTFWriter {
    * @param  {Boolean} flipY before writing out the image
    * @return {Integer}     Index of the processed texture in the "images" array
    */
-  private processImage(image: ImageRepresentation, format: number, flipY: boolean): number {
+  private processImage(
+    image: ImageRepresentation,
+    format: number,
+    flipY: boolean,
+    mimeType: string = 'image/png',
+  ): number {
     const writer = this
     const cache = writer.cache
     const json = writer.json
@@ -1152,7 +1239,6 @@ class GLTFWriter {
     if (!cache.images.has(image)) cache.images.set(image, {})
 
     const cachedImages = cache.images.get(image)
-    const mimeType = format === RGBAFormat ? 'image/png' : 'image/jpeg'
     const key = mimeType + ':flipY/' + flipY.toString()
 
     if (cachedImages !== undefined && cachedImages[key] !== undefined) return cachedImages[key]
@@ -1161,72 +1247,76 @@ class GLTFWriter {
 
     const imageDef: ImageDef = { mimeType: mimeType }
 
-    if (options.embedImages && options.maxTextureSize !== undefined) {
-      const canvas = (this.cachedCanvas = this.cachedCanvas || document.createElement('canvas'))
+    const canvas = this.getCanvas()
 
-      canvas.width = Math.min(image.width, options.maxTextureSize)
-      canvas.height = Math.min(image.height, options.maxTextureSize)
+    canvas.width = Math.min(image.width, options.maxTextureSize!)
+    canvas.height = Math.min(image.height, options.maxTextureSize!)
 
-      const ctx = canvas.getContext('2d')
+    const ctx = canvas.getContext('2d')
 
-      if (flipY) {
-        ctx?.translate(0, canvas.height)
-        ctx?.scale(1, -1)
+    if (flipY === true) {
+      ctx?.translate(0, canvas.height)
+      ctx?.scale(1, -1)
+    }
+
+    if (image instanceof ImageData && image.data !== undefined) {
+      // THREE.DataTexture
+
+      if (format !== RGBAFormat) {
+        console.error('GLTFExporter: Only RGBAFormat is supported.')
       }
 
-      if (
-        (typeof HTMLImageElement !== 'undefined' && image instanceof HTMLImageElement) ||
-        (typeof HTMLCanvasElement !== 'undefined' && image instanceof HTMLCanvasElement) ||
-        (typeof OffscreenCanvas !== 'undefined' && image instanceof OffscreenCanvas) ||
-        (typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap)
-      ) {
-        ctx?.drawImage(image, 0, 0, canvas.width, canvas.height)
-      } else {
-        if (format !== RGBAFormat) {
-          console.error('GLTFExporter: Only RGBA format is supported.')
-        }
-
-        if (image.width > options.maxTextureSize || image.height > options.maxTextureSize) {
-          console.warn('GLTFExporter: Image size is bigger than maxTextureSize', image)
-        }
-
-        const data = new Uint8ClampedArray(image.height * image.width * 4)
-
-        if (image instanceof ImageData) {
-          for (let i = 0; i < data.length; i += 4) {
-            data[i + 0] = image.data[i + 0]
-            data[i + 1] = image.data[i + 1]
-            data[i + 2] = image.data[i + 2]
-            data[i + 3] = image.data[i + 3]
-          }
-        }
-
-        ctx?.putImageData(new ImageData(data, image.width, image.height), 0, 0)
+      if (image.width > options.maxTextureSize! || image.height > options.maxTextureSize!) {
+        console.warn('GLTFExporter: Image size is bigger than maxTextureSize', image)
       }
 
-      if (options.binary) {
-        pending.push(
-          new Promise(function (resolve) {
-            canvas.toBlob(function (blob) {
-              if (blob !== null) {
-                writer.processBufferViewImage(blob).then(function (bufferViewIndex) {
-                  imageDef.bufferView = bufferViewIndex
-                  // @ts-expect-error
-                  resolve()
-                })
-              }
-            }, mimeType)
+      const data = new Uint8ClampedArray(image.height * image.width * 4)
+
+      for (let i = 0; i < data.length; i += 4) {
+        data[i + 0] = image.data[i + 0]
+        data[i + 1] = image.data[i + 1]
+        data[i + 2] = image.data[i + 2]
+        data[i + 3] = image.data[i + 3]
+      }
+
+      ctx?.putImageData(new ImageData(data, image.width, image.height), 0, 0)
+    } else {
+      ctx?.drawImage(image, 0, 0, canvas.width, canvas.height)
+    }
+
+    if (options.binary === true) {
+      pending.push(
+        this.getToBlobPromise(canvas, mimeType)
+          .then((blob) => writer.processBufferViewImage(blob))
+          .then((bufferViewIndex: number) => {
+            imageDef.bufferView = bufferViewIndex
           }),
-        )
-      } else {
+      )
+    } else {
+      if (canvas instanceof HTMLCanvasElement && canvas.toDataURL !== undefined) {
         imageDef.uri = canvas.toDataURL(mimeType)
+      } else {
+        pending.push(
+          this.getToBlobPromise(canvas, mimeType)
+            .then((blob) => {
+              return new Promise<string>((resolve, reject) => {
+                const reader = new FileReader()
+                reader.onload = (): void => {
+                  return resolve(reader.result as string)
+                }
+                reader.onerror = reject
+                reader.readAsDataURL(blob)
+              })
+            })
+            .then((dataURL: string) => {
+              imageDef.uri = dataURL
+            }),
+        )
       }
-    } else if (image instanceof Image) {
-      imageDef.uri = image.src
     }
 
     const index = json.images.push(imageDef) - 1
-    if (cachedImages !== undefined) cachedImages[key] = index
+    if (cachedImages) cachedImages[key] = index
     return index
   }
 
@@ -1263,9 +1353,13 @@ class GLTFWriter {
 
     if (!json.textures) json.textures = []
 
+    let mimeType = map.userData.mimeType
+
+    if (mimeType === 'image/webp') mimeType = 'image/png'
+
     const textureDef: TextureDef = {
       sampler: this.processSampler(map),
-      source: this.processImage(map.image, map.format, map.flipY),
+      source: this.processImage(map.image, map.format, map.flipY, mimeType),
     }
 
     if (map.name) textureDef.name = map.name
@@ -1335,8 +1429,11 @@ class GLTFWriter {
       (material instanceof MeshStandardMaterial && material.roughnessMap)
     ) {
       if (material.metalnessMap === material.roughnessMap && material.metalnessMap !== null) {
-        const metalRoughMapDef = { index: this.processTexture(material.metalnessMap) }
-        this.applyTextureTransform(metalRoughMapDef, material.metalnessMap)
+        const metalRoughTexture = material.roughnessMap
+          ? this.buildMetalRoughTexture(material.metalnessMap, material.roughnessMap)
+          : material.metalnessMap
+        const metalRoughMapDef = { index: this.processTexture(metalRoughTexture) }
+        this.applyTextureTransform(metalRoughMapDef, metalRoughTexture)
         materialDef.pbrMetallicRoughness.metallicRoughnessTexture = metalRoughMapDef
       } else {
         console.warn(
@@ -1681,7 +1778,6 @@ class GLTFWriter {
         let cacheKey = this.getUID(geometry.index)
 
         if (groups[i].start !== undefined || groups[i].count !== undefined) {
-          // @ts-expect-error
           cacheKey += `:${groups[i].start}:${groups[i].count}`
         }
 
@@ -2100,20 +2196,7 @@ class GLTFWriter {
    * @return {ArrayBuffer}
    */
   private stringToArrayBuffer(text: string): ArrayBuffer {
-    if (window.TextEncoder !== undefined) {
-      return new TextEncoder().encode(text).buffer
-    }
-
-    const array = new Uint8Array(new ArrayBuffer(text.length))
-
-    for (let i = 0, il = text.length; i < il; i++) {
-      const value = text.charCodeAt(i)
-
-      // Replacing multi-byte character with space(0x20).
-      array[i] = value > 0xff ? 0x20 : value
-    }
-
-    return array.buffer
+    return new TextEncoder().encode(text).buffer
   }
 
   private isIdentityMatrix(matrix: Matrix4): boolean {
@@ -2186,6 +2269,35 @@ class GLTFWriter {
     }
 
     return arrayBuffer
+  }
+
+  private getCanvas(): OffscreenCanvas | HTMLCanvasElement {
+    if (typeof document === 'undefined' && typeof OffscreenCanvas !== 'undefined') {
+      return new OffscreenCanvas(1, 1)
+    }
+
+    return document.createElement('canvas')
+  }
+
+  private getToBlobPromise(canvas: HTMLCanvasElement | OffscreenCanvas, mimeType: string): Promise<Blob> {
+    if (canvas instanceof HTMLCanvasElement && canvas.toBlob !== undefined) {
+      return new Promise((resolve: any) => canvas.toBlob(resolve, mimeType))
+    }
+
+    let quality
+
+    // Blink's implementation of convertToBlob seems to default to a quality level of 100%
+    // Use the Blink default quality levels of toBlob instead so that file sizes are comparable.
+    if (mimeType === 'image/jpeg') {
+      quality = 0.92
+    } else if (mimeType === 'image/webp') {
+      quality = 0.8
+    }
+
+    return (canvas as OffscreenCanvas).convertToBlob({
+      type: mimeType,
+      quality: quality,
+    })
   }
 }
 

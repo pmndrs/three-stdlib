@@ -697,7 +697,6 @@ class TransformControlsGizmo extends Object3D {
       depthWrite: false,
       transparent: true,
       linewidth: 1,
-      fog: false,
       toneMapped: false,
     })
 

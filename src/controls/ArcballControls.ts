@@ -1950,9 +1950,9 @@ class ArcballControls extends EventDispatcher {
     const curveGeometry = new BufferGeometry().setFromPoints(points)
 
     //material
-    const curveMaterialX = new LineBasicMaterial({ color: 0xff8080, fog: false, transparent: true, opacity: 0.6 })
-    const curveMaterialY = new LineBasicMaterial({ color: 0x80ff80, fog: false, transparent: true, opacity: 0.6 })
-    const curveMaterialZ = new LineBasicMaterial({ color: 0x8080ff, fog: false, transparent: true, opacity: 0.6 })
+    const curveMaterialX = new LineBasicMaterial({ color: 0xff8080, transparent: true, opacity: 0.6 })
+    const curveMaterialY = new LineBasicMaterial({ color: 0x80ff80, transparent: true, opacity: 0.6 })
+    const curveMaterialZ = new LineBasicMaterial({ color: 0x8080ff, transparent: true, opacity: 0.6 })
 
     //line
     const gizmoX = new Line(curveGeometry, curveMaterialX)
