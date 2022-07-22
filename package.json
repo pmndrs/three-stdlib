@@ -61,7 +61,7 @@
     "@storybook/preset-typescript": "^3.0.0",
     "@types/draco3d": "^1.4.0",
     "@types/offscreencanvas": "^2019.6.4",
-    "@types/three": "^0.141.0",
+    "@types/three": "~0.140.0",
     "@typescript-eslint/eslint-plugin": "^4.28.0",
     "@typescript-eslint/parser": "^4.28.0",
     "babel-loader": "^8.2.3",
