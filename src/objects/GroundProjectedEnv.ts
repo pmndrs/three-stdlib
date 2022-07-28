@@ -130,7 +130,7 @@ export class GroundProjectedEnv extends Mesh<BufferGeometry, ShaderMaterial> {
     this.material.uniforms.radius.value = radius
   }
 
-  get radius() {
+  get radius(): number {
     return this.material.uniforms.radius.value
   }
 
@@ -138,7 +138,7 @@ export class GroundProjectedEnv extends Mesh<BufferGeometry, ShaderMaterial> {
     this.material.uniforms.height.value = height
   }
 
-  get height() {
+  get height(): number {
     return this.material.uniforms.height.value
   }
 }
