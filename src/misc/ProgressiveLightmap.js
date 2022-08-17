@@ -6,7 +6,6 @@ import {
   MeshPhongMaterial,
   DoubleSide,
   PlaneGeometry,
-  PlaneGeometry,
   Mesh,
 } from 'three'
 import potpack from 'potpack'
