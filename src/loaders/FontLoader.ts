@@ -2,7 +2,17 @@ import { FileLoader, Loader, ShapePath } from 'three'
 
 import type { LoadingManager, Shape } from 'three'
 
+type Options = {
+  lineHeight: number
+  letterSpacing: number
+}
+
 export class FontLoader extends Loader {
+  options: Options = {
+    lineHeight: 1,
+    letterSpacing: 0,
+  }
+
   constructor(manager?: LoadingManager) {
     super(manager)
   }
@@ -36,7 +46,11 @@ export class FontLoader extends Loader {
   }
 
   public parse(json: FontData): Font {
-    return new Font(json)
+    return new Font(json, this.options)
+  }
+
+  public setOptions(options: Partial<Options>) {
+    Object.assign(this.options, options)
   }
 }
 
@@ -56,16 +70,18 @@ type FontData = {
 
 export class Font {
   public data: FontData
+  public options: Options
   public static isFont: true
   public static type: 'Font'
 
-  constructor(data: FontData) {
+  constructor(data: FontData, options: Options) {
     this.data = data
+    this.options = options
   }
 
   public generateShapes(text: string, size = 100): Shape[] {
     const shapes: Shape[] = []
-    const paths = createPaths(text, size, this.data)
+    const paths = createPaths(text, size, this.data, this.options)
 
     for (let p = 0, pl = paths.length; p < pl; p++) {
       Array.prototype.push.apply(shapes, paths[p].toShapes(false))
@@ -75,7 +91,7 @@ export class Font {
   }
 }
 
-function createPaths(text: string, size: number, data: FontData): ShapePath[] {
+function createPaths(text: string, size: number, data: FontData, options: Options): ShapePath[] {
   const chars = Array.from(text)
   const scale = size / data.resolution
   const line_height = (data.boundingBox.yMax - data.boundingBox.yMin + data.underlineThickness) * scale
@@ -90,11 +106,11 @@ function createPaths(text: string, size: number, data: FontData): ShapePath[] {
 
     if (char === '\n') {
       offsetX = 0
-      offsetY -= line_height
+      offsetY -= line_height * options.lineHeight
     } else {
       const ret = createPath(char, scale, offsetX, offsetY, data)
       if (ret) {
-        offsetX += ret.offsetX
+        offsetX += ret.offsetX + options.letterSpacing
         paths.push(ret.path)
       }
     }
