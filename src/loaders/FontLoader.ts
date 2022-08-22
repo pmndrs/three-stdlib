@@ -49,7 +49,7 @@ export class FontLoader extends Loader {
     return new Font(json, this.options)
   }
 
-  public setOptions(options: Partial<Options>) {
+  public setOptions(options: Partial<Options>): void {
     Object.assign(this.options, options)
   }
 }
