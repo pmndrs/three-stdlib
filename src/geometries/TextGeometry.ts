@@ -11,6 +11,8 @@ export type TextGeometryParameters = {
   font: Font
   height?: number
   size?: number
+  lineHeight?: number
+  letterSpacing?: number
 }
 
 export class TextGeometry extends ExtrudeGeometry {
@@ -22,13 +24,13 @@ export class TextGeometry extends ExtrudeGeometry {
       font,
       height = 50,
       size = 100,
+      lineHeight = 1,
+      letterSpacing = 0,
       ...rest
     } = parameters
 
-    const shapes = font.generateShapes(text, size)
-
+    const shapes = font.generateShapes(text, size, { lineHeight, letterSpacing })
     super(shapes, { ...rest, bevelEnabled, bevelSize, bevelThickness, depth: height })
-
     this.type = 'TextGeometry'
   }
 }

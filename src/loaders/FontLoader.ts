@@ -8,11 +8,6 @@ type Options = {
 }
 
 export class FontLoader extends Loader {
-  options: Options = {
-    lineHeight: 1,
-    letterSpacing: 0,
-  }
-
   constructor(manager?: LoadingManager) {
     super(manager)
   }
@@ -46,11 +41,7 @@ export class FontLoader extends Loader {
   }
 
   public parse(json: FontData): Font {
-    return new Font(json, this.options)
-  }
-
-  public setOptions(options: Partial<Options>): void {
-    Object.assign(this.options, options)
+    return new Font(json)
   }
 }
 
@@ -70,23 +61,20 @@ type FontData = {
 
 export class Font {
   public data: FontData
-  public options: Options
   public static isFont: true
   public static type: 'Font'
 
-  constructor(data: FontData, options: Options) {
+  constructor(data: FontData) {
     this.data = data
-    this.options = options
   }
 
-  public generateShapes(text: string, size = 100): Shape[] {
+  public generateShapes(text: string, size = 100, _options?: Partial<Options>): Shape[] {
     const shapes: Shape[] = []
-    const paths = createPaths(text, size, this.data, this.options)
-
+    const options = { letterSpacing: 0, lineHeight: 1, ..._options }
+    const paths = createPaths(text, size, this.data, options)
     for (let p = 0, pl = paths.length; p < pl; p++) {
       Array.prototype.push.apply(shapes, paths[p].toShapes(false))
     }
-
     return shapes
   }
 }
