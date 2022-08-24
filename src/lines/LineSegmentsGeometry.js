@@ -1,28 +1,24 @@
 import {
   Box3,
-  BufferGeometry,
-  BufferAttribute,
   Float32BufferAttribute,
   InstancedBufferGeometry,
   InstancedInterleavedBuffer,
   InterleavedBufferAttribute,
-  LineSegments,
-  Matrix4,
-  Mesh,
   Sphere,
   Vector3,
   WireframeGeometry,
 } from 'three'
 
+const _box = new Box3()
+const _vector = new Vector3()
+
 class LineSegmentsGeometry extends InstancedBufferGeometry {
-  public readonly isLineSegmentsGeometry = true
-  public type = 'LineSegmentsGeometry'
-
-  public boundingBox: Box3 | null = null
-  public boundingSphere: Sphere | null = null
-
   constructor() {
     super()
+
+    this.isLineSegmentsGeometry = true
+
+    this.type = 'LineSegmentsGeometry'
 
     const positions = [-1, 2, 0, 1, 2, 0, -1, 1, 0, 1, 1, 0, -1, 0, 0, 1, 0, 0, -1, -1, 0, 1, -1, 0]
     const uvs = [-1, 2, 1, 2, -1, 1, 1, 1, -1, -1, 1, -1, -1, -2, 1, -2]
@@ -33,7 +29,7 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
     this.setAttribute('uv', new Float32BufferAttribute(uvs, 2))
   }
 
-  public applyMatrix4(matrix: Matrix4): this {
+  applyMatrix4(matrix) {
     const start = this.attributes.instanceStart
     const end = this.attributes.instanceEnd
 
@@ -56,16 +52,13 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
     return this
   }
 
-  public setPositions(array: number[] | Float32Array): this {
+  setPositions(array) {
     let lineSegments
 
     if (array instanceof Float32Array) {
       lineSegments = array
     } else if (Array.isArray(array)) {
       lineSegments = new Float32Array(array)
-    } else {
-      console.error('LineSegmentsGeometry.setPosition requires either a Float32Array or regular array of numbers')
-      return this
     }
 
     const instanceBuffer = new InstancedInterleavedBuffer(lineSegments, 6, 1) // xyz, xyz
@@ -81,16 +74,13 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
     return this
   }
 
-  public setColors(array: number[] | Float32Array): this {
+  setColors(array) {
     let colors
 
     if (array instanceof Float32Array) {
       colors = array
     } else if (Array.isArray(array)) {
       colors = new Float32Array(array)
-    } else {
-      console.error('LineSegmentsGeometry.setColors requires either a Float32Array or regular array of numbers')
-      return this
     }
 
     const instanceColorBuffer = new InstancedInterleavedBuffer(colors, 6, 1) // rgb, rgb
@@ -101,58 +91,54 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
     return this
   }
 
-  public fromWireframeGeometry(geometry: BufferGeometry): this {
-    this.setPositions(Array.from(geometry.attributes.position.array))
+  fromWireframeGeometry(geometry) {
+    this.setPositions(geometry.attributes.position.array)
 
     return this
   }
 
-  public fromEdgesGeometry(geometry: BufferGeometry): this {
-    this.setPositions(Array.from(geometry.attributes.position.array))
+  fromEdgesGeometry(geometry) {
+    this.setPositions(geometry.attributes.position.array)
 
     return this
   }
 
-  public fromMesh(mesh: Mesh): this {
+  fromMesh(mesh) {
     this.fromWireframeGeometry(new WireframeGeometry(mesh.geometry))
-
-    return this
-  }
-
-  public fromLineSegments(lineSegments: LineSegments): this {
-    const geometry = lineSegments.geometry
-
-    if (geometry.isBufferGeometry) {
-      this.setPositions(Array.from(geometry.attributes.position.array)) // assumes non-indexed
-    }
 
     // set colors, maybe
 
     return this
   }
 
-  private box = new Box3()
+  fromLineSegments(lineSegments) {
+    const geometry = lineSegments.geometry
 
-  public computeBoundingBox(): void {
+    this.setPositions(geometry.attributes.position.array) // assumes non-indexed
+
+    // set colors, maybe
+
+    return this
+  }
+
+  computeBoundingBox() {
     if (this.boundingBox === null) {
       this.boundingBox = new Box3()
     }
 
-    const start = this.attributes.instanceStart as BufferAttribute
-    const end = this.attributes.instanceEnd as BufferAttribute
+    const start = this.attributes.instanceStart
+    const end = this.attributes.instanceEnd
 
     if (start !== undefined && end !== undefined) {
       this.boundingBox.setFromBufferAttribute(start)
 
-      this.box.setFromBufferAttribute(end)
+      _box.setFromBufferAttribute(end)
 
-      this.boundingBox.union(this.box)
+      this.boundingBox.union(_box)
     }
   }
 
-  private vector = new Vector3()
-
-  public computeBoundingSphere(): void {
+  computeBoundingSphere() {
     if (this.boundingSphere === null) {
       this.boundingSphere = new Sphere()
     }
@@ -167,18 +153,16 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
     if (start !== undefined && end !== undefined) {
       const center = this.boundingSphere.center
 
-      if (this.boundingBox) {
-        this.boundingBox.getCenter(center)
-      }
+      this.boundingBox.getCenter(center)
 
       let maxRadiusSq = 0
 
       for (let i = 0, il = start.count; i < il; i++) {
-        this.vector.fromBufferAttribute(start, i)
-        maxRadiusSq = Math.max(maxRadiusSq, center.distanceToSquared(this.vector))
+        _vector.fromBufferAttribute(start, i)
+        maxRadiusSq = Math.max(maxRadiusSq, center.distanceToSquared(_vector))
 
-        this.vector.fromBufferAttribute(end, i)
-        maxRadiusSq = Math.max(maxRadiusSq, center.distanceToSquared(this.vector))
+        _vector.fromBufferAttribute(end, i)
+        maxRadiusSq = Math.max(maxRadiusSq, center.distanceToSquared(_vector))
       }
 
       this.boundingSphere.radius = Math.sqrt(maxRadiusSq)
@@ -192,8 +176,14 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
     }
   }
 
-  public toJSON(): void {
+  toJSON() {
     // todo
+  }
+
+  applyMatrix(matrix) {
+    console.warn('THREE.LineSegmentsGeometry: applyMatrix() has been renamed to applyMatrix4().')
+
+    return this.applyMatrix4(matrix)
   }
 }
 
