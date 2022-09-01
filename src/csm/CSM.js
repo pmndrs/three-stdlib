@@ -1,9 +1,9 @@
 import { Vector2, Vector3, DirectionalLight, MathUtils, ShaderChunk, Matrix4, Box3 } from 'three'
-import Frustum from './Frustum'
-import Shader from './Shader'
+import { CSMFrustum } from './CSMFrustum'
+import { CSMShader } from './CSMShader'
 
 const _cameraToLightMatrix = new Matrix4()
-const _lightSpaceFrustum = new Frustum()
+const _lightSpaceFrustum = new CSMFrustum()
 const _center = new Vector3()
 const _bbox = new Box3()
 const _uniformArray = []
@@ -27,7 +27,7 @@ export class CSM {
     this.lightMargin = data.lightMargin || 200
     this.customSplitsCallback = data.customSplitsCallback
     this.fade = false
-    this.mainFrustum = new Frustum()
+    this.mainFrustum = new CSMFrustum()
     this.frustums = []
     this.breaks = []
 
@@ -189,8 +189,8 @@ export class CSM {
   }
 
   injectInclude() {
-    ShaderChunk.lights_fragment_begin = Shader.lights_fragment_begin
-    ShaderChunk.lights_pars_begin = Shader.lights_pars_begin
+    ShaderChunk.lights_fragment_begin = CSMShader.lights_fragment_begin
+    ShaderChunk.lights_pars_begin = CSMShader.lights_pars_begin
   }
 
   setupMaterial(material) {
@@ -206,7 +206,7 @@ export class CSM {
     const scope = this
     const shaders = this.shaders
 
-    material.onBeforeCompile = (shader) => {
+    material.onBeforeCompile = function (shader) {
       const far = Math.min(scope.camera.far, scope.maxFar)
       scope.getExtendedBreaks(breaksVec2)
 
@@ -272,7 +272,7 @@ export class CSM {
 
   dispose() {
     const shaders = this.shaders
-    shaders.forEach((shader, material) => {
+    shaders.forEach(function (shader, material) {
       delete material.onBeforeCompile
       delete material.defines.USE_CSM
       delete material.defines.CSM_CASCADES
