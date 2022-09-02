@@ -1,4 +1,5 @@
-import { BufferGeometry, Curve, ParametricGeometry, Vector3 } from 'three'
+import { BufferGeometry, Curve, Vector3 } from 'three'
+import { ParametricGeometry } from './ParametricGeometry'
 
 /**
  * Experimenting of primitive geometry creation using Surface Parametric equations
