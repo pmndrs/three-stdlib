@@ -297,7 +297,7 @@ class RGBELoader extends DataTextureLoader {
         image_rgba_data = RGBE_ReadPixels_RLE(byteArray.subarray(byteArray.pos), w, h)
 
       if (RGBE_RETURN_FAILURE !== image_rgba_data) {
-        let data, format, type
+        let data, type
         let numElements
 
         switch (this.type) {
@@ -337,7 +337,6 @@ class RGBELoader extends DataTextureLoader {
           header: rgbe_header_info.string,
           gamma: rgbe_header_info.gamma,
           exposure: rgbe_header_info.exposure,
-          format: format,
           type: type,
         }
       }
@@ -355,19 +354,13 @@ class RGBELoader extends DataTextureLoader {
     function onLoadCallback(texture, texData) {
       switch (texture.type) {
         case FloatType:
-          texture.encoding = LinearEncoding
-          texture.minFilter = LinearFilter
-          texture.magFilter = LinearFilter
-          texture.generateMipmaps = false
-          texture.flipY = true
-          break
-
         case HalfFloatType:
           texture.encoding = LinearEncoding
           texture.minFilter = LinearFilter
           texture.magFilter = LinearFilter
           texture.generateMipmaps = false
           texture.flipY = true
+
           break
       }
 
