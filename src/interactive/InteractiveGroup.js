@@ -1,114 +1,97 @@
-import {
-	Group,
-	Matrix4,
-	Raycaster,
-	Vector2
-} from 'three';
+import { Group, Matrix4, Raycaster, Vector2 } from 'three'
 
-const _pointer = new Vector2();
-const _event = { type: '', data: _pointer };
+const _pointer = new Vector2()
+const _event = { type: '', data: _pointer }
 
 class InteractiveGroup extends Group {
+  constructor(renderer, camera) {
+    super()
 
-	constructor(renderer, camera) {
+    const scope = this
 
-		super();
+    const raycaster = new Raycaster()
+    const tempMatrix = new Matrix4()
 
-		const scope = this;
+    // Pointer Events
 
-		const raycaster = new Raycaster();
-		const tempMatrix = new Matrix4();
+    const element = renderer.domElement
 
-		// Pointer Events
+    function onPointerEvent(event) {
+      event.stopPropagation()
 
-		const element = renderer.domElement;
+      _pointer.x = (event.clientX / element.clientWidth) * 2 - 1
+      _pointer.y = -(event.clientY / element.clientHeight) * 2 + 1
 
-		function onPointerEvent(event) {
+      raycaster.setFromCamera(_pointer, camera)
 
-			event.stopPropagation();
+      const intersects = raycaster.intersectObjects(scope.children, false)
 
-			_pointer.x = (event.clientX / element.clientWidth) * 2 - 1;
-			_pointer.y = - (event.clientY / element.clientHeight) * 2 + 1;
+      if (intersects.length > 0) {
+        const intersection = intersects[0]
 
-			raycaster.setFromCamera(_pointer, camera);
+        const object = intersection.object
+        const uv = intersection.uv
 
-			const intersects = raycaster.intersectObjects(scope.children, false);
+        _event.type = event.type
+        _event.data.set(uv.x, 1 - uv.y)
 
-			if (intersects.length > 0) {
+        object.dispatchEvent(_event)
+      }
+    }
 
-				const intersection = intersects[0];
+    element.addEventListener('pointerdown', onPointerEvent)
+    element.addEventListener('pointerup', onPointerEvent)
+    element.addEventListener('pointermove', onPointerEvent)
+    element.addEventListener('mousedown', onPointerEvent)
+    element.addEventListener('mouseup', onPointerEvent)
+    element.addEventListener('mousemove', onPointerEvent)
+    element.addEventListener('click', onPointerEvent)
 
-				const object = intersection.object;
-				const uv = intersection.uv;
+    // WebXR Controller Events
+    // TODO: Dispatch pointerevents too
 
-				_event.type = event.type;
-				_event.data.set(uv.x, 1 - uv.y);
+    const events = {
+      move: 'mousemove',
+      select: 'click',
+      selectstart: 'mousedown',
+      selectend: 'mouseup',
+    }
 
-				object.dispatchEvent(_event);
+    function onXRControllerEvent(event) {
+      const controller = event.target
 
-			}
+      tempMatrix.identity().extractRotation(controller.matrixWorld)
 
-		}
+      raycaster.ray.origin.setFromMatrixPosition(controller.matrixWorld)
+      raycaster.ray.direction.set(0, 0, -1).applyMatrix4(tempMatrix)
 
-		element.addEventListener('pointerdown', onPointerEvent);
-		element.addEventListener('pointerup', onPointerEvent);
-		element.addEventListener('pointermove', onPointerEvent);
-		element.addEventListener('mousedown', onPointerEvent);
-		element.addEventListener('mouseup', onPointerEvent);
-		element.addEventListener('mousemove', onPointerEvent);
-		element.addEventListener('click', onPointerEvent);
+      const intersections = raycaster.intersectObjects(scope.children, false)
 
-		// WebXR Controller Events
-		// TODO: Dispatch pointerevents too
+      if (intersections.length > 0) {
+        const intersection = intersections[0]
 
-		const events = {
-			'move': 'mousemove',
-			'select': 'click',
-			'selectstart': 'mousedown',
-			'selectend': 'mouseup'
-		};
+        const object = intersection.object
+        const uv = intersection.uv
 
-		function onXRControllerEvent(event) {
+        _event.type = events[event.type]
+        _event.data.set(uv.x, 1 - uv.y)
 
-			const controller = event.target;
+        object.dispatchEvent(_event)
+      }
+    }
 
-			tempMatrix.identity().extractRotation(controller.matrixWorld);
+    const controller1 = renderer.xr.getController(0)
+    controller1.addEventListener('move', onXRControllerEvent)
+    controller1.addEventListener('select', onXRControllerEvent)
+    controller1.addEventListener('selectstart', onXRControllerEvent)
+    controller1.addEventListener('selectend', onXRControllerEvent)
 
-			raycaster.ray.origin.setFromMatrixPosition(controller.matrixWorld);
-			raycaster.ray.direction.set(0, 0, - 1).applyMatrix4(tempMatrix);
-
-			const intersections = raycaster.intersectObjects(scope.children, false);
-
-			if (intersections.length > 0) {
-
-				const intersection = intersections[0];
-
-				const object = intersection.object;
-				const uv = intersection.uv;
-
-				_event.type = events[event.type];
-				_event.data.set(uv.x, 1 - uv.y);
-
-				object.dispatchEvent(_event);
-
-			}
-
-		}
-
-		const controller1 = renderer.xr.getController(0);
-		controller1.addEventListener('move', onXRControllerEvent);
-		controller1.addEventListener('select', onXRControllerEvent);
-		controller1.addEventListener('selectstart', onXRControllerEvent);
-		controller1.addEventListener('selectend', onXRControllerEvent);
-
-		const controller2 = renderer.xr.getController(1);
-		controller2.addEventListener('move', onXRControllerEvent);
-		controller2.addEventListener('select', onXRControllerEvent);
-		controller2.addEventListener('selectstart', onXRControllerEvent);
-		controller2.addEventListener('selectend', onXRControllerEvent);
-
-	}
-
+    const controller2 = renderer.xr.getController(1)
+    controller2.addEventListener('move', onXRControllerEvent)
+    controller2.addEventListener('select', onXRControllerEvent)
+    controller2.addEventListener('selectstart', onXRControllerEvent)
+    controller2.addEventListener('selectend', onXRControllerEvent)
+  }
 }
 
-export { InteractiveGroup };
+export { InteractiveGroup }
