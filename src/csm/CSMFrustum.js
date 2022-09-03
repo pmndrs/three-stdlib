@@ -2,7 +2,7 @@ import { Vector3, Matrix4 } from 'three'
 
 const inverseProjectionMatrix = new Matrix4()
 
-export default class Frustum {
+class CSMFrustum {
   constructor(data) {
     data = data || {}
 
@@ -30,7 +30,7 @@ export default class Frustum {
     this.vertices.near[1].set(1, -1, -1)
     this.vertices.near[2].set(-1, -1, -1)
     this.vertices.near[3].set(-1, 1, -1)
-    this.vertices.near.forEach((v) => {
+    this.vertices.near.forEach(function (v) {
       v.applyMatrix4(inverseProjectionMatrix)
     })
 
@@ -38,7 +38,7 @@ export default class Frustum {
     this.vertices.far[1].set(1, -1, 1)
     this.vertices.far[2].set(-1, -1, 1)
     this.vertices.far[3].set(-1, 1, 1)
-    this.vertices.far.forEach((v) => {
+    this.vertices.far.forEach(function (v) {
       v.applyMatrix4(inverseProjectionMatrix)
 
       const absZ = Math.abs(v.z)
@@ -54,7 +54,7 @@ export default class Frustum {
 
   split(breaks, target) {
     while (breaks.length > target.length) {
-      target.push(new Frustum())
+      target.push(new CSMFrustum())
     }
 
     target.length = breaks.length
@@ -72,7 +72,7 @@ export default class Frustum {
         }
       }
 
-      if (i === breaks - 1) {
+      if (i === breaks.length - 1) {
         for (let j = 0; j < 4; j++) {
           cascade.vertices.far[j].copy(this.vertices.far[j])
         }
@@ -92,3 +92,5 @@ export default class Frustum {
     }
   }
 }
+
+export { CSMFrustum }
