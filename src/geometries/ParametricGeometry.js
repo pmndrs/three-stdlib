@@ -33,10 +33,6 @@ class ParametricGeometry extends BufferGeometry {
     const pu = new Vector3(),
       pv = new Vector3()
 
-    if (func.length < 3) {
-      console.error('THREE.ParametricGeometry: Function must now modify a Vector3 as third parameter.')
-    }
-
     // generate vertices, normals and uvs
 
     const sliceCount = slices + 1

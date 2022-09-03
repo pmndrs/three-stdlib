@@ -97,6 +97,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.16.7",
+    "@types/offscreencanvas": "^2019.6.4",
     "@webgpu/glslang": "^0.0.15",
     "chevrotain": "^10.1.2",
     "draco3d": "^1.4.1",

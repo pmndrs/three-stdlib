@@ -1,5 +1,4 @@
 import { Curve, Vector3 } from 'three'
-
 import { ParametricGeometry } from './ParametricGeometry'
 
 /**
