@@ -83,12 +83,7 @@ class CSMHelper extends Group {
 
     while (cascadeLines.length < cascades) {
       const cascadeLine = new Box3Helper(new Box3(), 0xffffff)
-      const planeMat = new MeshBasicMaterial({
-        transparent: true,
-        opacity: 0.1,
-        depthWrite: false,
-        side: DoubleSide,
-      })
+      const planeMat = new MeshBasicMaterial({ transparent: true, opacity: 0.1, depthWrite: false, side: DoubleSide })
       const cascadePlane = new Mesh(new PlaneGeometry(), planeMat)
       const shadowLineGroup = new Group()
       const shadowLine = new Box3Helper(new Box3(), 0xffff00)
