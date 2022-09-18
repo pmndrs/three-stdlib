@@ -50,3 +50,5 @@ dist
 
 # storybook
 storybook-static
+
+.idea

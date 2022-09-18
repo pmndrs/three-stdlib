@@ -4,7 +4,7 @@ import {
   PointLight,
   SpotLight,
   Mesh,
-  IcosahedronBufferGeometry,
+  IcosahedronGeometry,
   MeshStandardMaterial,
   Color,
 } from 'three'
@@ -19,7 +19,7 @@ export default {
 export const Default = () => {
   // must run in this so the canvas has mounted in the iframe & can be accessed by `three`
   useEffect(() => {
-    const mesh = new Mesh(new IcosahedronBufferGeometry(1), new MeshStandardMaterial({ color: 'pink' }))
+    const mesh = new Mesh(new IcosahedronGeometry(1), new MeshStandardMaterial({ color: 'pink' }))
 
     const ambientLight = new AmbientLight('white', 0.2)
     const directionalLight = new DirectionalLight('pink', 2)

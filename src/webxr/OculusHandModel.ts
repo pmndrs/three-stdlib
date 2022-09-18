@@ -1,11 +1,24 @@
-import { Object3D, Sphere, Box3 } from 'three'
+import { Object3D, Sphere, Box3, Mesh, Texture, XRInputSource, Vector3 } from 'three'
 import { XRHandMeshModel } from './XRHandMeshModel'
 
 const TOUCH_RADIUS = 0.01
 const POINTING_JOINT = 'index-finger-tip'
 
+export interface XRButton extends Object3D {
+  onPress(): void
+  onClear(): void
+  isPressed(): boolean
+  whilePressed(): void
+}
+
 class OculusHandModel extends Object3D {
-  constructor(controller) {
+  controller: Object3D
+  motionController: XRHandMeshModel | null
+  envMap: Texture | null
+  mesh: Mesh | null
+  xrInputSource: XRInputSource | null
+
+  constructor(controller: Object3D, leftModelPath?: string, rightModelPath?: string) {
     super()
 
     this.controller = controller
@@ -13,6 +26,7 @@ class OculusHandModel extends Object3D {
     this.envMap = null
 
     this.mesh = null
+    this.xrInputSource = null
 
     controller.addEventListener('connected', (event) => {
       const xrInputSource = event.data
@@ -20,17 +34,22 @@ class OculusHandModel extends Object3D {
       if (xrInputSource.hand && !this.motionController) {
         this.xrInputSource = xrInputSource
 
-        this.motionController = new XRHandMeshModel(this, controller, this.path, xrInputSource.handedness)
+        this.motionController = new XRHandMeshModel(
+          this,
+          controller,
+          undefined,
+          xrInputSource.handedness,
+          xrInputSource.handedness === 'left' ? leftModelPath : rightModelPath,
+        )
       }
     })
 
     controller.addEventListener('disconnected', () => {
-      this.clear()
-      this.motionController = null
+      this.dispose()
     })
   }
 
-  updateMatrixWorld(force) {
+  updateMatrixWorld(force?: boolean): void {
     super.updateMatrixWorld(force)
 
     if (this.motionController) {
@@ -38,7 +57,8 @@ class OculusHandModel extends Object3D {
     }
   }
 
-  getPointerPosition() {
+  getPointerPosition(): Vector3 | null {
+    // @ts-ignore XRController needs to extend Group
     const indexFingerTip = this.controller.joints[POINTING_JOINT]
     if (indexFingerTip) {
       return indexFingerTip.position
@@ -47,7 +67,7 @@ class OculusHandModel extends Object3D {
     }
   }
 
-  intersectBoxObject(boxObject) {
+  intersectBoxObject(boxObject: Object3D): boolean {
     const pointerPosition = this.getPointerPosition()
     if (pointerPosition) {
       const indexSphere = new Sphere(pointerPosition, TOUCH_RADIUS)
@@ -58,7 +78,7 @@ class OculusHandModel extends Object3D {
     }
   }
 
-  checkButton(button) {
+  checkButton(button: XRButton): void {
     if (this.intersectBoxObject(button)) {
       button.onPress()
     } else {
@@ -68,6 +88,11 @@ class OculusHandModel extends Object3D {
     if (button.isPressed()) {
       button.whilePressed()
     }
+  }
+
+  dispose(): void {
+    this.clear()
+    this.motionController = null
   }
 }
 

@@ -210,6 +210,24 @@ class TransformControls<TCamera extends Camera = Camera> extends Object3D {
     return this
   }
 
+  // Reset
+  public reset = (): this => {
+    if (!this.enabled) return this
+
+    if (this.dragging) {
+      if (this.object !== undefined) {
+        this.object.position.copy(this.positionStart)
+        this.object.quaternion.copy(this.quaternionStart)
+        this.object.scale.copy(this.scaleStart)
+        this.dispatchEvent(this.changeEvent)
+        this.dispatchEvent(this.objectChangeEvent)
+        this.pointStart.copy(this.pointEnd)
+      }
+    }
+
+    return this
+  }
+
   public updateMatrixWorld = (): void => {
     if (this.object !== undefined) {
       this.object.updateMatrixWorld()

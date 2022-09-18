@@ -2,6 +2,11 @@ import { FileLoader, Loader, ShapePath } from 'three'
 
 import type { LoadingManager, Shape } from 'three'
 
+type Options = {
+  lineHeight: number
+  letterSpacing: number
+}
+
 export class FontLoader extends Loader {
   constructor(manager?: LoadingManager) {
     super(manager)
@@ -63,19 +68,18 @@ export class Font {
     this.data = data
   }
 
-  public generateShapes(text: string, size = 100): Shape[] {
+  public generateShapes(text: string, size = 100, _options?: Partial<Options>): Shape[] {
     const shapes: Shape[] = []
-    const paths = createPaths(text, size, this.data)
-
+    const options = { letterSpacing: 0, lineHeight: 1, ..._options }
+    const paths = createPaths(text, size, this.data, options)
     for (let p = 0, pl = paths.length; p < pl; p++) {
       Array.prototype.push.apply(shapes, paths[p].toShapes(false))
     }
-
     return shapes
   }
 }
 
-function createPaths(text: string, size: number, data: FontData): ShapePath[] {
+function createPaths(text: string, size: number, data: FontData, options: Options): ShapePath[] {
   const chars = Array.from(text)
   const scale = size / data.resolution
   const line_height = (data.boundingBox.yMax - data.boundingBox.yMin + data.underlineThickness) * scale
@@ -90,11 +94,11 @@ function createPaths(text: string, size: number, data: FontData): ShapePath[] {
 
     if (char === '\n') {
       offsetX = 0
-      offsetY -= line_height
+      offsetY -= line_height * options.lineHeight
     } else {
       const ret = createPath(char, scale, offsetX, offsetY, data)
       if (ret) {
-        offsetX += ret.offsetX
+        offsetX += ret.offsetX + options.letterSpacing
         paths.push(ret.path)
       }
     }

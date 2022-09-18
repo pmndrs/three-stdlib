@@ -135,8 +135,9 @@ class NodeBuilder {
     if (type === 'int') return `${Math.round(value)}`
     if (type === 'uint') return value >= 0 ? `${Math.round(value)}u` : '0u'
     if (type === 'bool') return value ? 'true' : 'false'
-    if (type === 'color')
+    if (type === 'color') {
       return `${this.getType('vec3')}( ${toFloat(value.r)}, ${toFloat(value.g)}, ${toFloat(value.b)} )`
+    }
 
     const typeLength = this.getTypeLength(type)
 

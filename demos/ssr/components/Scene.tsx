@@ -22,7 +22,7 @@ export const Scene = (): JSX.Element => {
       <Controls />
       <Lights />
       <mesh ref={meshRef}>
-        <icosahedronBufferGeometry args={[1]} />
+        <icosahedronGeometry args={[1]} />
         <meshStandardMaterial color="pink" roughness={0} />
       </mesh>
     </>
