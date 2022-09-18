@@ -1,10 +1,8 @@
 import { BufferGeometry, Float32BufferAttribute } from 'three'
 import { ConvexHull } from '../math/ConvexHull'
 
-// ConvexGeometry
-
 class ConvexGeometry extends BufferGeometry {
-  constructor(points) {
+  constructor(points = []) {
     super()
 
     // buffers
