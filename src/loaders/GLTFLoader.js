@@ -1418,6 +1418,7 @@ class GLTFMaterialsPbrSpecularGlossinessExtension {
       'alphaMap',
       'envMap',
       'envMapIntensity',
+      'refractionRatio',
     ]
   }
 
@@ -1502,6 +1503,8 @@ class GLTFMaterialsPbrSpecularGlossinessExtension {
 
     material.envMap = materialParams.envMap === undefined ? null : materialParams.envMap
     material.envMapIntensity = 1.0
+
+    material.refractionRatio = 0.98
 
     return material
   }
