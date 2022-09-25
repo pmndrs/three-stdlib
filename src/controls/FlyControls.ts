@@ -40,28 +40,14 @@ class FlyControls extends EventDispatcher {
   private moveVector = new Vector3(0, 0, 0)
   private rotationVector = new Vector3(0, 0, 0)
 
-  constructor(object: Camera, domElement: HTMLElement | Document) {
+  constructor(object: Camera, domElement?: HTMLElement | Document) {
     super()
-
-    if (domElement === undefined) {
-      console.warn('THREE.FlyControls: The second parameter "domElement" is now mandatory.')
-      domElement = document
-    }
 
     this.object = object
     this.domElement = domElement
 
-    if (domElement && !(domElement instanceof Document)) {
-      domElement.setAttribute('tabindex', -1 as any)
-    }
-
-    this.domElement.addEventListener('contextmenu', contextmenu)
-    ;(this.domElement as HTMLElement).addEventListener('mousemove', this.mousemove)
-    ;(this.domElement as HTMLElement).addEventListener('mousedown', this.mousedown)
-    ;(this.domElement as HTMLElement).addEventListener('mouseup', this.mouseup)
-
-    window.addEventListener('keydown', this.keydown)
-    window.addEventListener('keyup', this.keyup)
+    // connect events
+    if (domElement !== undefined) this.connect(domElement)
 
     this.updateMovementVector()
     this.updateRotationVector()
@@ -179,7 +165,7 @@ class FlyControls extends EventDispatcher {
     this.updateRotationVector()
   }
 
-  private mousedown = (event: MouseEvent): void => {
+  private pointerdown = (event: MouseEvent): void => {
     if (this.dragToLook) {
       this.mouseStatus++
     } else {
@@ -196,7 +182,7 @@ class FlyControls extends EventDispatcher {
     }
   }
 
-  private mousemove = (event: MouseEvent): void => {
+  private pointermove = (event: MouseEvent): void => {
     if (!this.dragToLook || this.mouseStatus > 0) {
       const container = this.getContainerDimensions()
       const halfWidth = container.size[0] / 2
@@ -209,7 +195,7 @@ class FlyControls extends EventDispatcher {
     }
   }
 
-  private mouseup = (event: MouseEvent): void => {
+  private pointerup = (event: MouseEvent): void => {
     if (this.dragToLook) {
       this.mouseStatus--
 
@@ -287,11 +273,28 @@ class FlyControls extends EventDispatcher {
     }
   }
 
+  // https://github.com/mrdoob/three.js/issues/20575
+  public connect = (domElement: HTMLElement | Document): void => {
+    this.domElement = domElement
+
+    if (domElement && !(domElement instanceof Document)) {
+      domElement.setAttribute('tabindex', -1 as any)
+    }
+
+    this.domElement.addEventListener('contextmenu', contextmenu)
+    ;(this.domElement as HTMLElement).addEventListener('pointermove', this.pointermove)
+    ;(this.domElement as HTMLElement).addEventListener('pointerdown', this.pointerdown)
+    ;(this.domElement as HTMLElement).addEventListener('pointerup', this.pointerup)
+
+    window.addEventListener('keydown', this.keydown)
+    window.addEventListener('keyup', this.keyup)
+  }
+
   public dispose = (): void => {
     this.domElement.removeEventListener('contextmenu', contextmenu)
-    ;(this.domElement as HTMLElement).removeEventListener('mousemove', this.mousemove)
-    ;(this.domElement as HTMLElement).removeEventListener('mousedown', this.mousedown)
-    ;(this.domElement as HTMLElement).removeEventListener('mouseup', this.mouseup)
+    ;(this.domElement as HTMLElement).removeEventListener('pointermove', this.pointermove)
+    ;(this.domElement as HTMLElement).removeEventListener('pointerdown', this.pointerdown)
+    ;(this.domElement as HTMLElement).removeEventListener('pointerup', this.pointerup)
 
     window.removeEventListener('keydown', this.keydown)
     window.removeEventListener('keyup', this.keyup)
