@@ -6,7 +6,7 @@ function contextmenu(event: Event): void {
 
 class FlyControls extends EventDispatcher {
   public object: Camera
-  public domElement: HTMLElement | Document
+  public domElement: HTMLElement | Document = null!
 
   public movementSpeed = 1.0
   public rollSpeed = 0.005
@@ -44,7 +44,6 @@ class FlyControls extends EventDispatcher {
     super()
 
     this.object = object
-    this.domElement = domElement
 
     // connect events
     if (domElement !== undefined) this.connect(domElement)
