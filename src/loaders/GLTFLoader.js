@@ -1929,9 +1929,9 @@ class GLTFParser {
 
     const isSafari =
       typeof navigator !== 'undefined' && /^((?!chrome|android).)*safari/i.test(navigator.userAgent) === true
-    const isFirefox = typeof navigator !== 'undefined' && navigator.userAgent.indexOf('Firefox') > -1
+    const isFirefox = typeof navigator !== 'undefined' && navigator.userAgent?.indexOf('Firefox') > -1
     const firefoxVersion =
-      typeof navigator !== 'undefined' && isFirefox ? navigator.userAgent.match(/Firefox\/([0-9]+)\./)[1] : -1
+      typeof navigator !== 'undefined' && isFirefox ? navigator.userAgent?.match(/Firefox\/([0-9]+)\./)[1] : -1
 
     if (typeof createImageBitmap === 'undefined' || isSafari || (isFirefox && firefoxVersion < 98)) {
       this.textureLoader = new TextureLoader(this.options.manager)
