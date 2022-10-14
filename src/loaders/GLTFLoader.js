@@ -810,7 +810,7 @@ class GLTFMaterialsVolumeExtension {
       pending.push(parser.assignTexture(materialParams, 'thicknessMap', extension.thicknessTexture))
     }
 
-    materialParams.attenuationDistance = extension.attenuationDistance || 0
+    materialParams.attenuationDistance = extension.attenuationDistance || Infinity
 
     const colorArray = extension.attenuationColor || [1, 1, 1]
     materialParams.attenuationColor = new Color(colorArray[0], colorArray[1], colorArray[2])
