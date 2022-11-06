@@ -1,9 +1,81 @@
-import { BufferAttribute, BufferGeometry, FileLoader, Loader } from 'three'
+import {
+  Attribute,
+  DataType,
+  Decoder,
+  DecoderBuffer,
+  DecoderModule,
+  DracoDecoderModule,
+  DracoDecoderModuleProps,
+  Mesh,
+  PointCloud,
+} from 'draco3d'
+import { BufferAttribute, BufferGeometry, FileLoader, Loader, LoadingManager } from 'three'
+import { TypedArray } from 'types/shared'
+
+type DecoderConfig = {
+  type?: string
+} & DracoDecoderModuleProps
+
+type TypedArrayIndices = 'Float32Array' | 'Uint32Array' | 'Uint16Array' | 'Uint8Array' | 'Int16Array' | 'Int8Array'
+
+type TaskConfig = {
+  attributeIDs: {
+    position: string | number
+    normal: string | number
+    color: string
+    uv: string | number
+  }
+  attributeTypes: {
+    position: TypedArrayIndices | TypedArray
+    normal: TypedArrayIndices | TypedArray
+    color: TypedArrayIndices | TypedArray
+    uv: TypedArrayIndices | TypedArray
+  }
+  useUniqueIDs: boolean
+}
+
+type DefaultAttributeTypes = {
+  position: TypedArrayIndices
+  normal: TypedArrayIndices
+  color: TypedArrayIndices
+  uv: TypedArrayIndices
+}
+
+type ExtendedWorker = Worker & {
+  _callbacks: {
+    [T: number]: {
+      resolve: (value: unknown) => void
+      reject: (reason?: any) => void
+    }
+  }
+  _taskCosts: {
+    [T: number]: number
+  }
+  _taskLoad: number
+}
+
+type ClientMessage = {
+  type: 'decode' | 'error'
+  id: number
+  geometry?: DecodeGeometry
+  error?: string
+}
 
 const _taskCache = new WeakMap()
 
 class DRACOLoader extends Loader {
-  constructor(manager) {
+  decoderPath
+  decoderConfig: DecoderConfig
+  decoderBinary: null
+  decoderPending: Promise<void> | null
+  workerLimit
+  workerPool: ExtendedWorker[]
+  workerNextTaskID
+  workerSourceURL
+  defaultAttributeIDs
+  defaultAttributeTypes: DefaultAttributeTypes
+
+  constructor(manager?: LoadingManager) {
     super(manager)
 
     this.decoderPath = ''
@@ -30,25 +102,30 @@ class DRACOLoader extends Loader {
     }
   }
 
-  setDecoderPath(path) {
+  setDecoderPath(path: string): DRACOLoader {
     this.decoderPath = path
 
     return this
   }
 
-  setDecoderConfig(config) {
+  setDecoderConfig(config: DecoderConfig): DRACOLoader {
     this.decoderConfig = config
 
     return this
   }
 
-  setWorkerLimit(workerLimit) {
+  setWorkerLimit(workerLimit: number): DRACOLoader {
     this.workerLimit = workerLimit
 
     return this
   }
 
-  load(url, onLoad, onProgress, onError) {
+  load(
+    url: string,
+    onLoad: (geometry: BufferGeometry) => void,
+    onProgress?: (event: ProgressEvent) => void,
+    onError?: (event: ErrorEvent) => void,
+  ): void {
     const loader = new FileLoader(this.manager)
 
     loader.setPath(this.path)
@@ -65,7 +142,9 @@ class DRACOLoader extends Loader {
           useUniqueIDs: false,
         }
 
-        this.decodeGeometry(buffer, taskConfig).then(onLoad).catch(onError)
+        this.decodeGeometry(buffer as ArrayBuffer, taskConfig)
+          .then(onLoad)
+          .catch(onError)
       },
       onProgress,
       onError,
@@ -73,7 +152,12 @@ class DRACOLoader extends Loader {
   }
 
   /** @deprecated Kept for backward-compatibility with previous DRACOLoader versions. */
-  decodeDracoFile(buffer, callback, attributeIDs, attributeTypes) {
+  decodeDracoFile(
+    buffer: ArrayBuffer,
+    callback: (geometry: BufferGeometry) => void,
+    attributeIDs: TaskConfig['attributeIDs'],
+    attributeTypes: TaskConfig['attributeTypes'],
+  ): void {
     const taskConfig = {
       attributeIDs: attributeIDs || this.defaultAttributeIDs,
       attributeTypes: attributeTypes || this.defaultAttributeTypes,
@@ -83,15 +167,19 @@ class DRACOLoader extends Loader {
     this.decodeGeometry(buffer, taskConfig).then(callback)
   }
 
-  decodeGeometry(buffer, taskConfig) {
+  decodeGeometry(buffer: ArrayBuffer, taskConfig: TaskConfig): Promise<BufferGeometry> {
     // TODO: For backward-compatibility, support 'attributeTypes' objects containing
     // references (rather than names) to typed array constructors. These must be
     // serialized before sending them to the worker.
     for (const attribute in taskConfig.attributeTypes) {
-      const type = taskConfig.attributeTypes[attribute]
+      const type = taskConfig.attributeTypes[attribute as keyof TaskConfig['attributeTypes']]
 
-      if (type.BYTES_PER_ELEMENT !== undefined) {
-        taskConfig.attributeTypes[attribute] = type.name
+      if ((type as TypedArray).BYTES_PER_ELEMENT !== undefined) {
+        // Name doesn't seem to be a recognized property but does exist
+        // See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray/name
+        taskConfig.attributeTypes[attribute as keyof TaskConfig['attributeTypes']] = (type as TypedArray & {
+          name: TypedArrayIndices
+        }).name
       }
     }
 
@@ -120,7 +208,7 @@ class DRACOLoader extends Loader {
 
     //
 
-    let worker
+    let worker: ExtendedWorker
     const taskID = this.workerNextTaskID++
     const taskCost = buffer.byteLength
 
@@ -138,7 +226,9 @@ class DRACOLoader extends Loader {
           // this.debug();
         })
       })
-      .then((message) => this._createGeometry(message.geometry))
+      .then((message) => {
+        return this._createGeometry((message as ClientMessage).geometry as DecodeGeometry)
+      })
 
     // Remove task from the task list.
     // Note: replaced '.finally()' with '.catch().then()' block - iOS 11 support (#19416)
@@ -161,7 +251,7 @@ class DRACOLoader extends Loader {
     return geometryPending
   }
 
-  _createGeometry(geometryData) {
+  private _createGeometry(geometryData: DecodeGeometry): BufferGeometry {
     const geometry = new BufferGeometry()
 
     if (geometryData.index) {
@@ -180,7 +270,7 @@ class DRACOLoader extends Loader {
     return geometry
   }
 
-  _loadLibrary(url, responseType) {
+  private _loadLibrary(url: string, responseType: string): Promise<string | ArrayBuffer> {
     const loader = new FileLoader(this.manager)
     loader.setPath(this.decoderPath)
     loader.setResponseType(responseType)
@@ -191,13 +281,13 @@ class DRACOLoader extends Loader {
     })
   }
 
-  preload() {
+  preload(): DRACOLoader {
     this._initDecoder()
 
     return this
   }
 
-  _initDecoder() {
+  private _initDecoder(): Promise<void> {
     if (this.decoderPending) return this.decoderPending
 
     const useJS = typeof WebAssembly !== 'object' || this.decoderConfig.type === 'js'
@@ -214,7 +304,7 @@ class DRACOLoader extends Loader {
       const jsContent = libraries[0]
 
       if (!useJS) {
-        this.decoderConfig.wasmBinary = libraries[1]
+        this.decoderConfig.wasmBinary = libraries[1] as ArrayBuffer
       }
 
       const fn = DRACOWorker.toString()
@@ -233,10 +323,10 @@ class DRACOLoader extends Loader {
     return this.decoderPending
   }
 
-  _getWorker(taskID, taskCost) {
+  private _getWorker(taskID: number, taskCost: number): Promise<ExtendedWorker> {
     return this._initDecoder().then(() => {
       if (this.workerPool.length < this.workerLimit) {
-        const worker = new Worker(this.workerSourceURL)
+        const worker = new Worker(this.workerSourceURL) as ExtendedWorker
 
         worker._callbacks = {}
         worker._taskCosts = {}
@@ -244,8 +334,8 @@ class DRACOLoader extends Loader {
 
         worker.postMessage({ type: 'init', decoderConfig: this.decoderConfig })
 
-        worker.onmessage = function (e) {
-          const message = e.data
+        worker.onmessage = function (e): void {
+          const message: ClientMessage = e.data
 
           switch (message.type) {
             case 'decode':
@@ -275,20 +365,20 @@ class DRACOLoader extends Loader {
     })
   }
 
-  _releaseTask(worker, taskID) {
+  private _releaseTask(worker: ExtendedWorker, taskID: number): void {
     worker._taskLoad -= worker._taskCosts[taskID]
     delete worker._callbacks[taskID]
     delete worker._taskCosts[taskID]
   }
 
-  debug() {
+  debug(): void {
     console.log(
       'Task load: ',
       this.workerPool.map((worker) => worker._taskLoad),
     )
   }
 
-  dispose() {
+  dispose(): DRACOLoader {
     for (let i = 0; i < this.workerPool.length; ++i) {
       this.workerPool[i].terminate()
     }
@@ -301,18 +391,46 @@ class DRACOLoader extends Loader {
 
 /* WEB WORKER */
 
-function DRACOWorker() {
-  let decoderConfig
-  let decoderPending
+type WorkerMessage = {
+  type: 'init' | 'decode'
+  decoderConfig: DecoderConfig
+  buffer?: ArrayBuffer
+  id?: number
+  taskConfig?: TaskConfig
+}
 
-  onmessage = function (e) {
-    const message = e.data
+type DecodeGeometry = {
+  index: DecodeIndex | null
+  attributes: DecodeAttribute[]
+}
+
+type DecodeIndex = {
+  array: Uint32Array
+  itemSize: number
+}
+
+type DecodeAttribute = {
+  name: string
+  array: Uint32Array
+  itemSize: number
+}
+
+declare const self: DedicatedWorkerGlobalScope
+
+function DRACOWorker(): void {
+  let decoderConfig: DecoderConfig
+  let decoderPending: Promise<{ draco: DecoderModule }>
+
+  let DracoDecoderModule: DracoDecoderModule
+
+  onmessage = function (e): void {
+    const message: WorkerMessage = e.data
 
     switch (message.type) {
       case 'init':
         decoderConfig = message.decoderConfig
         decoderPending = new Promise(function (resolve /*, reject*/) {
-          decoderConfig.onModuleLoaded = function (draco) {
+          decoderConfig!.onModuleLoaded = function (draco: DecoderModule): void {
             // Module is Promise-like. Wrap before resolving to avoid loop.
             resolve({ draco: draco })
           }
@@ -322,7 +440,7 @@ function DRACOWorker() {
         break
 
       case 'decode':
-        const buffer = message.buffer
+        const buffer = message.buffer as ArrayBuffer
         const taskConfig = message.taskConfig
         decoderPending.then((module) => {
           const draco = module.draco
@@ -331,7 +449,7 @@ function DRACOWorker() {
           decoderBuffer.Init(new Int8Array(buffer), buffer.byteLength)
 
           try {
-            const geometry = decodeGeometry(draco, decoder, decoderBuffer, taskConfig)
+            const geometry = decodeGeometry(draco, decoder, decoderBuffer, taskConfig as TaskConfig)
 
             const buffers = geometry.attributes.map((attr) => attr.array.buffer)
 
@@ -341,7 +459,7 @@ function DRACOWorker() {
           } catch (error) {
             console.error(error)
 
-            self.postMessage({ type: 'error', id: message.id, error: error.message })
+            self.postMessage({ type: 'error', id: message.id, error: (error as Error).message })
           } finally {
             draco.destroy(decoderBuffer)
             draco.destroy(decoder)
@@ -351,7 +469,12 @@ function DRACOWorker() {
     }
   }
 
-  function decodeGeometry(draco, decoder, decoderBuffer, taskConfig) {
+  function decodeGeometry(
+    draco: DecoderModule,
+    decoder: Decoder,
+    decoderBuffer: DecoderBuffer,
+    taskConfig: TaskConfig,
+  ): DecodeGeometry {
     const attributeIDs = taskConfig.attributeIDs
     const attributeTypes = taskConfig.attributeTypes
 
@@ -370,15 +493,17 @@ function DRACOWorker() {
       throw new Error('THREE.DRACOLoader: Unexpected geometry type.')
     }
 
-    if (!decodingStatus.ok() || dracoGeometry.ptr === 0) {
+    if (!decodingStatus.ok() || (dracoGeometry as Mesh).ptr === 0) {
       throw new Error('THREE.DRACOLoader: Decoding failed: ' + decodingStatus.error_msg())
     }
 
-    const geometry = { index: null, attributes: [] }
+    const geometry: DecodeGeometry = { index: null, attributes: [] }
 
     // Gather all vertex attributes.
     for (const attributeName in attributeIDs) {
-      const attributeType = self[attributeTypes[attributeName]]
+      const name = attributeName as keyof TaskConfig['attributeTypes']
+      const arrayType = attributeTypes[name] as TypedArrayIndices
+      const attributeType = (self[arrayType as keyof DedicatedWorkerGlobalScope] as unknown) as TypedArray
 
       let attribute
       let attributeID
@@ -388,22 +513,23 @@ function DRACOWorker() {
       // a Draco file may contain a custom set of attributes, identified by known unique
       // IDs. glTF files always do the latter, and `.drc` files typically do the former.
       if (taskConfig.useUniqueIDs) {
-        attributeID = attributeIDs[attributeName]
-        attribute = decoder.GetAttributeByUniqueId(dracoGeometry, attributeID)
+        attributeID = attributeIDs[name] as number
+        attribute = decoder.GetAttributeByUniqueId(dracoGeometry as Mesh, attributeID)
       } else {
-        attributeID = decoder.GetAttributeId(dracoGeometry, draco[attributeIDs[attributeName]])
+        let attributeIDName = attributeIDs[name] as keyof DecoderModule
+        attributeID = decoder.GetAttributeId(dracoGeometry as PointCloud, draco[attributeIDName] as number)
 
         if (attributeID === -1) continue
 
-        attribute = decoder.GetAttribute(dracoGeometry, attributeID)
+        attribute = decoder.GetAttribute(dracoGeometry as PointCloud, attributeID)
       }
 
-      geometry.attributes.push(decodeAttribute(draco, decoder, dracoGeometry, attributeName, attributeType, attribute))
+      geometry.attributes.push(decodeAttribute(draco, decoder, dracoGeometry as Mesh, name, attributeType, attribute))
     }
 
     // Add index.
     if (geometryType === draco.TRIANGULAR_MESH) {
-      geometry.index = decodeIndex(draco, decoder, dracoGeometry)
+      geometry.index = decodeIndex(draco, decoder, dracoGeometry as Mesh)
     }
 
     draco.destroy(dracoGeometry)
@@ -411,7 +537,7 @@ function DRACOWorker() {
     return geometry
   }
 
-  function decodeIndex(draco, decoder, dracoGeometry) {
+  function decodeIndex(draco: DecoderModule, decoder: Decoder, dracoGeometry: Mesh): DecodeIndex {
     const numFaces = dracoGeometry.num_faces()
     const numIndices = numFaces * 3
     const byteLength = numIndices * 4
@@ -424,15 +550,23 @@ function DRACOWorker() {
     return { array: index, itemSize: 1 }
   }
 
-  function decodeAttribute(draco, decoder, dracoGeometry, attributeName, attributeType, attribute) {
+  function decodeAttribute(
+    draco: DecoderModule,
+    decoder: Decoder,
+    dracoGeometry: Mesh,
+    attributeName: keyof TaskConfig['attributeTypes'],
+    attributeType: TypedArray,
+    attribute: Attribute,
+  ): DecodeAttribute {
     const numComponents = attribute.num_components()
     const numPoints = dracoGeometry.num_points()
     const numValues = numPoints * numComponents
     const byteLength = numValues * attributeType.BYTES_PER_ELEMENT
-    const dataType = getDracoDataType(draco, attributeType)
+    const dataType = getDracoDataType(draco, attributeType) as DataType
 
     const ptr = draco._malloc(byteLength)
     decoder.GetAttributeDataArrayForAllPoints(dracoGeometry, attribute, dataType, byteLength, ptr)
+    // @ts-expect-error
     const array = new attributeType(draco.HEAPF32.buffer, ptr, numValues).slice()
     draco._free(ptr)
 
@@ -443,21 +577,21 @@ function DRACOWorker() {
     }
   }
 
-  function getDracoDataType(draco, attributeType) {
+  function getDracoDataType(draco: DecoderModule, attributeType: TypedArray): DataType | undefined {
     switch (attributeType) {
-      case Float32Array:
+      case (Float32Array as unknown) as Float32Array:
         return draco.DT_FLOAT32
-      case Int8Array:
+      case (Int8Array as unknown) as Int8Array:
         return draco.DT_INT8
-      case Int16Array:
+      case (Int16Array as unknown) as Int16Array:
         return draco.DT_INT16
-      case Int32Array:
+      case (Int32Array as unknown) as Int32Array:
         return draco.DT_INT32
-      case Uint8Array:
+      case (Uint8Array as unknown) as Uint8Array:
         return draco.DT_UINT8
-      case Uint16Array:
+      case (Uint16Array as unknown) as Uint16Array:
         return draco.DT_UINT16
-      case Uint32Array:
+      case (Uint32Array as unknown) as Uint32Array:
         return draco.DT_UINT32
     }
   }
