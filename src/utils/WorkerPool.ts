@@ -2,7 +2,22 @@
  * @author Deepkolos / https://github.com/deepkolos
  */
 
+type Resolver = (value: unknown) => void
+
+type Queue = {
+  resolve: Resolver
+  msg: any
+  transfer: Transferable[]
+}
+
 export class WorkerPool {
+  pool
+  queue: Queue[]
+  workers: Worker[]
+  workersResolve: Resolver[]
+  workerStatus
+  workerCreator?: () => Worker
+
   constructor(pool = 4) {
     this.pool = pool
     this.queue = []
@@ -11,26 +26,26 @@ export class WorkerPool {
     this.workerStatus = 0
   }
 
-  _initWorker(workerId) {
+  private _initWorker(workerId: number): void {
     if (!this.workers[workerId]) {
-      const worker = this.workerCreator()
+      const worker = this.workerCreator!()
       worker.addEventListener('message', this._onMessage.bind(this, workerId))
       this.workers[workerId] = worker
     }
   }
 
-  _getIdleWorker() {
+  private _getIdleWorker(): number {
     for (let i = 0; i < this.pool; i++) if (!(this.workerStatus & (1 << i))) return i
 
     return -1
   }
 
-  _onMessage(workerId, msg) {
+  private _onMessage(workerId: number, msg: any): void {
     const resolve = this.workersResolve[workerId]
     resolve && resolve(msg)
 
     if (this.queue.length) {
-      const { resolve, msg, transfer } = this.queue.shift()
+      const { resolve, msg, transfer } = this.queue.shift() as Queue
       this.workersResolve[workerId] = resolve
       this.workers[workerId].postMessage(msg, transfer)
     } else {
@@ -38,15 +53,15 @@ export class WorkerPool {
     }
   }
 
-  setWorkerCreator(workerCreator) {
+  setWorkerCreator(workerCreator: () => Worker): void {
     this.workerCreator = workerCreator
   }
 
-  setWorkerLimit(pool) {
+  setWorkerLimit(pool: number): void {
     this.pool = pool
   }
 
-  postMessage(msg, transfer) {
+  postMessage(msg: any, transfer: Transferable[]): Promise<any> {
     return new Promise((resolve) => {
       const workerId = this._getIdleWorker()
 
@@ -61,7 +76,7 @@ export class WorkerPool {
     })
   }
 
-  dispose() {
+  dispose(): void {
     this.workers.forEach((worker) => worker.terminate())
     this.workersResolve.length = 0
     this.workers.length = 0
