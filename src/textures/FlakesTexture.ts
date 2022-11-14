@@ -4,7 +4,7 @@ class FlakesTexture {
     canvas.width = width
     canvas.height = height
 
-    const context = canvas.getContext('2d')
+    const context = canvas.getContext('2d') as CanvasRenderingContext2D
     context.fillStyle = 'rgb(127,127,255)'
     context.fillRect(0, 0, width, height)
 
