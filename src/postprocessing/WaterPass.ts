@@ -68,7 +68,7 @@ class WaterPass extends Pass {
     this.time = 0
   }
 
-  render(renderer: WebGLRenderer, writeBuffer: WebGLRenderTarget, readBuffer: WebGLRenderTarget) {
+  public render(renderer: WebGLRenderer, writeBuffer: WebGLRenderTarget, readBuffer: WebGLRenderTarget): void {
     this.uniforms['tex'].value = readBuffer.texture
     this.uniforms['time'].value = this.time
     this.uniforms['factor'].value = this.factor

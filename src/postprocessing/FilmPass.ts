@@ -36,7 +36,6 @@ class FilmPass extends Pass {
     writeBuffer: WebGLRenderTarget,
     readBuffer: WebGLRenderTarget,
     deltaTime: number,
-    maskActive: boolean,
   ): void {
     this.uniforms['tDiffuse'].value = readBuffer.texture
     this.uniforms['time'].value += deltaTime
