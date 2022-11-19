@@ -64,6 +64,7 @@ class CCDIKHelper extends Object3D {
       return geometry
     }
 
+    const scope = this
     function createTargetMesh() {
       return new Mesh(scope.sphereGeometry, scope.targetSphereMaterial)
     }
