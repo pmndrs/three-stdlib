@@ -2,9 +2,7 @@ import { Mesh, ShaderMaterial, SphereGeometry } from 'three'
 
 class LightProbeHelper extends Mesh {
   constructor(lightProbe, size) {
-    this.lightProbe = lightProbe
-
-    this.size = size
+    
 
     const material = new ShaderMaterial({
       type: 'LightProbeHelperMaterial',
@@ -90,6 +88,8 @@ class LightProbeHelper extends Mesh {
 
     super(geometry, material)
 
+    this.lightProbe = lightProbe
+    this.size = size
     this.type = 'LightProbeHelper'
 
     this.onBeforeRender()

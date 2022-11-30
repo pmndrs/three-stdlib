@@ -14,10 +14,6 @@ import {
 
 class RectAreaLightHelper extends Line {
   constructor(light, color) {
-    this.light = light
-
-    this.color = color // optional hardwired color for the helper
-
     const positions = [1, 1, 0, -1, 1, 0, -1, -1, 0, 1, -1, 0, 1, 1, 0]
 
     const geometry = new BufferGeometry()
@@ -29,6 +25,8 @@ class RectAreaLightHelper extends Line {
     super(geometry, material)
 
     this.type = 'RectAreaLightHelper'
+    this.light = light
+    this.color = color // optional hardwired color for the helper
 
     //
 
