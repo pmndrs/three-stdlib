@@ -2,8 +2,6 @@ import { Mesh, ShaderMaterial, SphereGeometry } from 'three'
 
 class LightProbeHelper extends Mesh {
   constructor(lightProbe, size) {
-    
-
     const material = new ShaderMaterial({
       type: 'LightProbeHelperMaterial',
 
