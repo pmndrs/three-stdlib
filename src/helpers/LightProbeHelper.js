@@ -6,9 +6,9 @@ class LightProbeHelper extends Mesh {
       type: 'LightProbeHelperMaterial',
 
       uniforms: {
-        sh: { value: this.lightProbe.sh.coefficients }, // by reference
+        sh: { value: lightProbe.sh.coefficients }, // by reference
 
-        intensity: { value: this.lightProbe.intensity },
+        intensity: { value: lightProbe.intensity },
       },
 
       vertexShader: [
