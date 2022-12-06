@@ -1,3 +1,4 @@
+import { GLTFObject } from 'loaders/tmp'
 import {
   BufferAttribute,
   ClampToEdgeWrapping,
@@ -46,11 +47,28 @@ import {
   OrthographicCamera,
   PerspectiveCamera,
   SkinnedMesh,
-  Vector3Tuple,
   DirectionalLight,
   PointLight,
   SpotLight,
 } from 'three'
+import {
+  AccessorDef,
+  BufferViewDef,
+  CameraDef,
+  GLTFExportJson,
+  ImageDef,
+  ImageRepresentation,
+  LightDef,
+  MaterialDef,
+  MeshDef,
+  NodeDef,
+  OcclusionMapDef,
+  Primitive,
+  SamplerDef,
+  SceneDef,
+  TextureDef,
+} from 'types/gltf'
+import { WEBGL_EXPORTER_CONSTANTS as WEBGL_CONSTANTS } from '../loaders/tmp/constants'
 
 export interface GLTFExporterOptions {
   binary?: boolean
@@ -77,148 +95,6 @@ type TransformDef = {
   offset?: Vector2Tuple
   rotation?: number
   scale?: Vector2Tuple
-}
-
-type BufferViewDef = {
-  buffer: number
-  byteOffset: number
-  byteLength: number
-  target?: number
-  byteStride?: number
-}
-
-type AccessorDef = {
-  bufferView: unknown
-  byteOffset: unknown
-  componentType: unknown
-  count: unknown
-  max: unknown
-  min: unknown
-  type: unknown
-  normalized?: boolean
-}
-
-type ImageDef = {
-  mimeType: string
-  bufferView?: number
-  uri?: string
-}
-
-type ImageRepresentation = HTMLImageElement | HTMLCanvasElement | OffscreenCanvas | ImageBitmap
-
-type SamplerDef = {
-  magFilter: typeof WEBGL_CONSTANTS[keyof typeof WEBGL_CONSTANTS]
-  minFilter: typeof WEBGL_CONSTANTS[keyof typeof WEBGL_CONSTANTS]
-  wrapS: typeof WEBGL_CONSTANTS[keyof typeof WEBGL_CONSTANTS]
-  wrapT: typeof WEBGL_CONSTANTS[keyof typeof WEBGL_CONSTANTS]
-}
-
-type TextureDef = {
-  sampler: number
-  source: number
-  name?: string
-}
-
-type MaterialDef = {
-  pbrMetallicRoughness: {
-    baseColorFactor?: number[]
-    metallicFactor?: number
-    roughnessFactor?: number
-    metallicRoughnessTexture?: {
-      index: number
-    }
-    baseColorTexture?: {
-      index: number
-    }
-  }
-  emissiveFactor?: number[]
-  emissiveTexture?: {
-    index: number
-  }
-  normalTexture?: {
-    index: number
-    scale?: number | undefined
-  }
-  occlusionTexture?: OcclusionMapDef
-  alphaMode?: string
-  alphaCutoff?: number
-  doubleSided?: boolean
-  name?: string
-  extensions?: {
-    [key: string]: unknown
-  }
-}
-
-type OcclusionMapDef = {
-  index: number
-  texCoord: number
-  strength?: number
-}
-
-type Primitive = {
-  mode: number
-  attributes: {
-    [key: string]: BufferAttribute | InterleavedBufferAttribute | number
-  }
-  targets?: {
-    [key: string]: BufferAttribute | InterleavedBufferAttribute | number
-  }[]
-  indices?: BufferAttribute | InterleavedBufferAttribute | number
-  material?: number
-}
-
-type MeshDef = {
-  weights?: number[]
-  extras?: {
-    [key: string]: string[]
-  }
-  primitives?: Primitive[]
-}
-
-type CameraDef = {
-  type: string
-  orthographic?: {
-    xmag: number
-    ymag: number
-    zfar: number
-    znear: number
-  }
-  perspective?: {
-    aspectRatio: number
-    yfov: number
-    zfar: number
-    znear: number
-  }
-  name?: string
-}
-
-type NodeDef = {
-  rotation?: number[]
-  translation?: Vector3Tuple
-  scale?: Vector3Tuple
-  matrix?: number[]
-  name?: string
-  mesh?: number
-  camera?: number
-  children?: number[]
-  extensions?: { [key: string]: number | { light?: number } }
-}
-
-type SceneDef = {
-  name?: string
-  nodes?: number[]
-}
-
-type LightDef = {
-  name?: string
-  color?: number[]
-  intensity?: number
-  type?: string
-  spot?: {
-    innerConeAngle?: number
-    outerConeAngle?: number
-  }
-  range?: number
 }
 
 type ExtensionDef = {
@@ -474,34 +350,6 @@ class GLTFExporter {
 // Constants
 //------------------------------------------------------------------------------
 
-const WEBGL_CONSTANTS = {
-  POINTS: 0x0000,
-  LINES: 0x0001,
-  LINE_LOOP: 0x0002,
-  LINE_STRIP: 0x0003,
-  TRIANGLES: 0x0004,
-  TRIANGLE_STRIP: 0x0005,
-  TRIANGLE_FAN: 0x0006,
-
-  UNSIGNED_BYTE: 0x1401,
-  UNSIGNED_SHORT: 0x1403,
-  FLOAT: 0x1406,
-  UNSIGNED_INT: 0x1405,
-  ARRAY_BUFFER: 0x8892,
-  ELEMENT_ARRAY_BUFFER: 0x8893,
-
-  NEAREST: 0x2600,
-  LINEAR: 0x2601,
-  NEAREST_MIPMAP_NEAREST: 0x2700,
-  LINEAR_MIPMAP_NEAREST: 0x2701,
-  NEAREST_MIPMAP_LINEAR: 0x2702,
-  LINEAR_MIPMAP_LINEAR: 0x2703,
-
-  CLAMP_TO_EDGE: 33071,
-  MIRRORED_REPEAT: 33648,
-  REPEAT: 10497,
-} as const
-
 const THREE_TO_WEBGL: { [key: number]: typeof WEBGL_CONSTANTS[keyof typeof WEBGL_CONSTANTS] } = {}
 
 THREE_TO_WEBGL[NearestFilter] = WEBGL_CONSTANTS.NEAREST
@@ -562,37 +410,7 @@ class GLTFWriter {
   private uids: Map<{ [key: string]: any }, number>
   private uid: number
 
-  public json: {
-    asset: {
-      version: string
-      generator: string
-    }
-    buffers?: {
-      uri?: ArrayBuffer | string
-      byteLength: number
-    }[]
-    extensionsUsed?: string[]
-    bufferViews?: BufferViewDef[]
-    images?: ImageRepresentation[] & ImageDef[]
-    accessors?: AccessorDef[]
-    samplers?: SamplerDef[]
-    textures?: Texture[] & TextureDef[]
-    materials?: Material[] & MaterialDef[]
-    meshes?: unknown[]
-    cameras?: (Camera | CameraDef)[]
-    animations?: unknown[]
-    nodes?: {
-      [key: string]: unknown
-    }[]
-    skins?: {}[]
-    scenes?: (Scene | SceneDef)[]
-    scene?: number
-    extensions?: {
-      [key: string]: {
-        lights: unknown[]
-      }
-    }
-  }
+  public json: GLTFExportJson //GLTFJSON
 
   private cache: {
     meshes: Map<string, number>
