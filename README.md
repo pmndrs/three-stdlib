@@ -40,6 +40,7 @@ But most importantly, allowing more people that use and rely on these primitives
 
 If you want to get involved you could do any of the following:
 
-- Create amazing stories for these examples for our dedicate storybook
+- Help to maintain and sync the existing primitives
+- Create stories for these examples for our dedicated storybook
 - Convert some of the files to Typescript
-- Add new examples for the library you think could be awesome for others
+- Add new examples for the library you think could be helpful for others
