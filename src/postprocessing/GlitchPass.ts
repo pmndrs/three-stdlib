@@ -23,23 +23,16 @@ class GlitchPass extends Pass {
 
   constructor(dt_size = 64) {
     super()
-
-    if (DigitalGlitch === undefined) console.error('THREE.GlitchPass relies on DigitalGlitch')
-
-    const shader = DigitalGlitch
-
-    this.uniforms = UniformsUtils.clone(shader.uniforms)
-
+    this.uniforms = UniformsUtils.clone(DigitalGlitch.uniforms)
     this.uniforms['tDisp'].value = this.generateHeightmap(dt_size)
 
     this.material = new ShaderMaterial({
       uniforms: this.uniforms,
-      vertexShader: shader.vertexShader,
-      fragmentShader: shader.fragmentShader,
+      vertexShader: DigitalGlitch.vertexShader,
+      fragmentShader: DigitalGlitch.fragmentShader,
     })
 
     this.fsQuad = new FullScreenQuad(this.material)
-
     this.goWild = false
     this.curF = 0
     this.generateTrigger()

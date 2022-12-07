@@ -1,10 +1,10 @@
 // http://download.autodesk.com/us/systemdocs/help/2011/lustre/index.html?url=./files/WSc4e151a45a3b785a24c3d9a411df9298473-7ffd.htm,topicNumber=d0e9492
-
+// https://community.foundry.com/discuss/topic/103636/format-spec-for-3dl?mode=Post&postID=895258
 import {
   Loader,
   FileLoader,
   DataTexture,
-  DataTexture3D,
+  Data3DTexture,
   RGBAFormat,
   UnsignedByteType,
   ClampToEdgeWrapping,
@@ -109,8 +109,9 @@ export class LUT3dlLoader extends Loader {
     texture.wrapS = ClampToEdgeWrapping
     texture.wrapT = ClampToEdgeWrapping
     texture.generateMipmaps = false
+    texture.needsUpdate = true
 
-    const texture3D = new DataTexture3D()
+    const texture3D = new Data3DTexture()
     texture3D.image.data = data
     texture3D.image.width = size
     texture3D.image.height = size
@@ -123,6 +124,7 @@ export class LUT3dlLoader extends Loader {
     texture3D.wrapT = ClampToEdgeWrapping
     texture3D.wrapR = ClampToEdgeWrapping
     texture3D.generateMipmaps = false
+    texture3D.needsUpdate = true
 
     return {
       size,
