@@ -1,11 +1,24 @@
-import { Mesh, MeshBasicMaterial, Object3D, SphereGeometry } from 'three'
+import { Mesh, Object3D, SphereGeometry, MeshBasicMaterial } from 'three'
+import type { Texture, Group } from 'three'
+// @ts-ignore
 import { GLTFLoader } from '../loaders/GLTFLoader'
-import { MotionControllerConstants, fetchProfile, MotionController } from '../libs/MotionControllers'
+import { fetchProfile, MotionController, MotionControllerConstants } from '../libs/MotionControllers'
 
 const DEFAULT_PROFILES_PATH = 'https://cdn.jsdelivr.net/npm/@webxr-input-profiles/assets@1.0/dist/profiles'
 const DEFAULT_PROFILE = 'generic-trigger'
 
+const applyEnvironmentMap = (envMap: Texture, obj: Object3D): void => {
+  obj.traverse((child) => {
+    if (child instanceof Mesh && 'envMap' in child.material) {
+      child.material.envMap = envMap
+      child.material.needsUpdate = true
+    }
+  })
+}
+
 class XRControllerModel extends Object3D {
+  envMap: Texture | null
+  motionController: MotionController | null
   constructor() {
     super()
 
@@ -13,18 +26,13 @@ class XRControllerModel extends Object3D {
     this.envMap = null
   }
 
-  setEnvironmentMap(envMap) {
+  setEnvironmentMap(envMap: Texture): XRControllerModel {
     if (this.envMap == envMap) {
       return this
     }
 
     this.envMap = envMap
-    this.traverse((child) => {
-      if (child.isMesh) {
-        child.material.envMap = this.envMap
-        child.material.needsUpdate = true
-      }
-    })
+    applyEnvironmentMap(this.envMap, this)
 
     return this
   }
@@ -33,7 +41,7 @@ class XRControllerModel extends Object3D {
    * Polls data from the XRInputSource and updates the model's components to match
    * the real world data
    */
-  updateMatrixWorld(force) {
+  updateMatrixWorld(force: boolean): void {
     super.updateMatrixWorld(force)
 
     if (!this.motionController) return
@@ -52,9 +60,17 @@ class XRControllerModel extends Object3D {
         if (!valueNode) return
 
         // Calculate the new properties based on the weight supplied
-        if (valueNodeProperty === MotionControllerConstants.VisualResponseProperty.VISIBILITY) {
+        if (
+          valueNodeProperty === MotionControllerConstants.VisualResponseProperty.VISIBILITY &&
+          typeof value === 'boolean'
+        ) {
           valueNode.visible = value
-        } else if (valueNodeProperty === MotionControllerConstants.VisualResponseProperty.TRANSFORM) {
+        } else if (
+          valueNodeProperty === MotionControllerConstants.VisualResponseProperty.TRANSFORM &&
+          minNode &&
+          maxNode &&
+          typeof value === 'number'
+        ) {
           valueNode.quaternion.slerpQuaternions(minNode.quaternion, maxNode.quaternion, value)
 
           valueNode.position.lerpVectors(minNode.position, maxNode.position, value)
@@ -69,12 +85,12 @@ class XRControllerModel extends Object3D {
  * saves them to the motionContoller components for use in the frame loop. When
  * touchpads are found, attaches a touch dot to them.
  */
-function findNodes(motionController, scene) {
+function findNodes(motionController: MotionController, scene: Object3D): void {
   // Loop through the components and find the nodes needed for each components' visual responses
   Object.values(motionController.components).forEach((component) => {
     const { type, touchPointNodeName, visualResponses } = component
 
-    if (type === MotionControllerConstants.ComponentType.TOUCHPAD) {
+    if (type === MotionControllerConstants.ComponentType.TOUCHPAD && touchPointNodeName) {
       component.touchPointNode = scene.getObjectByName(touchPointNodeName)
       if (component.touchPointNode) {
         // Attach a touch dot to the touchpad.
@@ -92,7 +108,11 @@ function findNodes(motionController, scene) {
       const { valueNodeName, minNodeName, maxNodeName, valueNodeProperty } = visualResponse
 
       // If animating a transform, find the two nodes to be interpolated between.
-      if (valueNodeProperty === MotionControllerConstants.VisualResponseProperty.TRANSFORM) {
+      if (
+        valueNodeProperty === MotionControllerConstants.VisualResponseProperty.TRANSFORM &&
+        minNodeName &&
+        maxNodeName
+      ) {
         visualResponse.minNode = scene.getObjectByName(minNodeName)
         visualResponse.maxNode = scene.getObjectByName(maxNodeName)
 
@@ -117,18 +137,13 @@ function findNodes(motionController, scene) {
   })
 }
 
-function addAssetSceneToControllerModel(controllerModel, scene) {
+function addAssetSceneToControllerModel(controllerModel: XRControllerModel, scene: Object3D): void {
   // Find the nodes needed for animation and cache them on the motionController.
-  findNodes(controllerModel.motionController, scene)
+  findNodes(controllerModel.motionController!, scene)
 
   // Apply any environment map that the mesh already has set.
   if (controllerModel.envMap) {
-    scene.traverse((child) => {
-      if (child.isMesh) {
-        child.material.envMap = controllerModel.envMap
-        child.material.needsUpdate = true
-      }
-    })
+    applyEnvironmentMap(controllerModel.envMap, scene)
   }
 
   // Add the glTF scene to the controllerModel.
@@ -136,7 +151,10 @@ function addAssetSceneToControllerModel(controllerModel, scene) {
 }
 
 class XRControllerModelFactory {
-  constructor(gltfLoader = null) {
+  gltfLoader: GLTFLoader
+  path: string
+  private _assetCache: Record<string, { scene: Object3D } | undefined>
+  constructor(gltfLoader: GLTFLoader = null) {
     this.gltfLoader = gltfLoader
     this.path = DEFAULT_PROFILES_PATH
     this._assetCache = {}
@@ -147,9 +165,9 @@ class XRControllerModelFactory {
     }
   }
 
-  createControllerModel(controller) {
+  createControllerModel(controller: Group): XRControllerModel {
     const controllerModel = new XRControllerModel()
-    let scene = null
+    let scene: Object3D | null = null
 
     controller.addEventListener('connected', (event) => {
       const xrInputSource = event.data
@@ -158,9 +176,15 @@ class XRControllerModelFactory {
 
       fetchProfile(xrInputSource, this.path, DEFAULT_PROFILE)
         .then(({ profile, assetPath }) => {
+          if (!assetPath) {
+            throw new Error('no asset path')
+          }
+
           controllerModel.motionController = new MotionController(xrInputSource, profile, assetPath)
 
-          const cachedAsset = this._assetCache[controllerModel.motionController.assetUrl]
+          const assetUrl = controllerModel.motionController.assetUrl
+
+          const cachedAsset = this._assetCache[assetUrl]
           if (cachedAsset) {
             scene = cachedAsset.scene.clone()
 
@@ -173,8 +197,13 @@ class XRControllerModelFactory {
             this.gltfLoader.setPath('')
             this.gltfLoader.load(
               controllerModel.motionController.assetUrl,
-              (asset) => {
-                this._assetCache[controllerModel.motionController.assetUrl] = asset
+              (asset: { scene: Object3D }) => {
+                if (!controllerModel.motionController) {
+                  console.warn('motionController gone while gltf load, bailing...')
+                  return
+                }
+
+                this._assetCache[assetUrl] = asset
 
                 scene = asset.scene.clone()
 
@@ -182,7 +211,7 @@ class XRControllerModelFactory {
               },
               null,
               () => {
-                throw new Error(`Asset ${controllerModel.motionController.assetUrl} missing or malformed.`)
+                throw new Error(`Asset ${assetUrl} missing or malformed.`)
               },
             )
           }
@@ -194,7 +223,9 @@ class XRControllerModelFactory {
 
     controller.addEventListener('disconnected', () => {
       controllerModel.motionController = null
-      controllerModel.remove(scene)
+      if (scene) {
+        controllerModel.remove(scene)
+      }
       scene = null
     })
 

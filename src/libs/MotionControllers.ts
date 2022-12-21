@@ -2,6 +2,57 @@
  * @webxr-input-profiles/motion-controllers 1.0.0 https://github.com/immersive-web/webxr-input-profiles
  */
 
+import type { Object3D, XRGamepad, XRHandedness, XRInputSource } from 'three'
+
+interface GamepadIndices {
+  button: number
+  xAxis?: number
+  yAxis?: number
+}
+
+interface VisualResponseDescription {
+  componentProperty: string
+  states: string[]
+  valueNodeProperty: string
+  valueNodeName: string
+  minNodeName?: string
+  maxNodeName?: string
+}
+
+type VisualResponses = Record<string, VisualResponseDescription>
+
+interface ComponentDescription {
+  type: string
+  gamepadIndices: GamepadIndices
+  rootNodeName: string
+  visualResponses: VisualResponses
+  touchPointNodeName?: string
+}
+
+interface Components {
+  [componentKey: string]: ComponentDescription
+}
+
+interface LayoutDescription {
+  selectComponentId: string
+  components: Components
+  gamepadMapping: string
+  rootNodeName: string
+  assetPath: string
+}
+
+type Layouts = Partial<Record<XRHandedness, LayoutDescription>>
+
+export interface Profile {
+  profileId: string
+  fallbackProfileIds: string[]
+  layouts: Layouts
+}
+
+interface ProfilesList {
+  [profileId: string]: { path: string; deprecated?: boolean } | undefined
+}
+
 const MotionControllerConstants = {
   Handedness: Object.freeze({
     NONE: 'none',
@@ -44,7 +95,7 @@ const MotionControllerConstants = {
  * @description Static helper function to fetch a JSON file and turn it into a JS object
  * @param {string} path - Path to JSON file to be fetched
  */
-async function fetchJsonFile(path) {
+async function fetchJsonFile<T>(path: string): Promise<T> {
   const response = await fetch(path)
   if (!response.ok) {
     throw new Error(response.statusText)
@@ -53,17 +104,22 @@ async function fetchJsonFile(path) {
   }
 }
 
-async function fetchProfilesList(basePath) {
+async function fetchProfilesList(basePath: string): Promise<ProfilesList> {
   if (!basePath) {
     throw new Error('No basePath supplied')
   }
 
   const profileListFileName = 'profilesList.json'
-  const profilesList = await fetchJsonFile(`${basePath}/${profileListFileName}`)
+  const profilesList = await fetchJsonFile<ProfilesList>(`${basePath}/${profileListFileName}`)
   return profilesList
 }
 
-async function fetchProfile(xrInputSource, basePath, defaultProfile = null, getAssetPath = true) {
+async function fetchProfile(
+  xrInputSource: XRInputSource,
+  basePath: string,
+  defaultProfile: string | null = null,
+  getAssetPath = true,
+): Promise<{ profile: Profile; assetPath: string | undefined }> {
   if (!xrInputSource) {
     throw new Error('No xrInputSource supplied')
   }
@@ -76,7 +132,7 @@ async function fetchProfile(xrInputSource, basePath, defaultProfile = null, getA
   const supportedProfilesList = await fetchProfilesList(basePath)
 
   // Find the relative path to the first requested profile that is recognized
-  let match
+  let match: { profileId: string; profilePath: string; deprecated: boolean } | undefined = undefined
   xrInputSource.profiles.some((profileId) => {
     const supportedProfile = supportedProfilesList[profileId]
     if (supportedProfile) {
@@ -106,13 +162,13 @@ async function fetchProfile(xrInputSource, basePath, defaultProfile = null, getA
     }
   }
 
-  const profile = await fetchJsonFile(match.profilePath)
+  const profile = await fetchJsonFile<Profile>(match.profilePath)
 
-  let assetPath
+  let assetPath: string | undefined = undefined
   if (getAssetPath) {
     let layout
-    if (xrInputSource.handedness === 'any') {
-      layout = profile.layouts[Object.keys(profile.layouts)[0]]
+    if ((xrInputSource.handedness as string) === 'any') {
+      layout = profile.layouts[Object.keys(profile.layouts)[0] as XRHandedness]
     } else {
       layout = profile.layouts[xrInputSource.handedness]
     }
@@ -141,10 +197,13 @@ const defaultComponentValues = {
  * API) to the range 0 to 1 (for interpolation). Also caps the X, Y values to be bounded within
  * a circle. This ensures that thumbsticks are not animated outside the bounds of their physical
  * range of motion and touchpads do not report touch locations off their physical bounds.
- * @param {number} x The original x coordinate in the range -1 to 1
- * @param {number} y The original y coordinate in the range -1 to 1
+ * @param {number | undefined} x The original x coordinate in the range -1 to 1
+ * @param {number | undefined} y The original y coordinate in the range -1 to 1
  */
-function normalizeAxes(x = 0, y = 0) {
+function normalizeAxes(
+  x: number | undefined = 0,
+  y: number | undefined = 0,
+): { normalizedXAxis: number; normalizedYAxis: number } {
   let xAxis = x
   let yAxis = y
 
@@ -174,8 +233,18 @@ function normalizeAxes(x = 0, y = 0) {
  * to the named input changing, this object computes the appropriate weighting to use for
  * interpolating between the range of motion nodes.
  */
-class VisualResponse {
-  constructor(visualResponseDescription) {
+class VisualResponse implements VisualResponseDescription {
+  value: number | boolean
+  componentProperty: string
+  states: string[]
+  valueNodeName: string
+  valueNodeProperty: string
+  minNodeName?: string
+  maxNodeName?: string
+  valueNode: Object3D | undefined
+  minNode: Object3D | undefined
+  maxNode: Object3D | undefined
+  constructor(visualResponseDescription: VisualResponseDescription) {
     this.componentProperty = visualResponseDescription.componentProperty
     this.states = visualResponseDescription.states
     this.valueNodeName = visualResponseDescription.valueNodeName
@@ -194,12 +263,22 @@ class VisualResponse {
   /**
    * Computes the visual response's interpolation weight based on component state
    * @param {Object} componentValues - The component from which to update
-   * @param {number} xAxis - The reported X axis value of the component
-   * @param {number} yAxis - The reported Y axis value of the component
-   * @param {number} button - The reported value of the component's button
+   * @param {number | undefined} xAxis - The reported X axis value of the component
+   * @param {number | undefined} yAxis - The reported Y axis value of the component
+   * @param {number | undefined} button - The reported value of the component's button
    * @param {string} state - The component's active state
    */
-  updateFromComponent({ xAxis, yAxis, button, state }) {
+  updateFromComponent({
+    xAxis,
+    yAxis,
+    button,
+    state,
+  }: {
+    xAxis?: number
+    yAxis?: number
+    button?: number
+    state: string
+  }): void {
     const { normalizedXAxis, normalizedYAxis } = normalizeAxes(xAxis, yAxis)
     switch (this.componentProperty) {
       case MotionControllerConstants.ComponentProperty.X_AXIS:
@@ -209,7 +288,7 @@ class VisualResponse {
         this.value = this.states.includes(state) ? normalizedYAxis : 0.5
         break
       case MotionControllerConstants.ComponentProperty.BUTTON:
-        this.value = this.states.includes(state) ? button : 0
+        this.value = this.states.includes(state) && button ? button : 0
         break
       case MotionControllerConstants.ComponentProperty.STATE:
         if (this.valueNodeProperty === MotionControllerConstants.VisualResponseProperty.VISIBILITY) {
@@ -224,12 +303,27 @@ class VisualResponse {
   }
 }
 
-class Component {
+class Component implements ComponentDescription {
+  id: string
+  values: {
+    state: string
+    button: number | undefined
+    xAxis: number | undefined
+    yAxis: number | undefined
+  }
+
+  type: string
+  gamepadIndices: GamepadIndices
+  rootNodeName: string
+  visualResponses: Record<string, VisualResponse>
+  touchPointNodeName?: string | undefined
+  touchPointNode?: Object3D
+
   /**
-   * @param {Object} componentId - Id of the component
-   * @param {Object} componentDescription - Description of the component to be created
+   * @param {string} componentId - Id of the component
+   * @param {InputProfileComponent} componentDescription - Description of the component to be created
    */
-  constructor(componentId, componentDescription) {
+  constructor(componentId: string, componentDescription: ComponentDescription) {
     if (
       !componentId ||
       !componentDescription ||
@@ -263,7 +357,7 @@ class Component {
     }
   }
 
-  get data() {
+  get data(): { id: Component['id'] } & Component['values'] {
     const data = { id: this.id, ...this.values }
     return data
   }
@@ -272,7 +366,7 @@ class Component {
    * @description Poll for updated data based on current gamepad state
    * @param {Object} gamepad - The gamepad object from which the component data should be polled
    */
-  updateFromGamepad(gamepad) {
+  updateFromGamepad(gamepad: XRGamepad): void {
     // Set the state to default before processing other data sources
     this.values.state = MotionControllerConstants.ComponentState.DEFAULT
 
@@ -327,19 +421,23 @@ class Component {
     })
   }
 }
-
 /**
  * @description Builds a motion controller with components and visual responses based on the
  * supplied profile description. Data is polled from the xrInputSource's gamepad.
  * @author Nell Waliczek / https://github.com/NellWaliczek
  */
 class MotionController {
+  xrInputSource: XRInputSource
+  assetUrl: string
+  layoutDescription: LayoutDescription
+  id: string
+  components: Record<string, Component>
   /**
-   * @param {Object} xrInputSource - The XRInputSource to build the MotionController around
-   * @param {Object} profile - The best matched profile description for the supplied xrInputSource
-   * @param {Object} assetUrl
+   * @param {XRInputSource} xrInputSource - The XRInputSource to build the MotionController around
+   * @param {Profile} profile - The best matched profile description for the supplied xrInputSource
+   * @param {string} assetUrl
    */
-  constructor(xrInputSource, profile, assetUrl) {
+  constructor(xrInputSource: XRInputSource, profile: Profile, assetUrl: string) {
     if (!xrInputSource) {
       throw new Error('No xrInputSource supplied')
     }
@@ -348,12 +446,17 @@ class MotionController {
       throw new Error('No profile supplied')
     }
 
+    if (!profile.layouts[xrInputSource.handedness]) {
+      throw new Error('No layout for ' + xrInputSource.handedness + ' handedness')
+    }
+
     this.xrInputSource = xrInputSource
     this.assetUrl = assetUrl
     this.id = profile.profileId
 
     // Build child components as described in the profile description
-    this.layoutDescription = profile.layouts[xrInputSource.handedness]
+    this.layoutDescription = profile.layouts[xrInputSource.handedness]!
+
     this.components = {}
     Object.keys(this.layoutDescription.components).forEach((componentId) => {
       const componentDescription = this.layoutDescription.components[componentId]
@@ -364,19 +467,19 @@ class MotionController {
     this.updateFromGamepad()
   }
 
-  get gripSpace() {
+  get gripSpace(): XRInputSource['gripSpace'] {
     return this.xrInputSource.gripSpace
   }
 
-  get targetRaySpace() {
+  get targetRaySpace(): XRInputSource['targetRaySpace'] {
     return this.xrInputSource.targetRaySpace
   }
 
   /**
    * @description Returns a subset of component data for simplified debugging
    */
-  get data() {
-    const data = []
+  get data(): Array<Component['data']> {
+    const data: Array<Component['data']> = []
     Object.values(this.components).forEach((component) => {
       data.push(component.data)
     })
@@ -386,7 +489,7 @@ class MotionController {
   /**
    * @description Poll for updated data based on current gamepad state
    */
-  updateFromGamepad() {
+  updateFromGamepad(): void {
     Object.values(this.components).forEach((component) => {
       component.updateFromGamepad(this.xrInputSource.gamepad)
     })
