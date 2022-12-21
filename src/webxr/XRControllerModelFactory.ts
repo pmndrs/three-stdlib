@@ -169,7 +169,7 @@ class XRControllerModelFactory {
     const controllerModel = new XRControllerModel()
     let scene: Object3D | null = null
 
-    controller.addEventListener('connected', (event) => {
+    const onConnected = (event: any): void => {
       const xrInputSource = event.data
 
       if (xrInputSource.targetRayMode !== 'tracked-pointer' || !xrInputSource.gamepad) return
@@ -219,15 +219,21 @@ class XRControllerModelFactory {
         .catch((err) => {
           console.warn(err)
         })
-    })
+    }
 
-    controller.addEventListener('disconnected', () => {
+    controller.addEventListener('connected', onConnected)
+
+    const onDisconnected = (): void => {
+      controller.removeEventListener('connected', onConnected)
+      controller.removeEventListener('disconnected', onDisconnected)
       controllerModel.motionController = null
       if (scene) {
         controllerModel.remove(scene)
       }
       scene = null
-    })
+    }
+
+    controller.addEventListener('disconnected', onDisconnected)
 
     return controllerModel
   }
