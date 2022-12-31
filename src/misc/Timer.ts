@@ -51,7 +51,7 @@ class Timer {
     return this._delta / 1000
   }
 
-  getElapsed(): number {
+  getElapsedTime(): number {
     return this._elapsed / 1000
   }
 
@@ -89,6 +89,11 @@ class Timer {
     this._delta *= this._timescale
     this._elapsed += this._delta // _elapsed is the accumulation of all previous deltas
     return this
+  }
+
+  // For THREE.Clock backward compatibility
+  get elapsedTime(): number {
+    return this.getElapsedTime()
   }
 
   // private
