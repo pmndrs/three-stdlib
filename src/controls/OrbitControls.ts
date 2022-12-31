@@ -67,13 +67,20 @@ class OrbitControls extends EventDispatcher {
   // The four arrow keys
   keys = { LEFT: 'ArrowLeft', UP: 'ArrowUp', RIGHT: 'ArrowRight', BOTTOM: 'ArrowDown' }
   // Mouse buttons
-  mouseButtons = {
+  mouseButtons: Partial<{
+    LEFT: MOUSE
+    MIDDLE: MOUSE
+    RIGHT: MOUSE
+  }> = {
     LEFT: MOUSE.ROTATE,
     MIDDLE: MOUSE.DOLLY,
     RIGHT: MOUSE.PAN,
   }
   // Touch fingers
-  touches = { ONE: TOUCH.ROTATE, TWO: TOUCH.DOLLY_PAN }
+  touches: Partial<{
+    ONE: TOUCH
+    TWO: TOUCH
+  }> = { ONE: TOUCH.ROTATE, TWO: TOUCH.DOLLY_PAN }
   target0: Vector3
   position0: Vector3
   zoom0: number
