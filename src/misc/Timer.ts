@@ -16,13 +16,13 @@ class Timer {
     this._elapsed = 0
     this._timescale = 1
     this._useFixedDelta = false
-    this._fixedDelta = 16.67 // ms, corresponds to approx. 60 FPS    
+    this._fixedDelta = 16.67 // ms, corresponds to approx. 60 FPS
     this._usePageVisibilityAPI = typeof document !== 'undefined' && document.hidden !== undefined
   }
 
   // https://github.com/mrdoob/three.js/issues/20575
   // use Page Visibility API to avoid large time delta values
-  connect(): this {    
+  connect(): this {
     if (this._usePageVisibilityAPI) {
       this._pageVisibilityHandler = handleVisibilityChange.bind(this)
       document.addEventListener('visibilitychange', this._pageVisibilityHandler, false)
