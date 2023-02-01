@@ -846,7 +846,7 @@ export function computeMorphedAttributes(object: Mesh | Line | Points): Computed
 
 // Creates a new, non-indexed geometry with smooth normals everywhere except faces that meet at
 // an angle greater than the crease angle.
-export function toCreasedNormals(geometry: BufferGeometry, creaseAngle = Math.PI / 3 /* 60 degrees */) {
+export function toCreasedNormals(geometry: BufferGeometry, creaseAngle = Math.PI / 3 /* 60 degrees */): BufferGeometry {
   const creaseDot = Math.cos(creaseAngle)
   const hashMultiplier = (1 + 1e-10) * 1e2
 
@@ -858,7 +858,7 @@ export function toCreasedNormals(geometry: BufferGeometry, creaseAngle = Math.PI
   const tempNorm2 = new Vector3()
 
   // hashes a vector
-  function hashVertex(v: Vector3) {
+  function hashVertex(v: Vector3): string {
     const x = ~~(v.x * hashMultiplier)
     const y = ~~(v.y * hashMultiplier)
     const z = ~~(v.z * hashMultiplier)
