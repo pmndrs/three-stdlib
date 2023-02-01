@@ -29,8 +29,12 @@ export class TextGeometry extends ExtrudeGeometry {
       ...rest
     } = parameters
 
-    const shapes = font.generateShapes(text, size, { lineHeight, letterSpacing })
-    super(shapes, { ...rest, bevelEnabled, bevelSize, bevelThickness, depth: height })
+    if (font === undefined) {
+      super() // generate default extrude geometry
+    } else {
+      const shapes = font.generateShapes(text, size, { lineHeight, letterSpacing })
+      super(shapes, { ...rest, bevelEnabled, bevelSize, bevelThickness, depth: height })
+    }
     this.type = 'TextGeometry'
   }
 }
