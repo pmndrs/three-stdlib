@@ -16,7 +16,7 @@ export type TextGeometryParameters = {
 }
 
 export class TextGeometry extends ExtrudeGeometry {
-  constructor(text: string, parameters: TextGeometryParameters) {
+  constructor(text: string, parameters: TextGeometryParameters = {} as TextGeometryParameters) {
     const {
       bevelEnabled = false,
       bevelSize = 8,
