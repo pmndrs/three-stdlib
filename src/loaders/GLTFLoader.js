@@ -2530,8 +2530,8 @@ class GLTFParser {
     const parser = this
 
     return this.getDependency('texture', mapDef.index).then(function (texture) {
-      if (!texture) return null;
-      
+      if (!texture) return null
+
       // Materials sample aoMap from UV set 1 and other maps from UV set 0 - this can't be configured
       // However, we will copy UV set 0 to UV set 1 on demand for aoMap
       if (mapDef.texCoord !== undefined && mapDef.texCoord != 0 && !(mapName === 'aoMap' && mapDef.texCoord == 1)) {
