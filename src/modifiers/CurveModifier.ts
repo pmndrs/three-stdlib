@@ -273,6 +273,7 @@ export class InstancedFlow<
   constructor(count: number, curveCount: number, geometry: TGeometry, material: TMaterial) {
     const mesh = new InstancedMesh(geometry, material, count)
     mesh.instanceMatrix.setUsage(DynamicDrawUsage)
+    mesh.frustumCulled = false
     super(mesh, curveCount)
 
     this.offsets = new Array(count).fill(0)
