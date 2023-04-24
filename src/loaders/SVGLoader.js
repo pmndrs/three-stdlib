@@ -114,6 +114,10 @@ class SVGLoader extends Loader {
           traverseChildNodes = false
           break
 
+        case 'mask':
+          traverseChildNodes = false
+          break
+
         case 'use':
           style = parseStyle(node, style)
           const usedNodeId = node.href.baseVal.substring(1)
