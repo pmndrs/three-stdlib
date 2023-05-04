@@ -61,6 +61,7 @@ import {
   Vector3,
   VectorKeyframeTrack,
   sRGBEncoding,
+  REVISION,
 } from 'three'
 import { toTrianglesDrawMode } from '../utils/BufferGeometryUtils'
 
@@ -1587,8 +1588,21 @@ const ATTRIBUTES = {
   POSITION: 'position',
   NORMAL: 'normal',
   TANGENT: 'tangent',
-  TEXCOORD_0: 'uv',
-  TEXCOORD_1: 'uv2',
+  // uv => uv1, 4 uv channels
+  // https://github.com/mrdoob/three.js/pull/25943
+  // https://github.com/mrdoob/three.js/pull/25788
+  ...(REVISION.replace(/\D+/g, '') >= 152
+    ? {
+        TEXCOORD_0: 'uv',
+        TEXCOORD_1: 'uv1',
+        TEXCOORD_2: 'uv2',
+        TEXCOORD_3: 'uv3',
+      }
+    : {
+        TEXCOORD_0: 'uv',
+        TEXCOORD_1: 'uv2',
+      }),
+
   COLOR_0: 'color',
   WEIGHTS_0: 'skinWeight',
   JOINTS_0: 'skinIndex',
