@@ -39,7 +39,6 @@ import {
   Vector3,
   Vector4,
   VectorKeyframeTrack,
-  sRGBEncoding,
 } from 'three'
 import { unzlibSync } from 'fflate'
 import { NURBSCurve } from '../curves/NURBSCurve'
@@ -502,7 +501,8 @@ class FBXTreeParser {
         case 'Maya|TEX_color_map':
           parameters.map = scope.getTexture(textureMap, child.ID)
           if (parameters.map !== undefined) {
-            parameters.map.encoding = sRGBEncoding
+            if ('colorSpace' in parameters.map) parameters.map.colorSpace = 'srgb'
+            else parameters.map.encoding = 3001 // sRGBEncoding
           }
 
           break
@@ -514,7 +514,8 @@ class FBXTreeParser {
         case 'EmissiveColor':
           parameters.emissiveMap = scope.getTexture(textureMap, child.ID)
           if (parameters.emissiveMap !== undefined) {
-            parameters.emissiveMap.encoding = sRGBEncoding
+            if ('colorSpace' in parameters.emissiveMap) parameters.emissiveMap.colorSpace = 'srgb'
+            else parameters.emissiveMap.encoding = 3001 // sRGBEncoding
           }
 
           break
@@ -528,7 +529,9 @@ class FBXTreeParser {
           parameters.envMap = scope.getTexture(textureMap, child.ID)
           if (parameters.envMap !== undefined) {
             parameters.envMap.mapping = EquirectangularReflectionMapping
-            parameters.envMap.encoding = sRGBEncoding
+
+            if ('colorSpace' in parameters.envMap) parameters.envMap.colorSpace = 'srgb'
+            else parameters.envMap.encoding = 3001 // sRGBEncoding
           }
 
           break
@@ -536,7 +539,8 @@ class FBXTreeParser {
         case 'SpecularColor':
           parameters.specularMap = scope.getTexture(textureMap, child.ID)
           if (parameters.specularMap !== undefined) {
-            parameters.specularMap.encoding = sRGBEncoding
+            if ('colorSpace' in parameters.specularMap) parameters.specularMap.colorSpace = 'srgb'
+            else parameters.specularMap.encoding = 3001 // sRGBEncoding
           }
 
           break

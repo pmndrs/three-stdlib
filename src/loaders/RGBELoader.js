@@ -1,4 +1,4 @@
-import { DataTextureLoader, DataUtils, FloatType, HalfFloatType, LinearEncoding, LinearFilter } from 'three'
+import { DataTextureLoader, DataUtils, FloatType, HalfFloatType, LinearFilter } from 'three'
 
 // https://github.com/mrdoob/three.js/issues/5552
 // http://en.wikipedia.org/wiki/RGBE_image_format
@@ -355,7 +355,8 @@ class RGBELoader extends DataTextureLoader {
       switch (texture.type) {
         case FloatType:
         case HalfFloatType:
-          texture.encoding = LinearEncoding
+          if ('colorSpace' in texture) texture.colorSpace = 'srgb-linear'
+          else texture.encoding = 3000 // LinearEncoding
           texture.minFilter = LinearFilter
           texture.magFilter = LinearFilter
           texture.generateMipmaps = false

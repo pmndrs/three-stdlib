@@ -1,7 +1,6 @@
 import {
   Clock,
   Color,
-  LinearEncoding,
   Matrix4,
   Mesh,
   RepeatWrapping,
@@ -39,7 +38,7 @@ class Water2 extends Mesh {
     const reflectivity = options.reflectivity || 0.02
     const scale = options.scale || 1
     const shader = options.shader || Water2.WaterShader
-    const encoding = options.encoding !== undefined ? options.encoding : LinearEncoding
+    const encoding = options.encoding !== undefined ? options.encoding : 3000
 
     const textureLoader = new TextureLoader()
 

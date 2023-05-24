@@ -18,7 +18,6 @@ import {
   NearestFilter,
   RepeatWrapping,
   TextureLoader,
-  sRGBEncoding,
 } from 'three'
 import { unzipSync } from 'fflate'
 
@@ -641,7 +640,8 @@ class ThreeMFLoader extends Loader {
           URL.revokeObjectURL(sourceURI)
         })
 
-        texture.encoding = sRGBEncoding
+        if ('colorSpace' in texture) texture.colorSpace = 'srgb'
+        else texture.encoding = 3001 // sRGBEncoding
 
         // texture parameters
 

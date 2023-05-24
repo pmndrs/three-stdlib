@@ -1,4 +1,4 @@
-import { Box3, MathUtils, MeshLambertMaterial, Object3D, TextureLoader, UVMapping, sRGBEncoding } from 'three'
+import { Box3, MathUtils, MeshLambertMaterial, Object3D, TextureLoader, UVMapping } from 'three'
 import { MD2Loader } from '../loaders/MD2Loader'
 import { MorphBlendMesh } from '../misc/MorphBlendMesh'
 
@@ -421,7 +421,8 @@ var MD2CharacterComplex = function () {
       textures[i] = textureLoader.load(baseUrl + textureUrls[i], checkLoadingComplete)
       textures[i].mapping = UVMapping
       textures[i].name = textureUrls[i]
-      textures[i].encoding = sRGBEncoding
+      if ('colorSpace' in textures[i]) textures[i].colorSpace = 'srgb'
+      else textures[i].encoding = 3001 // sRGBEncoding
     }
 
     return textures

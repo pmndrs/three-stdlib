@@ -6,7 +6,7 @@ import NodeCode from './NodeCode.js'
 import NodeKeywords from './NodeKeywords.js'
 import { NodeUpdateType } from './constants.js'
 
-import { REVISION, LinearEncoding } from 'three'
+import { REVISION } from 'three'
 
 export const shaderStages = ['fragment', 'vertex']
 export const vector = ['x', 'y', 'z', 'w']
@@ -210,11 +210,13 @@ class NodeBuilder {
     let encoding
 
     if (map && map.isTexture) {
-      encoding = map.encoding
+      if ('colorSpace' in map) encoding = map.colorSpace === 'srgb' ? 3001 : 3000
+      else encoding = map.encoding
     } else if (map && map.isWebGLRenderTarget) {
-      encoding = map.texture.encoding
+      if ('colorSpace' in map.texture) encoding = map.texture.colorSpace === 'srgb' ? 3001 : 3000
+      else encoding = map.texture.encoding
     } else {
-      encoding = LinearEncoding
+      encoding = 3000 // LinearEncoding
     }
 
     return encoding

@@ -1,4 +1,4 @@
-import { CanvasTexture, LinearFilter, Mesh, MeshBasicMaterial, PlaneGeometry, sRGBEncoding, Color } from 'three'
+import { CanvasTexture, LinearFilter, Mesh, MeshBasicMaterial, PlaneGeometry, Color } from 'three'
 
 class HTMLMesh extends Mesh {
   constructor(dom) {
@@ -41,7 +41,8 @@ class HTMLTexture extends CanvasTexture {
     this.dom = dom
 
     this.anisotropy = 16
-    this.encoding = sRGBEncoding
+    if ('colorSpace' in this) this.colorSpace = 'srgb'
+    else this.encoding = 3001 // sRGBEncoding
     this.minFilter = LinearFilter
     this.magFilter = LinearFilter
 

@@ -17,7 +17,6 @@ import {
   UnsignedByteType,
   FloatType,
   HalfFloatType,
-  sRGBEncoding,
 } from 'three'
 import WebGPUTextureUtils from './WebGPUTextureUtils'
 
@@ -474,27 +473,27 @@ class WebGPUTextures {
   _getFormat(texture) {
     const format = texture.format
     const type = texture.type
-    const encoding = texture.encoding
+    const isSRGB = 'colorSpace' in texture ? texture.colorSpace === 'srgb' : texture.encoding === 3001
 
     let formatGPU
 
     switch (format) {
       case RGBA_S3TC_DXT1_Format:
-        formatGPU = encoding === sRGBEncoding ? GPUTextureFormat.BC1RGBAUnormSRGB : GPUTextureFormat.BC1RGBAUnorm
+        formatGPU = isSRGB ? GPUTextureFormat.BC1RGBAUnormSRGB : GPUTextureFormat.BC1RGBAUnorm
         break
 
       case RGBA_S3TC_DXT3_Format:
-        formatGPU = encoding === sRGBEncoding ? GPUTextureFormat.BC2RGBAUnormSRGB : GPUTextureFormat.BC2RGBAUnorm
+        formatGPU = isSRGB ? GPUTextureFormat.BC2RGBAUnormSRGB : GPUTextureFormat.BC2RGBAUnorm
         break
 
       case RGBA_S3TC_DXT5_Format:
-        formatGPU = encoding === sRGBEncoding ? GPUTextureFormat.BC3RGBAUnormSRGB : GPUTextureFormat.BC3RGBAUnorm
+        formatGPU = isSRGB ? GPUTextureFormat.BC3RGBAUnormSRGB : GPUTextureFormat.BC3RGBAUnorm
         break
 
       case RGBAFormat:
         switch (type) {
           case UnsignedByteType:
-            formatGPU = encoding === sRGBEncoding ? GPUTextureFormat.RGBA8UnormSRGB : GPUTextureFormat.RGBA8Unorm
+            formatGPU = isSRGB ? GPUTextureFormat.RGBA8UnormSRGB : GPUTextureFormat.RGBA8Unorm
             break
 
           case HalfFloatType:
