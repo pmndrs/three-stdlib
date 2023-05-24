@@ -54,7 +54,7 @@ var LightProbeGenerator = {
             color.convertSRGBToLinear()
           }
         } else if (cubeTexture.encoding === 3001) { // sRGBEncoding
-color.convertSRGBToLinear()
+          color.convertSRGBToLinear()
         }
 
         // pixel coordinate on unit cube
@@ -163,7 +163,7 @@ color.convertSRGBToLinear()
             color.convertSRGBToLinear()
           }
         } else if (cubeRenderTarget.texture.encoding === 3001) { // sRGBEncoding
-color.convertSRGBToLinear()
+          color.convertSRGBToLinear()
         }
 
         // pixel coordinate on unit cube
