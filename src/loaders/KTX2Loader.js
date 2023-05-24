@@ -13,6 +13,7 @@
 
 import {
   CompressedTexture,
+  ClampToEdgeWrapping,
   Data3DTexture,
   DataTexture,
   FileLoader,
