@@ -1,12 +1,4 @@
-import {
-  AnimationMixer,
-  Box3,
-  Mesh,
-  MeshLambertMaterial,
-  Object3D,
-  TextureLoader,
-  UVMapping,
-} from 'three'
+import { AnimationMixer, Box3, Mesh, MeshLambertMaterial, Object3D, TextureLoader, UVMapping } from 'three'
 import { MD2Loader } from '../loaders/MD2Loader'
 
 var MD2Character = function () {

@@ -53,7 +53,8 @@ var LightProbeGenerator = {
           if (cubeTexture.colorSpace === 'srgb') {
             color.convertSRGBToLinear()
           }
-        } else if (cubeTexture.encoding === 3001) { // sRGBEncoding
+        } else if (cubeTexture.encoding === 3001) {
+          // sRGBEncoding
           color.convertSRGBToLinear()
         }
 
@@ -162,7 +163,8 @@ var LightProbeGenerator = {
           if (cubeRenderTarget.texture.colorSpace === 'srgb') {
             color.convertSRGBToLinear()
           }
-        } else if (cubeRenderTarget.texture.encoding === 3001) { // sRGBEncoding
+        } else if (cubeRenderTarget.texture.encoding === 3001) {
+          // sRGBEncoding
           color.convertSRGBToLinear()
         }
 

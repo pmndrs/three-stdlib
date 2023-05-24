@@ -1,12 +1,4 @@
-import {
-  CubeTexture,
-  DataTexture,
-  FileLoader,
-  FloatType,
-  HalfFloatType,
-  LinearFilter,
-  Loader,
-} from 'three'
+import { CubeTexture, DataTexture, FileLoader, FloatType, HalfFloatType, LinearFilter, Loader } from 'three'
 import { RGBELoader } from '../loaders/RGBELoader.js'
 
 class HDRCubeTextureLoader extends Loader {

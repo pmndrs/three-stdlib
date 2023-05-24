@@ -1,12 +1,4 @@
-import {
-  DataTextureLoader,
-  DataUtils,
-  FloatType,
-  HalfFloatType,
-  LinearFilter,
-  RedFormat,
-  RGBAFormat,
-} from 'three'
+import { DataTextureLoader, DataUtils, FloatType, HalfFloatType, LinearFilter, RedFormat, RGBAFormat } from 'three'
 import { unzlibSync } from 'fflate'
 
 /**
@@ -1870,7 +1862,7 @@ class EXRLoader extends DataTextureLoader {
 
   load(url, onLoad, onProgress, onError) {
     function onLoadCallback(texture, texData) {
-      if ('colorSpace' in texture)  texture.colorSpace = texData.encoding === 3001 ? 'srgb' : 'srgb-linear'
+      if ('colorSpace' in texture) texture.colorSpace = texData.encoding === 3001 ? 'srgb' : 'srgb-linear'
       else texture.encoding = texData.encoding
       texture.minFilter = LinearFilter
       texture.magFilter = LinearFilter
