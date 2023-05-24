@@ -13,6 +13,7 @@
 
 import {
   CompressedTexture,
+  ClampToEdgeWrapping,
   Data3DTexture,
   DataTexture,
   FileLoader,
@@ -59,6 +60,16 @@ import {
   VK_FORMAT_R8G8B8A8_UNORM,
 } from 'ktx-parse'
 import { ZSTDDecoder } from 'zstddec'
+
+// https://github.com/mrdoob/three.js/pull/24745
+class CompressedArrayTexture extends CompressedTexture {
+  constructor(mipmaps, width, height, depth, format, type) {
+    super(mipmaps, width, height, format, type)
+    this.isCompressedArrayTexture = true
+    this.image.depth = depth
+    this.wrapR = ClampToEdgeWrapping
+  }
+}
 
 const _taskCache = new WeakMap()
 
@@ -205,12 +216,16 @@ class KTX2Loader extends Loader {
     )
   }
 
-  _createTextureFrom(transcodeResult) {
+  _createTextureFrom(transcodeResult, container) {
     const { mipmaps, width, height, format, type, error, dfdTransferFn, dfdFlags } = transcodeResult
 
     if (type === 'error') return Promise.reject(error)
 
-    const texture = new CompressedTexture(mipmaps, width, height, format, UnsignedByteType)
+    const texture =
+      container.layerCount > 1
+        ? new CompressedArrayTexture(mipmaps, width, height, container.layerCount, format, UnsignedByteType)
+        : new CompressedTexture(mipmaps, width, height, format, UnsignedByteType)
+
     texture.minFilter = mipmaps.length === 1 ? LinearFilter : LinearMipmapLinearFilter
     texture.magFilter = LinearFilter
     texture.generateMipmaps = false
@@ -224,9 +239,9 @@ class KTX2Loader extends Loader {
   /**
    * @param {ArrayBuffer} buffer
    * @param {object?} config
-   * @return {Promise<CompressedTexture|DataTexture|Data3DTexture>}
+   * @return {Promise<CompressedTexture|CompressedArrayTexture|DataTexture|Data3DTexture>}
    */
-  _createTexture(buffer, config = {}) {
+  async _createTexture(buffer, config = {}) {
     const container = read(new Uint8Array(buffer))
 
     if (container.vkFormat !== VK_FORMAT_UNDEFINED) {
@@ -240,7 +255,7 @@ class KTX2Loader extends Loader {
       .then(() => {
         return this.workerPool.postMessage({ type: 'transcode', buffer, taskConfig: taskConfig }, [buffer])
       })
-      .then((e) => this._createTextureFrom(e.data))
+      .then((e) => this._createTextureFrom(e.data, container))
 
     // Cache the task result.
     _taskCache.set(buffer, { promise: texturePending })
@@ -372,6 +387,7 @@ KTX2Loader.BasisWorker = function () {
     const basisFormat = ktx2File.isUASTC() ? BasisFormat.UASTC_4x4 : BasisFormat.ETC1S
     const width = ktx2File.getWidth()
     const height = ktx2File.getHeight()
+    const layers = ktx2File.getLayers() || 1
     const levels = ktx2File.getLevels()
     const hasAlpha = ktx2File.getHasAlpha()
     const dfdTransferFn = ktx2File.getDFDTransferFunc()
@@ -392,19 +408,26 @@ KTX2Loader.BasisWorker = function () {
     const mipmaps = []
 
     for (let mip = 0; mip < levels; mip++) {
-      const levelInfo = ktx2File.getImageLevelInfo(mip, 0, 0)
-      const mipWidth = levelInfo.origWidth
-      const mipHeight = levelInfo.origHeight
-      const dst = new Uint8Array(ktx2File.getImageTranscodedSizeInBytes(mip, 0, 0, transcoderFormat))
+      const layerMips = []
 
-      const status = ktx2File.transcodeImage(dst, mip, 0, 0, transcoderFormat, 0, -1, -1)
+      let mipWidth, mipHeight
 
-      if (!status) {
-        cleanup()
-        throw new Error('THREE.KTX2Loader: .transcodeImage failed.')
+      for (let layer = 0; layer < layers; layer++) {
+        const levelInfo = ktx2File.getImageLevelInfo(mip, layer, 0)
+        mipWidth = levelInfo.origWidth < 4 ? levelInfo.origWidth : levelInfo.width
+        mipHeight = levelInfo.origHeight < 4 ? levelInfo.origHeight : levelInfo.height
+        const dst = new Uint8Array(ktx2File.getImageTranscodedSizeInBytes(mip, layer, 0, transcoderFormat))
+        const status = ktx2File.transcodeImage(dst, mip, layer, 0, transcoderFormat, 0, -1, -1)
+
+        if (!status) {
+          cleanup()
+          throw new Error('THREE.KTX2Loader: .transcodeImage failed.')
+        }
+
+        layerMips.push(dst)
       }
 
-      mipmaps.push({ data: dst, width: mipWidth, height: mipHeight })
+      mipmaps.push({ data: concat(layerMips), width: mipWidth, height: mipHeight })
     }
 
     cleanup()
@@ -517,6 +540,29 @@ KTX2Loader.BasisWorker = function () {
     if (value <= 2) return true
 
     return (value & (value - 1)) === 0 && value !== 0
+  }
+
+  /** Concatenates N byte arrays. */
+  function concat(arrays) {
+    let totalByteLength = 0
+
+    for (let i = 0; i < arrays.length; i++) {
+      const array = arrays[i]
+      totalByteLength += array.byteLength
+    }
+
+    const result = new Uint8Array(totalByteLength)
+
+    let byteOffset = 0
+
+    for (let i = 0; i < arrays.length; i++) {
+      const array = arrays[i]
+      result.set(array, byteOffset)
+
+      byteOffset += array.byteLength
+    }
+
+    return result
   }
 }
 
