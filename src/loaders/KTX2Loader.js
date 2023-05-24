@@ -19,7 +19,6 @@ import {
   FileLoader,
   FloatType,
   HalfFloatType,
-  LinearEncoding,
   LinearFilter,
   LinearMipmapLinearFilter,
   Loader,
@@ -35,7 +34,6 @@ import {
   RGBA_S3TC_DXT5_Format,
   RGBAFormat,
   RGFormat,
-  sRGBEncoding,
   UnsignedByteType,
 } from 'three'
 import { WorkerPool } from '../utils/WorkerPool.js'
@@ -230,7 +228,8 @@ class KTX2Loader extends Loader {
     texture.magFilter = LinearFilter
     texture.generateMipmaps = false
     texture.needsUpdate = true
-    texture.encoding = dfdTransferFn === KHR_DF_TRANSFER_SRGB ? sRGBEncoding : LinearEncoding
+    if ('colorSpace' in texture) texture.colorSpace = dfdTransferFn === KHR_DF_TRANSFER_SRGB ? 'srgb' : 'srgb-linear'
+    else texture.encoding = dfdTransferFn === KHR_DF_TRANSFER_SRGB ? 3001 : 3000
     texture.premultiplyAlpha = !!(dfdFlags & KHR_DF_FLAG_ALPHA_PREMULTIPLIED)
 
     return texture
@@ -604,9 +603,9 @@ const TYPE_MAP = {
 }
 
 const ENCODING_MAP = {
-  [VK_FORMAT_R8G8B8A8_SRGB]: sRGBEncoding,
-  [VK_FORMAT_R8G8_SRGB]: sRGBEncoding,
-  [VK_FORMAT_R8_SRGB]: sRGBEncoding,
+  [VK_FORMAT_R8G8B8A8_SRGB]: 3001, // sRGBEncoding
+  [VK_FORMAT_R8G8_SRGB]: 3001, // sRGBEncoding
+  [VK_FORMAT_R8_SRGB]: 3001, // sRGBEncoding
 }
 
 async function createDataTexture(container) {
@@ -660,7 +659,7 @@ async function createDataTexture(container) {
 
   texture.type = TYPE_MAP[vkFormat]
   texture.format = FORMAT_MAP[vkFormat]
-  texture.encoding = ENCODING_MAP[vkFormat] || LinearEncoding
+  texture.encoding = ENCODING_MAP[vkFormat] || 3000 // LinearEncoding
 
   texture.needsUpdate = true
 

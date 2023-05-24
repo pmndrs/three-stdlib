@@ -3,7 +3,6 @@ import {
   DataUtils,
   FloatType,
   HalfFloatType,
-  LinearEncoding,
   LinearFilter,
   RedFormat,
   RGBAFormat,
@@ -1791,10 +1790,10 @@ class EXRLoader extends DataTextureLoader {
 
       if (EXRDecoder.outputChannels == 4) {
         EXRDecoder.format = RGBAFormat
-        EXRDecoder.encoding = LinearEncoding
+        EXRDecoder.encoding = 3000 // LinearEncoding
       } else {
         EXRDecoder.format = RedFormat
-        EXRDecoder.encoding = LinearEncoding
+        EXRDecoder.encoding = 3000 // LinearEncoding
       }
 
       return EXRDecoder
@@ -1871,7 +1870,8 @@ class EXRLoader extends DataTextureLoader {
 
   load(url, onLoad, onProgress, onError) {
     function onLoadCallback(texture, texData) {
-      texture.encoding = texData.encoding
+      if ('colorSpace' in texture)  texture.colorSpace = texData.encoding === 3001 ? 'srgb' : 'srgb-linear'
+      else texture.encoding = texData.encoding
       texture.minFilter = LinearFilter
       texture.magFilter = LinearFilter
       texture.generateMipmaps = false

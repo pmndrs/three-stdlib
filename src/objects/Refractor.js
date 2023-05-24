@@ -193,7 +193,8 @@ class Refractor extends Mesh {
     this.onBeforeRender = function (renderer, scene, camera) {
       // Render
 
-      renderTarget.texture.encoding = renderer.outputEncoding
+      if ('colorSpace' in renderTarget.texture) renderTarget.texture.colorSpace = renderer.outputColorSpace
+      else renderTarget.texture.encoding = renderer.outputEncoding
 
       // ensure refractors are rendered only once per frame
 

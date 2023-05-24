@@ -1,8 +1,6 @@
 import TempNode from '../core/Node.js'
 import { ShaderNode, vec3, pow, mul, sub, mix, join, lessThanEqual } from '../ShaderNode.js'
 
-import { LinearEncoding, sRGBEncoding } from 'three'
-
 export const LinearToLinear = new ShaderNode((inputs) => {
   return inputs.value
 })
@@ -41,9 +39,9 @@ class ColorSpaceNode extends TempNode {
   fromEncoding(encoding) {
     let method = null
 
-    if (encoding === LinearEncoding) {
+    if (encoding === 3000) {
       method = 'Linear'
-    } else if (encoding === sRGBEncoding) {
+    } else if (encoding === 3001) {
       method = 'sRGB'
     }
 

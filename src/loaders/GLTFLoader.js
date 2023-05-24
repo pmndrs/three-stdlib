@@ -60,7 +60,6 @@ import {
   Vector2,
   Vector3,
   VectorKeyframeTrack,
-  sRGBEncoding,
   REVISION,
 } from 'three'
 import { toTrianglesDrawMode } from '../utils/BufferGeometryUtils'
@@ -521,7 +520,7 @@ class GLTFMaterialsUnlitExtension {
       }
 
       if (metallicRoughness.baseColorTexture !== undefined) {
-        pending.push(parser.assignTexture(materialParams, 'map', metallicRoughness.baseColorTexture, sRGBEncoding))
+        pending.push(parser.assignTexture(materialParams, 'map', metallicRoughness.baseColorTexture, 3001)) // sRGBEncoding
       }
     }
 
@@ -731,7 +730,7 @@ class GLTFMaterialsSheenExtension {
     }
 
     if (extension.sheenColorTexture !== undefined) {
-      pending.push(parser.assignTexture(materialParams, 'sheenColorMap', extension.sheenColorTexture, sRGBEncoding))
+      pending.push(parser.assignTexture(materialParams, 'sheenColorMap', extension.sheenColorTexture, 3001)) // sRGBEncoding
     }
 
     if (extension.sheenRoughnessTexture !== undefined) {
@@ -913,7 +912,7 @@ class GLTFMaterialsSpecularExtension {
 
     if (extension.specularColorTexture !== undefined) {
       pending.push(
-        parser.assignTexture(materialParams, 'specularColorMap', extension.specularColorTexture, sRGBEncoding),
+        parser.assignTexture(materialParams, 'specularColorMap', extension.specularColorTexture, 3001), // sRGBEncoding
       )
     }
 
@@ -2515,7 +2514,8 @@ class GLTFParser {
       }
 
       if (encoding !== undefined) {
-        texture.encoding = encoding
+        if ('colorSpace' in texture) texture.colorSpace = encoding === 3001 ? 'srgb' : 'srgb-linear'
+        else texture.encoding = encoding
       }
 
       materialParams[mapName] = texture
@@ -2648,7 +2648,7 @@ class GLTFParser {
       }
 
       if (metallicRoughness.baseColorTexture !== undefined) {
-        pending.push(parser.assignTexture(materialParams, 'map', metallicRoughness.baseColorTexture, sRGBEncoding))
+        pending.push(parser.assignTexture(materialParams, 'map', metallicRoughness.baseColorTexture, 3001)) // sRGBEncoding
       }
 
       materialParams.metalness = metallicRoughness.metallicFactor !== undefined ? metallicRoughness.metallicFactor : 1.0

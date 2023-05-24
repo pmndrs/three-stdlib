@@ -4,7 +4,6 @@ import {
   FileLoader,
   FloatType,
   HalfFloatType,
-  LinearEncoding,
   LinearFilter,
   Loader,
 } from 'three'
@@ -36,14 +35,9 @@ class HDRCubeTextureLoader extends Loader {
 
     switch (texture.type) {
       case FloatType:
-        texture.encoding = LinearEncoding
-        texture.minFilter = LinearFilter
-        texture.magFilter = LinearFilter
-        texture.generateMipmaps = false
-        break
-
       case HalfFloatType:
-        texture.encoding = LinearEncoding
+        if ('colorSpace' in texture) texture.colorSpace = 'srgb-linear'
+        else texture.encoding = 3000 // LinearEncoding
         texture.minFilter = LinearFilter
         texture.magFilter = LinearFilter
         texture.generateMipmaps = false

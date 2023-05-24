@@ -126,7 +126,8 @@ class Reflector extends Mesh {
 
       // Render
 
-      renderTarget.texture.encoding = renderer.outputEncoding
+      if ('colorSpace' in renderTarget.texture) renderTarget.texture.colorSpace = renderer.outputColorSpace
+      else renderTarget.texture.encoding = renderer.outputEncoding
 
       scope.visible = false
 
