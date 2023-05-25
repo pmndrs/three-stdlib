@@ -1,7 +1,25 @@
 // This file is part of meshoptimizer library and is distributed under the terms of MIT License.
 // Copyright (C) 2016-2020, by Arseny Kapoulkine (arseny.kapoulkine@gmail.com)
 
-let generated
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+
+type API = {
+  ready: Promise<void>
+  supported: boolean
+  decodeVertexBuffer: (target: Uint8Array, count: number, size: number, source: Uint8Array, filter?: string) => void
+  decodeIndexBuffer: (target: Uint8Array, count: number, size: number, source: Uint8Array) => void
+  decodeIndexSequence: (target: Uint8Array, count: number, size: number, source: Uint8Array) => void
+  decodeGltfBuffer: (
+    target: Uint8Array,
+    count: number,
+    size: number,
+    source: Uint8Array,
+    mode: string,
+    filter?: string,
+  ) => void
+}
+
+let generated: API
 
 const MeshoptDecoder = () => {
   if (generated) return generated
@@ -145,14 +163,14 @@ const MeshoptDecoder = () => {
     wasm = wasm_simd
   }
 
-  let instance
+  let instance: any // WebAssembly.Instance
 
   const promise = WebAssembly.instantiate(unpack(wasm), {}).then((result) => {
     instance = result.instance
     instance.exports.__wasm_call_ctors()
   })
 
-  function unpack(data) {
+  function unpack(data: string) {
     const result = new Uint8Array(data.length)
     for (let i = 0; i < data.length; ++i) {
       const ch = data.charCodeAt(i)
@@ -165,7 +183,14 @@ const MeshoptDecoder = () => {
     return result.buffer.slice(0, write)
   }
 
-  function decode(fun, target, count, size, source, filter) {
+  function decode(
+    fun: Function,
+    target: Uint8Array,
+    count: number,
+    size: number,
+    source: Uint8Array,
+    filter?: Function,
+  ) {
     const sbrk = instance.exports.sbrk
     const count4 = (count + 3) & ~3 // pad for SIMD filter
     const tp = sbrk(count4 * size)
@@ -217,7 +242,7 @@ const MeshoptDecoder = () => {
         count,
         size,
         source,
-        instance.exports[filters[filter]],
+        instance.exports[filters[filter as keyof typeof filters]],
       )
     },
     decodeIndexBuffer(target, count, size, source) {
@@ -227,7 +252,14 @@ const MeshoptDecoder = () => {
       decode(instance.exports.meshopt_decodeIndexSequence, target, count, size, source)
     },
     decodeGltfBuffer(target, count, size, source, mode, filter) {
-      decode(instance.exports[decoders[mode]], target, count, size, source, instance.exports[filters[filter]])
+      decode(
+        instance.exports[decoders[mode as keyof typeof decoders]],
+        target,
+        count,
+        size,
+        source,
+        instance.exports[filters[filter as keyof typeof filters]],
+      )
     },
   }
 
