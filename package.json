@@ -3,42 +3,34 @@
   "version": "0.0.0-semantic-released",
   "private": true,
   "description": "stand-alone library of threejs examples",
-  "main": "index.cjs.js",
-  "module": "index.js",
-  "scripts": {
-    "build": "rollup -c && node ./scripts/createDeclarations.js && tsc --project tsconfig.dist.json && npm run copy",
-    "build-storybook": "build-storybook",
-    "copy": "copyfiles package.json README.md LICENSE dist && json -I -f dist/package.json -e \"this.private=false; this.devDependencies=undefined; this.optionalDependencies=undefined; this.scripts=undefined; this.husky=undefined; this.prettier=undefined; this.jest=undefined; this['lint-staged']=undefined;\"",
-    "lint": "eslint --cache --fix .",
-    "lint:ci": "eslint .",
-    "prebuild": "rimraf dist && npm run typegen",
-    "prepare": "npm run build",
-    "prettier:write": "prettier --write .",
-    "prettier:check": "prettier --check .",
-    "storybook": "start-storybook -p 6006",
-    "types": "tsc --noEmit",
-    "typegen": "tsc --emitDeclarationOnly"
-  },
-  "sideEffects": false,
-  "lint-staged": {
-    "*.{js,jsx,ts,tsx}": [
-      "prettier --write",
-      "eslint --fix"
-    ]
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/pmndrs/three-stdlib.git"
-  },
-  "author": "Paul Henschel",
+  "keywords": [
+    "three",
+    "typescript",
+    "examples",
+    "helpers",
+    "abstractions",
+    "3d"
+  ],
+  "author": "Paul Henschel (https://github.com/drcmda)",
   "maintainers": [
+    "Cody Bennett (https://github.com/codyjasonbennett)",
     "Josh Ellis (https://github.com/joshuaellis)"
   ],
+  "homepage": "https://github.com/pmndrs/three-stdlib",
+  "repository": "https://github.com/pmndrs/three-stdlib",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/pmndrs/three-stdlib/issues"
+  "files": [
+    "dist/*"
+  ],
+  "types": "./dist/index.d.ts",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "exports": {
+    "types": "./dist/index.d.ts",
+    "require": "./dist/index.js",
+    "import": "./dist/index.mjs"
   },
-  "homepage": "https://github.com/pmndrs/three-stdlib#readme",
+  "sideEffects": false,
   "devDependencies": {
     "@babel/core": "^7.16.7",
     "@babel/eslint-parser": "^7.16.5",
@@ -82,17 +74,10 @@
     "react-dom": "^17.0.2",
     "recrawl": "^2.2.1",
     "rimraf": "^3.0.2",
-    "rollup": "^2.45.2",
-    "rollup-plugin-commonjs": "^10.1.0",
-    "rollup-plugin-glslify": "^1.2.0",
-    "rollup-plugin-json": "^4.0.0",
-    "rollup-plugin-multi-input": "^1.2.0",
-    "rollup-plugin-node-resolve": "^5.2.0",
-    "rollup-plugin-size-snapshot": "^0.12.0",
-    "rollup-plugin-terser": "^7.0.2",
     "three": "^0.139.2",
     "tslib": "^2.2.0",
     "typescript": "^4.2.4",
+    "vite": "^4.3.8",
     "webpack": "^5.65.0"
   },
   "dependencies": {
@@ -110,5 +95,24 @@
   },
   "peerDependencies": {
     "three": ">=0.122.0"
+  },
+  "scripts": {
+    "build": "rimraf dist && vite build && npm run typegen && node ./scripts/createDeclarations.js && tsc --project tsconfig.dist.json && npm run copy",
+    "build-storybook": "build-storybook",
+    "copy": "copyfiles package.json README.md LICENSE dist && json -I -f dist/package.json -e \"this.private=false; this.devDependencies=undefined; this.optionalDependencies=undefined; this.scripts=undefined; this.husky=undefined; this.prettier=undefined; this.jest=undefined; this['lint-staged']=undefined;\"",
+    "lint": "eslint --cache --fix .",
+    "lint:ci": "eslint .",
+    "prepare": "npm run build",
+    "prettier:write": "prettier --write .",
+    "prettier:check": "prettier --check .",
+    "storybook": "start-storybook -p 6006",
+    "types": "tsc --noEmit",
+    "typegen": "tsc --emitDeclarationOnly"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "prettier --write",
+      "eslint --fix"
+    ]
   }
 }
