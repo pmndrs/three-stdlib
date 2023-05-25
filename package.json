@@ -97,9 +97,8 @@
     "three": ">=0.122.0"
   },
   "scripts": {
-    "build": "rimraf dist && vite build && npm run typegen && node ./scripts/createDeclarations.js && tsc --project tsconfig.dist.json && npm run copy",
+    "build": "rimraf dist && vite build && npm run typegen && node ./scripts/createDeclarations.js && tsc --project tsconfig.dist.json",
     "build-storybook": "build-storybook",
-    "copy": "copyfiles package.json README.md LICENSE dist && json -I -f dist/package.json -e \"this.private=false; this.devDependencies=undefined; this.optionalDependencies=undefined; this.scripts=undefined; this.husky=undefined; this.prettier=undefined; this.jest=undefined; this['lint-staged']=undefined;\"",
     "lint": "eslint --cache --fix .",
     "lint:ci": "eslint .",
     "prepare": "npm run build",
