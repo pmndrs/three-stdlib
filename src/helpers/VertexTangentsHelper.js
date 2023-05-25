@@ -1,37 +1,22 @@
 import { BufferGeometry, Float32BufferAttribute, LineSegments, LineBasicMaterial, Vector3 } from 'three'
 
-const _v1 = new Vector3()
-const _v2 = new Vector3()
+const _v1 = /* @__PURE__ */ new Vector3()
+const _v2 = /* @__PURE__ */ new Vector3()
 
 class VertexTangentsHelper extends LineSegments {
-  constructor(object, size, hex) {
-    const color = hex !== undefined ? hex : 0x00ffff
-
-    //
-
-    const objGeometry = object.geometry
-
-    if (!(objGeometry && objGeometry.isBufferGeometry)) {
-      console.error('THREE.VertexTangentsHelper: geometry not an instance of THREE.BufferGeometry.', objGeometry)
-      return
-    }
-
-    const nTangents = objGeometry.attributes.tangent.count
-
-    //
-
+  constructor(object, size = 1, color = 0x00ffff) {
     const geometry = new BufferGeometry()
 
+    const nTangents = object.geometry.attributes.tangent.count
     const positions = new Float32BufferAttribute(nTangents * 2 * 3, 3)
 
     geometry.setAttribute('position', positions)
 
     super(geometry, new LineBasicMaterial({ color, toneMapped: false }))
 
-    this.type = 'VertexTangentsHelper'
     this.object = object
-
-    this.size = size !== undefined ? size : 1
+    this.size = size
+    this.type = 'VertexTangentsHelper'
 
     //
 
@@ -60,9 +45,9 @@ class VertexTangentsHelper extends LineSegments {
     // for simplicity, ignore index and drawcalls, and render every tangent
 
     for (let j = 0, jl = objPos.count; j < jl; j++) {
-      _v1.set(objPos.getX(j), objPos.getY(j), objPos.getZ(j)).applyMatrix4(matrixWorld)
+      _v1.fromBufferAttribute(objPos, j).applyMatrix4(matrixWorld)
 
-      _v2.set(objTan.getX(j), objTan.getY(j), objTan.getZ(j))
+      _v2.fromBufferAttribute(objTan, j)
 
       _v2.transformDirection(matrixWorld).multiplyScalar(this.size).add(_v1)
 
@@ -76,6 +61,11 @@ class VertexTangentsHelper extends LineSegments {
     }
 
     position.needsUpdate = true
+  }
+
+  dispose() {
+    this.geometry.dispose()
+    this.material.dispose()
   }
 }
 

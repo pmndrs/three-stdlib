@@ -1,4 +1,4 @@
-import { Matrix4, Object3D, Vector3 } from 'three'
+import { Matrix4, Object3D, Vector2, Vector3 } from 'three'
 
 class CSS2DObject extends Object3D {
   constructor(element = document.createElement('div')) {
@@ -12,6 +12,8 @@ class CSS2DObject extends Object3D {
     this.element.style.userSelect = 'none'
 
     this.element.setAttribute('draggable', false)
+
+    this.center = new Vector2(0.5, 0.5) // ( 0, 0 ) is the lower left; ( 1, 1 ) is the top right
 
     this.addEventListener('removed', function () {
       this.traverse(function (object) {
@@ -27,15 +29,17 @@ class CSS2DObject extends Object3D {
 
     this.element = source.element.cloneNode(true)
 
+    this.center = source.center
+
     return this
   }
 }
 
-const _vector = /*#__PURE__*/ new Vector3()
-const _viewMatrix = /*#__PURE__*/ new Matrix4()
-const _viewProjectionMatrix = /*#__PURE__*/ new Matrix4()
-const _a = /*#__PURE__*/ new Vector3()
-const _b = /*#__PURE__*/ new Vector3()
+const _vector = /* @__PURE__ */ new Vector3()
+const _viewMatrix = /* @__PURE__ */ new Matrix4()
+const _viewProjectionMatrix = /* @__PURE__ */ new Matrix4()
+const _a = /* @__PURE__ */ new Vector3()
+const _b = /* @__PURE__ */ new Vector3()
 
 class CSS2DRenderer {
   constructor(parameters = {}) {
@@ -62,10 +66,8 @@ class CSS2DRenderer {
     }
 
     this.render = function (scene, camera) {
-      if (scene.matrixWorldAutoUpdate === true || scene.autoUpdate === true) scene.updateMatrixWorld()
-      if (camera.parent === null && (camera.matrixWorldAutoUpdate == null || camera.matrixWorldAutoUpdate === true)) {
-        camera.updateMatrixWorld()
-      }
+      if (scene.matrixWorldAutoUpdate === true) scene.updateMatrixWorld()
+      if (camera.parent === null && camera.matrixWorldAutoUpdate === true) camera.updateMatrixWorld()
 
       _viewMatrix.copy(camera.matrixWorldInverse)
       _viewProjectionMatrix.multiplyMatrices(camera.projectionMatrix, _viewMatrix)
@@ -100,7 +102,12 @@ class CSS2DRenderer {
           const element = object.element
 
           element.style.transform =
-            'translate(-50%,-50%) translate(' +
+            'translate(' +
+            -100 * object.center.x +
+            '%,' +
+            -100 * object.center.y +
+            '%)' +
+            'translate(' +
             (_vector.x * _widthHalf + _widthHalf) +
             'px,' +
             (-_vector.y * _heightHalf + _heightHalf) +

@@ -28,11 +28,11 @@ import {
 // by Eric Heitz, Jonathan Dupuy, Stephen Hill and David Neubelt
 // code: https://github.com/selfshadow/ltc_code/
 
-var RectAreaLightUniformsLib = {
-  init: function () {
+class RectAreaLightUniformsLib {
+  static init() {
     // source: https://github.com/selfshadow/ltc_code/tree/master/fit/results/ltc.js
 
-    var LTC_MAT_1 = [
+    const LTC_MAT_1 = [
       1,
       0,
       0,
@@ -16419,7 +16419,7 @@ var RectAreaLightUniformsLib = {
       1.6577,
     ]
 
-    var LTC_MAT_2 = [
+    const LTC_MAT_2 = [
       1,
       0,
       0,
@@ -32838,6 +32838,9 @@ var RectAreaLightUniformsLib = {
       1,
     )
 
+    UniformsLib.LTC_FLOAT_1.needsUpdate = true
+    UniformsLib.LTC_FLOAT_2.needsUpdate = true
+
     const ltc_half_1 = new Uint16Array(LTC_MAT_1.length)
 
     LTC_MAT_1.forEach(function (x, index) {
@@ -32876,7 +32879,10 @@ var RectAreaLightUniformsLib = {
       NearestFilter,
       1,
     )
-  },
+
+    UniformsLib.LTC_HALF_1.needsUpdate = true
+    UniformsLib.LTC_HALF_2.needsUpdate = true
+  }
 }
 
 export { RectAreaLightUniformsLib }

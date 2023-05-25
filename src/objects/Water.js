@@ -24,6 +24,8 @@ class Water extends Mesh {
   constructor(geometry, options = {}) {
     super(geometry)
 
+    this.isWater = true
+
     const scope = this
 
     const textureWidth = options.textureWidth !== undefined ? options.textureWidth : 512
@@ -176,7 +178,8 @@ class Water extends Mesh {
 					gl_FragColor = vec4( outgoingLight, alpha );
 
 					#include <tonemapping_fragment>
-					#include <fog_fragment>
+					#include <encodings_fragment>
+					#include <fog_fragment>	
 				}`,
     }
 
@@ -308,7 +311,5 @@ class Water extends Mesh {
     }
   }
 }
-
-Water.prototype.isWater = true
 
 export { Water }

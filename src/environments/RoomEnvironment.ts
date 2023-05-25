@@ -94,7 +94,7 @@ function RoomEnvironment() {
   light6.scale.set(1.0, 0.1, 1.0)
   scene.add(light6)
 
-  function createAreaLightMaterial(intensity) {
+  function createAreaLightMaterial(intensity: number) {
     const material = new THREE.MeshBasicMaterial()
     material.color.setScalar(intensity)
     return material

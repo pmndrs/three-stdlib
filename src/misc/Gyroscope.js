@@ -1,22 +1,19 @@
 import { Object3D, Quaternion, Vector3 } from 'three'
 
-var Gyroscope = function () {
-  Object3D.call(this)
-}
+const _translationObject = /* @__PURE__ */ new Vector3()
+const _quaternionObject = /* @__PURE__ */ new Quaternion()
+const _scaleObject = /* @__PURE__ */ new Vector3()
 
-Gyroscope.prototype = Object.create(Object3D.prototype)
-Gyroscope.prototype.constructor = Gyroscope
+const _translationWorld = /* @__PURE__ */ new Vector3()
+const _quaternionWorld = /* @__PURE__ */ new Quaternion()
+const _scaleWorld = /* @__PURE__ */ new Vector3()
 
-Gyroscope.prototype.updateMatrixWorld = (function () {
-  var translationObject = new Vector3()
-  var quaternionObject = new Quaternion()
-  var scaleObject = new Vector3()
+class Gyroscope extends Object3D {
+  constructor() {
+    super()
+  }
 
-  var translationWorld = new Vector3()
-  var quaternionWorld = new Quaternion()
-  var scaleWorld = new Vector3()
-
-  return function updateMatrixWorld(force) {
+  updateMatrixWorld(force) {
     this.matrixAutoUpdate && this.updateMatrix()
 
     // update matrixWorld
@@ -25,10 +22,10 @@ Gyroscope.prototype.updateMatrixWorld = (function () {
       if (this.parent !== null) {
         this.matrixWorld.multiplyMatrices(this.parent.matrixWorld, this.matrix)
 
-        this.matrixWorld.decompose(translationWorld, quaternionWorld, scaleWorld)
-        this.matrix.decompose(translationObject, quaternionObject, scaleObject)
+        this.matrixWorld.decompose(_translationWorld, _quaternionWorld, _scaleWorld)
+        this.matrix.decompose(_translationObject, _quaternionObject, _scaleObject)
 
-        this.matrixWorld.compose(translationWorld, quaternionObject, scaleWorld)
+        this.matrixWorld.compose(_translationWorld, _quaternionObject, _scaleWorld)
       } else {
         this.matrixWorld.copy(this.matrix)
       }
@@ -44,6 +41,6 @@ Gyroscope.prototype.updateMatrixWorld = (function () {
       this.children[i].updateMatrixWorld(force)
     }
   }
-})()
+}
 
 export { Gyroscope }

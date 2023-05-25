@@ -1,6 +1,6 @@
 import { Matrix3 } from 'three'
 
-import { VolumeSlice } from './VolumeSlice.js'
+import { VolumeSlice } from './VolumeSlice'
 
 export class Volume {
   constructor(xLength?: number, yLength?: number, zLength?: number, type?: string, arrayBuffer?: ArrayLike<number>)

@@ -24,9 +24,9 @@ class RectAreaLightHelper extends Line {
 
     super(geometry, material)
 
-    this.type = 'RectAreaLightHelper'
     this.light = light
     this.color = color // optional hardwired color for the helper
+    this.type = 'RectAreaLightHelper'
 
     //
 
@@ -56,7 +56,9 @@ class RectAreaLightHelper extends Line {
       this.children[0].material.color.copy(this.material.color)
     }
 
-    this.matrixWorld.copy(this.light.matrixWorld).scale(this.scale)
+    // ignore world scale on light
+    this.matrixWorld.extractRotation(this.light.matrixWorld).scale(this.scale).copyPosition(this.light.matrixWorld)
+
     this.children[0].matrixWorld.copy(this.matrixWorld)
   }
 

@@ -14,11 +14,43 @@ import {
   Vector3,
 } from 'three'
 
-const _m1 = new Matrix4()
-const _obj = new Object3D()
-const _offset = new Vector3()
+const _m1 = /* @__PURE__ */ new Matrix4()
+const _obj = /* @__PURE__ */ new Object3D()
+const _offset = /* @__PURE__ */ new Vector3()
 
 class Geometry extends EventDispatcher {
+  static createBufferGeometryFromObject(object) {
+    let buffergeometry = new BufferGeometry()
+
+    const geometry = object.geometry
+
+    if (object.isPoints || object.isLine) {
+      const positions = new Float32BufferAttribute(geometry.vertices.length * 3, 3)
+      const colors = new Float32BufferAttribute(geometry.colors.length * 3, 3)
+
+      buffergeometry.setAttribute('position', positions.copyVector3sArray(geometry.vertices))
+      buffergeometry.setAttribute('color', colors.copyColorsArray(geometry.colors))
+
+      if (geometry.lineDistances && geometry.lineDistances.length === geometry.vertices.length) {
+        const lineDistances = new Float32BufferAttribute(geometry.lineDistances.length, 1)
+
+        buffergeometry.setAttribute('lineDistance', lineDistances.copyArray(geometry.lineDistances))
+      }
+
+      if (geometry.boundingSphere !== null) {
+        buffergeometry.boundingSphere = geometry.boundingSphere.clone()
+      }
+
+      if (geometry.boundingBox !== null) {
+        buffergeometry.boundingBox = geometry.boundingBox.clone()
+      }
+    } else if (object.isMesh) {
+      buffergeometry = geometry.toBufferGeometry()
+    }
+
+    return buffergeometry
+  }
+
   constructor() {
     super()
     this.isGeometry = true
@@ -1169,38 +1201,6 @@ class Geometry extends EventDispatcher {
   dispose() {
     this.dispatchEvent({ type: 'dispose' })
   }
-}
-
-Geometry.createBufferGeometryFromObject = (object) => {
-  let buffergeometry = new BufferGeometry()
-
-  const geometry = object.geometry
-
-  if (object.isPoints || object.isLine) {
-    const positions = new Float32BufferAttribute(geometry.vertices.length * 3, 3)
-    const colors = new Float32BufferAttribute(geometry.colors.length * 3, 3)
-
-    buffergeometry.setAttribute('position', positions.copyVector3sArray(geometry.vertices))
-    buffergeometry.setAttribute('color', colors.copyColorsArray(geometry.colors))
-
-    if (geometry.lineDistances && geometry.lineDistances.length === geometry.vertices.length) {
-      const lineDistances = new Float32BufferAttribute(geometry.lineDistances.length, 1)
-
-      buffergeometry.setAttribute('lineDistance', lineDistances.copyArray(geometry.lineDistances))
-    }
-
-    if (geometry.boundingSphere !== null) {
-      buffergeometry.boundingSphere = geometry.boundingSphere.clone()
-    }
-
-    if (geometry.boundingBox !== null) {
-      buffergeometry.boundingBox = geometry.boundingBox.clone()
-    }
-  } else if (object.isMesh) {
-    buffergeometry = geometry.toBufferGeometry()
-  }
-
-  return buffergeometry
 }
 
 class DirectGeometry {

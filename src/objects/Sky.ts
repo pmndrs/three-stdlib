@@ -24,8 +24,8 @@ class Sky extends Mesh {
       rayleigh: { value: 1 },
       mieCoefficient: { value: 0.005 },
       mieDirectionalG: { value: 0.8 },
-      sunPosition: { value: new Vector3() },
-      up: { value: new Vector3(0, 1, 0) },
+      sunPosition: { value: /* @__PURE__ */ new Vector3() },
+      up: { value: /* @__PURE__ */ new Vector3(0, 1, 0) },
     },
 
     vertexShader: [
@@ -190,11 +190,11 @@ class Sky extends Mesh {
     ].join('\n'),
   }
 
-  public static material = new ShaderMaterial({
+  public static material = /* @__PURE__ */ new ShaderMaterial({
     name: 'SkyShader',
     fragmentShader: Sky.SkyShader.fragmentShader,
     vertexShader: Sky.SkyShader.vertexShader,
-    uniforms: UniformsUtils.clone(Sky.SkyShader.uniforms),
+    uniforms: /* @__PURE__ */ UniformsUtils.clone(Sky.SkyShader.uniforms),
     side: BackSide,
     depthWrite: false,
   })

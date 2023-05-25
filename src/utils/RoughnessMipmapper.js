@@ -17,26 +17,22 @@ import {
   WebGLRenderTarget,
 } from 'three'
 
-var _mipmapMaterial = _getMipmapMaterial()
+var _mipmapMaterial = /* @__PURE__ */ _getMipmapMaterial()
 
-var _mesh = new Mesh(new PlaneGeometry(2, 2), _mipmapMaterial)
+var _mesh = /* @__PURE__ */ new Mesh(/* @__PURE__ */ new PlaneGeometry(2, 2), _mipmapMaterial)
 
-var _flatCamera = new OrthographicCamera(0, 1, 0, 1, 0, 1)
+var _flatCamera = /* @__PURE__ */ new OrthographicCamera(0, 1, 0, 1, 0, 1)
 
 var _tempTarget = null
 
-var _renderer = null
+class RoughnessMipmapper {
+  constructor(renderer) {
+    this._renderer = renderer
 
-function RoughnessMipmapper(renderer) {
-  _renderer = renderer
+    this._renderer.compile(_mesh, _flatCamera)
+  }
 
-  _renderer.compile(_mesh, _flatCamera)
-}
-
-RoughnessMipmapper.prototype = {
-  constructor: RoughnessMipmapper,
-
-  generateMipmaps: function (material) {
+  generateMipmaps = function (material) {
     if ('roughnessMap' in material === false) return
 
     var { roughnessMap, normalMap } = material
@@ -58,11 +54,11 @@ RoughnessMipmapper.prototype = {
 
     if (!MathUtils.isPowerOfTwo(width) || !MathUtils.isPowerOfTwo(height)) return
 
-    var oldTarget = _renderer.getRenderTarget()
+    var oldTarget = this._renderer.getRenderTarget()
 
-    var autoClear = _renderer.autoClear
+    var autoClear = this._renderer.autoClear
 
-    _renderer.autoClear = false
+    this._renderer.autoClear = false
 
     if (_tempTarget === null || _tempTarget.width !== width || _tempTarget.height !== height) {
       if (_tempTarget !== null) _tempTarget.dispose()
@@ -89,7 +85,7 @@ RoughnessMipmapper.prototype = {
 
       // Setting the render target causes the memory to be allocated.
 
-      _renderer.setRenderTarget(newRoughnessTarget)
+      this._renderer.setRenderTarget(newRoughnessTarget)
 
       material.roughnessMap = newRoughnessTarget.texture
 
@@ -119,29 +115,29 @@ RoughnessMipmapper.prototype = {
 
       _tempTarget.scissor.set(position.x, position.y, width, height)
 
-      _renderer.setRenderTarget(_tempTarget)
+      this._renderer.setRenderTarget(_tempTarget)
 
-      _renderer.render(_mesh, _flatCamera)
+      this._renderer.render(_mesh, _flatCamera)
 
-      _renderer.copyFramebufferToTexture(position, material.roughnessMap, mip)
+      this._renderer.copyFramebufferToTexture(position, material.roughnessMap, mip)
 
       _mipmapMaterial.uniforms.roughnessMap.value = material.roughnessMap
     }
 
     if (roughnessMap !== material.roughnessMap) roughnessMap.dispose()
 
-    _renderer.setRenderTarget(oldTarget)
+    this._renderer.setRenderTarget(oldTarget)
 
-    _renderer.autoClear = autoClear
-  },
+    this._renderer.autoClear = autoClear
+  }
 
-  dispose: function () {
+  dispose = function () {
     _mipmapMaterial.dispose()
 
     _mesh.geometry.dispose()
 
     if (_tempTarget != null) _tempTarget.dispose()
-  },
+  }
 }
 
 function _getMipmapMaterial() {
