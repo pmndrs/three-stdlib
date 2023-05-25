@@ -5,11 +5,11 @@ import {
   FileLoader,
   Vector3,
   DataTexture,
-  Data3DTexture,
   UnsignedByteType,
   ClampToEdgeWrapping,
   LinearFilter,
 } from 'three'
+import { Data3DTexture } from '../_polyfill/Data3DTexture'
 
 export class LUTCubeLoader extends Loader {
   load(url, onLoad, onProgress, onError) {

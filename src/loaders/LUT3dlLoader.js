@@ -4,12 +4,12 @@ import {
   Loader,
   FileLoader,
   DataTexture,
-  Data3DTexture,
   RGBAFormat,
   UnsignedByteType,
   ClampToEdgeWrapping,
   LinearFilter,
 } from 'three'
+import { Data3DTexture } from '../_polyfill/Data3DTexture'
 
 export class LUT3dlLoader extends Loader {
   load(url, onLoad, onProgress, onError) {
