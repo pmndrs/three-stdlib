@@ -17,8 +17,6 @@ Stand-alone version of [threejs/examples/jsm](https://github.com/mrdoob/three.js
 import * as STDLIB from 'three-stdlib'
 // Flatbundle
 import { OrbitControls, ... } from 'three-stdlib'
-// Pick individual objects
-import { OrbitControls } from 'three-stdlib/controls/OrbitControls'
 ```
 
 ## Problem
