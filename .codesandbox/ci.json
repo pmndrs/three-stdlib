@@ -1,4 +1,4 @@
 {
-  "sandboxes": ["/demos/ssr"],
-  "node": "14"
+  "sandboxes": ["/demo"],
+  "node": "18"
 }
