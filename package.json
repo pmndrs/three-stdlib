@@ -82,6 +82,7 @@
   "dependencies": {
     "@babel/runtime": "^7.16.7",
     "@types/offscreencanvas": "^2019.6.4",
+    "@types/webxr": "^0.5.2",
     "@webgpu/glslang": "^0.0.15",
     "chevrotain": "^10.1.2",
     "draco3d": "^1.4.1",
@@ -96,7 +97,7 @@
     "three": ">=0.122.0"
   },
   "scripts": {
-    "build": "rimraf dist && vite build && npm run typegen && node ./scripts/createDeclarations.js && tsc --project tsconfig.dist.json",
+    "build": "rimraf dist && vite build && npm run typegen",
     "build-storybook": "build-storybook",
     "lint": "eslint --cache --fix .",
     "lint:ci": "eslint .",
@@ -105,7 +106,7 @@
     "prettier:check": "prettier --check .",
     "storybook": "start-storybook -p 6006",
     "types": "tsc --noEmit",
-    "typegen": "tsc --emitDeclarationOnly"
+    "typegen": "tsc --emitDeclarationOnly && copyfiles -u 1 \"src/**/*.d.ts\" dist"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [

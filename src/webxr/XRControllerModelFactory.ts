@@ -154,7 +154,7 @@ class XRControllerModelFactory {
   gltfLoader: GLTFLoader
   path: string
   private _assetCache: Record<string, { scene: Object3D } | undefined>
-  constructor(gltfLoader: GLTFLoader = null) {
+  constructor(gltfLoader: GLTFLoader = null!) {
     this.gltfLoader = gltfLoader
     this.path = DEFAULT_PROFILES_PATH
     this._assetCache = {}
@@ -209,7 +209,7 @@ class XRControllerModelFactory {
 
                 addAssetSceneToControllerModel(controllerModel, scene)
               },
-              null,
+              () => {},
               () => {
                 throw new Error(`Asset ${assetUrl} missing or malformed.`)
               },
