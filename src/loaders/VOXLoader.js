@@ -1,6 +1,5 @@
 import {
   BufferGeometry,
-  Data3DTexture,
   FileLoader,
   Float32BufferAttribute,
   Loader,
@@ -10,6 +9,7 @@ import {
   NearestFilter,
   RedFormat,
 } from 'three'
+import { Data3DTexture } from '../_polyfill/Data3DTexture'
 
 class VOXLoader extends Loader {
   load(url, onLoad, onProgress, onError) {

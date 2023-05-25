@@ -13,8 +13,6 @@
 
 import {
   CompressedTexture,
-  ClampToEdgeWrapping,
-  Data3DTexture,
   DataTexture,
   FileLoader,
   FloatType,
@@ -58,16 +56,8 @@ import {
   VK_FORMAT_R8G8B8A8_UNORM,
 } from 'ktx-parse'
 import { ZSTDDecoder } from 'zstddec'
-
-// https://github.com/mrdoob/three.js/pull/24745
-class CompressedArrayTexture extends CompressedTexture {
-  constructor(mipmaps, width, height, depth, format, type) {
-    super(mipmaps, width, height, format, type)
-    this.isCompressedArrayTexture = true
-    this.image.depth = depth
-    this.wrapR = ClampToEdgeWrapping
-  }
-}
+import { CompressedArrayTexture } from '../_polyfill/CompressedArrayTexture'
+import { Data3DTexture } from '../_polyfill/Data3DTexture'
 
 const _taskCache = new WeakMap()
 

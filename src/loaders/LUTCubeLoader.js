@@ -1,15 +1,7 @@
 // https://wwwimages2.adobe.com/content/dam/acom/en/products/speedgrade/cc/pdfs/cube-lut-specification-1.0.pdf
 
-import {
-  Loader,
-  FileLoader,
-  Vector3,
-  DataTexture,
-  Data3DTexture,
-  UnsignedByteType,
-  ClampToEdgeWrapping,
-  LinearFilter,
-} from 'three'
+import { Loader, FileLoader, Vector3, DataTexture, UnsignedByteType, ClampToEdgeWrapping, LinearFilter } from 'three'
+import { Data3DTexture } from '../_polyfill/Data3DTexture'
 
 export class LUTCubeLoader extends Loader {
   load(url, onLoad, onProgress, onError) {
