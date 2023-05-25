@@ -349,9 +349,11 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
     // render beauty and depth
 
     if (this.encoding) {
-      if ('colorSpace' in this.beautyRenderTarget.texture)
+      if ('colorSpace' in this.beautyRenderTarget.texture) {
         this.beautyRenderTarget.texture.colorSpace = this.encoding === 3001 ? 'srgb' : 'srgb-linear'
-      else this.beautyRenderTarget.texture.encoding = this.encoding
+      } else {
+        this.beautyRenderTarget.texture.encoding = this.encoding
+      }
     }
     renderer.setRenderTarget(this.beautyRenderTarget)
     renderer.clear()
