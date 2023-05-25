@@ -1,4 +1,4 @@
-import { AnimationClip, Audio, Camera, Mesh, Object3D, Quaternion, SkinnedMesh, Bone, AnimationMixer } from 'three'
+import { AnimationClip, Audio, Camera, Object3D, Quaternion, SkinnedMesh, Bone, AnimationMixer } from 'three'
 
 import { CCDIKSolver } from './CCDIKSolver'
 import { MMDPhysics } from './MMDPhysics'

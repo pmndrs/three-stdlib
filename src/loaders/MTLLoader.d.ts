@@ -67,36 +67,34 @@ export interface TexParams {
   url: string
 }
 
-export namespace MTLLoader {
-  class MaterialCreator {
-    constructor(baseUrl?: string, options?: MaterialCreatorOptions)
+export class MaterialCreator {
+  constructor(baseUrl?: string, options?: MaterialCreatorOptions)
 
-    baseUrl: string
-    options: MaterialCreatorOptions
-    materialsInfo: { [key: string]: MaterialInfo }
-    materials: { [key: string]: Material }
-    private materialsArray: Material[]
-    nameLookup: { [key: string]: number }
-    side: Side
-    wrap: Wrapping
-    crossOrigin: string
+  baseUrl: string
+  options: MaterialCreatorOptions
+  materialsInfo: { [key: string]: MaterialInfo }
+  materials: { [key: string]: Material }
+  private materialsArray: Material[]
+  nameLookup: { [key: string]: number }
+  side: Side
+  wrap: Wrapping
+  crossOrigin: string
 
-    setCrossOrigin(value: string): this
-    setManager(value: LoadingManager): void
-    setMaterials(materialsInfo: { [key: string]: MaterialInfo }): void
-    convert(materialsInfo: { [key: string]: MaterialInfo }): { [key: string]: MaterialInfo }
-    preload(): void
-    getIndex(materialName: string): number
-    getAsArray(): Material[]
-    create(materialName: string): Material
-    createMaterial_(materialName: string): Material
-    getTextureParams(value: string, matParams: any): TexParams
-    loadTexture(
-      url: string,
-      mapping?: Mapping,
-      onLoad?: (bufferGeometry: BufferGeometry) => void,
-      onProgress?: (event: ProgressEvent) => void,
-      onError?: (event: ErrorEvent) => void,
-    ): Texture
-  }
+  setCrossOrigin(value: string): this
+  setManager(value: LoadingManager): void
+  setMaterials(materialsInfo: { [key: string]: MaterialInfo }): void
+  convert(materialsInfo: { [key: string]: MaterialInfo }): { [key: string]: MaterialInfo }
+  preload(): void
+  getIndex(materialName: string): number
+  getAsArray(): Material[]
+  create(materialName: string): Material
+  createMaterial_(materialName: string): Material
+  getTextureParams(value: string, matParams: any): TexParams
+  loadTexture(
+    url: string,
+    mapping?: Mapping,
+    onLoad?: (bufferGeometry: BufferGeometry) => void,
+    onProgress?: (event: ProgressEvent) => void,
+    onError?: (event: ErrorEvent) => void,
+  ): Texture
 }

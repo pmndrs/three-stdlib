@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { CubeTexture, LightProbe, WebGLRenderer, WebGLCubeRenderTarget } from 'three'
 
 export namespace LightProbeGenerator {
