@@ -318,7 +318,7 @@ class MMDLoader extends Loader {
 
   _getParser() {
     if (this.parser === null) {
-      this.parser = new Parser() // eslint-disable-line no-undef
+      this.parser = new Parser()
     }
 
     return this.parser

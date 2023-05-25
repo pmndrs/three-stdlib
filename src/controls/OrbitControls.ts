@@ -1,4 +1,3 @@
-/* eslint-disable */
 import {
   Camera,
   EventDispatcher,

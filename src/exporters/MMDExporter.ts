@@ -129,7 +129,7 @@ class MMDExporter {
 
   private unicodeToShiftjis(str: string): Uint8Array {
     if (this.u2sTable === undefined) {
-      const encoder = new CharsetEncoder() // eslint-disable-line no-undef
+      const encoder = new CharsetEncoder()
       const table = encoder.s2uTable
       this.u2sTable = {}
 

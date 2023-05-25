@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Mesh } from 'three'
 
 export namespace GeometryCompressionUtils {

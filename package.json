@@ -27,18 +27,7 @@
   "sideEffects": false,
   "devDependencies": {
     "@types/three": "^0.139.0",
-    "@typescript-eslint/eslint-plugin": "^4.28.0",
-    "@typescript-eslint/parser": "^4.28.0",
     "copyfiles": "^2.4.1",
-    "eslint": "^7.29.0",
-    "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-import": "^2.23.4",
-    "eslint-plugin-jest": "^24.3.6",
-    "eslint-plugin-prettier": "^3.4.0",
-    "eslint-plugin-react": "^7.24.0",
-    "eslint-plugin-react-hooks": "^4.2.0",
-    "husky": "^7.0.4",
-    "lint-staged": "^12.1.5",
     "prettier": "^2.2.1",
     "rimraf": "^3.0.2",
     "three": "^0.139.2",
@@ -63,19 +52,7 @@
     "three": ">=0.122.0"
   },
   "scripts": {
-    "build": "rimraf dist && vite build && npm run typegen",
-    "lint": "eslint --cache --fix .",
-    "lint:ci": "eslint .",
-    "prepare": "npm run build",
-    "prettier:write": "prettier --write .",
-    "prettier:check": "prettier --check .",
-    "types": "tsc --noEmit",
-    "typegen": "tsc --emitDeclarationOnly && copyfiles -u 1 \"src/**/*.d.ts\" dist"
-  },
-  "lint-staged": {
-    "*.{js,jsx,ts,tsx}": [
-      "prettier --write",
-      "eslint --fix"
-    ]
+    "build": "rimraf dist && vite build && tsc --emitDeclarationOnly && copyfiles -u 1 \"src/**/*.d.ts\" dist",
+    "lint": "tsc --noEmit"
   }
 }

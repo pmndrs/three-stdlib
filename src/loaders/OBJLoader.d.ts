@@ -1,9 +1,9 @@
 import { Loader, LoadingManager, Group } from 'three'
-import { MTLLoader } from './MTLLoader'
+import { MaterialCreator } from './MTLLoader'
 
 export class OBJLoader extends Loader {
   constructor(manager?: LoadingManager)
-  materials: MTLLoader.MaterialCreator
+  materials: MaterialCreator
 
   load(
     url: string,
@@ -13,5 +13,5 @@ export class OBJLoader extends Loader {
   ): void
   loadAsync(url: string, onProgress?: (event: ProgressEvent) => void): Promise<Group>
   parse(data: string): Group
-  setMaterials(materials: MTLLoader.MaterialCreator): this
+  setMaterials(materials: MaterialCreator): this
 }

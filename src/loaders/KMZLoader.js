@@ -60,15 +60,15 @@ class KMZLoader extends Loader {
 
     //
 
-    const zip = unzipSync(new Uint8Array(data)) // eslint-disable-line no-undef
+    const zip = unzipSync(new Uint8Array(data))
 
     if (zip['doc.kml']) {
-      const xml = new DOMParser().parseFromString(fflate.strFromU8(zip['doc.kml']), 'application/xml') // eslint-disable-line no-undef
+      const xml = new DOMParser().parseFromString(fflate.strFromU8(zip['doc.kml']), 'application/xml')
       const model = xml.querySelector('Placemark Model Link href')
 
       if (model) {
         const loader = new ColladaLoader(manager)
-        return loader.parse(fflate.strFromU8(zip[model.textContent])) // eslint-disable-line no-undef
+        return loader.parse(fflate.strFromU8(zip[model.textContent]))
       }
     } else {
       console.warn('KMZLoader: Missing doc.kml file.')
@@ -78,7 +78,7 @@ class KMZLoader extends Loader {
 
         if (extension === 'dae') {
           const loader = new ColladaLoader(manager)
-          return loader.parse(fflate.strFromU8(zip[path])) // eslint-disable-line no-undef
+          return loader.parse(fflate.strFromU8(zip[path]))
         }
       }
     }

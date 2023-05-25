@@ -1,8 +1,6 @@
 // This file is part of meshoptimizer library and is distributed under the terms of MIT License.
 // Copyright (C) 2016-2020, by Arseny Kapoulkine (arseny.kapoulkine@gmail.com)
 
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
-
 type API = {
   ready: Promise<void>
   supported: boolean

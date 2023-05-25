@@ -94,7 +94,7 @@ class ThreeMFLoader extends Loader {
       const otherParts = {}
 
       try {
-        zip = unzipSync(new Uint8Array(data)) // eslint-disable-line no-undef
+        zip = unzipSync(new Uint8Array(data))
       } catch (e) {
         if (e instanceof ReferenceError) {
           console.error('THREE.3MFLoader: fflate missing and file is compressed.')

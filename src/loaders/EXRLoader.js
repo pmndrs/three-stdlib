@@ -1020,7 +1020,7 @@ class EXRLoader extends DataTextureLoader {
 
     function uncompressZIP(info) {
       var compressed = info.array.slice(info.offset.value, info.offset.value + info.size)
-      var rawBuffer = unzlibSync(compressed) // eslint-disable-line no-undef
+      var rawBuffer = unzlibSync(compressed)
       var tmpBuffer = new Uint8Array(rawBuffer.length)
 
       predictor(rawBuffer) // revert predictor
@@ -1108,7 +1108,7 @@ class EXRLoader extends DataTextureLoader {
 
     function uncompressPXR(info) {
       var compressed = info.array.slice(info.offset.value, info.offset.value + info.size)
-      var rawBuffer = unzlibSync(compressed) // eslint-disable-line no-undef
+      var rawBuffer = unzlibSync(compressed)
 
       const sz = info.lines * info.channels * info.width
       const tmpBuffer = info.type == 1 ? new Uint16Array(sz) : new Uint32Array(sz)
@@ -1263,7 +1263,7 @@ class EXRLoader extends DataTextureLoader {
 
           case DEFLATE:
             var compressed = info.array.slice(inOffset.value, inOffset.value + dwaHeader.totalAcUncompressedCount)
-            var data = unzlibSync(compressed) // eslint-disable-line no-undef
+            var data = unzlibSync(compressed)
             var acBuffer = new Uint16Array(data.buffer)
             inOffset.value += dwaHeader.totalAcUncompressedCount
             break
@@ -1284,7 +1284,7 @@ class EXRLoader extends DataTextureLoader {
       // Read RLE compressed data
       if (dwaHeader.rleRawSize > 0) {
         var compressed = info.array.slice(inOffset.value, inOffset.value + dwaHeader.rleCompressedSize)
-        var data = unzlibSync(compressed) // eslint-disable-line no-undef
+        var data = unzlibSync(compressed)
         var rleBuffer = decodeRunLength(data.buffer)
 
         inOffset.value += dwaHeader.rleCompressedSize

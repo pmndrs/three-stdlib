@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { AnimationClip, Bone, Matrix4, Object3D, Skeleton, SkeletonHelper } from 'three'
 
 export namespace SkeletonUtils {

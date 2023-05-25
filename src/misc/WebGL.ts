@@ -27,11 +27,11 @@ export function isWebGL2Available(): boolean {
 }
 
 export function getWebGLErrorMessage(): HTMLDivElement {
-  return this.getErrorMessage(1)
+  return getErrorMessage(1)
 }
 
 export function getWebGL2ErrorMessage(): HTMLDivElement {
-  return this.getErrorMessage(2)
+  return getErrorMessage(2)
 }
 
 export function getErrorMessage(version: 1 | 2): HTMLDivElement {

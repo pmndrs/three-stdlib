@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Curve, Vector3 } from 'three'
 
 import { ParametricGeometry } from './ParametricGeometry'

@@ -103,7 +103,7 @@ class Timer {
   }
 }
 
-function handleVisibilityChange(): void {
+function handleVisibilityChange(this: Timer): void {
   if (document.hidden === false) this.reset()
 }
 

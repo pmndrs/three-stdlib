@@ -458,7 +458,7 @@ class GLTFExporter {
         // new) keyframe to the merged track. Values from the previous loop may
         // be written again, but keyframes are de-duplicated.
         for (let j = 0; j < sourceTrack.times.length; j++) {
-          const keyframeIndex = this.insertKeyframe(mergedTrack, sourceTrack.times[j])
+          const keyframeIndex = this.insertKeyframe(mergedTrack, sourceTrack.times[j])!
           mergedTrack.values[keyframeIndex * targetCount + targetIndex] = sourceTrack.values[j]
         }
       }
