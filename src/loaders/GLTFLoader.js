@@ -2717,7 +2717,7 @@ class GLTFParser {
     }
 
     if (materialDef.emissiveTexture !== undefined && materialType !== MeshBasicMaterial) {
-      pending.push(parser.assignTexture(materialParams, 'emissiveMap', materialDef.emissiveTexture, sRGBEncoding))
+      pending.push(parser.assignTexture(materialParams, 'emissiveMap', materialDef.emissiveTexture, 3001)) // sRGBEncoding
     }
 
     return Promise.all(pending).then(function () {
