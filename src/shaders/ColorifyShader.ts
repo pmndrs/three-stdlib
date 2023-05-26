@@ -7,7 +7,7 @@ import { Color } from 'three'
 export const ColorifyShader = {
   uniforms: {
     tDiffuse: { value: null },
-    color: { value: new Color(0xffffff) },
+    color: { value: /* @__PURE__ */ new Color(0xffffff) },
   },
 
   vertexShader: [

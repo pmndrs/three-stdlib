@@ -19,11 +19,11 @@ const meshphong_frag_head = ShaderChunk['meshphong_frag'].slice(
 const meshphong_frag_body = ShaderChunk['meshphong_frag'].slice(ShaderChunk['meshphong_frag'].indexOf('void main() {'))
 
 export const SubsurfaceScatteringShader = {
-  uniforms: UniformsUtils.merge([
+  uniforms: /* @__PURE__ */ UniformsUtils.merge([
     ShaderLib['phong'].uniforms,
     {
       thicknessMap: { value: null },
-      thicknessColor: { value: new Color(0xffffff) },
+      thicknessColor: { value: /* @__PURE__ */ new Color(0xffffff) },
       thicknessDistortion: { value: 0.1 },
       thicknessAmbient: { value: 0.0 },
       thicknessAttenuation: { value: 0.1 },

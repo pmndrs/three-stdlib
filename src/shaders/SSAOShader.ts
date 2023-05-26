@@ -21,9 +21,9 @@ export const SSAOShader = {
     kernel: { value: null },
     cameraNear: { value: null },
     cameraFar: { value: null },
-    resolution: { value: new Vector2() },
-    cameraProjectionMatrix: { value: new Matrix4() },
-    cameraInverseProjectionMatrix: { value: new Matrix4() },
+    resolution: { value: /* @__PURE__ */ new Vector2() },
+    cameraProjectionMatrix: { value: /* @__PURE__ */ new Matrix4() },
+    cameraInverseProjectionMatrix: { value: /* @__PURE__ */ new Matrix4() },
     kernelRadius: { value: 8 },
     minDistance: { value: 0.005 },
     maxDistance: { value: 0.05 },
@@ -227,7 +227,7 @@ export const SSAODepthShader = {
 export const SSAOBlurShader = {
   uniforms: {
     tDiffuse: { value: null },
-    resolution: { value: new Vector2() },
+    resolution: { value: /* @__PURE__ */ new Vector2() },
   },
 
   vertexShader: [
