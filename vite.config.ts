@@ -8,7 +8,7 @@ export default defineConfig({
     lib: {
       formats: ['cjs', 'es'],
       entry: 'src/index.ts',
-      fileName: '[name]',
+      fileName: (format) => (format === 'es' ? '[name].js' : '[name].cjs'),
     },
     rollupOptions: {
       external: (id: string) => !id.startsWith('.') && !path.isAbsolute(id),
