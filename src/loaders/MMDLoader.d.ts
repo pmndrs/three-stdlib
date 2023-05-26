@@ -1,5 +1,4 @@
-import { Camera, AnimationClip, FileLoader, LoadingManager, SkinnedMesh } from 'three'
-import { Loader } from '../types/Loader'
+import { Loader, Camera, AnimationClip, FileLoader, LoadingManager, SkinnedMesh } from 'three'
 
 export interface MMDLoaderAnimationObject {
   animation: AnimationClip

@@ -1,5 +1,4 @@
-import { CompressedTexture, LoadingManager, WebGLRenderer } from 'three'
-import { Loader } from '../types/Loader'
+import { Loader, CompressedTexture, LoadingManager, WebGLRenderer } from 'three'
 
 export class BasisTextureLoader extends Loader {
   constructor(manager?: LoadingManager)

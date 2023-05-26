@@ -1,5 +1,4 @@
-import { LoadingManager, Vector3, DataTexture, Texture } from 'three'
-import { Loader } from '../types/Loader'
+import { Loader, LoadingManager, Vector3, DataTexture, Texture } from 'three'
 
 export interface LUTCubeResult {
   title: string

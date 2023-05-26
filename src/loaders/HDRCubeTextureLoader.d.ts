@@ -1,5 +1,4 @@
-import { CubeTexture, LoadingManager, TextureDataType } from 'three'
-import { Loader } from '../types/Loader'
+import { Loader, CubeTexture, LoadingManager, TextureDataType } from 'three'
 
 import { RGBELoader } from './RGBELoader'
 

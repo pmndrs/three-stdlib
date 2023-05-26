@@ -1,5 +1,4 @@
-import { Object3D, LoadingManager } from 'three'
-import { Loader } from '../types/Loader'
+import { Loader, Object3D, LoadingManager } from 'three'
 
 export interface Assimp {
   animation: any

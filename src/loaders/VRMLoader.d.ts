@@ -1,5 +1,4 @@
-import { LoadingManager } from 'three'
-import { Loader } from '../types/Loader'
+import { Loader, LoadingManager } from 'three'
 
 import { GLTFLoader, GLTF } from './GLTFLoader'
 import { DRACOLoader } from './DRACOLoader'
