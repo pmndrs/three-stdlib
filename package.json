@@ -1,6 +1,7 @@
 {
   "name": "three-stdlib",
-  "version": "2.23.1",
+  "version": "0.0.0-semantic-released",
+  "private": true,
   "description": "stand-alone library of threejs examples",
   "keywords": [
     "three",
@@ -18,9 +19,6 @@
   "homepage": "https://github.com/pmndrs/three-stdlib",
   "repository": "https://github.com/pmndrs/three-stdlib",
   "license": "MIT",
-  "files": [
-    "dist/*"
-  ],
   "types": "./dist/index.d.ts",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -28,6 +26,7 @@
   "devDependencies": {
     "@types/three": "^0.128.0",
     "copyfiles": "^2.4.1",
+    "json": "^11.0.0",
     "prettier": "^2.2.1",
     "rimraf": "^3.0.2",
     "three": "^0.128.0",
@@ -51,7 +50,7 @@
     "three": ">=0.128.0"
   },
   "scripts": {
-    "build": "rimraf dist && vite build && tsc --emitDeclarationOnly && copyfiles -u 1 \"src/**/*.d.ts\" dist",
+    "build": "rimraf dist && vite build && tsc --emitDeclarationOnly && copyfiles -u 1 \"src/**/*.d.ts\" dist && copyfiles package.json dist && json -I -f dist/package.json -e \"this.private=undefined; this.types=\\\"./index.d.ts\\\"; this.main=\\\"./index.cjs\\\"; this.module=\\\"./index.js\\\";\"",
     "lint": "tsc --noEmit"
   }
 }
