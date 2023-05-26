@@ -387,7 +387,7 @@ const MMDAnimationHelper = (() => {
       if (params.world === undefined && this.sharedPhysics) {
         const masterPhysics = this._getMasterPhysics()
 
-        if (masterPhysics !== null) world = masterPhysics.world // eslint-disable-line no-undef
+        if (masterPhysics !== null) world = masterPhysics.world
       }
 
       objects.physics = this._createMMDPhysics(mesh, params)

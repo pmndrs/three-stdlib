@@ -157,7 +157,7 @@ class TTFLoader extends Loader {
       return reversed
     }
 
-    return convert(parse(arraybuffer), this.reversed) // eslint-disable-line no-undef
+    return convert(parse(arraybuffer), this.reversed)
   }
 }
 

@@ -2803,7 +2803,7 @@ class BinaryParser {
           }
         }
 
-        const data = unzlibSync(new Uint8Array(reader.getArrayBuffer(compressedLength))) // eslint-disable-line no-undef
+        const data = unzlibSync(new Uint8Array(reader.getArrayBuffer(compressedLength)))
         const reader2 = new BinaryReader(data.buffer)
 
         switch (type) {

@@ -13,16 +13,9 @@ class Pass {
   // if set to true, the result of the pass is rendered to screen. This is set automatically by EffectComposer.
   public renderToScreen = false
 
-  public setSize(
-    /* eslint-disable @typescript-eslint/no-unused-vars */
-    /* eslint-disable no-unused-vars */
-    width: number,
-    height: number,
-  ): void {}
+  public setSize(width: number, height: number): void {}
 
   public render(
-    /* eslint-disable @typescript-eslint/no-unused-vars */
-    /* eslint-disable no-unused-vars */
     renderer: WebGLRenderer,
     writeBuffer: WebGLRenderTarget,
     readBuffer: WebGLRenderTarget,

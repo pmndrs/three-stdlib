@@ -230,7 +230,7 @@ class VRMLLoader extends Loader {
       const Comment = createToken({
         name: 'Comment',
         pattern: /#.*/,
-        group: Lexer.SKIPPED, // eslint-disable-line no-undef
+        group: Lexer.SKIPPED,
       })
 
       // commas, blanks, tabs, newlines and carriage returns are whitespace characters wherever they appear outside of string fields
@@ -238,7 +238,7 @@ class VRMLLoader extends Loader {
       const WhiteSpace = createToken({
         name: 'WhiteSpace',
         pattern: /[ ,\s]/,
-        group: Lexer.SKIPPED, // eslint-disable-line no-undef
+        group: Lexer.SKIPPED,
       })
 
       const tokens = [
@@ -2727,7 +2727,7 @@ class VRMLLoader extends Loader {
 
 class VRMLLexer {
   constructor(tokens) {
-    this.lexer = new Lexer(tokens) // eslint-disable-line no-undef
+    this.lexer = new Lexer(tokens)
   }
 
   lex(inputText) {

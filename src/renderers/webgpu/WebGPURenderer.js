@@ -11,7 +11,6 @@ import WebGPURenderLists from './WebGPURenderLists'
 import WebGPUTextures from './WebGPUTextures'
 import WebGPUBackground from './WebGPUBackground'
 import WebGPUNodes from './nodes/WebGPUNodes'
-import glslang from '@webgpu/glslang/dist/web-devel/glslang'
 
 import { Frustum, Matrix4, Vector3, Color } from 'three'
 
@@ -170,6 +169,7 @@ class WebGPURenderer {
 
     const device = await adapter.requestDevice(deviceDescriptor)
 
+    const glslang = await import('@webgpu/glslang/dist/web-devel/glslang')
     const compiler = await glslang()
 
     const context = parameters.context !== undefined ? parameters.context : this.domElement.getContext('gpupresent')

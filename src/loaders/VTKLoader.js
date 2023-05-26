@@ -617,7 +617,7 @@ class VTKLoader extends Loader {
           }
 
           for (var i = 0; i < dataOffsets.length - 1; i++) {
-            var data = unzlibSync(byteData.slice(dataOffsets[i], dataOffsets[i + 1])) // eslint-disable-line no-undef
+            var data = unzlibSync(byteData.slice(dataOffsets[i], dataOffsets[i + 1]))
             content = data.buffer
 
             if (ele.attributes.type === 'Float32') {
@@ -689,7 +689,7 @@ class VTKLoader extends Loader {
         }
       } else if (window.ActiveXObject) {
         try {
-          dom = new ActiveXObject('Microsoft.XMLDOM') // eslint-disable-line no-undef
+          dom = new ActiveXObject('Microsoft.XMLDOM')
           dom.async = false
 
           if (!(dom.loadXML(/* xml */))) {

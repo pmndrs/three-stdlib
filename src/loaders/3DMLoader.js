@@ -656,7 +656,7 @@ function Rhino3dmWorker() {
           /* Like Basis Loader */
           RhinoModule = { wasmBinary, onRuntimeInitialized: resolve }
 
-          rhino3dm(RhinoModule) // eslint-disable-line no-undef
+          rhino3dm(RhinoModule)
         }).then(() => {
           rhino = RhinoModule
         })

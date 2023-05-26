@@ -1,4 +1,3 @@
-/* eslint-disable import/export */
 // @ts-nocheck
 export * from './offscreen/scene'
 export * from './offscreen/offscreen'

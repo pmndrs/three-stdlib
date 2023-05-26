@@ -1254,7 +1254,7 @@ AssimpLoader.prototype = Object.assign(Object.create(Loader.prototype), {
 
     function ReadBounds(stream, T /*p*/, n) {
       // not sure what to do here, the data isn't really useful.
-      return stream.Seek(sizeof(T) * n, aiOrigin_CUR) // eslint-disable-line no-undef
+      return stream.Seek(sizeof(T) * n, aiOrigin_CUR)
     }
 
     function ai_assert(bool) {
@@ -1776,7 +1776,7 @@ AssimpLoader.prototype = Object.assign(Object.create(Loader.prototype), {
         var compressedData = []
         stream.Read(compressedData, 1, compressedSize)
         var uncompressedData = []
-        uncompress(uncompressedData, uncompressedSize, compressedData, compressedSize) // eslint-disable-line no-undef
+        uncompress(uncompressedData, uncompressedSize, compressedData, compressedSize)
         var buff = new ArrayBuffer(uncompressedData)
         ReadBinaryScene(buff, pScene)
       } else {

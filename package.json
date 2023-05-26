@@ -1,103 +1,43 @@
 {
   "name": "three-stdlib",
   "version": "0.0.0-semantic-released",
-  "private": true,
   "description": "stand-alone library of threejs examples",
-  "main": "index.cjs.js",
-  "module": "index.js",
-  "scripts": {
-    "build": "rollup -c && node ./scripts/createDeclarations.js && tsc --project tsconfig.dist.json && npm run copy",
-    "build-storybook": "build-storybook",
-    "copy": "copyfiles package.json README.md LICENSE dist && json -I -f dist/package.json -e \"this.private=false; this.devDependencies=undefined; this.optionalDependencies=undefined; this.scripts=undefined; this.husky=undefined; this.prettier=undefined; this.jest=undefined; this['lint-staged']=undefined;\"",
-    "lint": "eslint --cache --fix .",
-    "lint:ci": "eslint .",
-    "prebuild": "rimraf dist && npm run typegen",
-    "prepare": "npm run build",
-    "prettier:write": "prettier --write .",
-    "prettier:check": "prettier --check .",
-    "storybook": "start-storybook -p 6006",
-    "types": "tsc --noEmit",
-    "typegen": "tsc --emitDeclarationOnly"
-  },
-  "sideEffects": false,
-  "lint-staged": {
-    "*.{js,jsx,ts,tsx}": [
-      "prettier --write",
-      "eslint --fix"
-    ]
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/pmndrs/three-stdlib.git"
-  },
-  "author": "Paul Henschel",
+  "keywords": [
+    "three",
+    "typescript",
+    "examples",
+    "helpers",
+    "abstractions",
+    "3d"
+  ],
+  "author": "Paul Henschel (https://github.com/drcmda)",
   "maintainers": [
+    "Cody Bennett (https://github.com/codyjasonbennett)",
     "Josh Ellis (https://github.com/joshuaellis)"
   ],
+  "homepage": "https://github.com/pmndrs/three-stdlib",
+  "repository": "https://github.com/pmndrs/three-stdlib",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/pmndrs/three-stdlib/issues"
-  },
-  "homepage": "https://github.com/pmndrs/three-stdlib#readme",
+  "files": [
+    "dist/*"
+  ],
+  "types": "./dist/index.d.ts",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "sideEffects": false,
   "devDependencies": {
-    "@babel/core": "^7.16.7",
-    "@babel/eslint-parser": "^7.16.5",
-    "@babel/plugin-proposal-class-properties": "^7.16.7",
-    "@babel/plugin-proposal-optional-chaining": "^7.16.7",
-    "@babel/plugin-transform-parameters": "^7.16.7",
-    "@babel/plugin-transform-runtime": "^7.16.7",
-    "@babel/preset-env": "^7.16.7",
-    "@babel/preset-typescript": "^7.16.7",
-    "@rollup/plugin-babel": "^5.3.0",
-    "@rollup/plugin-typescript": "^8.2.1",
-    "@storybook/addon-controls": "^6.4.14",
-    "@storybook/addon-essentials": "^6.4.14",
-    "@storybook/addon-storysource": "^6.4.14",
-    "@storybook/addons": "^6.4.14",
-    "@storybook/builder-webpack5": "^6.4.14",
-    "@storybook/client-api": "^6.4.14",
-    "@storybook/html": "^6.4.14",
-    "@storybook/manager-webpack5": "^6.4.14",
-    "@storybook/preset-typescript": "^3.0.0",
-    "@types/draco3d": "^1.4.0",
-    "@types/offscreencanvas": "^2019.6.4",
     "@types/three": "^0.139.0",
-    "@typescript-eslint/eslint-plugin": "^4.28.0",
-    "@typescript-eslint/parser": "^4.28.0",
-    "babel-loader": "^8.2.3",
-    "babel-plugin-transform-react-remove-prop-types": "^0.4.24",
     "copyfiles": "^2.4.1",
-    "eslint": "^7.29.0",
-    "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-import": "^2.23.4",
-    "eslint-plugin-jest": "^24.3.6",
-    "eslint-plugin-prettier": "^3.4.0",
-    "eslint-plugin-react": "^7.24.0",
-    "eslint-plugin-react-hooks": "^4.2.0",
-    "husky": "^7.0.4",
-    "json": "^10.0.0",
-    "lint-staged": "^12.1.5",
     "prettier": "^2.2.1",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "recrawl": "^2.2.1",
     "rimraf": "^3.0.2",
-    "rollup": "^2.45.2",
-    "rollup-plugin-commonjs": "^10.1.0",
-    "rollup-plugin-glslify": "^1.2.0",
-    "rollup-plugin-json": "^4.0.0",
-    "rollup-plugin-multi-input": "^1.2.0",
-    "rollup-plugin-node-resolve": "^5.2.0",
-    "rollup-plugin-size-snapshot": "^0.12.0",
-    "rollup-plugin-terser": "^7.0.2",
     "three": "^0.139.2",
-    "tslib": "^2.2.0",
     "typescript": "^4.2.4",
-    "webpack": "^5.65.0"
+    "vite": "^4.3.8"
   },
   "dependencies": {
-    "@babel/runtime": "^7.16.7",
+    "@types/draco3d": "^1.4.0",
     "@types/offscreencanvas": "^2019.6.4",
+    "@types/webxr": "^0.5.2",
     "@webgpu/glslang": "^0.0.15",
     "chevrotain": "^10.1.2",
     "draco3d": "^1.4.1",
@@ -110,5 +50,9 @@
   },
   "peerDependencies": {
     "three": ">=0.122.0"
+  },
+  "scripts": {
+    "build": "rimraf dist && vite build && tsc --emitDeclarationOnly && copyfiles -u 1 \"src/**/*.d.ts\" dist",
+    "lint": "tsc --noEmit"
   }
 }

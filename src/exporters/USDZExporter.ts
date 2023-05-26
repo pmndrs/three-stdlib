@@ -10,7 +10,7 @@ import {
   Texture,
   Vector2,
 } from 'three'
-import { Nullable } from 'types/utils'
+import { Nullable } from '../types/utils'
 
 type MaterialRepresentaion = MeshStandardMaterial | MeshPhysicalMaterial
 
