@@ -1,5 +1,4 @@
-import { AnimationClip, BufferAttribute, LoadingManager } from 'three'
-import { Loader } from '../types/Loader'
+import { Loader, AnimationClip, BufferAttribute, LoadingManager } from 'three'
 
 export interface MDD {
   morphTargets: BufferAttribute[]

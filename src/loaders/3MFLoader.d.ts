@@ -1,5 +1,4 @@
-import { LoadingManager, Group } from 'three'
-import { Loader } from '../types/Loader'
+import { Loader, LoadingManager, Group } from 'three'
 
 export class ThreeMFLoader extends Loader {
   constructor(manager?: LoadingManager)

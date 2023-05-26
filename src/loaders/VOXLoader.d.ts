@@ -1,5 +1,4 @@
-import { Texture, Mesh, LoadingManager } from 'three'
-import { Loader } from '../types/Loader'
+import { Loader, Texture, Mesh, LoadingManager } from 'three'
 
 export interface Chunk {
   palette: number[]

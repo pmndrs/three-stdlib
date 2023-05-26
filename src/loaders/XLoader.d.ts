@@ -1,5 +1,4 @@
-import { Mesh, LoadingManager } from 'three'
-import { Loader } from '../types/Loader'
+import { Loader, Mesh, LoadingManager } from 'three'
 
 export interface XResult {
   animations: object[]

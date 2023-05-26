@@ -1,5 +1,4 @@
-import { LoadingManager, Object3D } from 'three'
-import { Loader } from '../types/Loader'
+import { Loader, LoadingManager, Object3D } from 'three'
 
 export class Rhino3dmLoader extends Loader {
   constructor(manager?: LoadingManager)

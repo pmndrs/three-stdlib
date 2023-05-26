@@ -1,5 +1,4 @@
-import { LoadingManager } from 'three'
-import { Loader } from '../types/Loader'
+import { Loader, LoadingManager } from 'three'
 
 import { Collada } from './ColladaLoader'
 

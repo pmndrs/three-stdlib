@@ -1,5 +1,4 @@
-import { FileLoader, ShapePath } from 'three'
-import { Loader } from '../types/Loader'
+import { Loader, FileLoader, ShapePath } from 'three'
 
 import type { LoadingManager, Shape } from 'three'
 
@@ -39,6 +38,11 @@ export class FontLoader extends Loader {
       onProgress,
       onError,
     )
+  }
+
+  loadAsync(url: string, onProgress?: (event: ProgressEvent) => void): Promise<Font> {
+    // @ts-ignore
+    return super.loadAsync(url, onProgress)
   }
 
   public parse(json: FontData): Font {

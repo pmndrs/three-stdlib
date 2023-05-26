@@ -1,5 +1,4 @@
-import { Points, LoadingManager } from 'three'
-import { Loader } from '../types/Loader'
+import { Loader, Points, LoadingManager } from 'three'
 
 export class PCDLoader extends Loader {
   constructor(manager?: LoadingManager)

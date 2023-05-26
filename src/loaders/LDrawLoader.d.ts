@@ -1,5 +1,4 @@
-import { LoadingManager, Group, Material } from 'three'
-import { Loader } from '../types/Loader'
+import { Loader, LoadingManager, Group, Material } from 'three'
 
 export class LDrawLoader extends Loader {
   materials: Material[]
