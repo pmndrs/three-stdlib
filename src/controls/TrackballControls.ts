@@ -31,7 +31,7 @@ class TrackballControls extends EventDispatcher {
   public domElement: HTMLElement | undefined
   public cursorZoom: boolean = false
 
-  private target = new Vector3()
+  readonly target = new Vector3()
   private mousePosition = new Vector2()
 
   // internals
