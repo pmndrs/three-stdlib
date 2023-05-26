@@ -1830,7 +1830,7 @@ function getImageURIMimeType(uri) {
   return 'image/png'
 }
 
-const _identityMatrix = new Matrix4()
+const _identityMatrix = /* @__PURE__ */ new Matrix4()
 
 /* GLTF PARSER */
 

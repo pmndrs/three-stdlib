@@ -18,14 +18,8 @@ import {
   Vector3,
 } from 'three'
 
-var AssimpLoader = function (manager) {
-  Loader.call(this, manager)
-}
-
-AssimpLoader.prototype = Object.assign(Object.create(Loader.prototype), {
-  constructor: AssimpLoader,
-
-  load: function (url, onLoad, onProgress, onError) {
+class AssimpLoader extends Loader {
+  load(url, onLoad, onProgress, onError) {
     var scope = this
 
     var path = scope.path === '' ? LoaderUtils.extractUrlBase(url) : scope.path
@@ -54,50 +48,52 @@ AssimpLoader.prototype = Object.assign(Object.create(Loader.prototype), {
       onProgress,
       onError,
     )
-  },
+  }
 
-  parse: function (buffer, path) {
+  parse(buffer, path) {
     var textureLoader = new TextureLoader(this.manager)
     textureLoader.setPath(this.resourcePath || path).setCrossOrigin(this.crossOrigin)
 
     var Virtulous = {}
 
-    Virtulous.KeyFrame = function (time, matrix) {
-      this.time = time
-      this.matrix = matrix.clone()
-      this.position = new Vector3()
-      this.quaternion = new Quaternion()
-      this.scale = new Vector3(1, 1, 1)
-      this.matrix.decompose(this.position, this.quaternion, this.scale)
-      this.clone = function () {
-        var n = new Virtulous.KeyFrame(this.time, this.matrix)
-        return n
-      }
+    Virtulous.KeyFrame = class {
+      constructor(time, matrix) {
+        this.time = time
+        this.matrix = matrix.clone()
+        this.position = new Vector3()
+        this.quaternion = new Quaternion()
+        this.scale = new Vector3(1, 1, 1)
+        this.matrix.decompose(this.position, this.quaternion, this.scale)
+        this.clone = function () {
+          var n = new Virtulous.KeyFrame(this.time, this.matrix)
+          return n
+        }
 
-      this.lerp = function (nextKey, time) {
-        time -= this.time
-        var dist = nextKey.time - this.time
-        var l = time / dist
-        var l2 = 1 - l
-        var keypos = this.position
-        var keyrot = this.quaternion
-        //      var keyscl =  key.parentspaceScl || key.scl;
-        var key2pos = nextKey.position
-        var key2rot = nextKey.quaternion
-        //  var key2scl =  key2.parentspaceScl || key2.scl;
-        Virtulous.KeyFrame.tempAniPos.x = keypos.x * l2 + key2pos.x * l
-        Virtulous.KeyFrame.tempAniPos.y = keypos.y * l2 + key2pos.y * l
-        Virtulous.KeyFrame.tempAniPos.z = keypos.z * l2 + key2pos.z * l
-        //     tempAniScale.x = keyscl[0] * l2 + key2scl[0] * l;
-        //     tempAniScale.y = keyscl[1] * l2 + key2scl[1] * l;
-        //     tempAniScale.z = keyscl[2] * l2 + key2scl[2] * l;
-        Virtulous.KeyFrame.tempAniQuat.set(keyrot.x, keyrot.y, keyrot.z, keyrot.w)
-        Virtulous.KeyFrame.tempAniQuat.slerp(key2rot, l)
-        return Virtulous.KeyFrame.tempAniMatrix.compose(
-          Virtulous.KeyFrame.tempAniPos,
-          Virtulous.KeyFrame.tempAniQuat,
-          Virtulous.KeyFrame.tempAniScale,
-        )
+        this.lerp = function (nextKey, time) {
+          time -= this.time
+          var dist = nextKey.time - this.time
+          var l = time / dist
+          var l2 = 1 - l
+          var keypos = this.position
+          var keyrot = this.quaternion
+          //      var keyscl =  key.parentspaceScl || key.scl;
+          var key2pos = nextKey.position
+          var key2rot = nextKey.quaternion
+          //  var key2scl =  key2.parentspaceScl || key2.scl;
+          Virtulous.KeyFrame.tempAniPos.x = keypos.x * l2 + key2pos.x * l
+          Virtulous.KeyFrame.tempAniPos.y = keypos.y * l2 + key2pos.y * l
+          Virtulous.KeyFrame.tempAniPos.z = keypos.z * l2 + key2pos.z * l
+          //     tempAniScale.x = keyscl[0] * l2 + key2scl[0] * l;
+          //     tempAniScale.y = keyscl[1] * l2 + key2scl[1] * l;
+          //     tempAniScale.z = keyscl[2] * l2 + key2scl[2] * l;
+          Virtulous.KeyFrame.tempAniQuat.set(keyrot.x, keyrot.y, keyrot.z, keyrot.w)
+          Virtulous.KeyFrame.tempAniQuat.slerp(key2rot, l)
+          return Virtulous.KeyFrame.tempAniMatrix.compose(
+            Virtulous.KeyFrame.tempAniPos,
+            Virtulous.KeyFrame.tempAniQuat,
+            Virtulous.KeyFrame.tempAniScale,
+          )
+        }
       }
     }
 
@@ -514,286 +510,310 @@ AssimpLoader.prototype = Object.assign(Object.create(Loader.prototype), {
       return undefined
     }
 
-    function aiMesh() {
-      this.mPrimitiveTypes = 0
-      this.mNumVertices = 0
-      this.mNumFaces = 0
-      this.mNumBones = 0
-      this.mMaterialIndex = 0
-      this.mVertices = []
-      this.mNormals = []
-      this.mTangents = []
-      this.mBitangents = []
-      this.mColors = [[]]
-      this.mTextureCoords = [[]]
-      this.mFaces = []
-      this.mBones = []
-      this.hookupSkeletons = function (scene) {
-        if (this.mBones.length == 0) return
+    class aiMesh {
+      constructor() {
+        this.mPrimitiveTypes = 0
+        this.mNumVertices = 0
+        this.mNumFaces = 0
+        this.mNumBones = 0
+        this.mMaterialIndex = 0
+        this.mVertices = []
+        this.mNormals = []
+        this.mTangents = []
+        this.mBitangents = []
+        this.mColors = [[]]
+        this.mTextureCoords = [[]]
+        this.mFaces = []
+        this.mBones = []
+        this.hookupSkeletons = function (scene) {
+          if (this.mBones.length == 0) return
 
-        var allBones = []
-        var offsetMatrix = []
-        var skeletonRoot = scene.findNode(this.mBones[0].mName)
+          var allBones = []
+          var offsetMatrix = []
+          var skeletonRoot = scene.findNode(this.mBones[0].mName)
 
-        while (skeletonRoot.mParent && skeletonRoot.mParent.isBone) {
-          skeletonRoot = skeletonRoot.mParent
-        }
-
-        var threeSkeletonRoot = skeletonRoot.toTHREE(scene)
-        var threeSkeletonRootBone = cloneTreeToBones(threeSkeletonRoot, scene)
-        this.threeNode.add(threeSkeletonRootBone)
-
-        for (let i = 0; i < this.mBones.length; i++) {
-          var bone = findMatchingBone(threeSkeletonRootBone, this.mBones[i].mName)
-
-          if (bone) {
-            var tbone = bone
-            allBones.push(tbone)
-            //tbone.matrixAutoUpdate = false;
-            offsetMatrix.push(this.mBones[i].mOffsetMatrix.toTHREE())
-          } else {
-            var skeletonRoot = scene.findNode(this.mBones[i].mName)
-            if (!skeletonRoot) return
-            var threeSkeletonRoot = skeletonRoot.toTHREE(scene)
-            var threeSkeletonRootBone = cloneTreeToBones(threeSkeletonRoot, scene)
-            this.threeNode.add(threeSkeletonRootBone)
-            var bone = findMatchingBone(threeSkeletonRootBone, this.mBones[i].mName)
-            var tbone = bone
-            allBones.push(tbone)
-            //tbone.matrixAutoUpdate = false;
-            offsetMatrix.push(this.mBones[i].mOffsetMatrix.toTHREE())
+          while (skeletonRoot.mParent && skeletonRoot.mParent.isBone) {
+            skeletonRoot = skeletonRoot.mParent
           }
-        }
 
-        var skeleton = new Skeleton(allBones, offsetMatrix)
-
-        this.threeNode.bind(skeleton, new Matrix4())
-        this.threeNode.material.skinning = true
-      }
-
-      this.toTHREE = function (scene) {
-        if (this.threeNode) return this.threeNode
-        var geometry = new BufferGeometry()
-        var mat
-        if (scene.mMaterials[this.mMaterialIndex]) mat = scene.mMaterials[this.mMaterialIndex].toTHREE(scene)
-        else mat = new MeshLambertMaterial()
-        geometry.setIndex(new BufferAttribute(new Uint32Array(this.mIndexArray), 1))
-        geometry.setAttribute('position', new BufferAttribute(this.mVertexBuffer, 3))
-        if (this.mNormalBuffer && this.mNormalBuffer.length > 0) {
-          geometry.setAttribute('normal', new BufferAttribute(this.mNormalBuffer, 3))
-        }
-        if (this.mColorBuffer && this.mColorBuffer.length > 0) {
-          geometry.setAttribute('color', new BufferAttribute(this.mColorBuffer, 4))
-        }
-        if (this.mTexCoordsBuffers[0] && this.mTexCoordsBuffers[0].length > 0) {
-          geometry.setAttribute('uv', new BufferAttribute(new Float32Array(this.mTexCoordsBuffers[0]), 2))
-        }
-        if (this.mTexCoordsBuffers[1] && this.mTexCoordsBuffers[1].length > 0) {
-          geometry.setAttribute('uv1', new BufferAttribute(new Float32Array(this.mTexCoordsBuffers[1]), 2))
-        }
-        if (this.mTangentBuffer && this.mTangentBuffer.length > 0) {
-          geometry.setAttribute('tangents', new BufferAttribute(this.mTangentBuffer, 3))
-        }
-        if (this.mBitangentBuffer && this.mBitangentBuffer.length > 0) {
-          geometry.setAttribute('bitangents', new BufferAttribute(this.mBitangentBuffer, 3))
-        }
-        if (this.mBones.length > 0) {
-          var weights = []
-          var bones = []
+          var threeSkeletonRoot = skeletonRoot.toTHREE(scene)
+          var threeSkeletonRootBone = cloneTreeToBones(threeSkeletonRoot, scene)
+          this.threeNode.add(threeSkeletonRootBone)
 
           for (let i = 0; i < this.mBones.length; i++) {
-            for (let j = 0; j < this.mBones[i].mWeights.length; j++) {
-              var weight = this.mBones[i].mWeights[j]
-              if (weight) {
-                if (!weights[weight.mVertexId]) weights[weight.mVertexId] = []
-                if (!bones[weight.mVertexId]) bones[weight.mVertexId] = []
-                weights[weight.mVertexId].push(weight.mWeight)
-                bones[weight.mVertexId].push(parseInt(i))
-              }
+            var bone = findMatchingBone(threeSkeletonRootBone, this.mBones[i].mName)
+
+            if (bone) {
+              var tbone = bone
+              allBones.push(tbone)
+              //tbone.matrixAutoUpdate = false;
+              offsetMatrix.push(this.mBones[i].mOffsetMatrix.toTHREE())
+            } else {
+              var skeletonRoot = scene.findNode(this.mBones[i].mName)
+              if (!skeletonRoot) return
+              var threeSkeletonRoot = skeletonRoot.toTHREE(scene)
+              var threeSkeletonRootBone = cloneTreeToBones(threeSkeletonRoot, scene)
+              this.threeNode.add(threeSkeletonRootBone)
+              var bone = findMatchingBone(threeSkeletonRootBone, this.mBones[i].mName)
+              var tbone = bone
+              allBones.push(tbone)
+              //tbone.matrixAutoUpdate = false;
+              offsetMatrix.push(this.mBones[i].mOffsetMatrix.toTHREE())
             }
           }
 
-          for (let i in bones) {
-            sortWeights(bones[i], weights[i])
+          var skeleton = new Skeleton(allBones, offsetMatrix)
+
+          this.threeNode.bind(skeleton, new Matrix4())
+          this.threeNode.material.skinning = true
+        }
+
+        this.toTHREE = function (scene) {
+          if (this.threeNode) return this.threeNode
+          var geometry = new BufferGeometry()
+          var mat
+          if (scene.mMaterials[this.mMaterialIndex]) mat = scene.mMaterials[this.mMaterialIndex].toTHREE(scene)
+          else mat = new MeshLambertMaterial()
+          geometry.setIndex(new BufferAttribute(new Uint32Array(this.mIndexArray), 1))
+          geometry.setAttribute('position', new BufferAttribute(this.mVertexBuffer, 3))
+          if (this.mNormalBuffer && this.mNormalBuffer.length > 0) {
+            geometry.setAttribute('normal', new BufferAttribute(this.mNormalBuffer, 3))
           }
+          if (this.mColorBuffer && this.mColorBuffer.length > 0) {
+            geometry.setAttribute('color', new BufferAttribute(this.mColorBuffer, 4))
+          }
+          if (this.mTexCoordsBuffers[0] && this.mTexCoordsBuffers[0].length > 0) {
+            geometry.setAttribute('uv', new BufferAttribute(new Float32Array(this.mTexCoordsBuffers[0]), 2))
+          }
+          if (this.mTexCoordsBuffers[1] && this.mTexCoordsBuffers[1].length > 0) {
+            geometry.setAttribute('uv1', new BufferAttribute(new Float32Array(this.mTexCoordsBuffers[1]), 2))
+          }
+          if (this.mTangentBuffer && this.mTangentBuffer.length > 0) {
+            geometry.setAttribute('tangents', new BufferAttribute(this.mTangentBuffer, 3))
+          }
+          if (this.mBitangentBuffer && this.mBitangentBuffer.length > 0) {
+            geometry.setAttribute('bitangents', new BufferAttribute(this.mBitangentBuffer, 3))
+          }
+          if (this.mBones.length > 0) {
+            var weights = []
+            var bones = []
 
-          var _weights = []
-          var _bones = []
-
-          for (let i = 0; i < weights.length; i++) {
-            for (let j = 0; j < 4; j++) {
-              if (weights[i] && bones[i]) {
-                _weights.push(weights[i][j])
-                _bones.push(bones[i][j])
-              } else {
-                _weights.push(0)
-                _bones.push(0)
+            for (let i = 0; i < this.mBones.length; i++) {
+              for (let j = 0; j < this.mBones[i].mWeights.length; j++) {
+                var weight = this.mBones[i].mWeights[j]
+                if (weight) {
+                  if (!weights[weight.mVertexId]) weights[weight.mVertexId] = []
+                  if (!bones[weight.mVertexId]) bones[weight.mVertexId] = []
+                  weights[weight.mVertexId].push(weight.mWeight)
+                  bones[weight.mVertexId].push(parseInt(i))
+                }
               }
             }
+
+            for (let i in bones) {
+              sortWeights(bones[i], weights[i])
+            }
+
+            var _weights = []
+            var _bones = []
+
+            for (let i = 0; i < weights.length; i++) {
+              for (let j = 0; j < 4; j++) {
+                if (weights[i] && bones[i]) {
+                  _weights.push(weights[i][j])
+                  _bones.push(bones[i][j])
+                } else {
+                  _weights.push(0)
+                  _bones.push(0)
+                }
+              }
+            }
+
+            geometry.setAttribute('skinWeight', new BufferAttribute(new Float32Array(_weights), BONESPERVERT))
+            geometry.setAttribute('skinIndex', new BufferAttribute(new Float32Array(_bones), BONESPERVERT))
           }
 
-          geometry.setAttribute('skinWeight', new BufferAttribute(new Float32Array(_weights), BONESPERVERT))
-          geometry.setAttribute('skinIndex', new BufferAttribute(new Float32Array(_bones), BONESPERVERT))
+          var mesh
+
+          if (this.mBones.length == 0) mesh = new Mesh(geometry, mat)
+
+          if (this.mBones.length > 0) {
+            mesh = new SkinnedMesh(geometry, mat)
+            mesh.normalizeSkinWeights()
+          }
+
+          this.threeNode = mesh
+          //mesh.matrixAutoUpdate = false;
+          return mesh
+        }
+      }
+    }
+
+    class aiFace {
+      constructor() {
+        this.mNumIndices = 0
+        this.mIndices = []
+      }
+    }
+
+    class aiVector3D {
+      constructor() {
+        this.x = 0
+        this.y = 0
+        this.z = 0
+
+        this.toTHREE = function () {
+          return new Vector3(this.x, this.y, this.z)
+        }
+      }
+    }
+
+    class aiColor3D {
+      constructor() {
+        this.r = 0
+        this.g = 0
+        this.b = 0
+        this.a = 0
+        this.toTHREE = function () {
+          return new Color(this.r, this.g, this.b)
+        }
+      }
+    }
+
+    class aiQuaternion {
+      constructor() {
+        this.x = 0
+        this.y = 0
+        this.z = 0
+        this.w = 0
+        this.toTHREE = function () {
+          return new Quaternion(this.x, this.y, this.z, this.w)
+        }
+      }
+    }
+
+    class aiVertexWeight {
+      constructor() {
+        this.mVertexId = 0
+        this.mWeight = 0
+      }
+    }
+
+    class aiString {
+      constructor() {
+        this.data = []
+        this.toString = function () {
+          var str = ''
+          this.data.forEach(function (i) {
+            str += String.fromCharCode(i)
+          })
+          return str.replace(/[^\x20-\x7E]+/g, '')
+        }
+      }
+    }
+
+    class aiVectorKey {
+      constructor() {
+        this.mTime = 0
+        this.mValue = null
+      }
+    }
+
+    class aiQuatKey {
+      constructor() {
+        this.mTime = 0
+        this.mValue = null
+      }
+    }
+
+    class aiNode {
+      constructor() {
+        this.mName = ''
+        this.mTransformation = []
+        this.mNumChildren = 0
+        this.mNumMeshes = 0
+        this.mMeshes = []
+        this.mChildren = []
+        this.toTHREE = function (scene) {
+          if (this.threeNode) return this.threeNode
+          var o = new Object3D()
+          o.name = this.mName
+          o.matrix = this.mTransformation.toTHREE()
+
+          for (let i = 0; i < this.mChildren.length; i++) {
+            o.add(this.mChildren[i].toTHREE(scene))
+          }
+
+          for (let i = 0; i < this.mMeshes.length; i++) {
+            o.add(scene.mMeshes[this.mMeshes[i]].toTHREE(scene))
+          }
+
+          this.threeNode = o
+          //o.matrixAutoUpdate = false;
+          o.matrix.decompose(o.position, o.quaternion, o.scale)
+          return o
+        }
+      }
+    }
+
+    class aiBone {
+      constructor() {
+        this.mName = ''
+        this.mNumWeights = 0
+        this.mOffsetMatrix = 0
+      }
+    }
+
+    class aiMaterialProperty {
+      constructor() {
+        this.mKey = ''
+        this.mSemantic = 0
+        this.mIndex = 0
+        this.mData = []
+        this.mDataLength = 0
+        this.mType = 0
+        this.dataAsColor = function () {
+          var array = new Uint8Array(this.mData).buffer
+          var reader = new DataView(array)
+          var r = reader.getFloat32(0, true)
+          var g = reader.getFloat32(4, true)
+          var b = reader.getFloat32(8, true)
+          //var a = reader.getFloat32(12, true);
+          return new Color(r, g, b)
         }
 
-        var mesh
-
-        if (this.mBones.length == 0) mesh = new Mesh(geometry, mat)
-
-        if (this.mBones.length > 0) {
-          mesh = new SkinnedMesh(geometry, mat)
-          mesh.normalizeSkinWeights()
+        this.dataAsFloat = function () {
+          var array = new Uint8Array(this.mData).buffer
+          var reader = new DataView(array)
+          var r = reader.getFloat32(0, true)
+          return r
         }
 
-        this.threeNode = mesh
-        //mesh.matrixAutoUpdate = false;
-        return mesh
-      }
-    }
-
-    function aiFace() {
-      this.mNumIndices = 0
-      this.mIndices = []
-    }
-
-    function aiVector3D() {
-      this.x = 0
-      this.y = 0
-      this.z = 0
-
-      this.toTHREE = function () {
-        return new Vector3(this.x, this.y, this.z)
-      }
-    }
-
-    function aiColor3D() {
-      this.r = 0
-      this.g = 0
-      this.b = 0
-      this.a = 0
-      this.toTHREE = function () {
-        return new Color(this.r, this.g, this.b)
-      }
-    }
-
-    function aiQuaternion() {
-      this.x = 0
-      this.y = 0
-      this.z = 0
-      this.w = 0
-      this.toTHREE = function () {
-        return new Quaternion(this.x, this.y, this.z, this.w)
-      }
-    }
-
-    function aiVertexWeight() {
-      this.mVertexId = 0
-      this.mWeight = 0
-    }
-
-    function aiString() {
-      this.data = []
-      this.toString = function () {
-        var str = ''
-        this.data.forEach(function (i) {
-          str += String.fromCharCode(i)
-        })
-        return str.replace(/[^\x20-\x7E]+/g, '')
-      }
-    }
-
-    function aiVectorKey() {
-      this.mTime = 0
-      this.mValue = null
-    }
-
-    function aiQuatKey() {
-      this.mTime = 0
-      this.mValue = null
-    }
-
-    function aiNode() {
-      this.mName = ''
-      this.mTransformation = []
-      this.mNumChildren = 0
-      this.mNumMeshes = 0
-      this.mMeshes = []
-      this.mChildren = []
-      this.toTHREE = function (scene) {
-        if (this.threeNode) return this.threeNode
-        var o = new Object3D()
-        o.name = this.mName
-        o.matrix = this.mTransformation.toTHREE()
-
-        for (let i = 0; i < this.mChildren.length; i++) {
-          o.add(this.mChildren[i].toTHREE(scene))
+        this.dataAsBool = function () {
+          var array = new Uint8Array(this.mData).buffer
+          var reader = new DataView(array)
+          var r = reader.getFloat32(0, true)
+          return !!r
         }
 
-        for (let i = 0; i < this.mMeshes.length; i++) {
-          o.add(scene.mMeshes[this.mMeshes[i]].toTHREE(scene))
+        this.dataAsString = function () {
+          var s = new aiString()
+          s.data = this.mData
+          return s.toString()
         }
 
-        this.threeNode = o
-        //o.matrixAutoUpdate = false;
-        o.matrix.decompose(o.position, o.quaternion, o.scale)
-        return o
-      }
-    }
+        this.dataAsMap = function () {
+          var s = new aiString()
+          s.data = this.mData
+          var path = s.toString()
+          path = path.replace(/\\/g, '/')
 
-    function aiBone() {
-      this.mName = ''
-      this.mNumWeights = 0
-      this.mOffsetMatrix = 0
-    }
+          if (path.indexOf('/') != -1) {
+            path = path.substr(path.lastIndexOf('/') + 1)
+          }
 
-    function aiMaterialProperty() {
-      this.mKey = ''
-      this.mSemantic = 0
-      this.mIndex = 0
-      this.mData = []
-      this.mDataLength = 0
-      this.mType = 0
-      this.dataAsColor = function () {
-        var array = new Uint8Array(this.mData).buffer
-        var reader = new DataView(array)
-        var r = reader.getFloat32(0, true)
-        var g = reader.getFloat32(4, true)
-        var b = reader.getFloat32(8, true)
-        //var a = reader.getFloat32(12, true);
-        return new Color(r, g, b)
-      }
-
-      this.dataAsFloat = function () {
-        var array = new Uint8Array(this.mData).buffer
-        var reader = new DataView(array)
-        var r = reader.getFloat32(0, true)
-        return r
-      }
-
-      this.dataAsBool = function () {
-        var array = new Uint8Array(this.mData).buffer
-        var reader = new DataView(array)
-        var r = reader.getFloat32(0, true)
-        return !!r
-      }
-
-      this.dataAsString = function () {
-        var s = new aiString()
-        s.data = this.mData
-        return s.toString()
-      }
-
-      this.dataAsMap = function () {
-        var s = new aiString()
-        s.data = this.mData
-        var path = s.toString()
-        path = path.replace(/\\/g, '/')
-
-        if (path.indexOf('/') != -1) {
-          path = path.substr(path.lastIndexOf('/') + 1)
+          return textureLoader.load(path)
         }
-
-        return textureLoader.load(path)
       }
     }
 
@@ -831,42 +851,44 @@ AssimpLoader.prototype = Object.assign(Object.create(Loader.prototype), {
       '$tex.file': 'map',
     }
 
-    function aiMaterial() {
-      this.mNumAllocated = 0
-      this.mNumProperties = 0
-      this.mProperties = []
-      this.toTHREE = function () {
-        var mat = new MeshPhongMaterial()
+    class aiMaterial {
+      constructor() {
+        this.mNumAllocated = 0
+        this.mNumProperties = 0
+        this.mProperties = []
+        this.toTHREE = function () {
+          var mat = new MeshPhongMaterial()
 
-        for (let i = 0; i < this.mProperties.length; i++) {
-          if (nameTypeMapping[this.mProperties[i].mKey] == 'float') {
-            mat[namePropMapping[this.mProperties[i].mKey]] = this.mProperties[i].dataAsFloat()
+          for (let i = 0; i < this.mProperties.length; i++) {
+            if (nameTypeMapping[this.mProperties[i].mKey] == 'float') {
+              mat[namePropMapping[this.mProperties[i].mKey]] = this.mProperties[i].dataAsFloat()
+            }
+            if (nameTypeMapping[this.mProperties[i].mKey] == 'color') {
+              mat[namePropMapping[this.mProperties[i].mKey]] = this.mProperties[i].dataAsColor()
+            }
+            if (nameTypeMapping[this.mProperties[i].mKey] == 'bool') {
+              mat[namePropMapping[this.mProperties[i].mKey]] = this.mProperties[i].dataAsBool()
+            }
+            if (nameTypeMapping[this.mProperties[i].mKey] == 'string') {
+              mat[namePropMapping[this.mProperties[i].mKey]] = this.mProperties[i].dataAsString()
+            }
+            if (nameTypeMapping[this.mProperties[i].mKey] == 'map') {
+              var prop = this.mProperties[i]
+              if (prop.mSemantic == aiTextureType_DIFFUSE) mat.map = this.mProperties[i].dataAsMap()
+              if (prop.mSemantic == aiTextureType_NORMALS) mat.normalMap = this.mProperties[i].dataAsMap()
+              if (prop.mSemantic == aiTextureType_LIGHTMAP) mat.lightMap = this.mProperties[i].dataAsMap()
+              if (prop.mSemantic == aiTextureType_OPACITY) mat.alphaMap = this.mProperties[i].dataAsMap()
+            }
           }
-          if (nameTypeMapping[this.mProperties[i].mKey] == 'color') {
-            mat[namePropMapping[this.mProperties[i].mKey]] = this.mProperties[i].dataAsColor()
-          }
-          if (nameTypeMapping[this.mProperties[i].mKey] == 'bool') {
-            mat[namePropMapping[this.mProperties[i].mKey]] = this.mProperties[i].dataAsBool()
-          }
-          if (nameTypeMapping[this.mProperties[i].mKey] == 'string') {
-            mat[namePropMapping[this.mProperties[i].mKey]] = this.mProperties[i].dataAsString()
-          }
-          if (nameTypeMapping[this.mProperties[i].mKey] == 'map') {
-            var prop = this.mProperties[i]
-            if (prop.mSemantic == aiTextureType_DIFFUSE) mat.map = this.mProperties[i].dataAsMap()
-            if (prop.mSemantic == aiTextureType_NORMALS) mat.normalMap = this.mProperties[i].dataAsMap()
-            if (prop.mSemantic == aiTextureType_LIGHTMAP) mat.lightMap = this.mProperties[i].dataAsMap()
-            if (prop.mSemantic == aiTextureType_OPACITY) mat.alphaMap = this.mProperties[i].dataAsMap()
-          }
+
+          mat.ambient.r = 0.53
+          mat.ambient.g = 0.53
+          mat.ambient.b = 0.53
+          mat.color.r = 1
+          mat.color.g = 1
+          mat.color.b = 1
+          return mat
         }
-
-        mat.ambient.r = 0.53
-        mat.ambient.g = 0.53
-        mat.ambient.b = 0.53
-        mat.color.r = 1
-        mat.color.g = 1
-        mat.color.b = 1
-        return mat
       }
     }
 
@@ -920,220 +942,234 @@ AssimpLoader.prototype = Object.assign(Object.create(Loader.prototype), {
       }
     }
 
-    function aiNodeAnim() {
-      this.mNodeName = ''
-      this.mNumPositionKeys = 0
-      this.mNumRotationKeys = 0
-      this.mNumScalingKeys = 0
-      this.mPositionKeys = []
-      this.mRotationKeys = []
-      this.mScalingKeys = []
-      this.mPreState = ''
-      this.mPostState = ''
-      this.init = function (tps) {
-        if (!tps) tps = 1
+    class aiNodeAnim {
+      constructor() {
+        this.mNodeName = ''
+        this.mNumPositionKeys = 0
+        this.mNumRotationKeys = 0
+        this.mNumScalingKeys = 0
+        this.mPositionKeys = []
+        this.mRotationKeys = []
+        this.mScalingKeys = []
+        this.mPreState = ''
+        this.mPostState = ''
+        this.init = function (tps) {
+          if (!tps) tps = 1
 
-        function t(t) {
-          t.mTime /= tps
-        }
-
-        this.mPositionKeys.forEach(t)
-        this.mRotationKeys.forEach(t)
-        this.mScalingKeys.forEach(t)
-      }
-
-      this.sortKeys = function () {
-        function comp(a, b) {
-          return a.mTime - b.mTime
-        }
-
-        this.mPositionKeys.sort(comp)
-        this.mRotationKeys.sort(comp)
-        this.mScalingKeys.sort(comp)
-      }
-
-      this.getLength = function () {
-        return Math.max(
-          Math.max.apply(
-            null,
-            this.mPositionKeys.map(function (a) {
-              return a.mTime
-            }),
-          ),
-          Math.max.apply(
-            null,
-            this.mRotationKeys.map(function (a) {
-              return a.mTime
-            }),
-          ),
-          Math.max.apply(
-            null,
-            this.mScalingKeys.map(function (a) {
-              return a.mTime
-            }),
-          ),
-        )
-      }
-
-      this.toTHREE = function (o) {
-        this.sortKeys()
-        var length = this.getLength()
-        var track = new Virtulous.KeyFrameTrack()
-
-        for (let i = 0; i < length; i += 0.05) {
-          var matrix = new Matrix4()
-          var time = i
-          var pos = sampleTrack(this.mPositionKeys, time, length, veclerp)
-          var scale = sampleTrack(this.mScalingKeys, time, length, veclerp)
-          var rotation = sampleTrack(this.mRotationKeys, time, length, quatlerp)
-          matrix.compose(pos, rotation, scale)
-
-          var key = new Virtulous.KeyFrame(time, matrix)
-          track.addKey(key)
-        }
-
-        track.target = o.findNode(this.mNodeName).toTHREE()
-
-        var tracks = [track]
-
-        if (o.nodeToBoneMap[this.mNodeName]) {
-          for (let i = 0; i < o.nodeToBoneMap[this.mNodeName].length; i++) {
-            var t2 = track.clone()
-            t2.target = o.nodeToBoneMap[this.mNodeName][i]
-            tracks.push(t2)
+          function t(t) {
+            t.mTime /= tps
           }
+
+          this.mPositionKeys.forEach(t)
+          this.mRotationKeys.forEach(t)
+          this.mScalingKeys.forEach(t)
         }
 
-        return tracks
-      }
-    }
-
-    function aiAnimation() {
-      this.mName = ''
-      this.mDuration = 0
-      this.mTicksPerSecond = 0
-      this.mNumChannels = 0
-      this.mChannels = []
-      this.toTHREE = function (root) {
-        var animationHandle = new Virtulous.Animation()
-
-        for (let i in this.mChannels) {
-          this.mChannels[i].init(this.mTicksPerSecond)
-
-          var tracks = this.mChannels[i].toTHREE(root)
-
-          for (let j in tracks) {
-            tracks[j].init()
-            animationHandle.addTrack(tracks[j])
+        this.sortKeys = function () {
+          function comp(a, b) {
+            return a.mTime - b.mTime
           }
+
+          this.mPositionKeys.sort(comp)
+          this.mRotationKeys.sort(comp)
+          this.mScalingKeys.sort(comp)
         }
 
-        animationHandle.length = Math.max.apply(
-          null,
-          animationHandle.tracks.map(function (e) {
-            return e.length
-          }),
-        )
-        return animationHandle
-      }
-    }
-
-    function aiTexture() {
-      this.mWidth = 0
-      this.mHeight = 0
-      this.texAchFormatHint = []
-      this.pcData = []
-    }
-
-    function aiLight() {
-      this.mName = ''
-      this.mType = 0
-      this.mAttenuationConstant = 0
-      this.mAttenuationLinear = 0
-      this.mAttenuationQuadratic = 0
-      this.mAngleInnerCone = 0
-      this.mAngleOuterCone = 0
-      this.mColorDiffuse = null
-      this.mColorSpecular = null
-      this.mColorAmbient = null
-    }
-
-    function aiCamera() {
-      this.mName = ''
-      this.mPosition = null
-      this.mLookAt = null
-      this.mUp = null
-      this.mHorizontalFOV = 0
-      this.mClipPlaneNear = 0
-      this.mClipPlaneFar = 0
-      this.mAspect = 0
-    }
-
-    function aiScene() {
-      this.versionMajor = 0
-      this.versionMinor = 0
-      this.versionRevision = 0
-      this.compileFlags = 0
-      this.mFlags = 0
-      this.mNumMeshes = 0
-      this.mNumMaterials = 0
-      this.mNumAnimations = 0
-      this.mNumTextures = 0
-      this.mNumLights = 0
-      this.mNumCameras = 0
-      this.mRootNode = null
-      this.mMeshes = []
-      this.mMaterials = []
-      this.mAnimations = []
-      this.mLights = []
-      this.mCameras = []
-      this.nodeToBoneMap = {}
-      this.findNode = function (name, root) {
-        if (!root) {
-          root = this.mRootNode
+        this.getLength = function () {
+          return Math.max(
+            Math.max.apply(
+              null,
+              this.mPositionKeys.map(function (a) {
+                return a.mTime
+              }),
+            ),
+            Math.max.apply(
+              null,
+              this.mRotationKeys.map(function (a) {
+                return a.mTime
+              }),
+            ),
+            Math.max.apply(
+              null,
+              this.mScalingKeys.map(function (a) {
+                return a.mTime
+              }),
+            ),
+          )
         }
 
-        if (root.mName == name) {
-          return root
-        }
+        this.toTHREE = function (o) {
+          this.sortKeys()
+          var length = this.getLength()
+          var track = new Virtulous.KeyFrameTrack()
 
-        for (let i = 0; i < root.mChildren.length; i++) {
-          var ret = this.findNode(name, root.mChildren[i])
-          if (ret) return ret
-        }
+          for (let i = 0; i < length; i += 0.05) {
+            var matrix = new Matrix4()
+            var time = i
+            var pos = sampleTrack(this.mPositionKeys, time, length, veclerp)
+            var scale = sampleTrack(this.mScalingKeys, time, length, veclerp)
+            var rotation = sampleTrack(this.mRotationKeys, time, length, quatlerp)
+            matrix.compose(pos, rotation, scale)
 
-        return null
-      }
-
-      this.toTHREE = function () {
-        this.nodeCount = 0
-
-        markBones(this)
-
-        var o = this.mRootNode.toTHREE(this)
-
-        for (let i in this.mMeshes) this.mMeshes[i].hookupSkeletons(this)
-
-        if (this.mAnimations.length > 0) {
-          var a = this.mAnimations[0].toTHREE(this)
-        }
-
-        return { object: o, animation: a }
-      }
-    }
-
-    function aiMatrix4() {
-      this.elements = [[], [], [], []]
-      this.toTHREE = function () {
-        var m = new Matrix4()
-
-        for (let i = 0; i < 4; ++i) {
-          for (let i2 = 0; i2 < 4; ++i2) {
-            m.elements[i * 4 + i2] = this.elements[i2][i]
+            var key = new Virtulous.KeyFrame(time, matrix)
+            track.addKey(key)
           }
+
+          track.target = o.findNode(this.mNodeName).toTHREE()
+
+          var tracks = [track]
+
+          if (o.nodeToBoneMap[this.mNodeName]) {
+            for (let i = 0; i < o.nodeToBoneMap[this.mNodeName].length; i++) {
+              var t2 = track.clone()
+              t2.target = o.nodeToBoneMap[this.mNodeName][i]
+              tracks.push(t2)
+            }
+          }
+
+          return tracks
+        }
+      }
+    }
+
+    class aiAnimation {
+      constructor() {
+        this.mName = ''
+        this.mDuration = 0
+        this.mTicksPerSecond = 0
+        this.mNumChannels = 0
+        this.mChannels = []
+        this.toTHREE = function (root) {
+          var animationHandle = new Virtulous.Animation()
+
+          for (let i in this.mChannels) {
+            this.mChannels[i].init(this.mTicksPerSecond)
+
+            var tracks = this.mChannels[i].toTHREE(root)
+
+            for (let j in tracks) {
+              tracks[j].init()
+              animationHandle.addTrack(tracks[j])
+            }
+          }
+
+          animationHandle.length = Math.max.apply(
+            null,
+            animationHandle.tracks.map(function (e) {
+              return e.length
+            }),
+          )
+          return animationHandle
+        }
+      }
+    }
+
+    class aiTexture {
+      constructor() {
+        this.mWidth = 0
+        this.mHeight = 0
+        this.texAchFormatHint = []
+        this.pcData = []
+      }
+    }
+
+    class aiLight {
+      constructor() {
+        this.mName = ''
+        this.mType = 0
+        this.mAttenuationConstant = 0
+        this.mAttenuationLinear = 0
+        this.mAttenuationQuadratic = 0
+        this.mAngleInnerCone = 0
+        this.mAngleOuterCone = 0
+        this.mColorDiffuse = null
+        this.mColorSpecular = null
+        this.mColorAmbient = null
+      }
+    }
+
+    class aiCamera {
+      constructor() {
+        this.mName = ''
+        this.mPosition = null
+        this.mLookAt = null
+        this.mUp = null
+        this.mHorizontalFOV = 0
+        this.mClipPlaneNear = 0
+        this.mClipPlaneFar = 0
+        this.mAspect = 0
+      }
+    }
+
+    class aiScene {
+      constructor() {
+        this.versionMajor = 0
+        this.versionMinor = 0
+        this.versionRevision = 0
+        this.compileFlags = 0
+        this.mFlags = 0
+        this.mNumMeshes = 0
+        this.mNumMaterials = 0
+        this.mNumAnimations = 0
+        this.mNumTextures = 0
+        this.mNumLights = 0
+        this.mNumCameras = 0
+        this.mRootNode = null
+        this.mMeshes = []
+        this.mMaterials = []
+        this.mAnimations = []
+        this.mLights = []
+        this.mCameras = []
+        this.nodeToBoneMap = {}
+        this.findNode = function (name, root) {
+          if (!root) {
+            root = this.mRootNode
+          }
+
+          if (root.mName == name) {
+            return root
+          }
+
+          for (let i = 0; i < root.mChildren.length; i++) {
+            var ret = this.findNode(name, root.mChildren[i])
+            if (ret) return ret
+          }
+
+          return null
         }
 
-        return m
+        this.toTHREE = function () {
+          this.nodeCount = 0
+
+          markBones(this)
+
+          var o = this.mRootNode.toTHREE(this)
+
+          for (let i in this.mMeshes) this.mMeshes[i].hookupSkeletons(this)
+
+          if (this.mAnimations.length > 0) {
+            var a = this.mAnimations[0].toTHREE(this)
+          }
+
+          return { object: o, animation: a }
+        }
+      }
+    }
+
+    class aiMatrix4 {
+      constructor() {
+        this.elements = [[], [], [], []]
+        this.toTHREE = function () {
+          var m = new Matrix4()
+
+          for (let i = 0; i < 4; ++i) {
+            for (let i2 = 0; i2 < 4; ++i2) {
+              m.elements[i * 4 + i2] = this.elements[i2][i]
+            }
+          }
+
+          return m
+        }
       }
     }
 
@@ -1787,7 +1823,7 @@ AssimpLoader.prototype = Object.assign(Object.create(Loader.prototype), {
     }
 
     return InternReadFile(buffer)
-  },
-})
+  }
+}
 
 export { AssimpLoader }

@@ -1,6 +1,9 @@
 import { Loader, FileLoader } from 'three'
 import * as Nodes from '../nodes/Nodes'
 
+/**
+ * @deprecated
+ */
 class NodeMaterialLoader extends Loader {
   constructor(manager, library = {}) {
     super(manager)

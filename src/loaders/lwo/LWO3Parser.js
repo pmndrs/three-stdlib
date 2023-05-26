@@ -1,16 +1,14 @@
-function LWO3Parser(IFFParser) {
-  this.IFF = IFFParser
-}
+class LWO3Parser {
+  constructor(IFFParser) {
+    this.IFF = IFFParser
+  }
 
-LWO3Parser.prototype = {
-  constructor: LWO3Parser,
-
-  parseBlock: function () {
+  parseBlock() {
     this.IFF.debugger.offset = this.IFF.reader.offset
     this.IFF.debugger.closeForms()
 
-    var blockID = this.IFF.reader.getIDTag()
-    var length = this.IFF.reader.getUint32() // size of data in bytes
+    const blockID = this.IFF.reader.getIDTag()
+    const length = this.IFF.reader.getUint32() // size of data in bytes
 
     this.IFF.debugger.dataOffset = this.IFF.reader.offset
     this.IFF.debugger.length = length
@@ -33,8 +31,8 @@ LWO3Parser.prototype = {
       case 'NORM':
 
       // ENVL FORM skipped
-      case 'PRE ':
-      case 'POST':
+      case 'PRE ': // Pre-loop behavior for the keyframe
+      case 'POST': // Post-loop behavior for the keyframe
       case 'KEY ':
       case 'SPAN':
 
@@ -195,14 +193,11 @@ LWO3Parser.prototype = {
 
       // Image Map Layer
       case 'WRAP':
-        this.IFF.currentForm.wrap = {
-          w: this.IFF.reader.getUint16(),
-          h: this.IFF.reader.getUint16(),
-        }
+        this.IFF.currentForm.wrap = { w: this.IFF.reader.getUint16(), h: this.IFF.reader.getUint16() }
         break
 
       case 'IMAG':
-        var index = this.IFF.reader.getVariableLengthIndex()
+        const index = this.IFF.reader.getVariableLengthIndex()
         this.IFF.currentForm.imageIndex = index
         break
 
@@ -270,50 +265,38 @@ LWO3Parser.prototype = {
 
       // LWO2 Spec chunks: these are needed since the SURF FORMs are often in LWO2 format
       case 'SMAN':
-        var maxSmoothingAngle = this.IFF.reader.getFloat32()
+        const maxSmoothingAngle = this.IFF.reader.getFloat32()
         this.IFF.currentSurface.attributes.smooth = maxSmoothingAngle < 0 ? false : true
         break
 
       // LWO2: Basic Surface Parameters
       case 'COLR':
-        this.IFF.currentSurface.attributes.Color = {
-          value: this.IFF.reader.getFloat32Array(3),
-        }
+        this.IFF.currentSurface.attributes.Color = { value: this.IFF.reader.getFloat32Array(3) }
         this.IFF.reader.skip(2) // VX: envelope
         break
 
       case 'LUMI':
-        this.IFF.currentSurface.attributes.Luminosity = {
-          value: this.IFF.reader.getFloat32(),
-        }
+        this.IFF.currentSurface.attributes.Luminosity = { value: this.IFF.reader.getFloat32() }
         this.IFF.reader.skip(2)
         break
 
       case 'SPEC':
-        this.IFF.currentSurface.attributes.Specular = {
-          value: this.IFF.reader.getFloat32(),
-        }
+        this.IFF.currentSurface.attributes.Specular = { value: this.IFF.reader.getFloat32() }
         this.IFF.reader.skip(2)
         break
 
       case 'DIFF':
-        this.IFF.currentSurface.attributes.Diffuse = {
-          value: this.IFF.reader.getFloat32(),
-        }
+        this.IFF.currentSurface.attributes.Diffuse = { value: this.IFF.reader.getFloat32() }
         this.IFF.reader.skip(2)
         break
 
       case 'REFL':
-        this.IFF.currentSurface.attributes.Reflection = {
-          value: this.IFF.reader.getFloat32(),
-        }
+        this.IFF.currentSurface.attributes.Reflection = { value: this.IFF.reader.getFloat32() }
         this.IFF.reader.skip(2)
         break
 
       case 'GLOS':
-        this.IFF.currentSurface.attributes.Glossiness = {
-          value: this.IFF.reader.getFloat32(),
-        }
+        this.IFF.currentSurface.attributes.Glossiness = { value: this.IFF.reader.getFloat32() }
         this.IFF.reader.skip(2)
         break
 
@@ -372,7 +355,7 @@ LWO3Parser.prototype = {
     if (this.IFF.reader.offset >= this.IFF.currentFormEnd) {
       this.IFF.currentForm = this.IFF.parentForm
     }
-  },
+  }
 }
 
 export { LWO3Parser }

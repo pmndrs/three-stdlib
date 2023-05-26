@@ -32,7 +32,6 @@
  *
  **/
 
-import { LoaderUtils } from 'three'
 import { LWO2Parser } from './LWO2Parser'
 import { LWO3Parser } from './LWO3Parser'
 
@@ -584,7 +583,7 @@ IFFParser.prototype = {
   // x -> -x and switch material FrontSide -> BackSide
   parsePoints(length) {
     this.currentPoints = []
-    for (let i = 0; i < length / 4; i += 3) {
+    for (var i = 0; i < length / 4; i += 3) {
       // z -> -z to match three.js right handed coords
       this.currentPoints.push(this.reader.getFloat32(), this.reader.getFloat32(), -this.reader.getFloat32())
     }
@@ -715,7 +714,7 @@ IFFParser.prototype = {
       numverts = numverts & 1023 // remaining ten low order bits are vertex num
       polygonDimensions.push(numverts)
 
-      for (let j = 0; j < numverts; j++) indices.push(this.reader.getVariableLengthIndex())
+      for (var j = 0; j < numverts; j++) indices.push(this.reader.getVariableLengthIndex())
     }
 
     var geometryData = {
@@ -743,9 +742,8 @@ IFFParser.prototype = {
   parsePolygonTagMapping(length) {
     var finalOffset = this.reader.offset + length
     var type = this.reader.getIDTag()
-    if (type === 'SURF') {
-      this.parseMaterialIndices(finalOffset)
-    } else {
+    if (type === 'SURF') this.parseMaterialIndices(finalOffset)
+    else {
       //PART, SMGP, COLR not supported
 
       this.reader.skip(length - 4)
@@ -779,6 +777,8 @@ IFFParser.prototype = {
 function DataViewReader(buffer) {
   this.dv = new DataView(buffer)
   this.offset = 0
+  this._textDecoder = new TextDecoder()
+  this._bytes = new Uint8Array(buffer)
 }
 
 DataViewReader.prototype = {
@@ -846,7 +846,7 @@ DataViewReader.prototype = {
   getFloat32Array: function (size) {
     var a = []
 
-    for (let i = 0; i < size; i++) {
+    for (var i = 0; i < size; i++) {
       a.push(this.getFloat32())
     }
 
@@ -862,7 +862,7 @@ DataViewReader.prototype = {
   getFloat64Array: function (size) {
     var a = []
 
-    for (let i = 0; i < size; i++) {
+    for (var i = 0; i < size; i++) {
       a.push(this.getFloat64())
     }
 
@@ -893,27 +893,30 @@ DataViewReader.prototype = {
   getString: function (size) {
     if (size === 0) return
 
-    // note: safari 9 doesn't support Uint8Array.indexOf; create intermediate array instead
-    var a = []
+    const start = this.offset
+
+    let result
+    let length
 
     if (size) {
-      for (let i = 0; i < size; i++) {
-        a[i] = this.getUint8()
-      }
+      length = size
+      result = this._textDecoder.decode(new Uint8Array(this.dv.buffer, start, size))
     } else {
-      var currentChar
-      var len = 0
+      // use 1:1 mapping of buffer to avoid redundant new array creation.
+      length = this._bytes.indexOf(0, start) - start
 
-      while (currentChar !== 0) {
-        currentChar = this.getUint8()
-        if (currentChar !== 0) a.push(currentChar)
-        len++
-      }
+      result = this._textDecoder.decode(new Uint8Array(this.dv.buffer, start, length))
 
-      if (!isEven(len + 1)) this.getUint8() // if string with terminating nullbyte is uneven, extra nullbyte is added
+      // account for null byte in length
+      length++
+
+      // if string with terminating nullbyte is uneven, extra nullbyte is added, skip that too
+      length += length % 2
     }
 
-    return LoaderUtils.decodeText(new Uint8Array(a))
+    this.skip(length)
+
+    return result
   },
 
   getStringArray: function (size) {
@@ -978,7 +981,7 @@ Debugger.prototype = {
   closeForms: function () {
     if (!this.active) return
 
-    for (let i = this.formList.length - 1; i >= 0; i--) {
+    for (var i = this.formList.length - 1; i >= 0; i--) {
       if (this.offset >= this.formList[i]) {
         this.depth -= 1
         console.log('| '.repeat(this.depth) + '}')
@@ -1003,7 +1006,7 @@ function stringOffset(string) {
 // for testing purposes, dump buffer to console
 // printBuffer( this.reader.dv.buffer, this.reader.offset, length );
 function printBuffer(buffer, from, to) {
-  console.log(LoaderUtils.decodeText(new Uint8Array(buffer, from, to)))
+  console.log(new TextDecoder().decode(new Uint8Array(buffer, from, to)))
 }
 
 export { IFFParser }
