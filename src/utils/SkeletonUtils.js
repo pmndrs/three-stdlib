@@ -315,5 +315,3 @@ function parallelTraverse(a, b, callback) {
 }
 
 export const SkeletonUtils = { retarget, retargetClip, clone }
-
-export { retarget, retargetClip, clone }
