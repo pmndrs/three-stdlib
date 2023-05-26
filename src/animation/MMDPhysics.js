@@ -25,8 +25,6 @@ import Ammo from '../_polyfill/Ammo'
  *  - Physics in Worker
  */
 
-/* global Ammo */
-
 class MMDPhysics {
   /**
    * @param {THREE.SkinnedMesh} mesh
