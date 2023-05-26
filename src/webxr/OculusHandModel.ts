@@ -1,4 +1,4 @@
-import { Object3D, Sphere, Box3, Mesh, Texture, XRInputSource, Vector3 } from 'three'
+import { Object3D, Sphere, Box3, Mesh, Texture, Vector3 } from 'three'
 import { XRHandMeshModel } from './XRHandMeshModel'
 
 const TOUCH_RADIUS = 0.01

@@ -243,7 +243,7 @@ def "Geometry"
 
   private buildMeshVertexIndices(geometry: BufferGeometry): string {
     if (geometry.index !== null) {
-      // @ts-expect-error
+      // @ts-ignore
       return geometry.index.array.join(', ')
     }
 
@@ -287,7 +287,7 @@ def "Geometry"
     const data = attribute.array
 
     for (let i = 0; i < data.length; i += 2) {
-      // @ts-expect-error
+      // @ts-ignore
       array.push(`(${data[i + 0].toPrecision(this.PRECISION)}, ${1 - data[i + 1].toPrecision(this.PRECISION)})`)
     }
 

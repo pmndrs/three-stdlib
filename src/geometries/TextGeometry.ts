@@ -30,11 +30,13 @@ export class TextGeometry extends ExtrudeGeometry {
     } = parameters
 
     if (font === undefined) {
+      // @ts-ignore
       super() // generate default extrude geometry
     } else {
       const shapes = font.generateShapes(text, size, { lineHeight, letterSpacing })
       super(shapes, { ...rest, bevelEnabled, bevelSize, bevelThickness, depth: height })
     }
+    // @ts-ignore
     this.type = 'TextGeometry'
   }
 }

@@ -1,13 +1,13 @@
 import { Pass } from './Pass'
-import { Color, ColorRepresentation, WebGLRenderer, WebGLRenderTarget } from 'three'
+import { Color, WebGLRenderer, WebGLRenderTarget } from 'three'
 
 class ClearPass extends Pass {
-  public clearColor: ColorRepresentation
+  public clearColor: Color | string | number
   public clearAlpha: number
 
   private _oldClearColor: Color
 
-  constructor(clearColor?: ColorRepresentation, clearAlpha?: number) {
+  constructor(clearColor?: Color | string | number, clearAlpha?: number) {
     super()
     this.needsSwap = false
     this.clearColor = clearColor !== undefined ? clearColor : 0x000000

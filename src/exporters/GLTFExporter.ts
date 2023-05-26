@@ -304,15 +304,15 @@ class GLTFExporter {
       const tolerance = 0.001 // 1ms
       const valueSize = track.getValueSize()
 
-      // @ts-expect-error
+      // @ts-ignore
       const times = new track.TimeBufferType(track.times.length + 1)
-      // @ts-expect-error
+      // @ts-ignore
       const values = new track.ValueBufferType(track.values.length + valueSize)
       /**
        * NOTE: createInterpolant does not exist in the type, but it does exist as a property of the class
        * https://github.com/mrdoob/three.js/blob/77480d339d737b7505b335101ffd3cf29a30738d/src/animation/KeyframeTrack.js#L117
        */
-      // @ts-expect-error
+      // @ts-ignore
       const interpolant = track.createInterpolant(new track.ValueBufferType(valueSize))
 
       let index
@@ -393,12 +393,12 @@ class GLTFExporter {
         }
 
         if (
-          // @ts-expect-error
+          // @ts-ignore
           sourceTrack.createInterpolant !== sourceTrack.InterpolantFactoryMethodDiscrete &&
-          // @ts-expect-error
+          // @ts-ignore
           sourceTrack.createInterpolant !== sourceTrack.InterpolantFactoryMethodLinear
         ) {
-          // @ts-expect-error
+          // @ts-ignore
           if (sourceTrack.createInterpolant.isInterpolantFactoryMethodGLTFCubicSpline) {
             // This should never happen, because glTF morph target animations
             // affect all targets already.
@@ -425,7 +425,7 @@ class GLTFExporter {
         if (mergedTracks[sourceTrackNode.uuid] === undefined) {
           mergedTrack = sourceTrack.clone()
 
-          // @ts-expect-error
+          // @ts-ignore
           const values = new mergedTrack.ValueBufferType(targetCount * mergedTrack.times.length)
 
           for (let j = 0; j < mergedTrack.times.length; j++) {
@@ -443,7 +443,7 @@ class GLTFExporter {
           continue
         }
 
-        // @ts-expect-error
+        // @ts-ignore
         const sourceInterpolant = sourceTrack.createInterpolant(new sourceTrack.ValueBufferType(1))
 
         mergedTrack = mergedTracks[sourceTrackNode.uuid]
@@ -1211,7 +1211,7 @@ class GLTFWriter {
               if (blob !== null) {
                 writer.processBufferViewImage(blob).then(function (bufferViewIndex) {
                   imageDef.bufferView = bufferViewIndex
-                  // @ts-expect-error
+                  // @ts-ignore
                   resolve()
                 })
               }
@@ -1290,6 +1290,7 @@ class GLTFWriter {
 
     if (cache.materials.has(material)) return cache.materials.get(material)!
 
+    // @ts-ignore
     if (material instanceof ShaderMaterial && material.isShaderMaterial) {
       console.warn('GLTFExporter: THREE.ShaderMaterial not supported.')
       return null
@@ -1305,7 +1306,7 @@ class GLTFWriter {
         material instanceof MeshStandardMaterial &&
         material.isMeshStandardMaterial &&
         material instanceof MeshBasicMaterial &&
-        // @ts-expect-error
+        // @ts-ignore
         material.isMeshBasicMaterial
       )
     ) {
@@ -1681,7 +1682,7 @@ class GLTFWriter {
         let cacheKey = this.getUID(geometry.index)
 
         if (groups[i].start !== undefined || groups[i].count !== undefined) {
-          // @ts-expect-error
+          // @ts-ignore
           cacheKey += `:${groups[i].start}:${groups[i].count}`
         }
 
@@ -1814,7 +1815,7 @@ class GLTFWriter {
       // Detecting glTF cubic spline interpolant by checking factory method's special property
       // GLTFCubicSplineInterpolant is a custom interpolant and track doesn't return
       // valid value from .getInterpolation().
-      // @ts-expect-error
+      // @ts-ignore
       if (track.createInterpolant.isInterpolantFactoryMethodGLTFCubicSpline) {
         interpolation = 'CUBICSPLINE'
 
@@ -2208,7 +2209,7 @@ class GLTFLightExtension {
 
     if (
       !(light instanceof DirectionalLight && light.isDirectionalLight) &&
-      // @ts-expect-error
+      // @ts-ignore
       !(light instanceof PointLight && light.isPointLight) &&
       !(light instanceof SpotLight && light.isSpotLight)
     ) {
@@ -2232,7 +2233,7 @@ class GLTFLightExtension {
       lightDef.type = 'directional'
     } else if (
       light instanceof PointLight &&
-      // @ts-expect-error
+      // @ts-ignore
       light.isPointLight
     ) {
       lightDef.type = 'point'
@@ -2302,7 +2303,7 @@ class GLTFMaterialsUnlitExtension {
     if (
       !(
         material instanceof MeshBasicMaterial &&
-        // @ts-expect-error
+        // @ts-ignore
         material.isMeshBasicMaterial
       )
     ) {
@@ -2337,7 +2338,7 @@ class GLTFMaterialsPBRSpecularGlossiness {
   }
 
   public writeMaterial(material: Material, materialDef: MaterialDef): void {
-    // @ts-expect-error
+    // @ts-ignore
     if (!material.isGLTFSpecularGlossinessMaterial) return
 
     const writer = this.writer
@@ -2354,7 +2355,7 @@ class GLTFMaterialsPBRSpecularGlossiness {
       material.specular.toArray(specularFactor, 0)
       extensionDef.specularFactor = specularFactor
       extensionDef.glossinessFactor =
-        // @ts-expect-error
+        // @ts-ignore
         material.glossiness
     }
 
@@ -2397,7 +2398,7 @@ class GLTFMaterialsTransmissionExtension {
     if (
       !(
         material instanceof MeshPhysicalMaterial &&
-        // @ts-expect-error
+        // @ts-ignore
         material.isMeshPhysicalMaterial
       ) ||
       material.transmission === 0
@@ -2443,9 +2444,10 @@ class GLTFMaterialsVolumeExtension {
     if (
       !(
         material instanceof MeshPhysicalMaterial &&
-        // @ts-expect-error
+        // @ts-ignore
         material.isMeshPhysicalMaterial
       ) ||
+      // @ts-ignore
       material.thickness === 0
     ) {
       return
@@ -2456,16 +2458,21 @@ class GLTFMaterialsVolumeExtension {
 
     const extensionDef: ExtensionDef = {}
 
+    // @ts-ignore
     extensionDef.thickness = material.thickness
 
+    // @ts-ignore
     if (material.thicknessMap) {
       const thicknessMapDef = {
+        // @ts-ignore
         index: writer.processTexture(material.thicknessMap),
       }
+      // @ts-ignore
       writer.applyTextureTransform(thicknessMapDef, material.thicknessMap)
       extensionDef.thicknessTexture = thicknessMapDef
     }
 
+    // @ts-ignore
     extensionDef.attenuationDistance = material.attenuationDistance
     extensionDef.attenuationColor =
       //@ts-expect-error

@@ -9,7 +9,6 @@ import {
   Vector2,
   WebGLRenderer,
   WebGLRenderTarget,
-  ColorRepresentation,
 } from 'three'
 
 import { Pass, FullScreenQuad } from './Pass'
@@ -66,14 +65,14 @@ export class SAOPass extends Pass {
     renderer: WebGLRenderer,
     passMaterial: Material,
     renderTarget: WebGLRenderTarget,
-    clearColor?: ColorRepresentation,
+    clearColor?: Color | string | number,
     clearAlpha?: number,
   ): void
   renderOverride(
     renderer: WebGLRenderer,
     overrideMaterial: Material,
     renderTarget: WebGLRenderTarget,
-    clearColor?: ColorRepresentation,
+    clearColor?: Color | string | number,
     clearAlpha?: number,
   ): void
 }

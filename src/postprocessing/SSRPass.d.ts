@@ -9,7 +9,6 @@ import {
   Camera,
   Mesh,
   Material,
-  ColorRepresentation,
 } from 'three'
 import { Pass, FullScreenQuad } from '../postprocessing/Pass'
 import { ReflectorForSSRPass } from '../objects/ReflectorForSSRPass'
@@ -102,23 +101,23 @@ export class SSRPass extends Pass {
     renderer: WebGLRenderer,
     passMaterial: Material,
     renderTarget: WebGLRenderTarget,
-    clearColor: ColorRepresentation,
-    clearAlpha: ColorRepresentation,
+    clearColor: Color | string | number,
+    clearAlpha: Color | string | number,
   ) => void
 
   renderOverride: (
     renderer: WebGLRenderer,
     passMaterial: Material,
     renderTarget: WebGLRenderTarget,
-    clearColor: ColorRepresentation,
-    clearAlpha: ColorRepresentation,
+    clearColor: Color | string | number,
+    clearAlpha: Color | string | number,
   ) => void
 
   renderMetalness: (
     renderer: WebGLRenderer,
     passMaterial: Material,
     renderTarget: WebGLRenderTarget,
-    clearColor: ColorRepresentation,
-    clearAlpha: ColorRepresentation,
+    clearColor: Color | string | number,
+    clearAlpha: Color | string | number,
   ) => void
 }

@@ -72,7 +72,7 @@ class DRACOExporter {
       dracoObject = new dracoEncoder.Mesh()
 
       const vertices = geometry.getAttribute('position')
-      // @ts-expect-error
+      // @ts-ignore
       builder.AddFloatAttributeToMesh(
         dracoObject,
         dracoEncoder.POSITION,
@@ -84,8 +84,7 @@ class DRACOExporter {
       const faces = geometry.getIndex()
 
       if (faces !== null) {
-        // @ts-expect-error
-        builder.AddFacesToMesh(dracoObject, faces.count / 3, faces.array)
+        builder.AddFacesToMesh(dracoObject, faces.count / 3, faces.array as Uint16Array | Uint32Array)
       } else {
         const faces = new (vertices.count > 65535 ? Uint32Array : Uint16Array)(vertices.count)
 
@@ -100,7 +99,7 @@ class DRACOExporter {
         const normals = geometry.getAttribute('normal')
 
         if (normals !== undefined) {
-          // @ts-expect-error
+          // @ts-ignore
           builder.AddFloatAttributeToMesh(
             dracoObject,
             dracoEncoder.NORMAL,
@@ -115,7 +114,7 @@ class DRACOExporter {
         const uvs = geometry.getAttribute('uv')
 
         if (uvs !== undefined) {
-          // @ts-expect-error
+          // @ts-ignore
           builder.AddFloatAttributeToMesh(dracoObject, dracoEncoder.TEX_COORD, uvs.count, uvs.itemSize, uvs.array)
         }
       }
@@ -124,14 +123,14 @@ class DRACOExporter {
         const colors = geometry.getAttribute('color')
 
         if (colors !== undefined) {
-          // @ts-expect-error
+          // @ts-ignore
           builder.AddFloatAttributeToMesh(dracoObject, dracoEncoder.COLOR, colors.count, colors.itemSize, colors.array)
         }
       }
     } else if (object instanceof Points && object.isPoints) {
-      // @ts-expect-error
+      // @ts-ignore
       builder = new dracoEncoder.PointCloudBuilder()
-      // @ts-expect-error
+      // @ts-ignore
       dracoObject = new dracoEncoder.PointCloud()
 
       const vertices = geometry.getAttribute('position')
@@ -180,7 +179,7 @@ class DRACOExporter {
     if (object instanceof Mesh && object.isMesh) {
       length = encoder.EncodeMeshToDracoBuffer(dracoObject, encodedData)
     } else {
-      // @ts-expect-error
+      // @ts-ignore
       length = encoder.EncodePointCloudToDracoBuffer(dracoObject, true, encodedData)
     }
 

@@ -26,19 +26,18 @@
   "module": "./dist/index.mjs",
   "sideEffects": false,
   "devDependencies": {
-    "@types/three": "^0.139.0",
+    "@types/three": "^0.128.0",
     "copyfiles": "^2.4.1",
     "prettier": "^2.2.1",
     "rimraf": "^3.0.2",
-    "three": "^0.139.2",
-    "typescript": "^4.2.4",
+    "three": "^0.128.0",
+    "typescript": "^4.7.4",
     "vite": "^4.3.8"
   },
   "dependencies": {
     "@types/draco3d": "^1.4.0",
     "@types/offscreencanvas": "^2019.6.4",
     "@types/webxr": "^0.5.2",
-    "@webgpu/glslang": "^0.0.15",
     "chevrotain": "^10.1.2",
     "draco3d": "^1.4.1",
     "fflate": "^0.6.9",
@@ -49,7 +48,7 @@
     "zstddec": "^0.0.2"
   },
   "peerDependencies": {
-    "three": ">=0.122.0"
+    "three": ">=0.128.0"
   },
   "scripts": {
     "build": "rimraf dist && vite build && tsc --emitDeclarationOnly && copyfiles -u 1 \"src/**/*.d.ts\" dist",

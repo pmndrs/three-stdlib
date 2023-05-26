@@ -1,7 +1,7 @@
-import { BufferGeometry, ColorRepresentation, Mesh, ShaderMaterial, Texture, TextureEncoding, Vector2 } from 'three'
+import { BufferGeometry, Color, Mesh, ShaderMaterial, Texture, TextureEncoding, Vector2 } from 'three'
 
 export interface Water2Options {
-  color?: ColorRepresentation
+  color?: Color | string | number
   textureWidth?: number
   textureHeight?: number
   clipBias?: number
