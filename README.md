@@ -10,7 +10,9 @@ Stand-alone version of [threejs/examples/jsm](https://github.com/mrdoob/three.js
 
 ## Basic usage
 
-    npm install three-stdlib
+```bash
+npm install three-stdlib
+```
 
 ```ts
 // Export collection
@@ -21,24 +23,33 @@ import { OrbitControls, ... } from 'three-stdlib'
 
 ## Problem
 
-`threejs/examples` are usually regarded as something that you copy/paste into your project and adapt to your needs. That's not how people use it, and this has caused numerous issues in the past.
+`three/examples` are usually regarded as something that you copy/paste into your project and adapt to your needs. That's not how people use it, and this has caused numerous issues in the past.
 
 ## Solution
 
-- A build system for esm and cjs
-- Version managed dependencies
+- A build system for ESM and CJS, compatible with browser, workers, and Node
 - Class based, optimized for tree-shaking, no globals, exports instead of collections
-- Single flatbundle as well as individual transpiles
 - Typesafety with simple annotation-like types
-- CI, tests, linting, formatting (prettier)
+- SemVer and NPM managed dependencies
 
 But most importantly, allowing more people that use and rely on these primitives to hold a little stake, and to share the weight of maintaining it.
 
-## How to contribute
+## How to Contribute
 
-If you want to get involved you could do any of the following:
+1.  Fork and clone the repo
+2.  Run `yarn install` to install dependencies
+3.  Create a branch for your PR with `git checkout -b pr-type/issue-number-your-branch-name beta
+4.  Let's get cooking! 👨🏻‍🍳🥓
 
-- Help to maintain and sync the existing primitives
-- Create stories for these examples for our dedicated storybook
-- Convert some of the files to Typescript
-- Add new examples for the library you think could be helpful for others
+### Commit Guidelines
+
+Be sure your commit messages follow this specification: https://conventionalcommits.org/en/v1.0.0-beta.4
+
+## Publishing
+
+We use `semantic-release-action` to deploy the package. Because of this only certain commits will trigger the action of creating a release:
+
+- `chore` will not release a new version
+- `fix:` will create a `0.0.x` version
+- `feat:` will create a `0.x.0` version
+- `BREAKING CHANGE:` will create a `x.0.0` version
