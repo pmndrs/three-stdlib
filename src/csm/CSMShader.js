@@ -239,14 +239,17 @@ IncidentLight directLight;
 
 #endif
 `,
-  lights_pars_begin:
-    /* glsl */ `
-#if defined( USE_CSM ) && defined( CSM_CASCADES )
-uniform vec2 CSM_cascades[CSM_CASCADES];
-uniform float cameraNear;
-uniform float shadowFar;
-#endif
-	` + ShaderChunk.lights_pars_begin,
+  getlights_pars_begin() {
+    return /* glsl */ `
+			#if defined( USE_CSM ) && defined( CSM_CASCADES )
+			uniform vec2 CSM_cascades[CSM_CASCADES];
+			uniform float cameraNear;
+			uniform float shadowFar;
+			#endif
+
+			${ShaderChunk.lights_pars_begin}
+		`
+  },
 }
 
 export { CSMShader }
