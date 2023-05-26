@@ -169,7 +169,7 @@ class WebGPURenderer {
 
     const device = await adapter.requestDevice(deviceDescriptor)
 
-    const glslang = await import('@webgpu/glslang/dist/web-devel/glslang')
+    const glslang = await import('@webgpu/glslang/dist/web-devel/glslang.js')
     const compiler = await glslang()
 
     const context = parameters.context !== undefined ? parameters.context : this.domElement.getContext('gpupresent')
