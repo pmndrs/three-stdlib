@@ -21,10 +21,10 @@ export * from './modifiers/CurveModifier'
 export * from './modifiers/SimplifyModifier'
 export * from './modifiers/EdgeSplitModifier'
 export * from './modifiers/TessellateModifier'
-// export * from './exporters/GLTFExporter' //
+export * from './exporters/GLTFExporter'
 export * from './exporters/USDZExporter'
 export * from './exporters/PLYExporter'
-// export * from './exporters/DRACOExporter' //
+export * from './exporters/DRACOExporter'
 export * from './exporters/ColladaExporter'
 export * from './exporters/MMDExporter'
 export * from './exporters/STLExporter'
@@ -37,14 +37,14 @@ export * from './animation/MMDAnimationHelper'
 export * from './objects/Reflector'
 export * from './objects/Refractor'
 export * from './objects/ShadowMesh'
-// export * from './objects/Lensflare' //
+export * from './objects/Lensflare'
 export * from './objects/Water'
 export * from './objects/MarchingCubes'
-// export * from './objects/LightningStorm' //
+export * from './objects/LightningStorm'
 export * from './objects/ReflectorRTT'
-// export * from './objects/ReflectorForSSRPass' //
-// export * from './objects/Sky' //
-// export * from './objects/Water2' //
+export * from './objects/ReflectorForSSRPass'
+export * from './objects/Sky'
+export * from './objects/Water2'
 export * from './objects/GroundProjectedEnv'
 export * from './utils/SceneUtils'
 export * from './utils/UVsDebug'
@@ -81,20 +81,20 @@ export * from './postprocessing/HalftonePass'
 export * from './postprocessing/SMAAPass'
 export * from './postprocessing/FilmPass'
 export * from './postprocessing/OutlinePass'
-// export * from './postprocessing/SSAOPass' //
+export * from './postprocessing/SSAOPass'
 export * from './postprocessing/SavePass'
 export * from './postprocessing/BokehPass'
 export * from './postprocessing/Pass'
 export * from './postprocessing/TexturePass'
 export * from './postprocessing/AdaptiveToneMappingPass'
-// export * from './postprocessing/UnrealBloomPass' //
+export * from './postprocessing/UnrealBloomPass'
 export * from './postprocessing/CubeTexturePass'
-// export * from './postprocessing/SAOPass' //
+export * from './postprocessing/SAOPass'
 export * from './postprocessing/AfterimagePass'
 export * from './postprocessing/MaskPass'
 export * from './postprocessing/EffectComposer'
 export * from './postprocessing/DotScreenPass'
-// export * from './postprocessing/SSRPass' //
+export * from './postprocessing/SSRPass'
 export * from './postprocessing/TAARenderPass'
 export * from './postprocessing/ShaderPass'
 export * from './postprocessing/SSAARenderPass'
@@ -103,28 +103,28 @@ export * from './postprocessing/RenderPixelatedPass'
 export * from './postprocessing/BloomPass'
 export * from './postprocessing/WaterPass'
 export * from './webxr/ARButton'
-// export * from './webxr/OculusHandModel' //
-// export * from './webxr/OculusHandPointerModel' //
+export * from './webxr/OculusHandModel'
+export * from './webxr/OculusHandPointerModel'
 export * from './webxr/Text2D'
-// export * from './webxr/VRButton' //
-// export * from './webxr/XRControllerModelFactory' //
+export * from './webxr/VRButton'
+export * from './webxr/XRControllerModelFactory'
 export * from './webxr/XREstimatedLight'
-// export * from './webxr/XRHandMeshModel' //
-// export * from './webxr/XRHandModelFactory' //
+export * from './webxr/XRHandMeshModel'
+export * from './webxr/XRHandModelFactory'
 export * from './webxr/XRHandPrimitiveModel'
 export * from './geometries/ParametricGeometries'
 export * from './geometries/ParametricGeometry'
 export * from './geometries/ConvexGeometry'
-// export * from './geometries/LightningStrike' //
+export * from './geometries/LightningStrike'
 export * from './geometries/RoundedBoxGeometry'
 export * from './geometries/BoxLineGeometry'
 export * from './geometries/DecalGeometry'
 export * from './geometries/TeapotGeometry'
 export * from './geometries/TextGeometry'
-// export * from './csm/CSM' //
+// export * from './csm/CSM'
 export * from './csm/CSMFrustum'
 export * from './csm/CSMHelper'
-// export * from './csm/CSMShader' //
+// export * from './csm/CSMShader'
 export * from './shaders/types'
 export * from './shaders/ACESFilmicToneMappingShader'
 export * from './shaders/AfterimageShader'
@@ -167,7 +167,7 @@ export * from './shaders/SSAOShader'
 export * from './shaders/SSRShader'
 export * from './shaders/SepiaShader'
 export * from './shaders/SobelOperatorShader'
-// export * from './shaders/SubsurfaceScatteringShader' //
+export * from './shaders/SubsurfaceScatteringShader'
 export * from './shaders/TechnicolorShader'
 export * from './shaders/ToneMapShader'
 export * from './shaders/ToonShader'
@@ -190,7 +190,7 @@ export * from './effects/AnaglyphEffect'
 export * from './effects/AsciiEffect'
 export * from './effects/StereoEffect'
 export * from './loaders/FBXLoader'
-// export * from './loaders/FontLoader' //
+export * from './loaders/FontLoader'
 export * from './loaders/TGALoader'
 export * from './loaders/LUTCubeLoader'
 export * from './loaders/NRRDLoader'
@@ -199,9 +199,9 @@ export * from './loaders/MTLLoader'
 export * from './loaders/XLoader'
 export * from './loaders/BVHLoader'
 export * from './loaders/KMZLoader'
-// export * from './loaders/VRMLoader'
+export * from './loaders/VRMLoader'
 export * from './loaders/VRMLLoader'
-// export * from './loaders/KTX2Loader' //
+export * from './loaders/KTX2Loader'
 export * from './loaders/LottieLoader'
 export * from './loaders/TTFLoader'
 export * from './loaders/RGBELoader'
@@ -216,16 +216,10 @@ export * from './loaders/LUT3dlLoader'
 export * from './loaders/DDSLoader'
 export * from './loaders/PVRLoader'
 export * from './loaders/GCodeLoader'
-// export * from './loaders/BasisTextureLoader' //
+export * from './loaders/BasisTextureLoader'
 export * from './loaders/TDSLoader'
 export * from './loaders/LDrawLoader'
-// export * from './loaders/GLTFLoader' //
-// @ts-ignore
-export * from './loaders/lwo/LWO3Parser'
-// @ts-ignore
-export * from './loaders/lwo/LWO2Parser'
-// @ts-ignore
-export * from './loaders/lwo/IFFParser'
+export * from './loaders/GLTFLoader'
 export * from './loaders/SVGLoader'
 export * from './loaders/3DMLoader'
 export * from './loaders/OBJLoader'
@@ -263,7 +257,7 @@ export * from './curves/NURBSSurface'
 export * from './curves/CurveExtras'
 export * from './deprecated/Geometry'
 export * from './libs/MeshoptDecoder'
-// export * from './libs/MotionControllers' //
+export * from './libs/MotionControllers'
 
 // TODO: these are defunct/problematic
 // export * from './renderers/nodes/core/constants'

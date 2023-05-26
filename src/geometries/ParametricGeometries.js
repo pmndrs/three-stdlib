@@ -1,6 +1,53 @@
 import { Curve, Vector3 } from 'three'
 import { ParametricGeometry } from './ParametricGeometry'
 
+class TubeGeometry extends ParametricGeometry {
+  constructor(path, segments = 64, radius = 1, segmentsRadius = 8, closed = false) {
+    const numpoints = segments + 1
+
+    const frames = path.computeFrenetFrames(segments, closed),
+      tangents = frames.tangents,
+      normals = frames.normals,
+      binormals = frames.binormals
+
+    const position = new Vector3()
+
+    function ParametricTube(u, v, target) {
+      v *= 2 * Math.PI
+
+      const i = Math.floor(u * (numpoints - 1))
+
+      path.getPointAt(u, position)
+
+      const normal = normals[i]
+      const binormal = binormals[i]
+
+      const cx = -radius * Math.cos(v) // TODO: Hack: Negating it so it faces outside.
+      const cy = radius * Math.sin(v)
+
+      position.x += cx * normal.x + cy * binormal.x
+      position.y += cx * normal.y + cy * binormal.y
+      position.z += cx * normal.z + cy * binormal.z
+
+      target.copy(position)
+    }
+
+    super(ParametricTube, segments, segmentsRadius)
+
+    // proxy internals
+
+    this.tangents = tangents
+    this.normals = normals
+    this.binormals = binormals
+
+    this.path = path
+    this.segments = segments
+    this.radius = radius
+    this.segmentsRadius = segmentsRadius
+    this.closed = closed
+  }
+}
+
 /**
  * Experimental primitive geometry creation using Surface Parametric equations
  */
@@ -68,53 +115,8 @@ const ParametricGeometries = {
 
     target.set(x, y, z)
   },
-  TubeGeometry: class TubeGeometry extends ParametricGeometry {
-    constructor(path, segments = 64, radius = 1, segmentsRadius = 8, closed = false) {
-      const numpoints = segments + 1
-
-      const frames = path.computeFrenetFrames(segments, closed),
-        tangents = frames.tangents,
-        normals = frames.normals,
-        binormals = frames.binormals
-
-      const position = new Vector3()
-
-      function ParametricTube(u, v, target) {
-        v *= 2 * Math.PI
-
-        const i = Math.floor(u * (numpoints - 1))
-
-        path.getPointAt(u, position)
-
-        const normal = normals[i]
-        const binormal = binormals[i]
-
-        const cx = -radius * Math.cos(v) // TODO: Hack: Negating it so it faces outside.
-        const cy = radius * Math.sin(v)
-
-        position.x += cx * normal.x + cy * binormal.x
-        position.y += cx * normal.y + cy * binormal.y
-        position.z += cx * normal.z + cy * binormal.z
-
-        target.copy(position)
-      }
-
-      super(ParametricTube, segments, segmentsRadius)
-
-      // proxy internals
-
-      this.tangents = tangents
-      this.normals = normals
-      this.binormals = binormals
-
-      this.path = path
-      this.segments = segments
-      this.radius = radius
-      this.segmentsRadius = segmentsRadius
-      this.closed = closed
-    }
-  },
-  TorusKnotGeometry: class TorusKnotGeometry extends ParametricGeometries.TubeGeometry {
+  TubeGeometry,
+  TorusKnotGeometry: class TorusKnotGeometry extends TubeGeometry {
     constructor(radius = 200, tube = 40, segmentsT = 64, segmentsR = 8, p = 2, q = 3) {
       class TorusKnotCurve extends Curve {
         getPoint(t, optionalTarget = new Vector3()) {

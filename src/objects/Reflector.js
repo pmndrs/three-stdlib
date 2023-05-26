@@ -14,6 +14,70 @@ import {
 } from 'three'
 
 class Reflector extends Mesh {
+  static ReflectorShader = {
+    uniforms: {
+      color: {
+        value: null,
+      },
+
+      tDiffuse: {
+        value: null,
+      },
+
+      textureMatrix: {
+        value: null,
+      },
+    },
+
+    vertexShader: /* glsl */ `
+		uniform mat4 textureMatrix;
+		varying vec4 vUv;
+
+		#include <common>
+		#include <logdepthbuf_pars_vertex>
+
+		void main() {
+
+			vUv = textureMatrix * vec4( position, 1.0 );
+
+			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+
+			#include <logdepthbuf_vertex>
+
+		}`,
+
+    fragmentShader: /* glsl */ `
+		uniform vec3 color;
+		uniform sampler2D tDiffuse;
+		varying vec4 vUv;
+
+		#include <logdepthbuf_pars_fragment>
+
+		float blendOverlay( float base, float blend ) {
+
+			return( base < 0.5 ? ( 2.0 * base * blend ) : ( 1.0 - 2.0 * ( 1.0 - base ) * ( 1.0 - blend ) ) );
+
+		}
+
+		vec3 blendOverlay( vec3 base, vec3 blend ) {
+
+			return vec3( blendOverlay( base.r, blend.r ), blendOverlay( base.g, blend.g ), blendOverlay( base.b, blend.b ) );
+
+		}
+
+		void main() {
+
+			#include <logdepthbuf_fragment>
+
+			vec4 base = texture2DProj( tDiffuse, vUv );
+			gl_FragColor = vec4( blendOverlay( base.rgb, color ), 1.0 );
+
+			#include <tonemapping_fragment>
+			#include <encodings_fragment>
+
+		}`,
+  }
+
   constructor(geometry, options = {}) {
     super(geometry)
 
@@ -188,70 +252,6 @@ class Reflector extends Mesh {
       scope.material.dispose()
     }
   }
-}
-
-Reflector.ReflectorShader = {
-  uniforms: {
-    color: {
-      value: null,
-    },
-
-    tDiffuse: {
-      value: null,
-    },
-
-    textureMatrix: {
-      value: null,
-    },
-  },
-
-  vertexShader: /* glsl */ `
-		uniform mat4 textureMatrix;
-		varying vec4 vUv;
-
-		#include <common>
-		#include <logdepthbuf_pars_vertex>
-
-		void main() {
-
-			vUv = textureMatrix * vec4( position, 1.0 );
-
-			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-
-			#include <logdepthbuf_vertex>
-
-		}`,
-
-  fragmentShader: /* glsl */ `
-		uniform vec3 color;
-		uniform sampler2D tDiffuse;
-		varying vec4 vUv;
-
-		#include <logdepthbuf_pars_fragment>
-
-		float blendOverlay( float base, float blend ) {
-
-			return( base < 0.5 ? ( 2.0 * base * blend ) : ( 1.0 - 2.0 * ( 1.0 - base ) * ( 1.0 - blend ) ) );
-
-		}
-
-		vec3 blendOverlay( vec3 base, vec3 blend ) {
-
-			return vec3( blendOverlay( base.r, blend.r ), blendOverlay( base.g, blend.g ), blendOverlay( base.b, blend.b ) );
-
-		}
-
-		void main() {
-
-			#include <logdepthbuf_fragment>
-
-			vec4 base = texture2DProj( tDiffuse, vUv );
-			gl_FragColor = vec4( blendOverlay( base.rgb, color ), 1.0 );
-
-			#include <tonemapping_fragment>
-			#include <encodings_fragment>
-
-		}`,
 }
 
 export { Reflector }

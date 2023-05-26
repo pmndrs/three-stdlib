@@ -1588,7 +1588,7 @@ const ATTRIBUTES = {
   // uv => uv1, 4 uv channels
   // https://github.com/mrdoob/three.js/pull/25943
   // https://github.com/mrdoob/three.js/pull/25788
-  ...(REVISION.replace(/\D+/g, '') >= 152
+  .../* @__PURE__ */ (REVISION.replace(/\D+/g, '') >= 152
     ? {
         TEXCOORD_0: 'uv',
         TEXCOORD_1: 'uv1',

@@ -54,41 +54,41 @@ interface ProfilesList {
 }
 
 const MotionControllerConstants = {
-  Handedness: Object.freeze({
+  Handedness: {
     NONE: 'none',
     LEFT: 'left',
     RIGHT: 'right',
-  }),
+  },
 
-  ComponentState: Object.freeze({
+  ComponentState: {
     DEFAULT: 'default',
     TOUCHED: 'touched',
     PRESSED: 'pressed',
-  }),
+  },
 
-  ComponentProperty: Object.freeze({
+  ComponentProperty: {
     BUTTON: 'button',
     X_AXIS: 'xAxis',
     Y_AXIS: 'yAxis',
     STATE: 'state',
-  }),
+  },
 
-  ComponentType: Object.freeze({
+  ComponentType: {
     TRIGGER: 'trigger',
     SQUEEZE: 'squeeze',
     TOUCHPAD: 'touchpad',
     THUMBSTICK: 'thumbstick',
     BUTTON: 'button',
-  }),
+  },
 
   ButtonTouchThreshold: 0.05,
 
   AxisTouchThreshold: 0.1,
 
-  VisualResponseProperty: Object.freeze({
+  VisualResponseProperty: {
     TRANSFORM: 'transform',
     VISIBILITY: 'visibility',
-  }),
+  },
 }
 
 /**
