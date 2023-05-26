@@ -67,8 +67,8 @@ const _center = {
 
 //transformation matrices for gizmos and camera
 const _transformation: Transformation = {
-  camera: new Matrix4(),
-  gizmos: new Matrix4(),
+  camera: /* @__PURE__ */ new Matrix4(),
+  gizmos: /* @__PURE__ */ new Matrix4(),
 }
 
 //events
@@ -360,7 +360,7 @@ class ArcballControls extends EventDispatcher {
     }
 
     const newRadius = this._tbRadius / scale
-    // @ts-expect-error
+    // @ts-ignore
     const curve = new EllipseCurve(0, 0, newRadius, newRadius)
     const points = curve.getPoints(this._curvePts)
     const curveGeometry = new BufferGeometry().setFromPoints(points)
@@ -656,14 +656,14 @@ class ArcballControls extends EventDispatcher {
             if (this.cursorZoom && this.enablePan) {
               let scalePoint
 
-              if (this.camera?.type === 'OrthographicCamera') {
+              if (this.camera instanceof OrthographicCamera) {
                 scalePoint = this.unprojectOnTbPlane(this.camera, event.clientX, event.clientY, this.domElement)
                   ?.applyQuaternion(this.camera.quaternion)
                   .multiplyScalar(1 / this.camera.zoom)
                   .add(this._gizmos.position)
               }
 
-              if (this.camera?.type === 'PerspectiveCamera') {
+              if (this.camera instanceof PerspectiveCamera) {
                 scalePoint = this.unprojectOnTbPlane(this.camera, event.clientX, event.clientY, this.domElement)
                   ?.applyQuaternion(this.camera.quaternion)
                   .add(this._gizmos.position)
@@ -687,7 +687,7 @@ class ArcballControls extends EventDispatcher {
             break
 
           case 'FOV':
-            if (this.camera?.type === 'PerspectiveCamera') {
+            if (this.camera instanceof PerspectiveCamera) {
               this.updateTbState(STATE.FOV, true)
 
               //Vertigo effect
@@ -822,7 +822,7 @@ class ArcballControls extends EventDispatcher {
         case 'FOV':
           if (!this.enableZoom) return
 
-          if (this.camera?.type === 'PerspectiveCamera') {
+          if (this.camera instanceof PerspectiveCamera) {
             if (this._animationId != -1) {
               cancelAnimationFrame(this._animationId)
               this._animationId = -1
@@ -999,7 +999,7 @@ class ArcballControls extends EventDispatcher {
           break
 
         case STATE.FOV:
-          if (this.enableZoom && this.camera?.type === 'PerspectiveCamera') {
+          if (this.enableZoom && this.camera instanceof PerspectiveCamera) {
             if (restart) {
               //switch to fov operation
 
@@ -1287,12 +1287,12 @@ class ArcballControls extends EventDispatcher {
       if (!this.enablePan) {
         scalePoint = this._gizmos.position
       } else {
-        if (this.camera?.type === 'OrthographicCamera') {
+        if (this.camera instanceof OrthographicCamera) {
           scalePoint = this.unprojectOnTbPlane(this.camera, _center.x, _center.y, this.domElement)
             ?.applyQuaternion(this.camera.quaternion)
             .multiplyScalar(1 / this.camera.zoom)
             .add(this._gizmos.position)
-        } else if (this.camera?.type === 'PerspectiveCamera') {
+        } else if (this.camera instanceof PerspectiveCamera) {
           scalePoint = this.unprojectOnTbPlane(this.camera, _center.x, _center.y, this.domElement)
             ?.applyQuaternion(this.camera.quaternion)
             .add(this._gizmos.position)
@@ -1699,11 +1699,11 @@ class ArcballControls extends EventDispatcher {
     const factor = 0.67
     const distance = camera.position.distanceTo(this._gizmos.position)
 
-    if (camera.type == 'PerspectiveCamera') {
+    if (camera instanceof PerspectiveCamera) {
       const halfFovV = MathUtils.DEG2RAD * camera.fov * 0.5 //vertical fov/2 in radians
       const halfFovH = Math.atan(camera.aspect * Math.tan(halfFovV)) //horizontal fov/2 in radians
       return Math.tan(Math.min(halfFovV, halfFovH)) * distance * factor
-    } else if (camera.type == 'OrthographicCamera') {
+    } else if (camera instanceof OrthographicCamera) {
       return Math.min(camera.top, camera.right) * factor
     }
   }
@@ -1749,7 +1749,7 @@ class ArcballControls extends EventDispatcher {
       const multiplier = 3
       let size, divisions, maxLength, tick
 
-      if (this.camera?.type === 'OrthographicCamera') {
+      if (this.camera instanceof OrthographicCamera) {
         const width = this.camera.right - this.camera.left
         const height = this.camera.bottom - this.camera.top
 
@@ -1758,7 +1758,7 @@ class ArcballControls extends EventDispatcher {
 
         size = (maxLength / this.camera.zoom) * multiplier
         divisions = (size / tick) * this.camera.zoom
-      } else if (this.camera?.type === 'PerspectiveCamera') {
+      } else if (this.camera instanceof PerspectiveCamera) {
         const distance = this.camera.position.distanceTo(this._gizmos.position)
         const halfFovV = MathUtils.DEG2RAD * this.camera.fov * 0.5
         const halfFovH = Math.atan(this.camera.aspect * Math.tan(halfFovV))
@@ -1875,7 +1875,7 @@ class ArcballControls extends EventDispatcher {
    */
   private getCursorPosition = (cursorX: number, cursorY: number, canvas: HTMLElement): Vector2 => {
     this._v2_1.copy(this.getCursorNDC(cursorX, cursorY, canvas))
-    if (this.camera?.type === 'OrthographicCamera') {
+    if (this.camera instanceof OrthographicCamera) {
       this._v2_1.x *= (this.camera.right - this.camera.left) * 0.5
       this._v2_1.y *= (this.camera.top - this.camera.bottom) * 0.5
     }
@@ -1892,7 +1892,7 @@ class ArcballControls extends EventDispatcher {
       camera.updateMatrix()
 
       //setting state
-      if (camera?.type == 'PerspectiveCamera') {
+      if (camera instanceof PerspectiveCamera) {
         this._fov0 = camera.fov
         this._fovState = camera.fov
       }
@@ -1942,7 +1942,7 @@ class ArcballControls extends EventDispatcher {
    * @param {number} tbRadius The trackball radius
    */
   private makeGizmos = (tbCenter: Vector3, tbRadius: number): void => {
-    // @ts-expect-error
+    // @ts-ignore
     const curve = new EllipseCurve(0, 0, tbRadius, tbRadius)
     const points = curve.getPoints(this._curvePts)
 
@@ -2099,12 +2099,12 @@ class ArcballControls extends EventDispatcher {
     if (this.camera) {
       const movement = p0.clone().sub(p1)
 
-      if (this.camera.type === 'OrthographicCamera') {
+      if (this.camera instanceof OrthographicCamera) {
         //adjust movement amount
         movement.multiplyScalar(1 / this.camera.zoom)
       }
 
-      if (this.camera.type === 'PerspectiveCamera' && adjust) {
+      if (this.camera instanceof PerspectiveCamera && adjust) {
         //adjust movement amount
         this._v3_1.setFromMatrixPosition(this._cameraMatrixState0) //camera's initial position
         this._v3_2.setFromMatrixPosition(this._gizmoMatrixState0) //gizmo's initial position
@@ -2129,7 +2129,7 @@ class ArcballControls extends EventDispatcher {
     if (this.camera) {
       this.camera.zoom = this._zoom0
 
-      if (this.camera.type === 'PerspectiveCamera') {
+      if (this.camera instanceof PerspectiveCamera) {
         this.camera.fov = this._fov0
       }
 
@@ -2184,7 +2184,7 @@ class ArcballControls extends EventDispatcher {
   public copyState = (): void => {
     if (this.camera) {
       const state = JSON.stringify(
-        this.camera?.type === 'OrthographicCamera'
+        this.camera instanceof OrthographicCamera
           ? {
               arcballState: {
                 cameraFar: this.camera.far,
@@ -2232,7 +2232,7 @@ class ArcballControls extends EventDispatcher {
     this._zoom0 = this.camera.zoom
     this._up0.copy(this.camera.up)
 
-    if (this.camera.type === 'PerspectiveCamera') {
+    if (this.camera instanceof PerspectiveCamera) {
       this._fov0 = this.camera.fov
     }
   }
@@ -2250,7 +2250,7 @@ class ArcballControls extends EventDispatcher {
     const scalePoint = point.clone()
     let sizeInverse = 1 / size
 
-    if (this.camera.type === 'OrthographicCamera') {
+    if (this.camera instanceof OrthographicCamera) {
       //camera zoom
       this.camera.zoom = this._zoomState
       this.camera.zoom *= size
@@ -2288,7 +2288,7 @@ class ArcballControls extends EventDispatcher {
       return _transformation
     }
 
-    if (this.camera.type === 'PerspectiveCamera') {
+    if (this.camera instanceof PerspectiveCamera) {
       this._v3_1.setFromMatrixPosition(this._cameraMatrixState)
       this._v3_2.setFromMatrixPosition(this._gizmoMatrixState)
 
@@ -2341,7 +2341,7 @@ class ArcballControls extends EventDispatcher {
    * @param {Number} value fov to be setted
    */
   private setFov = (value: number): void => {
-    if (this.camera?.type === 'PerspectiveCamera') {
+    if (this.camera instanceof PerspectiveCamera) {
       this.camera.fov = MathUtils.clamp(value, this.minFov, this.maxFov)
       this.camera.updateProjectionMatrix()
     }
@@ -2457,7 +2457,7 @@ class ArcballControls extends EventDispatcher {
     canvas: HTMLElement,
     tbRadius: number,
   ): Vector3 | undefined => {
-    if (camera.type == 'OrthographicCamera') {
+    if (camera instanceof OrthographicCamera) {
       this._v2_1.copy(this.getCursorPosition(cursorX, cursorY, canvas))
       this._v3_1.set(this._v2_1.x, this._v2_1.y, 0)
 
@@ -2476,7 +2476,7 @@ class ArcballControls extends EventDispatcher {
       return this._v3_1
     }
 
-    if (camera.type == 'PerspectiveCamera') {
+    if (camera instanceof PerspectiveCamera) {
       //unproject cursor on the near plane
       this._v2_1.copy(this.getCursorNDC(cursorX, cursorY, canvas))
 
@@ -2578,14 +2578,14 @@ class ArcballControls extends EventDispatcher {
     canvas: HTMLElement,
     initialDistance = false,
   ): Vector3 | undefined => {
-    if (camera.type == 'OrthographicCamera') {
+    if (camera instanceof OrthographicCamera) {
       this._v2_1.copy(this.getCursorPosition(cursorX, cursorY, canvas))
       this._v3_1.set(this._v2_1.x, this._v2_1.y, 0)
 
       return this._v3_1.clone()
     }
 
-    if (camera.type == 'PerspectiveCamera') {
+    if (camera instanceof PerspectiveCamera) {
       this._v2_1.copy(this.getCursorNDC(cursorX, cursorY, canvas))
 
       //unproject cursor on the near plane
@@ -2650,13 +2650,13 @@ class ArcballControls extends EventDispatcher {
     this._cameraMatrixState.copy(this.camera.matrix)
     this._gizmoMatrixState.copy(this._gizmos.matrix)
 
-    if (this.camera.type === 'OrthographicCamera') {
+    if (this.camera instanceof OrthographicCamera) {
       this._cameraProjectionState.copy(this.camera.projectionMatrix)
       this.camera.updateProjectionMatrix()
       this._zoomState = this.camera.zoom
     }
 
-    if (this.camera.type === 'PerspectiveCamera') {
+    if (this.camera instanceof PerspectiveCamera) {
       this._fovState = this.camera.fov
     }
   }
@@ -2690,7 +2690,7 @@ class ArcballControls extends EventDispatcher {
     if (!this.camera) return
 
     //check min/max parameters
-    if (this.camera.type === 'OrthographicCamera') {
+    if (this.camera instanceof OrthographicCamera) {
       //check zoom
       if (this.camera.zoom > this.maxZoom || this.camera.zoom < this.minZoom) {
         const newZoom = MathUtils.clamp(this.camera.zoom, this.minZoom, this.maxZoom)
@@ -2698,7 +2698,7 @@ class ArcballControls extends EventDispatcher {
       }
     }
 
-    if (this.camera.type === 'PerspectiveCamera') {
+    if (this.camera instanceof PerspectiveCamera) {
       //check distance
       const distance = this.camera.position.distanceTo(this._gizmos.position)
 
@@ -2723,7 +2723,7 @@ class ArcballControls extends EventDispatcher {
       if (oldRadius < this._tbRadius - EPS || oldRadius > this._tbRadius + EPS) {
         const scale = (this._gizmos.scale.x + this._gizmos.scale.y + this._gizmos.scale.z) / 3
         const newRadius = this._tbRadius / scale
-        // @ts-expect-error
+        // @ts-ignore
         const curve = new EllipseCurve(0, 0, newRadius, newRadius)
         const points = curve.getPoints(this._curvePts)
         const curveGeometry = new BufferGeometry().setFromPoints(points)
@@ -2751,7 +2751,7 @@ class ArcballControls extends EventDispatcher {
 
       this.camera.zoom = state.arcballState.cameraZoom
 
-      if (this.camera.type === 'PerspectiveCamera') {
+      if (this.camera instanceof PerspectiveCamera) {
         this.camera.fov = state.arcballState.cameraFov
       }
 

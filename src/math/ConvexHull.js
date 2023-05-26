@@ -7,11 +7,11 @@ import { Line3, Plane, Triangle, Vector3 } from 'three'
 const Visible = 0
 const Deleted = 1
 
-const _v1 = new Vector3()
-const _line3 = new Line3()
-const _plane = new Plane()
-const _closestPoint = new Vector3()
-const _triangle = new Triangle()
+const _v1 = /* @__PURE__ */ new Vector3()
+const _line3 = /* @__PURE__ */ new Line3()
+const _plane = /* @__PURE__ */ new Plane()
+const _closestPoint = /* @__PURE__ */ new Vector3()
+const _triangle = /* @__PURE__ */ new Triangle()
 
 class ConvexHull {
   constructor() {
@@ -61,20 +61,15 @@ class ConvexHull {
       const geometry = node.geometry
 
       if (geometry !== undefined) {
-        if (geometry.isGeometry) {
-          console.error('THREE.ConvexHull no longer supports Geometry. Use THREE.BufferGeometry instead.')
-          return
-        } else if (geometry.isBufferGeometry) {
-          const attribute = geometry.attributes.position
+        const attribute = geometry.attributes.position
 
-          if (attribute !== undefined) {
-            for (let i = 0, l = attribute.count; i < l; i++) {
-              const point = new Vector3()
+        if (attribute !== undefined) {
+          for (let i = 0, l = attribute.count; i < l; i++) {
+            const point = new Vector3()
 
-              point.fromBufferAttribute(attribute, i).applyMatrix4(node.matrixWorld)
+            point.fromBufferAttribute(attribute, i).applyMatrix4(node.matrixWorld)
 
-              points.push(point)
-            }
+            points.push(point)
           }
         }
       }
@@ -98,7 +93,7 @@ class ConvexHull {
   }
 
   intersectRay(ray, target) {
-    // based on "Fast Ray-Convex Polyhedron Intersection"  by Eric Haines, GRAPHICS GEMS II
+    // based on "Fast Ray-Convex Polyhedron Intersection" by Eric Haines, GRAPHICS GEMS II
 
     const faces = this.faces
 
@@ -130,7 +125,7 @@ class ConvexHull {
       // now categorized plane as front-facing or back-facing
 
       if (vD > 0) {
-        //  plane faces away from the ray, so this plane is a back-face
+        // plane faces away from the ray, so this plane is a back-face
 
         tFar = Math.min(t, tFar)
       } else {
@@ -208,7 +203,7 @@ class ConvexHull {
     return this
   }
 
-  // Removes all the visible vertices that a given face is able to see which are stored in the 'assigned' vertext list
+  // Removes all the visible vertices that a given face is able to see which are stored in the 'assigned' vertex list
 
   removeAllVerticesFromFace(face) {
     if (face.outside !== null) {
@@ -973,4 +968,4 @@ class VertexList {
   }
 }
 
-export { ConvexHull }
+export { ConvexHull, Face, HalfEdge, VertexNode, VertexList }

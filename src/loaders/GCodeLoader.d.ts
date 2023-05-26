@@ -1,4 +1,5 @@
-import { Group, Loader, LoadingManager } from 'three'
+import { Group, LoadingManager } from 'three'
+import { Loader } from '../types/Loader'
 
 export class GCodeLoader extends Loader {
   constructor(manager?: LoadingManager)

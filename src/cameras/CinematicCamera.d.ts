@@ -1,6 +1,6 @@
 import { PerspectiveCamera, ShaderMaterial, Scene, WebGLRenderer, OrthographicCamera, WebGLRenderTarget } from 'three'
 
-import { BokehShaderUniforms } from './../shaders/BokehShader2'
+import { BokehShader2Uniforms } from './../shaders/BokehShader2'
 
 export class CinematicCamera extends PerspectiveCamera {
   constructor(fov: number, aspect: number, near: number, far: number)
@@ -11,7 +11,7 @@ export class CinematicCamera extends PerspectiveCamera {
     camera: OrthographicCamera
     rtTextureDepth: WebGLRenderTarget
     rtTextureColor: WebGLRenderTarget
-    bokeh_uniforms: BokehShaderUniforms
+    bokeh_uniforms: BokehShader2Uniforms
   }
   shaderSettings: {
     rings: number

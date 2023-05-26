@@ -1,6 +1,6 @@
 import { IUniform, Texture, Vector2 } from 'three'
 
-export interface BokehShaderUniforms {
+export interface BokehShader2Uniforms {
   textureWidth: IUniform<number>
   textureHeight: IUniform<number>
 
@@ -43,7 +43,7 @@ export interface BokehShaderUniforms {
  */
 
 export const BokehShader2: {
-  uniforms: BokehShaderUniforms
+  uniforms: BokehShader2Uniforms
   vertexShader: string
   fragmentShader: string
 } = {
@@ -78,7 +78,7 @@ export const BokehShader2: {
     pentagon: { value: 0 },
 
     shaderFocus: { value: 1 },
-    focusCoords: { value: new Vector2() },
+    focusCoords: { value: /* @__PURE__ */ new Vector2() },
   },
 
   vertexShader: [

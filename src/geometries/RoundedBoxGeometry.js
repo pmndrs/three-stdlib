@@ -1,6 +1,7 @@
 import { BoxGeometry, Vector3 } from 'three'
 
-const tempNormal = new Vector3()
+const tempNormal = /* @__PURE__ */ new Vector3()
+
 function getUv(faceDirVector, normal, uvAxis, projectionAxis, radius, sideLength) {
   const totArcLength = (2 * Math.PI * radius) / 4
 

@@ -2,7 +2,7 @@
  * @webxr-input-profiles/motion-controllers 1.0.0 https://github.com/immersive-web/webxr-input-profiles
  */
 
-import type { Object3D, XRGamepad, XRHandedness, XRInputSource } from 'three'
+import type { Object3D } from 'three'
 
 interface GamepadIndices {
   button: number
@@ -54,41 +54,41 @@ interface ProfilesList {
 }
 
 const MotionControllerConstants = {
-  Handedness: Object.freeze({
+  Handedness: {
     NONE: 'none',
     LEFT: 'left',
     RIGHT: 'right',
-  }),
+  },
 
-  ComponentState: Object.freeze({
+  ComponentState: {
     DEFAULT: 'default',
     TOUCHED: 'touched',
     PRESSED: 'pressed',
-  }),
+  },
 
-  ComponentProperty: Object.freeze({
+  ComponentProperty: {
     BUTTON: 'button',
     X_AXIS: 'xAxis',
     Y_AXIS: 'yAxis',
     STATE: 'state',
-  }),
+  },
 
-  ComponentType: Object.freeze({
+  ComponentType: {
     TRIGGER: 'trigger',
     SQUEEZE: 'squeeze',
     TOUCHPAD: 'touchpad',
     THUMBSTICK: 'thumbstick',
     BUTTON: 'button',
-  }),
+  },
 
   ButtonTouchThreshold: 0.05,
 
   AxisTouchThreshold: 0.1,
 
-  VisualResponseProperty: Object.freeze({
+  VisualResponseProperty: {
     TRANSFORM: 'transform',
     VISIBILITY: 'visibility',
-  }),
+  },
 }
 
 /**
@@ -133,7 +133,7 @@ async function fetchProfile(
 
   // Find the relative path to the first requested profile that is recognized
   let match: { profileId: string; profilePath: string; deprecated: boolean } | undefined = undefined
-  xrInputSource.profiles.some((profileId) => {
+  xrInputSource.profiles.some((profileId: string) => {
     const supportedProfile = supportedProfilesList[profileId]
     if (supportedProfile) {
       match = {
@@ -366,7 +366,7 @@ class Component implements ComponentDescription {
    * @description Poll for updated data based on current gamepad state
    * @param {Object} gamepad - The gamepad object from which the component data should be polled
    */
-  updateFromGamepad(gamepad: XRGamepad): void {
+  updateFromGamepad(gamepad: Gamepad): void {
     // Set the state to default before processing other data sources
     this.values.state = MotionControllerConstants.ComponentState.DEFAULT
 
@@ -374,13 +374,13 @@ class Component implements ComponentDescription {
     if (this.gamepadIndices.button !== undefined && gamepad.buttons.length > this.gamepadIndices.button) {
       const gamepadButton = gamepad.buttons[this.gamepadIndices.button]
       this.values.button = gamepadButton.value
-      this.values.button = this.values.button < 0 ? 0 : this.values.button
-      this.values.button = this.values.button > 1 ? 1 : this.values.button
+      this.values.button = this.values.button! < 0 ? 0 : this.values.button
+      this.values.button = this.values.button! > 1 ? 1 : this.values.button
 
       // Set the state based on the button
       if (gamepadButton.pressed || this.values.button === 1) {
         this.values.state = MotionControllerConstants.ComponentState.PRESSED
-      } else if (gamepadButton.touched || this.values.button > MotionControllerConstants.ButtonTouchThreshold) {
+      } else if (gamepadButton.touched || this.values.button! > MotionControllerConstants.ButtonTouchThreshold) {
         this.values.state = MotionControllerConstants.ComponentState.TOUCHED
       }
     }
@@ -388,13 +388,13 @@ class Component implements ComponentDescription {
     // Get and normalize x axis value
     if (this.gamepadIndices.xAxis !== undefined && gamepad.axes.length > this.gamepadIndices.xAxis) {
       this.values.xAxis = gamepad.axes[this.gamepadIndices.xAxis]
-      this.values.xAxis = this.values.xAxis < -1 ? -1 : this.values.xAxis
-      this.values.xAxis = this.values.xAxis > 1 ? 1 : this.values.xAxis
+      this.values.xAxis = this.values.xAxis! < -1 ? -1 : this.values.xAxis
+      this.values.xAxis = this.values.xAxis! > 1 ? 1 : this.values.xAxis
 
       // If the state is still default, check if the xAxis makes it touched
       if (
         this.values.state === MotionControllerConstants.ComponentState.DEFAULT &&
-        Math.abs(this.values.xAxis) > MotionControllerConstants.AxisTouchThreshold
+        Math.abs(this.values.xAxis!) > MotionControllerConstants.AxisTouchThreshold
       ) {
         this.values.state = MotionControllerConstants.ComponentState.TOUCHED
       }
@@ -403,13 +403,13 @@ class Component implements ComponentDescription {
     // Get and normalize Y axis value
     if (this.gamepadIndices.yAxis !== undefined && gamepad.axes.length > this.gamepadIndices.yAxis) {
       this.values.yAxis = gamepad.axes[this.gamepadIndices.yAxis]
-      this.values.yAxis = this.values.yAxis < -1 ? -1 : this.values.yAxis
-      this.values.yAxis = this.values.yAxis > 1 ? 1 : this.values.yAxis
+      this.values.yAxis = this.values.yAxis! < -1 ? -1 : this.values.yAxis
+      this.values.yAxis = this.values.yAxis! > 1 ? 1 : this.values.yAxis
 
       // If the state is still default, check if the yAxis makes it touched
       if (
         this.values.state === MotionControllerConstants.ComponentState.DEFAULT &&
-        Math.abs(this.values.yAxis) > MotionControllerConstants.AxisTouchThreshold
+        Math.abs(this.values.yAxis!) > MotionControllerConstants.AxisTouchThreshold
       ) {
         this.values.state = MotionControllerConstants.ComponentState.TOUCHED
       }
@@ -491,7 +491,7 @@ class MotionController {
    */
   updateFromGamepad(): void {
     Object.values(this.components).forEach((component) => {
-      component.updateFromGamepad(this.xrInputSource.gamepad)
+      component.updateFromGamepad(this.xrInputSource.gamepad!)
     })
   }
 }

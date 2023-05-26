@@ -1,4 +1,5 @@
-import { Loader, LoadingManager, Material, Object3D } from 'three'
+import { LoadingManager, Material, Object3D } from 'three'
+import { Loader } from '../types/Loader'
 
 export interface LWO {
   materials: Material[]

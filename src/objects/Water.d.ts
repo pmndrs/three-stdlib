@@ -1,4 +1,4 @@
-import { BufferGeometry, ColorRepresentation, Mesh, ShaderMaterial, Side, Texture, Vector3 } from 'three'
+import { BufferGeometry, Color, Mesh, ShaderMaterial, Side, Texture, Vector3 } from 'three'
 
 export interface WaterOptions {
   textureWidth?: number
@@ -8,8 +8,8 @@ export interface WaterOptions {
   time?: number
   waterNormals?: Texture
   sunDirection?: Vector3
-  sunColor?: ColorRepresentation
-  waterColor?: ColorRepresentation
+  sunColor?: Color | string | number
+  waterColor?: Color | string | number
   eye?: Vector3
   distortionScale?: number
   side?: Side

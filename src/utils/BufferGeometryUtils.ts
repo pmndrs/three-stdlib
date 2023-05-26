@@ -249,7 +249,7 @@ export const mergeBufferAttributes = (attributes: BufferAttribute[]): BufferAttr
   })
 
   if (TypedArray && itemSize) {
-    // @ts-expect-error this works in JS and TS is complaining but it's such a tiny thing I can live with the guilt
+    // @ts-ignore this works in JS and TS is complaining but it's such a tiny thing I can live with the guilt
     const array = new TypedArray(arrayLength)
     let offset = 0
 
@@ -288,7 +288,7 @@ export const interleaveAttributes = (attributes: BufferAttribute[]): Interleaved
   }
 
   // Create the set of buffer attributes
-  // @ts-expect-error this works in JS and TS is complaining but it's such a tiny thing I can live with the guilt
+  // @ts-ignore this works in JS and TS is complaining but it's such a tiny thing I can live with the guilt
   const interleavedBuffer = new InterleavedBuffer(new TypedArray(arrayLength), stride)
   let offset = 0
   const res = []
@@ -606,7 +606,7 @@ export function computeMorphedAttributes(object: Mesh | Line | Points): Computed
     const morphInfluences = object.morphTargetInfluences
 
     if (
-      // @ts-expect-error
+      // @ts-ignore
       material.morphTargets &&
       morphAttribute &&
       morphInfluences
@@ -642,11 +642,11 @@ export function computeMorphedAttributes(object: Mesh | Line | Points): Computed
     }
 
     if ((object as SkinnedMesh).isSkinnedMesh) {
-      // @ts-expect-error – https://github.com/three-types/three-ts-types/issues/37
+      // @ts-ignore – https://github.com/three-types/three-ts-types/issues/37
       object.boneTransform(a, _vA)
-      // @ts-expect-error – https://github.com/three-types/three-ts-types/issues/37
+      // @ts-ignore – https://github.com/three-types/three-ts-types/issues/37
       object.boneTransform(b, _vB)
-      // @ts-expect-error – https://github.com/three-types/three-ts-types/issues/37
+      // @ts-ignore – https://github.com/three-types/three-ts-types/issues/37
       object.boneTransform(c, _vC)
     }
 

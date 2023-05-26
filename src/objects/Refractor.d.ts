@@ -1,7 +1,7 @@
-import { Mesh, BufferGeometry, ColorRepresentation, TextureEncoding, WebGLRenderTarget } from 'three'
+import { Mesh, BufferGeometry, Color, TextureEncoding, WebGLRenderTarget, PerspectiveCamera } from 'three'
 
 export interface RefractorOptions {
-  color?: ColorRepresentation
+  color?: Color | string | number
   textureWidth?: number
   textureHeight?: number
   clipBias?: number
@@ -11,6 +11,9 @@ export interface RefractorOptions {
 }
 
 export class Refractor extends Mesh {
+  type: 'Refractor'
+  camera: PerspectiveCamera
+
   constructor(geometry?: BufferGeometry, options?: RefractorOptions)
 
   getRenderTarget(): WebGLRenderTarget

@@ -5,7 +5,7 @@ import {
   MeshBasicMaterial,
   Object3D,
   Raycaster,
-  SphereBufferGeometry,
+  SphereGeometry,
   Texture,
   Vector3,
 } from 'three'
@@ -26,7 +26,7 @@ export class OculusHandPointerModel extends Object3D {
   pinched: boolean
   attached: boolean
 
-  cursorObject: Mesh<SphereBufferGeometry, MeshBasicMaterial> | null
+  cursorObject: Mesh<SphereGeometry, MeshBasicMaterial> | null
 
   raycaster: Raycaster
 

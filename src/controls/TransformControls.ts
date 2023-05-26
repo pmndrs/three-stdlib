@@ -24,6 +24,7 @@ import {
   TorusGeometry,
   Vector3,
   Camera,
+  Vector2,
 } from 'three'
 
 export interface TransformControlsPointerObject {
@@ -255,7 +256,7 @@ class TransformControls<TCamera extends Camera = Camera> extends Object3D {
   private pointerHover = (pointer: TransformControlsPointerObject): void => {
     if (this.object === undefined || this.dragging === true) return
 
-    this.raycaster.setFromCamera(pointer, this.camera)
+    this.raycaster.setFromCamera((pointer as unknown) as Vector2, this.camera)
 
     const intersect = this.intersectObjectWithRay(this.gizmo.picker[this.mode], this.raycaster)
 
@@ -270,7 +271,7 @@ class TransformControls<TCamera extends Camera = Camera> extends Object3D {
     if (this.object === undefined || this.dragging === true || pointer.button !== 0) return
 
     if (this.axis !== null) {
-      this.raycaster.setFromCamera(pointer, this.camera)
+      this.raycaster.setFromCamera((pointer as unknown) as Vector2, this.camera)
 
       const planeIntersect = this.intersectObjectWithRay(this.plane, this.raycaster, true)
 
@@ -326,7 +327,7 @@ class TransformControls<TCamera extends Camera = Camera> extends Object3D {
 
     if (object === undefined || axis === null || this.dragging === false || pointer.button !== -1) return
 
-    this.raycaster.setFromCamera(pointer, this.camera)
+    this.raycaster.setFromCamera((pointer as unknown) as Vector2, this.camera)
 
     const planeIntersect = this.intersectObjectWithRay(this.plane, this.raycaster, true)
 

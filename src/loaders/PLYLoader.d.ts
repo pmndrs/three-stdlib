@@ -1,4 +1,5 @@
-import { BufferGeometry, Loader, LoadingManager } from 'three'
+import { BufferGeometry, LoadingManager } from 'three'
+import { Loader } from '../types/Loader'
 
 export class PLYLoader extends Loader {
   constructor(manager?: LoadingManager)

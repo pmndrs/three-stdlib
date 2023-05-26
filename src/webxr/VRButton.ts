@@ -1,4 +1,4 @@
-import { Navigator, WebGLRenderer, XRSession, XRSessionInit } from 'three'
+import { WebGLRenderer } from 'three'
 
 class VRButton {
   static createButton(renderer: WebGLRenderer, sessionInit: XRSessionInit = {}): HTMLButtonElement | HTMLAnchorElement {
@@ -10,7 +10,7 @@ class VRButton {
       async function onSessionStarted(session: XRSession): Promise<void> {
         session.addEventListener('end', onSessionEnded)
 
-        await renderer.xr.setSession(session)
+        await renderer.xr.setSession(session as any)
         button.textContent = 'EXIT VR'
 
         currentSession = session
@@ -104,7 +104,7 @@ class VRButton {
       button.style.display = 'none'
 
       // Query for session mode
-      ;(navigator as Navigator).xr!.isSessionSupported('immersive-vr').then((supported) => {
+      navigator.xr!.isSessionSupported('immersive-vr').then((supported) => {
         supported ? showEnterVR() : showWebXRNotFound()
 
         if (supported && VRButton.xrSessionIsGranted) {

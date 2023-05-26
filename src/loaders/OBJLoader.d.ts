@@ -1,4 +1,5 @@
-import { Loader, LoadingManager, Group } from 'three'
+import { LoadingManager, Group } from 'three'
+import { Loader } from '../types/Loader'
 import { MaterialCreator } from './MTLLoader'
 
 export class OBJLoader extends Loader {

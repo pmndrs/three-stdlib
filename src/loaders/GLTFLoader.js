@@ -1507,7 +1507,7 @@ class GLTFCubicSplineInterpolant extends Interpolant {
   }
 }
 
-const _q = new Quaternion()
+const _q = /* @__PURE__ */ new Quaternion()
 
 class GLTFCubicSplineQuaternionInterpolant extends GLTFCubicSplineInterpolant {
   interpolate_(i1, t0, t, t1) {
@@ -1588,7 +1588,7 @@ const ATTRIBUTES = {
   // uv => uv1, 4 uv channels
   // https://github.com/mrdoob/three.js/pull/25943
   // https://github.com/mrdoob/three.js/pull/25788
-  ...(REVISION.replace(/\D+/g, '') >= 152
+  .../* @__PURE__ */ (REVISION.replace(/\D+/g, '') >= 152
     ? {
         TEXCOORD_0: 'uv',
         TEXCOORD_1: 'uv1',
@@ -1830,7 +1830,7 @@ function getImageURIMimeType(uri) {
   return 'image/png'
 }
 
-const _identityMatrix = new Matrix4()
+const _identityMatrix = /* @__PURE__ */ new Matrix4()
 
 /* GLTF PARSER */
 

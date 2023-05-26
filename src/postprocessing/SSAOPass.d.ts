@@ -9,10 +9,9 @@ import {
   Vector3,
   WebGLRenderer,
   WebGLRenderTarget,
-  ColorRepresentation,
 } from 'three'
 
-import { Pass } from './Pass'
+import { Pass, FullScreenQuad } from './Pass'
 
 export enum SSAOPassOUTPUT {
   Default,
@@ -46,7 +45,7 @@ export class SSAOPass extends Pass {
   blurMaterial: ShaderMaterial
   depthRenderMaterial: ShaderMaterial
   copyMaterial: ShaderMaterial
-  fsQuad: object
+  fsQuad: FullScreenQuad
   originalClearColor: Color
 
   static OUTPUT: SSAOPassOUTPUT
@@ -58,14 +57,14 @@ export class SSAOPass extends Pass {
     renderer: WebGLRenderer,
     passMaterial: Material,
     renderTarget: WebGLRenderTarget,
-    clearColor?: ColorRepresentation,
+    clearColor?: Color | string | number,
     clearAlpha?: number,
   ): void
   renderOverride(
     renderer: WebGLRenderer,
     overrideMaterial: Material,
     renderTarget: WebGLRenderTarget,
-    clearColor?: ColorRepresentation,
+    clearColor?: Color | string | number,
     clearAlpha?: number,
   ): void
 }

@@ -1,35 +1,33 @@
 import { ShaderMaterial, UniformsUtils } from 'three'
-import { Pass, FullScreenQuad } from '../postprocessing/Pass'
+import { Pass, FullScreenQuad } from './Pass'
 import { CopyShader } from '../shaders/CopyShader'
 
-var TexturePass = function (map, opacity) {
-  if (CopyShader === undefined) console.error('THREE.TexturePass relies on CopyShader')
+class TexturePass extends Pass {
+  constructor(map, opacity) {
+    super()
 
-  var shader = CopyShader
+    const shader = CopyShader
 
-  this.map = map
-  this.opacity = opacity !== undefined ? opacity : 1.0
+    this.map = map
+    this.opacity = opacity !== undefined ? opacity : 1.0
 
-  this.uniforms = UniformsUtils.clone(shader.uniforms)
+    this.uniforms = UniformsUtils.clone(shader.uniforms)
 
-  this.material = new ShaderMaterial({
-    uniforms: this.uniforms,
-    vertexShader: shader.vertexShader,
-    fragmentShader: shader.fragmentShader,
-    depthTest: false,
-    depthWrite: false,
-  })
+    this.material = new ShaderMaterial({
+      uniforms: this.uniforms,
+      vertexShader: shader.vertexShader,
+      fragmentShader: shader.fragmentShader,
+      depthTest: false,
+      depthWrite: false,
+    })
 
-  this.needsSwap = false
+    this.needsSwap = false
 
-  this.fsQuad = new FullScreenQuad(null)
-}
+    this.fsQuad = new FullScreenQuad(null)
+  }
 
-TexturePass.prototype = Object.assign(Object.create(Pass.prototype), {
-  constructor: TexturePass,
-
-  render: function (renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */) {
-    var oldAutoClear = renderer.autoClear
+  render(renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */) {
+    const oldAutoClear = renderer.autoClear
     renderer.autoClear = false
 
     this.fsQuad.material = this.material
@@ -43,7 +41,13 @@ TexturePass.prototype = Object.assign(Object.create(Pass.prototype), {
     this.fsQuad.render(renderer)
 
     renderer.autoClear = oldAutoClear
-  },
-})
+  }
+
+  dispose() {
+    this.material.dispose()
+
+    this.fsQuad.dispose()
+  }
+}
 
 export { TexturePass }

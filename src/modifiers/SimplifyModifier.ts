@@ -1,8 +1,8 @@
 import { BufferGeometry, Float32BufferAttribute, Vector3 } from 'three'
 import * as BufferGeometryUtils from '../utils/BufferGeometryUtils'
 
-const cb = new Vector3(),
-  ab = new Vector3()
+const cb = /* @__PURE__ */ new Vector3()
+const ab = /* @__PURE__ */ new Vector3()
 
 function pushIfUnique<TItem>(array: TItem[], object: TItem): void {
   if (array.indexOf(object) === -1) array.push(object)

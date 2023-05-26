@@ -180,7 +180,7 @@ class EdgeSplitModifier {
 
       for (let attribute of Object.values(newAttributes)) {
         for (let j = 0; j < attribute.itemSize; j++) {
-          // @ts-expect-error ArrayLike can't be mutated, but this works – https://github.com/three-types/three-ts-types/issues/35
+          // @ts-ignore ArrayLike can't be mutated, but this works – https://github.com/three-types/three-ts-types/issues/35
           attribute.array[(this.indexes.length + i) * attribute.itemSize + j] =
             attribute.array[index * attribute.itemSize + j]
         }
@@ -209,7 +209,7 @@ class EdgeSplitModifier {
         for (let i = 0; i < changedNormals.length; i++) {
           if (changedNormals[i] === false) {
             for (let j = 0; j < 3; j++) {
-              // @ts-expect-error ArrayLike can't be mutated, but this works – https://github.com/three-types/three-ts-types/issues/35
+              // @ts-ignore ArrayLike can't be mutated, but this works – https://github.com/three-types/three-ts-types/issues/35
               geometry.attributes.normal.array[3 * i + j] = this.oldNormals[3 * i + j]
             }
           }

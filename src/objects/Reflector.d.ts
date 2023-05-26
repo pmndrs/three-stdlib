@@ -1,7 +1,7 @@
-import { Mesh, BufferGeometry, ColorRepresentation, TextureEncoding, WebGLRenderTarget } from 'three'
+import { Mesh, BufferGeometry, Color, TextureEncoding, WebGLRenderTarget, PerspectiveCamera } from 'three'
 
 export interface ReflectorOptions {
-  color?: ColorRepresentation
+  color?: Color | string | number
   textureWidth?: number
   textureHeight?: number
   clipBias?: number
@@ -11,6 +11,9 @@ export interface ReflectorOptions {
 }
 
 export class Reflector extends Mesh {
+  type: 'Reflector'
+  camera: PerspectiveCamera
+
   constructor(geometry?: BufferGeometry, options?: ReflectorOptions)
 
   getRenderTarget(): WebGLRenderTarget

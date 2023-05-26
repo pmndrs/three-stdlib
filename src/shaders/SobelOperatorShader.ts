@@ -10,7 +10,7 @@ import { Vector2 } from 'three'
 export const SobelOperatorShader = {
   uniforms: {
     tDiffuse: { value: null },
-    resolution: { value: new Vector2() },
+    resolution: { value: /* @__PURE__ */ new Vector2() },
   },
 
   vertexShader: [

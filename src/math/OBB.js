@@ -2,73 +2,73 @@ import { Box3, MathUtils, Matrix4, Matrix3, Ray, Vector3 } from 'three'
 
 // module scope helper variables
 
-var a = {
+const a = {
   c: null, // center
-  u: [new Vector3(), new Vector3(), new Vector3()], // basis vectors
+  u: [/* @__PURE__ */ new Vector3(), /* @__PURE__ */ new Vector3(), /* @__PURE__ */ new Vector3()], // basis vectors
   e: [], // half width
 }
 
-var b = {
+const b = {
   c: null, // center
-  u: [new Vector3(), new Vector3(), new Vector3()], // basis vectors
+  u: [/* @__PURE__ */ new Vector3(), /* @__PURE__ */ new Vector3(), /* @__PURE__ */ new Vector3()], // basis vectors
   e: [], // half width
 }
 
-var R = [[], [], []]
-var AbsR = [[], [], []]
-var t = []
+const R = [[], [], []]
+const AbsR = [[], [], []]
+const t = []
 
-var xAxis = new Vector3()
-var yAxis = new Vector3()
-var zAxis = new Vector3()
-var v1 = new Vector3()
-var size = new Vector3()
-var closestPoint = new Vector3()
-var rotationMatrix = new Matrix3()
-var aabb = new Box3()
-var matrix = new Matrix4()
-var inverse = new Matrix4()
-var localRay = new Ray()
+const xAxis = /* @__PURE__ */ new Vector3()
+const yAxis = /* @__PURE__ */ new Vector3()
+const zAxis = /* @__PURE__ */ new Vector3()
+const v1 = /* @__PURE__ */ new Vector3()
+const size = /* @__PURE__ */ new Vector3()
+const closestPoint = /* @__PURE__ */ new Vector3()
+const rotationMatrix = /* @__PURE__ */ new Matrix3()
+const aabb = /* @__PURE__ */ new Box3()
+const matrix = /* @__PURE__ */ new Matrix4()
+const inverse = /* @__PURE__ */ new Matrix4()
+const localRay = /* @__PURE__ */ new Ray()
 
 // OBB
 
-function OBB(center = new Vector3(), halfSize = new Vector3(), rotation = new Matrix3()) {
-  this.center = center
-  this.halfSize = halfSize
-  this.rotation = rotation
-}
+class OBB {
+  constructor(center = new Vector3(), halfSize = new Vector3(), rotation = new Matrix3()) {
+    this.center = center
+    this.halfSize = halfSize
+    this.rotation = rotation
+  }
 
-Object.assign(OBB.prototype, {
-  set: function (center, halfSize, rotation) {
+  set(center, halfSize, rotation) {
     this.center = center
     this.halfSize = halfSize
     this.rotation = rotation
 
     return this
-  },
+  }
 
-  copy: function (obb) {
+  copy(obb) {
     this.center.copy(obb.center)
     this.halfSize.copy(obb.halfSize)
     this.rotation.copy(obb.rotation)
 
     return this
-  },
+  }
 
-  clone: function () {
+  clone() {
     return new this.constructor().copy(this)
-  },
+  }
 
-  getSize: function (result) {
+  getSize(result) {
     return result.copy(this.halfSize).multiplyScalar(2)
-  },
+  }
 
   /**
    * Reference: Closest Point on OBB to Point in Real-Time Collision Detection
    * by Christer Ericson (chapter 5.1.4)
    */
-  clampPoint: function (point, result) {
-    var halfSize = this.halfSize
+  clampPoint(point, result) {
+    const halfSize = this.halfSize
 
     v1.subVectors(point, this.center)
     this.rotation.extractBasis(xAxis, yAxis, zAxis)
@@ -79,19 +79,19 @@ Object.assign(OBB.prototype, {
 
     // project the target onto the OBB axes and walk towards that point
 
-    var x = MathUtils.clamp(v1.dot(xAxis), -halfSize.x, halfSize.x)
+    const x = MathUtils.clamp(v1.dot(xAxis), -halfSize.x, halfSize.x)
     result.add(xAxis.multiplyScalar(x))
 
-    var y = MathUtils.clamp(v1.dot(yAxis), -halfSize.y, halfSize.y)
+    const y = MathUtils.clamp(v1.dot(yAxis), -halfSize.y, halfSize.y)
     result.add(yAxis.multiplyScalar(y))
 
-    var z = MathUtils.clamp(v1.dot(zAxis), -halfSize.z, halfSize.z)
+    const z = MathUtils.clamp(v1.dot(zAxis), -halfSize.z, halfSize.z)
     result.add(zAxis.multiplyScalar(z))
 
     return result
-  },
+  }
 
-  containsPoint: function (point) {
+  containsPoint(point) {
     v1.subVectors(point, this.center)
     this.rotation.extractBasis(xAxis, yAxis, zAxis)
 
@@ -102,13 +102,13 @@ Object.assign(OBB.prototype, {
       Math.abs(v1.dot(yAxis)) <= this.halfSize.y &&
       Math.abs(v1.dot(zAxis)) <= this.halfSize.z
     )
-  },
+  }
 
-  intersectsBox3: function (box3) {
+  intersectsBox3(box3) {
     return this.intersectsOBB(obb.fromBox3(box3))
-  },
+  }
 
-  intersectsSphere: function (sphere) {
+  intersectsSphere(sphere) {
     // find the point on the OBB closest to the sphere center
 
     this.clampPoint(sphere.center, closestPoint)
@@ -116,14 +116,14 @@ Object.assign(OBB.prototype, {
     // if that point is inside the sphere, the OBB and sphere intersect
 
     return closestPoint.distanceToSquared(sphere.center) <= sphere.radius * sphere.radius
-  },
+  }
 
   /**
    * Reference: OBB-OBB Intersection in Real-Time Collision Detection
    * by Christer Ericson (chapter 4.4.1)
    *
    */
-  intersectsOBB: function (obb, epsilon = Number.EPSILON) {
+  intersectsOBB(obb, epsilon = Number.EPSILON) {
     // prepare data structures (the code uses the same nomenclature like the reference)
 
     a.c = this.center
@@ -166,7 +166,7 @@ Object.assign(OBB.prototype, {
       }
     }
 
-    var ra, rb
+    let ra, rb
 
     // test axes L = A0, L = A1, L = A2
 
@@ -241,13 +241,13 @@ Object.assign(OBB.prototype, {
     // since no separating axis is found, the OBBs must be intersecting
 
     return true
-  },
+  }
 
   /**
    * Reference: Testing Box Against Plane in Real-Time Collision Detection
    * by Christer Ericson (chapter 5.2.3)
    */
-  intersectsPlane: function (plane) {
+  intersectsPlane(plane) {
     this.rotation.extractBasis(xAxis, yAxis, zAxis)
 
     // compute the projection interval radius of this OBB onto L(t) = this->center + t * p.normal;
@@ -264,13 +264,13 @@ Object.assign(OBB.prototype, {
     // Intersection occurs when distance d falls within [-r,+r] interval
 
     return Math.abs(d) <= r
-  },
+  }
 
   /**
    * Performs a ray/OBB intersection test and stores the intersection point
    * to the given 3D vector. If no intersection is detected, *null* is returned.
    */
-  intersectRay: function (ray, result) {
+  intersectRay(ray, result) {
     // the idea is to perform the intersection test in the local space
     // of the OBB.
 
@@ -279,7 +279,7 @@ Object.assign(OBB.prototype, {
 
     // create a 4x4 transformation matrix
 
-    matrix4FromRotationMatrix(matrix, this.rotation)
+    matrix.setFromMatrix3(this.rotation)
     matrix.setPosition(this.center)
 
     // transform ray to the local space of the OBB
@@ -296,17 +296,17 @@ Object.assign(OBB.prototype, {
     } else {
       return null
     }
-  },
+  }
 
   /**
    * Performs a ray/OBB intersection test. Returns either true or false if
    * there is a intersection or not.
    */
-  intersectsRay: function (ray) {
+  intersectsRay(ray) {
     return this.intersectRay(ray, v1) !== null
-  },
+  }
 
-  fromBox3: function (box3) {
+  fromBox3(box3) {
     box3.getCenter(this.center)
 
     box3.getSize(this.halfSize).multiplyScalar(0.5)
@@ -314,27 +314,27 @@ Object.assign(OBB.prototype, {
     this.rotation.identity()
 
     return this
-  },
+  }
 
-  equals: function (obb) {
+  equals(obb) {
     return obb.center.equals(this.center) && obb.halfSize.equals(this.halfSize) && obb.rotation.equals(this.rotation)
-  },
+  }
 
-  applyMatrix4: function (matrix) {
-    var e = matrix.elements
+  applyMatrix4(matrix) {
+    const e = matrix.elements
 
-    var sx = v1.set(e[0], e[1], e[2]).length()
-    var sy = v1.set(e[4], e[5], e[6]).length()
-    var sz = v1.set(e[8], e[9], e[10]).length()
+    let sx = v1.set(e[0], e[1], e[2]).length()
+    const sy = v1.set(e[4], e[5], e[6]).length()
+    const sz = v1.set(e[8], e[9], e[10]).length()
 
-    var det = matrix.determinant()
+    const det = matrix.determinant()
     if (det < 0) sx = -sx
 
     rotationMatrix.setFromMatrix4(matrix)
 
-    var invSX = 1 / sx
-    var invSY = 1 / sy
-    var invSZ = 1 / sz
+    const invSX = 1 / sx
+    const invSY = 1 / sy
+    const invSZ = 1 / sz
 
     rotationMatrix.elements[0] *= invSX
     rotationMatrix.elements[1] *= invSX
@@ -358,34 +358,9 @@ Object.assign(OBB.prototype, {
     this.center.add(v1)
 
     return this
-  },
-})
-
-function matrix4FromRotationMatrix(matrix4, matrix3) {
-  var e = matrix4.elements
-  var me = matrix3.elements
-
-  e[0] = me[0]
-  e[1] = me[1]
-  e[2] = me[2]
-  e[3] = 0
-
-  e[4] = me[3]
-  e[5] = me[4]
-  e[6] = me[5]
-  e[7] = 0
-
-  e[8] = me[6]
-  e[9] = me[7]
-  e[10] = me[8]
-  e[11] = 0
-
-  e[12] = 0
-  e[13] = 0
-  e[14] = 0
-  e[15] = 1
+  }
 }
 
-var obb = new OBB()
+const obb = /* @__PURE__ */ new OBB()
 
 export { OBB }

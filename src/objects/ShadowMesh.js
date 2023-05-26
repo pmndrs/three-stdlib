@@ -1,10 +1,10 @@
-import { Matrix4, Mesh, MeshBasicMaterial } from 'three'
+import { Matrix4, Mesh, MeshBasicMaterial, EqualStencilFunc, IncrementStencilOp } from 'three'
 
 /**
  * A shadow Mesh that follows a shadow-casting Mesh in the scene, but is confined to a single plane.
  */
 
-const _shadowMatrix = new Matrix4()
+const _shadowMatrix = /* @__PURE__ */ new Matrix4()
 
 class ShadowMesh extends Mesh {
   constructor(mesh) {
@@ -13,9 +13,15 @@ class ShadowMesh extends Mesh {
       transparent: true,
       opacity: 0.6,
       depthWrite: false,
+      stencilWrite: true,
+      stencilFunc: EqualStencilFunc,
+      stencilRef: 0,
+      stencilZPass: IncrementStencilOp,
     })
 
     super(mesh.geometry, shadowMaterial)
+
+    this.isShadowMesh = true
 
     this.meshMatrix = mesh.matrixWorld
 
@@ -57,7 +63,5 @@ class ShadowMesh extends Mesh {
     this.matrix.multiplyMatrices(_shadowMatrix, this.meshMatrix)
   }
 }
-
-ShadowMesh.prototype.isShadowMesh = true
 
 export { ShadowMesh }

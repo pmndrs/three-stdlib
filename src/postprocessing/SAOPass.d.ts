@@ -9,10 +9,9 @@ import {
   Vector2,
   WebGLRenderer,
   WebGLRenderTarget,
-  ColorRepresentation,
 } from 'three'
 
-import { Pass } from './Pass'
+import { Pass, FullScreenQuad } from './Pass'
 
 export enum OUTPUT {
   Beauty,
@@ -57,23 +56,23 @@ export class SAOPass extends Pass {
   hBlurMaterial: ShaderMaterial
   materialCopy: ShaderMaterial
   depthCopy: ShaderMaterial
-  fsQuad: object
+  fsQuad: FullScreenQuad
   params: SAOPassParams
 
-  static OUTPUT: OUTPUT
+  static OUTPUT: typeof OUTPUT
 
   renderPass(
     renderer: WebGLRenderer,
     passMaterial: Material,
     renderTarget: WebGLRenderTarget,
-    clearColor?: ColorRepresentation,
+    clearColor?: Color | string | number,
     clearAlpha?: number,
   ): void
   renderOverride(
     renderer: WebGLRenderer,
     overrideMaterial: Material,
     renderTarget: WebGLRenderTarget,
-    clearColor?: ColorRepresentation,
+    clearColor?: Color | string | number,
     clearAlpha?: number,
   ): void
 }

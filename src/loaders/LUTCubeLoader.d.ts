@@ -1,4 +1,5 @@
-import { Loader, LoadingManager, Vector3, DataTexture, Data3DTexture } from 'three'
+import { LoadingManager, Vector3, DataTexture, Texture } from 'three'
+import { Loader } from '../types/Loader'
 
 export interface LUTCubeResult {
   title: string
@@ -6,7 +7,7 @@ export interface LUTCubeResult {
   domainMin: Vector3
   domainMax: Vector3
   texture: DataTexture
-  texture3D: Data3DTexture
+  texture3D: Texture // Data3DTexture
 }
 
 export class LUTCubeLoader extends Loader {

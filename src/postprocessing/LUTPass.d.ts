@@ -1,13 +1,13 @@
-import { DataTexture, Data3DTexture } from 'three'
+import { DataTexture, Texture } from 'three'
 import { ShaderPass } from './ShaderPass'
 
 export interface LUTPassParameters {
-  lut?: DataTexture | Data3DTexture
+  lut?: DataTexture | Texture // Data3DTexture
   intensity?: number
 }
 
 export class LUTPass extends ShaderPass {
-  lut?: DataTexture | Data3DTexture
+  lut?: DataTexture | Texture // Data3DTexture
   intensity?: number
   constructor(params: LUTPassParameters)
 }

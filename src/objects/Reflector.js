@@ -9,13 +9,82 @@ import {
   Vector3,
   Vector4,
   WebGLRenderTarget,
+  HalfFloatType,
+  NoToneMapping,
 } from 'three'
 
 class Reflector extends Mesh {
+  static ReflectorShader = {
+    uniforms: {
+      color: {
+        value: null,
+      },
+
+      tDiffuse: {
+        value: null,
+      },
+
+      textureMatrix: {
+        value: null,
+      },
+    },
+
+    vertexShader: /* glsl */ `
+		uniform mat4 textureMatrix;
+		varying vec4 vUv;
+
+		#include <common>
+		#include <logdepthbuf_pars_vertex>
+
+		void main() {
+
+			vUv = textureMatrix * vec4( position, 1.0 );
+
+			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+
+			#include <logdepthbuf_vertex>
+
+		}`,
+
+    fragmentShader: /* glsl */ `
+		uniform vec3 color;
+		uniform sampler2D tDiffuse;
+		varying vec4 vUv;
+
+		#include <logdepthbuf_pars_fragment>
+
+		float blendOverlay( float base, float blend ) {
+
+			return( base < 0.5 ? ( 2.0 * base * blend ) : ( 1.0 - 2.0 * ( 1.0 - base ) * ( 1.0 - blend ) ) );
+
+		}
+
+		vec3 blendOverlay( vec3 base, vec3 blend ) {
+
+			return vec3( blendOverlay( base.r, blend.r ), blendOverlay( base.g, blend.g ), blendOverlay( base.b, blend.b ) );
+
+		}
+
+		void main() {
+
+			#include <logdepthbuf_fragment>
+
+			vec4 base = texture2DProj( tDiffuse, vUv );
+			gl_FragColor = vec4( blendOverlay( base.rgb, color ), 1.0 );
+
+			#include <tonemapping_fragment>
+			#include <encodings_fragment>
+
+		}`,
+  }
+
   constructor(geometry, options = {}) {
     super(geometry)
 
+    this.isReflector = true
+
     this.type = 'Reflector'
+    this.camera = new PerspectiveCamera()
 
     const scope = this
 
@@ -24,6 +93,7 @@ class Reflector extends Mesh {
     const textureHeight = options.textureHeight || 512
     const clipBias = options.clipBias || 0
     const shader = options.shader || Reflector.ReflectorShader
+    const multisample = options.multisample !== undefined ? options.multisample : 4
 
     //
 
@@ -40,9 +110,12 @@ class Reflector extends Mesh {
     const q = new Vector4()
 
     const textureMatrix = new Matrix4()
-    const virtualCamera = new PerspectiveCamera()
+    const virtualCamera = this.camera
 
-    const renderTarget = new WebGLRenderTarget(textureWidth, textureHeight)
+    const renderTarget = new WebGLRenderTarget(textureWidth, textureHeight, {
+      samples: multisample,
+      type: HalfFloatType,
+    })
 
     const material = new ShaderMaterial({
       uniforms: UniformsUtils.clone(shader.uniforms),
@@ -125,19 +198,23 @@ class Reflector extends Mesh {
       projectionMatrix.elements[14] = clipPlane.w
 
       // Render
-
-      if ('colorSpace' in renderTarget.texture) renderTarget.texture.colorSpace = renderer.outputColorSpace
-      else renderTarget.texture.encoding = renderer.outputEncoding
-
       scope.visible = false
 
       const currentRenderTarget = renderer.getRenderTarget()
 
       const currentXrEnabled = renderer.xr.enabled
       const currentShadowAutoUpdate = renderer.shadowMap.autoUpdate
+      const currentToneMapping = renderer.toneMapping
+
+      let isSRGB = false
+      if ('outputColorSpace' in renderer) isSRGB = renderer.outputColorSpace === 'srgb'
+      else isSRGB = renderer.outputEncoding === 3001 // sRGBEncoding
 
       renderer.xr.enabled = false // Avoid camera modification
       renderer.shadowMap.autoUpdate = false // Avoid re-computing shadows
+      if ('outputColorSpace' in renderer) renderer.outputColorSpace = 'linear-srgb'
+      else renderer.outputEncoding = 3000 // LinearEncoding
+      renderer.toneMapping = NoToneMapping
 
       renderer.setRenderTarget(renderTarget)
 
@@ -148,6 +225,10 @@ class Reflector extends Mesh {
 
       renderer.xr.enabled = currentXrEnabled
       renderer.shadowMap.autoUpdate = currentShadowAutoUpdate
+      renderer.toneMapping = currentToneMapping
+
+      if ('outputColorSpace' in renderer) renderer.outputColorSpace = isSRGB ? 'srgb' : 'srgb-linear'
+      else renderer.outputEncoding = isSRGB ? 3001 : 3000
 
       renderer.setRenderTarget(currentRenderTarget)
 
@@ -171,69 +252,6 @@ class Reflector extends Mesh {
       scope.material.dispose()
     }
   }
-}
-
-Reflector.prototype.isReflector = true
-
-Reflector.ReflectorShader = {
-  uniforms: {
-    color: {
-      value: null,
-    },
-
-    tDiffuse: {
-      value: null,
-    },
-
-    textureMatrix: {
-      value: null,
-    },
-  },
-
-  vertexShader: /* glsl */ `
-		uniform mat4 textureMatrix;
-		varying vec4 vUv;
-
-		#include <common>
-		#include <logdepthbuf_pars_vertex>
-
-		void main() {
-
-			vUv = textureMatrix * vec4( position, 1.0 );
-
-			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-
-			#include <logdepthbuf_vertex>
-
-		}`,
-
-  fragmentShader: /* glsl */ `
-		uniform vec3 color;
-		uniform sampler2D tDiffuse;
-		varying vec4 vUv;
-
-		#include <logdepthbuf_pars_fragment>
-
-		float blendOverlay( float base, float blend ) {
-
-			return( base < 0.5 ? ( 2.0 * base * blend ) : ( 1.0 - 2.0 * ( 1.0 - base ) * ( 1.0 - blend ) ) );
-
-		}
-
-		vec3 blendOverlay( vec3 base, vec3 blend ) {
-
-			return vec3( blendOverlay( base.r, blend.r ), blendOverlay( base.g, blend.g ), blendOverlay( base.b, blend.b ) );
-
-		}
-
-		void main() {
-
-			#include <logdepthbuf_fragment>
-
-			vec4 base = texture2DProj( tDiffuse, vUv );
-			gl_FragColor = vec4( blendOverlay( base.rgb, color ), 1.0 );
-
-		}`,
 }
 
 export { Reflector }

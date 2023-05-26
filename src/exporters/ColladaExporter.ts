@@ -231,7 +231,7 @@ class ColladaExporter {
     if (attr instanceof InterleavedBufferAttribute && attr.isInterleavedBufferAttribute) {
       // use the typed array constructor to save on memory
       const TypedArrayConstructor: TypedArrayConstructors = attr.array.constructor
-      // @ts-expect-error
+      // @ts-ignore
       const arr: number[] = new TypedArrayConstructor(attr.count * attr.itemSize)
       const size = attr.itemSize
 
@@ -254,7 +254,7 @@ class ColladaExporter {
       return arr.slice(st, st + ct)
     } else {
       const TypedArrayConstructor: TypedArrayConstructors = arr.constructor
-      // @ts-expect-error
+      // @ts-ignore
       return new TypedArrayConstructor(arr.buffer, st * arr.BYTES_PER_ELEMENT, ct)
     }
   }

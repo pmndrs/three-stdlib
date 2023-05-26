@@ -1,5 +1,4 @@
 import { Object3D } from 'three'
-// @ts-ignore
 import { GLTFLoader } from '../loaders/GLTFLoader'
 
 const DEFAULT_HAND_PROFILE_PATH =

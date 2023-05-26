@@ -1,4 +1,5 @@
-import { FileLoader, Loader, ShapePath } from 'three'
+import { FileLoader, ShapePath } from 'three'
+import { Loader } from '../types/Loader'
 
 import type { LoadingManager, Shape } from 'three'
 

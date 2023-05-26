@@ -110,17 +110,110 @@ import { SimplexNoise } from '../math/SimplexNoise'
  */
 
 class LightningStrike extends BufferGeometry {
-  constructor(rayParameters) {
+  // Ray states
+  static RAY_INITIALIZED = 0
+  static RAY_UNBORN = 1
+  static RAY_PROPAGATING = 2
+  static RAY_STEADY = 3
+  static RAY_VANISHING = 4
+  static RAY_EXTINGUISHED = 5
+
+  static COS30DEG = Math.cos((30 * Math.PI) / 180)
+  static SIN30DEG = Math.sin((30 * Math.PI) / 180)
+
+  constructor(rayParameters = {}) {
     super()
+
+    this.isLightningStrike = true
 
     this.type = 'LightningStrike'
 
     // Set parameters, and set undefined parameters to default values
-    rayParameters = rayParameters || {}
     this.init(LightningStrike.copyParameters(rayParameters, rayParameters))
 
     // Creates and populates the mesh
     this.createMesh()
+  }
+
+  static createRandomGenerator() {
+    const numSeeds = 2053
+    const seeds = []
+
+    for (let i = 0; i < numSeeds; i++) {
+      seeds.push(Math.random())
+    }
+
+    const generator = {
+      currentSeed: 0,
+
+      random: function () {
+        const value = seeds[generator.currentSeed]
+
+        generator.currentSeed = (generator.currentSeed + 1) % numSeeds
+
+        return value
+      },
+
+      getSeed: function () {
+        return generator.currentSeed / numSeeds
+      },
+
+      setSeed: function (seed) {
+        generator.currentSeed = Math.floor(seed * numSeeds) % numSeeds
+      },
+    }
+
+    return generator
+  }
+
+  static copyParameters(dest = {}, source = {}) {
+    const vecCopy = function (v) {
+      if (source === dest) {
+        return v
+      } else {
+        return v.clone()
+      }
+    }
+
+    ;(dest.sourceOffset = source.sourceOffset !== undefined ? vecCopy(source.sourceOffset) : new Vector3(0, 100, 0)),
+      (dest.destOffset = source.destOffset !== undefined ? vecCopy(source.destOffset) : new Vector3(0, 0, 0)),
+      (dest.timeScale = source.timeScale !== undefined ? source.timeScale : 1),
+      (dest.roughness = source.roughness !== undefined ? source.roughness : 0.9),
+      (dest.straightness = source.straightness !== undefined ? source.straightness : 0.7),
+      (dest.up0 = source.up0 !== undefined ? vecCopy(source.up0) : new Vector3(0, 0, 1))
+    ;(dest.up1 = source.up1 !== undefined ? vecCopy(source.up1) : new Vector3(0, 0, 1)),
+      (dest.radius0 = source.radius0 !== undefined ? source.radius0 : 1),
+      (dest.radius1 = source.radius1 !== undefined ? source.radius1 : 1),
+      (dest.radius0Factor = source.radius0Factor !== undefined ? source.radius0Factor : 0.5),
+      (dest.radius1Factor = source.radius1Factor !== undefined ? source.radius1Factor : 0.2),
+      (dest.minRadius = source.minRadius !== undefined ? source.minRadius : 0.2),
+      // These parameters should not be changed after lightning creation. They can be changed but the ray will change its form abruptly:
+
+      (dest.isEternal =
+        source.isEternal !== undefined
+          ? source.isEternal
+          : source.birthTime === undefined || source.deathTime === undefined),
+      (dest.birthTime = source.birthTime),
+      (dest.deathTime = source.deathTime),
+      (dest.propagationTimeFactor = source.propagationTimeFactor !== undefined ? source.propagationTimeFactor : 0.1),
+      (dest.vanishingTimeFactor = source.vanishingTimeFactor !== undefined ? source.vanishingTimeFactor : 0.9),
+      (dest.subrayPeriod = source.subrayPeriod !== undefined ? source.subrayPeriod : 4),
+      (dest.subrayDutyCycle = source.subrayDutyCycle !== undefined ? source.subrayDutyCycle : 0.6)
+
+    // These parameters cannot change after lightning creation:
+
+    dest.maxIterations = source.maxIterations !== undefined ? source.maxIterations : 9
+    dest.isStatic = source.isStatic !== undefined ? source.isStatic : false
+    dest.ramification = source.ramification !== undefined ? source.ramification : 5
+    dest.maxSubrayRecursion = source.maxSubrayRecursion !== undefined ? source.maxSubrayRecursion : 3
+    dest.recursionProbability = source.recursionProbability !== undefined ? source.recursionProbability : 0.6
+    dest.generateUVs = source.generateUVs !== undefined ? source.generateUVs : false
+    ;(dest.randomGenerator = source.randomGenerator),
+      (dest.noiseSeed = source.noiseSeed),
+      (dest.onDecideSubrayCreation = source.onDecideSubrayCreation),
+      (dest.onSubrayCreation = source.onSubrayCreation)
+
+    return dest
   }
 
   update(time) {
@@ -265,6 +358,7 @@ class LightningStrike extends BufferGeometry {
 
     this.vertices = new Float32Array(maxVerts * 3)
     this.indices = new Uint32Array(maxIndices)
+
     if (this.generateUVs) {
       this.uvs = new Float32Array(maxVerts * 2)
     }
@@ -285,6 +379,7 @@ class LightningStrike extends BufferGeometry {
     if (!this.isStatic) {
       this.index.usage = DynamicDrawUsage
       this.positionAttribute.usage = DynamicDrawUsage
+
       if (this.generateUVs) {
         this.uvsAttribute.usage = DynamicDrawUsage
       }
@@ -293,6 +388,7 @@ class LightningStrike extends BufferGeometry {
     // Store buffers for later modification
     this.vertices = this.positionAttribute.array
     this.indices = this.index.array
+
     if (this.generateUVs) {
       this.uvs = this.uvsAttribute.array
     }
@@ -359,7 +455,7 @@ class LightningStrike extends BufferGeometry {
     })
   }
 
-  addNewSubray() /*rayParameters*/ {
+  addNewSubray(/*rayParameters*/) {
     return this.subrays[this.numSubrays++]
   }
 
@@ -594,7 +690,7 @@ class LightningStrike extends BufferGeometry {
 
   createPrismFaces(vertex /*, index*/) {
     const indices = this.indices
-    var vertex = this.currentVertex - 6
+    vertex = this.currentVertex - 6
 
     indices[this.currentIndex++] = vertex + 1
     indices[this.currentIndex++] = vertex + 2
@@ -619,7 +715,7 @@ class LightningStrike extends BufferGeometry {
   createDefaultSubrayCreationCallbacks() {
     const random1 = this.randomGenerator.random
 
-    this.onDecideSubrayCreation = (segment, lightningStrike) => {
+    this.onDecideSubrayCreation = function (segment, lightningStrike) {
       // Decide subrays creation at parent (sub)ray segment
 
       const subray = lightningStrike.currentSubray
@@ -695,21 +791,21 @@ class LightningStrike extends BufferGeometry {
     const vec3Side = new Vector3()
     const vec4Up = new Vector3()
 
-    this.onSubrayCreation = (segment, parentSubray, childSubray, lightningStrike) => {
+    this.onSubrayCreation = function (segment, parentSubray, childSubray, lightningStrike) {
       // Decide childSubray origin and destination positions (pos0 and pos1) and possibly other properties of childSubray
 
       // Just use the default cone position generator
       lightningStrike.subrayCylinderPosition(segment, parentSubray, childSubray, 0.5, 0.6, 0.2)
     }
 
-    this.subrayConePosition = (
+    this.subrayConePosition = function (
       segment,
       parentSubray,
       childSubray,
       heightFactor,
       sideWidthFactor,
       minSideWidthFactor,
-    ) => {
+    ) {
       // Sets childSubray pos0 and pos1 in a cone
 
       childSubray.pos0.copy(segment.pos0)
@@ -731,14 +827,14 @@ class LightningStrike extends BufferGeometry {
         .add(parentSubray.pos0)
     }
 
-    this.subrayCylinderPosition = (
+    this.subrayCylinderPosition = function (
       segment,
       parentSubray,
       childSubray,
       heightFactor,
       sideWidthFactor,
       minSideWidthFactor,
-    ) => {
+    ) {
       // Sets childSubray pos0 and pos1 in a cylinder
 
       childSubray.pos0.copy(segment.pos0)
@@ -818,102 +914,6 @@ class LightningStrike extends BufferGeometry {
   clone() {
     return new this.constructor(LightningStrike.copyParameters({}, this.rayParameters))
   }
-}
-
-LightningStrike.prototype.isLightningStrike = true
-
-// Ray states
-LightningStrike.RAY_INITIALIZED = 0
-LightningStrike.RAY_UNBORN = 1
-LightningStrike.RAY_PROPAGATING = 2
-LightningStrike.RAY_STEADY = 3
-LightningStrike.RAY_VANISHING = 4
-LightningStrike.RAY_EXTINGUISHED = 5
-
-LightningStrike.COS30DEG = Math.cos((30 * Math.PI) / 180)
-LightningStrike.SIN30DEG = Math.sin((30 * Math.PI) / 180)
-
-LightningStrike.createRandomGenerator = () => {
-  const numSeeds = 2053
-  const seeds = []
-
-  for (let i = 0; i < numSeeds; i++) {
-    seeds.push(Math.random())
-  }
-
-  const generator = {
-    currentSeed: 0,
-
-    random: function () {
-      const value = seeds[generator.currentSeed]
-
-      generator.currentSeed = (generator.currentSeed + 1) % numSeeds
-
-      return value
-    },
-
-    getSeed: function () {
-      return generator.currentSeed / numSeeds
-    },
-
-    setSeed: function (seed) {
-      generator.currentSeed = Math.floor(seed * numSeeds) % numSeeds
-    },
-  }
-
-  return generator
-}
-
-LightningStrike.copyParameters = (dest, source) => {
-  source = source || {}
-  dest = dest || {}
-
-  const vecCopy = (v) => {
-    if (source === dest) {
-      return v
-    } else {
-      return v.clone()
-    }
-  }
-  ;(dest.sourceOffset = source.sourceOffset !== undefined ? vecCopy(source.sourceOffset) : new Vector3(0, 100, 0)),
-    (dest.destOffset = source.destOffset !== undefined ? vecCopy(source.destOffset) : new Vector3(0, 0, 0)),
-    (dest.timeScale = source.timeScale !== undefined ? source.timeScale : 1),
-    (dest.roughness = source.roughness !== undefined ? source.roughness : 0.9),
-    (dest.straightness = source.straightness !== undefined ? source.straightness : 0.7),
-    (dest.up0 = source.up0 !== undefined ? vecCopy(source.up0) : new Vector3(0, 0, 1))
-  ;(dest.up1 = source.up1 !== undefined ? vecCopy(source.up1) : new Vector3(0, 0, 1)),
-    (dest.radius0 = source.radius0 !== undefined ? source.radius0 : 1),
-    (dest.radius1 = source.radius1 !== undefined ? source.radius1 : 1),
-    (dest.radius0Factor = source.radius0Factor !== undefined ? source.radius0Factor : 0.5),
-    (dest.radius1Factor = source.radius1Factor !== undefined ? source.radius1Factor : 0.2),
-    (dest.minRadius = source.minRadius !== undefined ? source.minRadius : 0.2),
-    // These parameters should not be changed after lightning creation. They can be changed but the ray will change its form abruptly:
-
-    (dest.isEternal =
-      source.isEternal !== undefined
-        ? source.isEternal
-        : source.birthTime === undefined || source.deathTime === undefined),
-    (dest.birthTime = source.birthTime),
-    (dest.deathTime = source.deathTime),
-    (dest.propagationTimeFactor = source.propagationTimeFactor !== undefined ? source.propagationTimeFactor : 0.1),
-    (dest.vanishingTimeFactor = source.vanishingTimeFactor !== undefined ? source.vanishingTimeFactor : 0.9),
-    (dest.subrayPeriod = source.subrayPeriod !== undefined ? source.subrayPeriod : 4),
-    (dest.subrayDutyCycle = source.subrayDutyCycle !== undefined ? source.subrayDutyCycle : 0.6)
-
-  // These parameters cannot change after lightning creation:
-
-  dest.maxIterations = source.maxIterations !== undefined ? source.maxIterations : 9
-  dest.isStatic = source.isStatic !== undefined ? source.isStatic : false
-  dest.ramification = source.ramification !== undefined ? source.ramification : 5
-  dest.maxSubrayRecursion = source.maxSubrayRecursion !== undefined ? source.maxSubrayRecursion : 3
-  dest.recursionProbability = source.recursionProbability !== undefined ? source.recursionProbability : 0.6
-  dest.generateUVs = source.generateUVs !== undefined ? source.generateUVs : false
-  ;(dest.randomGenerator = source.randomGenerator),
-    (dest.noiseSeed = source.noiseSeed),
-    (dest.onDecideSubrayCreation = source.onDecideSubrayCreation),
-    (dest.onSubrayCreation = source.onSubrayCreation)
-
-  return dest
 }
 
 export { LightningStrike }

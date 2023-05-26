@@ -8,8 +8,8 @@ import { Vector2 } from 'three'
 export const NormalMapShader = {
   uniforms: {
     heightMap: { value: null },
-    resolution: { value: new Vector2(512, 512) },
-    scale: { value: new Vector2(1, 1) },
+    resolution: { value: /* @__PURE__ */ new Vector2(512, 512) },
+    scale: { value: /* @__PURE__ */ new Vector2(1, 1) },
     height: { value: 0.05 },
   },
 

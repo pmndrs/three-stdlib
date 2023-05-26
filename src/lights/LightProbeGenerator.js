@@ -1,46 +1,43 @@
 import { Color, LightProbe, SphericalHarmonics3, Vector3 } from 'three'
 
-var LightProbeGenerator = {
+class LightProbeGenerator {
   // https://www.ppsloan.org/publications/StupidSH36.pdf
-  fromCubeTexture: function (cubeTexture) {
-    var norm,
-      lengthSq,
-      weight,
-      totalWeight = 0
+  static fromCubeTexture(cubeTexture) {
+    let totalWeight = 0
 
-    var coord = new Vector3()
+    const coord = new Vector3()
 
-    var dir = new Vector3()
+    const dir = new Vector3()
 
-    var color = new Color()
+    const color = new Color()
 
-    var shBasis = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+    const shBasis = [0, 0, 0, 0, 0, 0, 0, 0, 0]
 
-    var sh = new SphericalHarmonics3()
-    var shCoefficients = sh.coefficients
+    const sh = new SphericalHarmonics3()
+    const shCoefficients = sh.coefficients
 
     for (let faceIndex = 0; faceIndex < 6; faceIndex++) {
-      var image = cubeTexture.image[faceIndex]
+      const image = cubeTexture.image[faceIndex]
 
-      var width = image.width
-      var height = image.height
+      const width = image.width
+      const height = image.height
 
-      var canvas = document.createElement('canvas')
+      const canvas = document.createElement('canvas')
 
       canvas.width = width
       canvas.height = height
 
-      var context = canvas.getContext('2d')
+      const context = canvas.getContext('2d')
 
       context.drawImage(image, 0, 0, width, height)
 
-      var imageData = context.getImageData(0, 0, width, height)
+      const imageData = context.getImageData(0, 0, width, height)
 
-      var data = imageData.data
+      const data = imageData.data
 
-      var imageWidth = imageData.width // assumed to be square
+      const imageWidth = imageData.width // assumed to be square
 
-      var pixelSize = 2 / imageWidth
+      const pixelSize = 2 / imageWidth
 
       for (let i = 0, il = data.length; i < il; i += 4) {
         // RGBA assumed
@@ -60,11 +57,11 @@ var LightProbeGenerator = {
 
         // pixel coordinate on unit cube
 
-        var pixelIndex = i / 4
+        const pixelIndex = i / 4
 
-        var col = -1 + ((pixelIndex % imageWidth) + 0.5) * pixelSize
+        const col = -1 + ((pixelIndex % imageWidth) + 0.5) * pixelSize
 
-        var row = 1 - (Math.floor(pixelIndex / imageWidth) + 0.5) * pixelSize
+        const row = 1 - (Math.floor(pixelIndex / imageWidth) + 0.5) * pixelSize
 
         switch (faceIndex) {
           case 0:
@@ -94,9 +91,9 @@ var LightProbeGenerator = {
 
         // weight assigned to this pixel
 
-        lengthSq = coord.lengthSq()
+        const lengthSq = coord.lengthSq()
 
-        weight = 4 / (Math.sqrt(lengthSq) * lengthSq)
+        const weight = 4 / (Math.sqrt(lengthSq) * lengthSq)
 
         totalWeight += weight
 
@@ -116,7 +113,7 @@ var LightProbeGenerator = {
     }
 
     // normalize
-    norm = (4 * Math.PI) / totalWeight
+    const norm = (4 * Math.PI) / totalWeight
 
     for (let j = 0; j < 9; j++) {
       shCoefficients[j].x *= norm
@@ -125,32 +122,29 @@ var LightProbeGenerator = {
     }
 
     return new LightProbe(sh)
-  },
+  }
 
-  fromCubeRenderTarget: function (renderer, cubeRenderTarget) {
+  static fromCubeRenderTarget(renderer, cubeRenderTarget) {
     // The renderTarget must be set to RGBA in order to make readRenderTargetPixels works
-    var norm,
-      lengthSq,
-      weight,
-      totalWeight = 0
+    let totalWeight = 0
 
-    var coord = new Vector3()
+    const coord = new Vector3()
 
-    var dir = new Vector3()
+    const dir = new Vector3()
 
-    var color = new Color()
+    const color = new Color()
 
-    var shBasis = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+    const shBasis = [0, 0, 0, 0, 0, 0, 0, 0, 0]
 
-    var sh = new SphericalHarmonics3()
-    var shCoefficients = sh.coefficients
+    const sh = new SphericalHarmonics3()
+    const shCoefficients = sh.coefficients
 
     for (let faceIndex = 0; faceIndex < 6; faceIndex++) {
-      var imageWidth = cubeRenderTarget.width // assumed to be square
-      var data = new Uint8Array(imageWidth * imageWidth * 4)
+      const imageWidth = cubeRenderTarget.width // assumed to be square
+      const data = new Uint8Array(imageWidth * imageWidth * 4)
       renderer.readRenderTargetPixels(cubeRenderTarget, 0, 0, imageWidth, imageWidth, data, faceIndex)
 
-      var pixelSize = 2 / imageWidth
+      const pixelSize = 2 / imageWidth
 
       for (let i = 0, il = data.length; i < il; i += 4) {
         // RGBA assumed
@@ -170,11 +164,11 @@ var LightProbeGenerator = {
 
         // pixel coordinate on unit cube
 
-        var pixelIndex = i / 4
+        const pixelIndex = i / 4
 
-        var col = -1 + ((pixelIndex % imageWidth) + 0.5) * pixelSize
+        const col = -1 + ((pixelIndex % imageWidth) + 0.5) * pixelSize
 
-        var row = 1 - (Math.floor(pixelIndex / imageWidth) + 0.5) * pixelSize
+        const row = 1 - (Math.floor(pixelIndex / imageWidth) + 0.5) * pixelSize
 
         switch (faceIndex) {
           case 0:
@@ -204,9 +198,9 @@ var LightProbeGenerator = {
 
         // weight assigned to this pixel
 
-        lengthSq = coord.lengthSq()
+        const lengthSq = coord.lengthSq()
 
-        weight = 4 / (Math.sqrt(lengthSq) * lengthSq)
+        const weight = 4 / (Math.sqrt(lengthSq) * lengthSq)
 
         totalWeight += weight
 
@@ -226,7 +220,7 @@ var LightProbeGenerator = {
     }
 
     // normalize
-    norm = (4 * Math.PI) / totalWeight
+    const norm = (4 * Math.PI) / totalWeight
 
     for (let j = 0; j < 9; j++) {
       shCoefficients[j].x *= norm
@@ -235,7 +229,7 @@ var LightProbeGenerator = {
     }
 
     return new LightProbe(sh)
-  },
+  }
 }
 
 export { LightProbeGenerator }

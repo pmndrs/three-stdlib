@@ -1,6 +1,5 @@
 import { Mesh, Object3D, SphereGeometry, MeshBasicMaterial } from 'three'
 import type { Texture, Group } from 'three'
-// @ts-ignore
 import { GLTFLoader } from '../loaders/GLTFLoader'
 import { fetchProfile, MotionController, MotionControllerConstants } from '../libs/MotionControllers'
 

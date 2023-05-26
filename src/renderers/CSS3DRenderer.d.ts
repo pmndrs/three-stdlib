@@ -12,7 +12,7 @@ export class CSS3DSprite extends CSS3DObject {
   constructor(element: HTMLElement)
 }
 
-export type CSS3DParameters = {
+export interface CSS3DParameters {
   element?: HTMLElement
 }
 
