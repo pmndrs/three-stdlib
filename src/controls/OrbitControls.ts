@@ -1,5 +1,4 @@
 import {
-  Camera,
   EventDispatcher,
   Matrix4,
   MOUSE,
@@ -22,7 +21,7 @@ import {
 const moduloWrapAround = (offset: number, capacity: number) => ((offset % capacity) + capacity) % capacity
 
 class OrbitControls extends EventDispatcher {
-  object: Camera
+  object: PerspectiveCamera | OrthographicCamera
   domElement: HTMLElement | undefined
   // Set to false to disable this control
   enabled = true
@@ -99,7 +98,7 @@ class OrbitControls extends EventDispatcher {
   connect: (domElement: HTMLElement) => void
   dispose: () => void
 
-  constructor(object: Camera, domElement?: HTMLElement) {
+  constructor(object: PerspectiveCamera | OrthographicCamera, domElement?: HTMLElement) {
     super()
 
     this.object = object
@@ -108,7 +107,7 @@ class OrbitControls extends EventDispatcher {
     // for reset
     this.target0 = this.target.clone()
     this.position0 = this.object.position.clone()
-    this.zoom0 = this.object instanceof PerspectiveCamera ? this.object.zoom : 1
+    this.zoom0 = this.object.zoom
 
     //
     // public methods
@@ -168,16 +167,14 @@ class OrbitControls extends EventDispatcher {
     this.saveState = (): void => {
       scope.target0.copy(scope.target)
       scope.position0.copy(scope.object.position)
-      scope.zoom0 = scope.object instanceof PerspectiveCamera ? scope.object.zoom : 1
+      scope.zoom0 = scope.object.zoom
     }
 
     this.reset = (): void => {
       scope.target.copy(scope.target0)
       scope.object.position.copy(scope.position0)
-      if (scope.object instanceof PerspectiveCamera) {
-        scope.object.zoom = scope.zoom0
-        scope.object.updateProjectionMatrix()
-      }
+      scope.object.zoom = scope.zoom0
+      scope.object.updateProjectionMatrix()
 
       scope.dispatchEvent(changeEvent)
 
@@ -976,7 +973,7 @@ class OrbitControls extends EventDispatcher {
 //    Pan - left mouse, or arrow keys / touch: one-finger move
 
 class MapControls extends OrbitControls {
-  constructor(object: Camera, domElement?: HTMLElement) {
+  constructor(object: PerspectiveCamera | OrthographicCamera, domElement?: HTMLElement) {
     super(object, domElement)
 
     this.screenSpacePanning = false // pan orthogonal to world-space direction camera.up
