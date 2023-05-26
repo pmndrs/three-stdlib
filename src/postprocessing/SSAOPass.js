@@ -29,6 +29,15 @@ import { SSAOShader, SSAOBlurShader, SSAODepthShader } from '../shaders/SSAOShad
 import { CopyShader } from '../shaders/CopyShader'
 
 class SSAOPass extends Pass {
+  static OUTPUT = {
+    Default: 0,
+    SSAO: 1,
+    Blur: 2,
+    Beauty: 3,
+    Depth: 4,
+    Normal: 5,
+  }
+
   constructor(scene, camera, width, height) {
     super()
 
@@ -390,15 +399,6 @@ class SSAOPass extends Pass {
 
     cache.clear()
   }
-}
-
-SSAOPass.OUTPUT = {
-  Default: 0,
-  SSAO: 1,
-  Blur: 2,
-  Beauty: 3,
-  Depth: 4,
-  Normal: 5,
 }
 
 export { SSAOPass }

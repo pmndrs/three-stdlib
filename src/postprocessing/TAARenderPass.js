@@ -1,5 +1,5 @@
-import { WebGLRenderTarget } from 'three'
-import { SSAARenderPass } from '../postprocessing/SSAARenderPass'
+import { HalfFloatType, WebGLRenderTarget } from 'three'
+import { SSAARenderPass } from './SSAARenderPass'
 
 /**
  *
@@ -13,62 +13,54 @@ import { SSAARenderPass } from '../postprocessing/SSAARenderPass'
  *
  */
 
-var TAARenderPass = function (scene, camera, clearColor, clearAlpha) {
-  if (SSAARenderPass === undefined) {
-    console.error('THREE.TAARenderPass relies on SSAARenderPass')
+class TAARenderPass extends SSAARenderPass {
+  constructor(scene, camera, clearColor, clearAlpha) {
+    super(scene, camera, clearColor, clearAlpha)
+
+    this.sampleLevel = 0
+    this.accumulate = false
   }
 
-  SSAARenderPass.call(this, scene, camera, clearColor, clearAlpha)
-
-  this.sampleLevel = 0
-  this.accumulate = false
-}
-
-TAARenderPass.JitterVectors = SSAARenderPass.JitterVectors
-
-TAARenderPass.prototype = Object.assign(Object.create(SSAARenderPass.prototype), {
-  constructor: TAARenderPass,
-
-  render: function (renderer, writeBuffer, readBuffer, deltaTime) {
-    if (!this.accumulate) {
-      SSAARenderPass.prototype.render.call(this, renderer, writeBuffer, readBuffer, deltaTime)
+  render(renderer, writeBuffer, readBuffer, deltaTime) {
+    if (this.accumulate === false) {
+      super.render(renderer, writeBuffer, readBuffer, deltaTime)
 
       this.accumulateIndex = -1
       return
     }
 
-    var jitterOffsets = TAARenderPass.JitterVectors[5]
+    const jitterOffsets = _JitterVectors[5]
 
-    if (!this.sampleRenderTarget) {
-      this.sampleRenderTarget = new WebGLRenderTarget(readBuffer.width, readBuffer.height, this.params)
+    if (this.sampleRenderTarget === undefined) {
+      this.sampleRenderTarget = new WebGLRenderTarget(readBuffer.width, readBuffer.height, { type: HalfFloatType })
       this.sampleRenderTarget.texture.name = 'TAARenderPass.sample'
     }
 
-    if (!this.holdRenderTarget) {
-      this.holdRenderTarget = new WebGLRenderTarget(readBuffer.width, readBuffer.height, this.params)
+    if (this.holdRenderTarget === undefined) {
+      this.holdRenderTarget = new WebGLRenderTarget(readBuffer.width, readBuffer.height, { type: HalfFloatType })
       this.holdRenderTarget.texture.name = 'TAARenderPass.hold'
     }
 
-    if (this.accumulate && this.accumulateIndex === -1) {
-      SSAARenderPass.prototype.render.call(this, renderer, this.holdRenderTarget, readBuffer, deltaTime)
+    if (this.accumulateIndex === -1) {
+      super.render(renderer, this.holdRenderTarget, readBuffer, deltaTime)
 
       this.accumulateIndex = 0
     }
 
-    var autoClear = renderer.autoClear
+    const autoClear = renderer.autoClear
     renderer.autoClear = false
 
-    var sampleWeight = 1.0 / jitterOffsets.length
+    const sampleWeight = 1.0 / jitterOffsets.length
 
     if (this.accumulateIndex >= 0 && this.accumulateIndex < jitterOffsets.length) {
       this.copyUniforms['opacity'].value = sampleWeight
       this.copyUniforms['tDiffuse'].value = writeBuffer.texture
 
       // render the scene multiple times, each slightly jitter offset from the last and accumulate the results.
-      var numSamplesPerFrame = Math.pow(2, this.sampleLevel)
+      const numSamplesPerFrame = Math.pow(2, this.sampleLevel)
       for (let i = 0; i < numSamplesPerFrame; i++) {
-        var j = this.accumulateIndex
-        var jitterOffset = jitterOffsets[j]
+        const j = this.accumulateIndex
+        const jitterOffset = jitterOffsets[j]
 
         if (this.camera.setViewOffset) {
           this.camera.setViewOffset(
@@ -97,7 +89,7 @@ TAARenderPass.prototype = Object.assign(Object.create(SSAARenderPass.prototype),
       if (this.camera.clearViewOffset) this.camera.clearViewOffset()
     }
 
-    var accumulationWeight = this.accumulateIndex * sampleWeight
+    const accumulationWeight = this.accumulateIndex * sampleWeight
 
     if (accumulationWeight > 0) {
       this.copyUniforms['opacity'].value = 1.0
@@ -116,7 +108,47 @@ TAARenderPass.prototype = Object.assign(Object.create(SSAARenderPass.prototype),
     }
 
     renderer.autoClear = autoClear
-  },
-})
+  }
+
+  dispose() {
+    super.dispose()
+
+    if (this.sampleRenderTarget !== undefined) this.sampleRenderTarget.dispose()
+    if (this.holdRenderTarget !== undefined) this.holdRenderTarget.dispose()
+  }
+}
+
+// prettier-ignore
+const _JitterVectors = [
+	[
+		[ 0, 0 ]
+	],
+	[
+		[ 4, 4 ], [ - 4, - 4 ]
+	],
+	[
+		[ - 2, - 6 ], [ 6, - 2 ], [ - 6, 2 ], [ 2, 6 ]
+	],
+	[
+		[ 1, - 3 ], [ - 1, 3 ], [ 5, 1 ], [ - 3, - 5 ],
+		[ - 5, 5 ], [ - 7, - 1 ], [ 3, 7 ], [ 7, - 7 ]
+	],
+	[
+		[ 1, 1 ], [ - 1, - 3 ], [ - 3, 2 ], [ 4, - 1 ],
+		[ - 5, - 2 ], [ 2, 5 ], [ 5, 3 ], [ 3, - 5 ],
+		[ - 2, 6 ], [ 0, - 7 ], [ - 4, - 6 ], [ - 6, 4 ],
+		[ - 8, 0 ], [ 7, - 4 ], [ 6, 7 ], [ - 7, - 8 ]
+	],
+	[
+		[ - 4, - 7 ], [ - 7, - 5 ], [ - 3, - 5 ], [ - 5, - 4 ],
+		[ - 1, - 4 ], [ - 2, - 2 ], [ - 6, - 1 ], [ - 4, 0 ],
+		[ - 7, 1 ], [ - 1, 2 ], [ - 6, 3 ], [ - 3, 3 ],
+		[ - 7, 6 ], [ - 3, 6 ], [ - 5, 7 ], [ - 1, 7 ],
+		[ 5, - 7 ], [ 1, - 6 ], [ 6, - 5 ], [ 4, - 4 ],
+		[ 2, - 3 ], [ 7, - 2 ], [ 1, - 1 ], [ 4, - 1 ],
+		[ 2, 1 ], [ 6, 2 ], [ 0, 4 ], [ 4, 4 ],
+		[ 2, 5 ], [ 7, 5 ], [ 5, 6 ], [ 3, 7 ]
+	]
+];
 
 export { TAARenderPass }
