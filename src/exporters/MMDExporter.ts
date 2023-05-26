@@ -1,4 +1,5 @@
 import { Matrix4, Quaternion, Vector3, Bone, SkinnedMesh } from 'three'
+// @ts-ignore
 import { CharsetEncoder } from 'mmd-parser'
 
 /**
