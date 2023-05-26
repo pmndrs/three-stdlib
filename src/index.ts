@@ -159,16 +159,16 @@ export * from './controls/FlyControls'
 // export * from './postprocessing/RenderPixelatedPass'
 // export * from './postprocessing/BloomPass'
 // export * from './postprocessing/WaterPass'
-// export * from './webxr/ARButton'
-// export * from './webxr/OculusHandModel'
-// export * from './webxr/OculusHandPointerModel'
-// export * from './webxr/Text2D'
-// export * from './webxr/VRButton'
-// export * from './webxr/XRControllerModelFactory'
-// export * from './webxr/XREstimatedLight'
-// export * from './webxr/XRHandMeshModel'
-// export * from './webxr/XRHandModelFactory'
-// export * from './webxr/XRHandPrimitiveModel'
+export * from './webxr/ARButton'
+// export * from './webxr/OculusHandModel' //
+// export * from './webxr/OculusHandPointerModel' //
+export * from './webxr/Text2D'
+// export * from './webxr/VRButton' //
+// export * from './webxr/XRControllerModelFactory' //
+export * from './webxr/XREstimatedLight'
+// export * from './webxr/XRHandMeshModel' //
+// export * from './webxr/XRHandModelFactory' //
+export * from './webxr/XRHandPrimitiveModel'
 export * from './geometries/ParametricGeometries'
 export * from './geometries/ParametricGeometry'
 export * from './geometries/ConvexGeometry'
@@ -318,4 +318,4 @@ export * from './curves/NURBSSurface'
 export * from './curves/CurveExtras'
 export * from './deprecated/Geometry'
 export * from './libs/MeshoptDecoder'
-// export * from './libs/MotionControllers'
+// export * from './libs/MotionControllers' //
