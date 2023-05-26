@@ -1,4 +1,5 @@
-import { Loader, LoadingManager, Scene } from 'three'
+import { LoadingManager, Scene } from 'three'
+import { Loader } from '../types/Loader'
 
 export interface Collada {
   kinematics: object

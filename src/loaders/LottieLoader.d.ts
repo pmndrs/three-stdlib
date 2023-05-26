@@ -1,4 +1,5 @@
-import { CanvasTexture, Loader, LoadingManager } from 'three'
+import { CanvasTexture, LoadingManager } from 'three'
+import { Loader } from '../types/Loader'
 
 export class LottieLoader extends Loader {
   constructor(manager?: LoadingManager)

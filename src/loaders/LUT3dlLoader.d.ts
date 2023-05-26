@@ -1,4 +1,5 @@
-import { Loader, LoadingManager, DataTexture, Texture } from 'three'
+import { LoadingManager, DataTexture, Texture } from 'three'
+import { Loader } from '../types/Loader'
 
 export interface LUT3dlResult {
   size: number

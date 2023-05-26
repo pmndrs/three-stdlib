@@ -5,7 +5,6 @@ import {
   Camera,
   Group,
   InterleavedBufferAttribute,
-  Loader,
   LoadingManager,
   Mesh,
   MeshStandardMaterial,
@@ -17,6 +16,7 @@ import {
   FileLoader,
   ImageBitmapLoader,
 } from 'three'
+import { Loader } from '../types/Loader'
 
 import { DRACOLoader } from './DRACOLoader'
 import { KTX2Loader } from './KTX2Loader'

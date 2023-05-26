@@ -1,4 +1,5 @@
-import { Scene, Loader, LoadingManager } from 'three'
+import { Scene, LoadingManager } from 'three'
+import { Loader } from '../types/Loader'
 
 export class VRMLLoader extends Loader {
   constructor(manager?: LoadingManager)

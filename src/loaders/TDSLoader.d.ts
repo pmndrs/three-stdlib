@@ -1,4 +1,5 @@
-import { Color, Group, Loader, LoadingManager, Material, Mesh, Texture } from 'three'
+import { Color, Group, LoadingManager, Material, Mesh, Texture } from 'three'
+import { Loader } from '../types/Loader'
 
 export class TDSLoader extends Loader {
   constructor(manager?: LoadingManager)

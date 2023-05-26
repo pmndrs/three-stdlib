@@ -1,4 +1,5 @@
-import { AnimationClip, Skeleton, Loader, LoadingManager } from 'three'
+import { AnimationClip, Skeleton, LoadingManager } from 'three'
+import { Loader } from '../types/Loader'
 
 export interface BVH {
   clip: AnimationClip
