@@ -743,8 +743,9 @@ IFFParser.prototype = {
   parsePolygonTagMapping(length) {
     var finalOffset = this.reader.offset + length
     var type = this.reader.getIDTag()
-    if (type === 'SURF') this.parseMaterialIndices(finalOffset)
-    else {
+    if (type === 'SURF') {
+      this.parseMaterialIndices(finalOffset)
+    } else {
       //PART, SMGP, COLR not supported
 
       this.reader.skip(length - 4)

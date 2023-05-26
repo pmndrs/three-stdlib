@@ -37,7 +37,7 @@ class TransformControls<TCamera extends Camera = Camera> extends Object3D {
 
   public visible = false
 
-  private domElement: HTMLElement | Document
+  private domElement: HTMLElement | undefined
 
   private raycaster = new Raycaster()
 
@@ -102,17 +102,12 @@ class TransformControls<TCamera extends Camera = Camera> extends Object3D {
 
   // events
   private changeEvent = { type: 'change' }
-  private mouseDownEvent = { type: 'mouseDown' }
+  private mouseDownEvent = { type: 'mouseDown', mode: this.mode }
   private mouseUpEvent = { type: 'mouseUp', mode: this.mode }
   private objectChangeEvent = { type: 'objectChange' }
 
-  constructor(camera: TCamera, domElement: HTMLElement) {
+  constructor(camera: TCamera, domElement: HTMLElement | undefined) {
     super()
-
-    if (domElement === undefined) {
-      console.warn('THREE.TransformControls: The second parameter "domElement" is now mandatory.')
-      this.domElement = document
-    }
 
     this.domElement = domElement
     this.camera = camera
@@ -178,11 +173,8 @@ class TransformControls<TCamera extends Camera = Camera> extends Object3D {
     defineProperty('rotationAngle', this.rotationAngle)
     defineProperty('eye', this.eye)
 
-    {
-      domElement.addEventListener('pointerdown', this.onPointerDown)
-      domElement.addEventListener('pointermove', this.onPointerHover)
-      this.domElement.ownerDocument.addEventListener('pointerup', this.onPointerUp)
-    }
+    // connect events
+    if (domElement !== undefined) this.connect(domElement)
   }
 
   private intersectObjectWithRay = (
@@ -214,6 +206,24 @@ class TransformControls<TCamera extends Camera = Camera> extends Object3D {
     this.object = undefined
     this.visible = false
     this.axis = null
+
+    return this
+  }
+
+  // Reset
+  public reset = (): this => {
+    if (!this.enabled) return this
+
+    if (this.dragging) {
+      if (this.object !== undefined) {
+        this.object.position.copy(this.positionStart)
+        this.object.quaternion.copy(this.quaternionStart)
+        this.object.scale.copy(this.scaleStart)
+        this.dispatchEvent(this.changeEvent)
+        this.dispatchEvent(this.objectChangeEvent)
+        this.pointStart.copy(this.pointEnd)
+      }
+    }
 
     return this
   }
@@ -297,7 +307,7 @@ class TransformControls<TCamera extends Camera = Camera> extends Object3D {
       }
 
       this.dragging = true
-      this.mouseDownEvent.type = this.mode
+      this.mouseDownEvent.mode = this.mode
       this.dispatchEvent(this.mouseDownEvent)
     }
   }
@@ -532,10 +542,10 @@ class TransformControls<TCamera extends Camera = Camera> extends Object3D {
   }
 
   private onPointerDown = (event: Event): void => {
-    if (!this.enabled) return
-    ;(this.domElement as HTMLElement).style.touchAction = 'none' // disable touch scroll
-    this.domElement.ownerDocument?.addEventListener('pointermove', this.onPointerMove)
+    if (!this.enabled || !this.domElement) return
 
+    this.domElement.style.touchAction = 'none' // disable touch scroll
+    this.domElement.ownerDocument.addEventListener('pointermove', this.onPointerMove)
     this.pointerHover(this.getPointer(event))
     this.pointerDown(this.getPointer(event))
   }
@@ -547,9 +557,10 @@ class TransformControls<TCamera extends Camera = Camera> extends Object3D {
   }
 
   private onPointerUp = (event: Event): void => {
-    if (!this.enabled) return
-    ;(this.domElement as HTMLElement).style.touchAction = ''
-    this.domElement.ownerDocument?.removeEventListener('pointermove', this.onPointerMove)
+    if (!this.enabled || !this.domElement) return
+
+    this.domElement.style.touchAction! = ''
+    this.domElement.ownerDocument.removeEventListener('pointermove', this.onPointerMove)
 
     this.pointerUp(this.getPointer(event))
   }
@@ -586,11 +597,24 @@ class TransformControls<TCamera extends Camera = Camera> extends Object3D {
     )
   }
 
+  public connect = (domElement: HTMLElement): void => {
+    if ((domElement as any) === document) {
+      console.error(
+        'THREE.OrbitControls: "document" should not be used as the target "domElement". Please use "renderer.domElement" instead.',
+      )
+    }
+    this.domElement = domElement
+
+    this.domElement.addEventListener('pointerdown', this.onPointerDown)
+    this.domElement.addEventListener('pointermove', this.onPointerHover)
+    this.domElement.ownerDocument.addEventListener('pointerup', this.onPointerUp)
+  }
+
   public dispose = (): void => {
-    this.domElement.removeEventListener('pointerdown', this.onPointerDown)
-    this.domElement.removeEventListener('pointermove', this.onPointerHover)
-    this.domElement.ownerDocument?.removeEventListener('pointermove', this.onPointerMove)
-    this.domElement.ownerDocument?.removeEventListener('pointerup', this.onPointerUp)
+    this.domElement?.removeEventListener('pointerdown', this.onPointerDown)
+    this.domElement?.removeEventListener('pointermove', this.onPointerHover)
+    this.domElement?.ownerDocument?.removeEventListener('pointermove', this.onPointerMove)
+    this.domElement?.ownerDocument?.removeEventListener('pointerup', this.onPointerUp)
 
     this.traverse((child) => {
       const mesh = child as Mesh<BufferGeometry, Material>

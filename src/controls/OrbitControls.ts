@@ -1,4 +1,3 @@
-/* eslint-disable */
 import {
   Camera,
   EventDispatcher,
@@ -63,16 +62,24 @@ class OrbitControls extends EventDispatcher {
   // If auto-rotate is enabled, you must call controls.update() in your animation loop
   autoRotate = false
   autoRotateSpeed = 2.0 // 30 seconds per orbit when fps is 60
+  reverseOrbit = false // true if you want to reverse the orbit to mouse drag from left to right = orbits left
   // The four arrow keys
   keys = { LEFT: 'ArrowLeft', UP: 'ArrowUp', RIGHT: 'ArrowRight', BOTTOM: 'ArrowDown' }
   // Mouse buttons
-  mouseButtons = {
+  mouseButtons: Partial<{
+    LEFT: MOUSE
+    MIDDLE: MOUSE
+    RIGHT: MOUSE
+  }> = {
     LEFT: MOUSE.ROTATE,
     MIDDLE: MOUSE.DOLLY,
     RIGHT: MOUSE.PAN,
   }
   // Touch fingers
-  touches = { ONE: TOUCH.ROTATE, TWO: TOUCH.DOLLY_PAN }
+  touches: Partial<{
+    ONE: TOUCH
+    TWO: TOUCH
+  }> = { ONE: TOUCH.ROTATE, TWO: TOUCH.DOLLY_PAN }
   target0: Vector3
   position0: Vector3
   zoom0: number
@@ -383,11 +390,19 @@ class OrbitControls extends EventDispatcher {
     }
 
     function rotateLeft(angle: number): void {
-      sphericalDelta.theta -= angle
+      if (scope.reverseOrbit) {
+        sphericalDelta.theta += angle
+      } else {
+        sphericalDelta.theta -= angle
+      }
     }
 
     function rotateUp(angle: number): void {
-      sphericalDelta.phi -= angle
+      if (scope.reverseOrbit) {
+        sphericalDelta.phi += angle
+      } else {
+        sphericalDelta.phi -= angle
+      }
     }
 
     const panLeft = (() => {
@@ -533,10 +548,6 @@ class OrbitControls extends EventDispatcher {
       scope.update()
     }
 
-    function handleMouseUp(/*event*/) {
-      // no-op
-    }
-
     function handleMouseWheel(event: WheelEvent) {
       if (event.deltaY < 0) {
         dollyIn(getZoomScale())
@@ -677,10 +688,6 @@ class OrbitControls extends EventDispatcher {
       if (scope.enableRotate) handleTouchMoveRotate(event)
     }
 
-    function handleTouchEnd(/*event*/) {
-      // no-op
-    }
-
     //
     // event handlers - FSM: listen for events and reset state
     //
@@ -713,20 +720,18 @@ class OrbitControls extends EventDispatcher {
     }
 
     function onPointerUp(event: PointerEvent) {
-      if (scope.enabled === false) return
-
-      if (event.pointerType === 'touch') {
-        onTouchEnd()
-      } else {
-        onMouseUp()
-      }
-
       removePointer(event)
 
       if (pointers.length === 0) {
+        scope.domElement?.releasePointerCapture(event.pointerId)
+
         scope.domElement?.ownerDocument.removeEventListener('pointermove', onPointerMove)
         scope.domElement?.ownerDocument.removeEventListener('pointerup', onPointerUp)
       }
+
+      scope.dispatchEvent(endEvent)
+
+      state = STATE.NONE
     }
 
     function onPointerCancel(event: PointerEvent) {
@@ -812,12 +817,6 @@ class OrbitControls extends EventDispatcher {
           handleMouseMovePan(event)
           break
       }
-    }
-
-    function onMouseUp() {
-      handleMouseUp()
-      scope.dispatchEvent(endEvent)
-      state = STATE.NONE
     }
 
     function onMouseWheel(event: WheelEvent) {
@@ -923,12 +922,6 @@ class OrbitControls extends EventDispatcher {
         default:
           state = STATE.NONE
       }
-    }
-
-    function onTouchEnd() {
-      handleTouchEnd()
-      scope.dispatchEvent(endEvent)
-      state = STATE.NONE
     }
 
     function onContextMenu(event: Event) {

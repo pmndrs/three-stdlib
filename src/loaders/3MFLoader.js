@@ -18,7 +18,6 @@ import {
   NearestFilter,
   RepeatWrapping,
   TextureLoader,
-  sRGBEncoding,
 } from 'three'
 import { unzipSync } from 'fflate'
 
@@ -95,7 +94,7 @@ class ThreeMFLoader extends Loader {
       const otherParts = {}
 
       try {
-        zip = unzipSync(new Uint8Array(data)) // eslint-disable-line no-undef
+        zip = unzipSync(new Uint8Array(data))
       } catch (e) {
         if (e instanceof ReferenceError) {
           console.error('THREE.3MFLoader: fflate missing and file is compressed.')
@@ -641,7 +640,8 @@ class ThreeMFLoader extends Loader {
           URL.revokeObjectURL(sourceURI)
         })
 
-        texture.encoding = sRGBEncoding
+        if ('colorSpace' in texture) texture.colorSpace = 'srgb'
+        else texture.encoding = 3001 // sRGBEncoding
 
         // texture parameters
 

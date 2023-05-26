@@ -10,7 +10,7 @@ import {
   Mesh,
   MeshBasicMaterial,
   NearestFilter,
-  RGBFormat,
+  RGBAFormat,
   RawShaderMaterial,
   Vector2,
   Vector3,
@@ -31,14 +31,13 @@ class Lensflare extends Mesh {
     const positionView = new Vector3()
 
     // textures
-
-    const tempMap = new DataTexture(new Uint8Array(16 * 16 * 3), 16, 16, RGBFormat)
+    const tempMap = new DataTexture(new Uint8Array(16 * 16 * 3), 16, 16, RGBAFormat)
     tempMap.minFilter = NearestFilter
     tempMap.magFilter = NearestFilter
     tempMap.wrapS = ClampToEdgeWrapping
     tempMap.wrapT = ClampToEdgeWrapping
 
-    const occlusionMap = new DataTexture(new Uint8Array(16 * 16 * 3), 16, 16, RGBFormat)
+    const occlusionMap = new DataTexture(new Uint8Array(16 * 16 * 3), 16, 16, RGBAFormat)
     occlusionMap.minFilter = NearestFilter
     occlusionMap.magFilter = NearestFilter
     occlusionMap.wrapS = ClampToEdgeWrapping

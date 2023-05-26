@@ -1,42 +1,38 @@
-import { LinearFilter, RGBFormat, ShaderMaterial, UniformsUtils, WebGLRenderTarget } from 'three'
-import { Pass, FullScreenQuad } from '../postprocessing/Pass'
+import { ShaderMaterial, UniformsUtils, WebGLRenderTarget } from 'three'
+import { Pass, FullScreenQuad } from './Pass'
 import { CopyShader } from '../shaders/CopyShader'
 
-var SavePass = function (renderTarget) {
-  if (CopyShader === undefined) console.error('THREE.SavePass relies on CopyShader')
+class SavePass extends Pass {
+  constructor(renderTarget) {
+    super()
 
-  var shader = CopyShader
+    if (CopyShader === undefined) console.error('THREE.SavePass relies on CopyShader')
 
-  this.textureID = 'tDiffuse'
+    const shader = CopyShader
 
-  this.uniforms = UniformsUtils.clone(shader.uniforms)
+    this.textureID = 'tDiffuse'
 
-  this.material = new ShaderMaterial({
-    uniforms: this.uniforms,
-    vertexShader: shader.vertexShader,
-    fragmentShader: shader.fragmentShader,
-  })
+    this.uniforms = UniformsUtils.clone(shader.uniforms)
 
-  this.renderTarget = renderTarget
-
-  if (this.renderTarget === undefined) {
-    this.renderTarget = new WebGLRenderTarget(window.innerWidth, window.innerHeight, {
-      minFilter: LinearFilter,
-      magFilter: LinearFilter,
-      format: RGBFormat,
+    this.material = new ShaderMaterial({
+      uniforms: this.uniforms,
+      vertexShader: shader.vertexShader,
+      fragmentShader: shader.fragmentShader,
     })
-    this.renderTarget.texture.name = 'SavePass.rt'
+
+    this.renderTarget = renderTarget
+
+    if (this.renderTarget === undefined) {
+      this.renderTarget = new WebGLRenderTarget(window.innerWidth, window.innerHeight)
+      this.renderTarget.texture.name = 'SavePass.rt'
+    }
+
+    this.needsSwap = false
+
+    this.fsQuad = new FullScreenQuad(this.material)
   }
 
-  this.needsSwap = false
-
-  this.fsQuad = new FullScreenQuad(this.material)
-}
-
-SavePass.prototype = Object.assign(Object.create(Pass.prototype), {
-  constructor: SavePass,
-
-  render: function (renderer, writeBuffer, readBuffer) {
+  render(renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */) {
     if (this.uniforms[this.textureID]) {
       this.uniforms[this.textureID].value = readBuffer.texture
     }
@@ -44,7 +40,7 @@ SavePass.prototype = Object.assign(Object.create(Pass.prototype), {
     renderer.setRenderTarget(this.renderTarget)
     if (this.clear) renderer.clear()
     this.fsQuad.render(renderer)
-  },
-})
+  }
+}
 
 export { SavePass }

@@ -1,102 +1,67 @@
-import { TempNode } from '../core/TempNode'
-import { NodeLib } from '../core/NodeLib'
+import Node from '../core/Node.js'
+import AttributeNode from '../core/AttributeNode.js'
+import VaryNode from '../core/VaryNode.js'
+import ModelNode from '../accessors/ModelNode.js'
+import CameraNode from '../accessors/CameraNode.js'
+import OperatorNode from '../math/OperatorNode.js'
+import MathNode from '../math/MathNode.js'
 
-function NormalNode(scope) {
-  TempNode.call(this, 'v3')
+class NormalNode extends Node {
+  static GEOMETRY = 'geometry'
+  static LOCAL = 'local'
+  static WORLD = 'world'
+  static VIEW = 'view'
 
-  this.scope = scope || NormalNode.VIEW
-}
+  constructor(scope = NormalNode.LOCAL) {
+    super('vec3')
 
-NormalNode.LOCAL = 'local'
-NormalNode.WORLD = 'world'
-NormalNode.VIEW = 'view'
-
-NormalNode.prototype = Object.create(TempNode.prototype)
-NormalNode.prototype.constructor = NormalNode
-NormalNode.prototype.nodeType = 'Normal'
-
-NormalNode.prototype.getShared = function () {
-  // if shared is false, TempNode will not create temp variable (for optimization)
-
-  return this.scope === NormalNode.WORLD
-}
-
-NormalNode.prototype.build = function (builder, output, uuid, ns) {
-  var contextNormal = builder.context[this.scope + 'Normal']
-
-  if (contextNormal) {
-    return contextNormal.build(builder, output, uuid, ns)
+    this.scope = scope
   }
 
-  return TempNode.prototype.build.call(this, builder, output, uuid)
-}
-
-NormalNode.prototype.generate = function (builder, output) {
-  var result
-
-  switch (this.scope) {
-    case NormalNode.VIEW:
-      if (builder.isShader('vertex')) result = 'transformedNormal'
-      else result = 'geometryNormal'
-
-      break
-
-    case NormalNode.LOCAL:
-      if (builder.isShader('vertex')) {
-        result = 'objectNormal'
-      } else {
-        builder.requires.normal = true
-
-        result = 'vObjectNormal'
-      }
-
-      break
-
-    case NormalNode.WORLD:
-      if (builder.isShader('vertex')) {
-        result = 'inverseTransformDirection( transformedNormal, viewMatrix ).xyz'
-      } else {
-        builder.requires.worldNormal = true
-
-        result = 'vWNormal'
-      }
-
-      break
+  getHash(/*builder*/) {
+    return `normal-${this.scope}`
   }
 
-  return builder.format(result, this.getType(builder), output)
-}
+  generate(builder) {
+    const scope = this.scope
 
-NormalNode.prototype.copy = function (source) {
-  TempNode.prototype.copy.call(this, source)
+    let outputNode = null
 
-  this.scope = source.scope
+    if (scope === NormalNode.GEOMETRY) {
+      outputNode = new AttributeNode('normal', 'vec3')
+    } else if (scope === NormalNode.LOCAL) {
+      outputNode = new VaryNode(new NormalNode(NormalNode.GEOMETRY))
+    } else if (scope === NormalNode.VIEW) {
+      const vertexNormalNode = new OperatorNode(
+        '*',
+        new ModelNode(ModelNode.NORMAL_MATRIX),
+        new NormalNode(NormalNode.LOCAL),
+      )
+      outputNode = new MathNode(MathNode.NORMALIZE, new VaryNode(vertexNormalNode))
+    } else if (scope === NormalNode.WORLD) {
+      // To use INVERSE_TRANSFORM_DIRECTION only inverse the param order like this: MathNode( ..., Vector, Matrix );
+      const vertexNormalNode = new MathNode(
+        MathNode.TRANSFORM_DIRECTION,
+        new NormalNode(NormalNode.VIEW),
+        new CameraNode(CameraNode.VIEW_MATRIX),
+      )
+      outputNode = new MathNode(MathNode.NORMALIZE, new VaryNode(vertexNormalNode))
+    }
 
-  return this
-}
+    return outputNode.build(builder)
+  }
 
-NormalNode.prototype.toJSON = function (meta) {
-  var data = this.getJSONNode(meta)
-
-  if (!data) {
-    data = this.createJSONNode(meta)
+  serialize(data) {
+    super.serialize(data)
 
     data.scope = this.scope
   }
 
-  return data
+  deserialize(data) {
+    super.deserialize(data)
+
+    this.scope = data.scope
+  }
 }
 
-NodeLib.addKeyword('viewNormal', function () {
-  return new NormalNode(NormalNode.VIEW)
-})
-
-NodeLib.addKeyword('localNormal', function () {
-  return new NormalNode(NormalNode.NORMAL)
-})
-
-NodeLib.addKeyword('worldNormal', function () {
-  return new NormalNode(NormalNode.WORLD)
-})
-
-export { NormalNode }
+export default NormalNode

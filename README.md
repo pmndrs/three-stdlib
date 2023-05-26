@@ -17,31 +17,28 @@ Stand-alone version of [threejs/examples/jsm](https://github.com/mrdoob/three.js
 import * as STDLIB from 'three-stdlib'
 // Flatbundle
 import { OrbitControls, ... } from 'three-stdlib'
-// Pick individual objects
-import { OrbitControls } from 'three-stdlib/controls/OrbitControls'
 ```
 
 ## Problem
 
-`threejs/examples` were always considered as something that you need to copy/paste into your project and adapt to your needs. But that's not how people use them. This causes numerous issues & little support.
+`threejs/examples` are usually regarded as something that you copy/paste into your project and adapt to your needs. That's not how people use it, and this has caused numerous issues in the past.
 
 ## Solution
 
-- Real, npm/node conform esm modules with marked dependencies
-- Class based, optimized for tree-shaking, no global pollution, exports instead of collections
 - A build system for esm and cjs
+- Version managed dependencies
+- Class based, optimized for tree-shaking, no globals, exports instead of collections
 - Single flatbundle as well as individual transpiles
 - Typesafety with simple annotation-like types
 - CI, tests, linting, formatting (prettier)
 
-But most importantly, allowing the people that use and rely on these primitives to hold a little stake, and to distribute the weight of maintaining it.
-
-Let's give jsm/examples the care it deserves!
+But most importantly, allowing more people that use and rely on these primitives to hold a little stake, and to share the weight of maintaining it.
 
 ## How to contribute
 
 If you want to get involved you could do any of the following:
 
-- Create amazing stories for these examples for our dedicate storybook
+- Help to maintain and sync the existing primitives
+- Create stories for these examples for our dedicated storybook
 - Convert some of the files to Typescript
-- Add new examples for the library you think could be awesome for others
+- Add new examples for the library you think could be helpful for others

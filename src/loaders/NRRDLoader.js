@@ -240,7 +240,7 @@ class NRRDLoader extends Loader {
     if (headerObject.encoding.substring(0, 2) === 'gz') {
       // we need to decompress the datastream
       // here we start the unzipping and get a typed Uint8Array back
-      _data = gunzipSync(new Uint8Array(_data)) // eslint-disable-line no-undef
+      _data = gunzipSync(new Uint8Array(_data))
     } else if (
       headerObject.encoding === 'ascii' ||
       headerObject.encoding === 'text' ||

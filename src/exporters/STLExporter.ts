@@ -52,7 +52,7 @@ class STLExporter {
 
     //
 
-    scene.traverse(function (object) {
+    scene.traverse((object) => {
       if (object instanceof Mesh && object.isMesh) {
         const geometry = object.geometry
 

@@ -1,63 +1,27 @@
-import { TempNode } from '../core/TempNode'
-import { FunctionNode } from '../core/FunctionNode'
-import { UVNode } from '../accessors/UVNode'
+import Node from '../core/Node.js'
 
-function CheckerNode(uv) {
-  TempNode.call(this, 'f')
+import { ShaderNode, uv, add, mul, floor, mod, sign } from '../ShaderNode.js'
 
-  this.uv = uv || new UVNode()
-}
+const checkerShaderNode = new ShaderNode((inputs) => {
+  const uv = mul(inputs.uv, 2.0)
 
-CheckerNode.prototype = Object.create(TempNode.prototype)
-CheckerNode.prototype.constructor = CheckerNode
-CheckerNode.prototype.nodeType = 'Noise'
+  const cx = floor(uv.x)
+  const cy = floor(uv.y)
+  const result = mod(add(cx, cy), 2.0)
 
-CheckerNode.Nodes = (function () {
-  // https://github.com/mattdesl/glsl-checker/blob/master/index.glsl
+  return sign(result)
+})
 
-  var checker = new FunctionNode(
-    [
-      'float checker( vec2 uv ) {',
+class CheckerNode extends Node {
+  constructor(uvNode = uv()) {
+    super('float')
 
-      '	float cx = floor( uv.x );',
-      '	float cy = floor( uv.y ); ',
-      '	float result = mod( cx + cy, 2.0 );',
-
-      '	return sign( result );',
-
-      '}',
-    ].join('\n'),
-  )
-
-  return {
-    checker: checker,
-  }
-})()
-
-CheckerNode.prototype.generate = function (builder, output) {
-  var snoise = builder.include(CheckerNode.Nodes.checker)
-
-  return builder.format(snoise + '( ' + this.uv.build(builder, 'v2') + ' )', this.getType(builder), output)
-}
-
-CheckerNode.prototype.copy = function (source) {
-  TempNode.prototype.copy.call(this, source)
-
-  this.uv = source.uv
-
-  return this
-}
-
-CheckerNode.prototype.toJSON = function (meta) {
-  var data = this.getJSONNode(meta)
-
-  if (!data) {
-    data = this.createJSONNode(meta)
-
-    data.uv = this.uv.toJSON(meta).uuid
+    this.uvNode = uvNode
   }
 
-  return data
+  generate(builder) {
+    return checkerShaderNode({ uv: this.uvNode }).build(builder)
+  }
 }
 
-export { CheckerNode }
+export default CheckerNode

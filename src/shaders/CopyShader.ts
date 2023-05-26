@@ -2,7 +2,17 @@
  * Full-screen textured quad shader
  */
 
-const CopyShader = {
+import type { IUniform, Texture } from 'three'
+import type { IShader } from './types'
+
+export type CopyShaderUniforms = {
+  opacity: IUniform<number>
+  tDiffuse: IUniform<Texture | null>
+}
+
+export interface ICopyShader extends IShader<CopyShaderUniforms> {}
+
+export const CopyShader: ICopyShader = {
   uniforms: {
     tDiffuse: { value: null },
     opacity: { value: 1.0 },
@@ -34,5 +44,3 @@ const CopyShader = {
     '}',
   ].join('\n'),
 }
-
-export { CopyShader }

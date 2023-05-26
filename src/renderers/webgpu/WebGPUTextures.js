@@ -8,7 +8,6 @@ import {
   LinearFilter,
   RepeatWrapping,
   MirroredRepeatWrapping,
-  RGBFormat,
   RGBAFormat,
   RedFormat,
   RGFormat,
@@ -18,7 +17,6 @@ import {
   UnsignedByteType,
   FloatType,
   HalfFloatType,
-  sRGBEncoding,
 } from 'three'
 import WebGPUTextureUtils from './WebGPUTextureUtils'
 
@@ -425,20 +423,27 @@ class WebGPUTextures {
   _getBlockData(format) {
     // this method is only relevant for compressed texture formats
 
-    if (format === GPUTextureFormat.BC1RGBAUnorm || format === GPUTextureFormat.BC1RGBAUnormSRGB)
-      return { byteLength: 8, width: 4, height: 4 } // DXT1
-    if (format === GPUTextureFormat.BC2RGBAUnorm || format === GPUTextureFormat.BC2RGBAUnormSRGB)
-      return { byteLength: 16, width: 4, height: 4 } // DXT3
-    if (format === GPUTextureFormat.BC3RGBAUnorm || format === GPUTextureFormat.BC3RGBAUnormSRGB)
-      return { byteLength: 16, width: 4, height: 4 } // DXT5
-    if (format === GPUTextureFormat.BC4RUnorm || format === GPUTextureFormat.BC4RSNorm)
-      return { byteLength: 8, width: 4, height: 4 } // RGTC1
-    if (format === GPUTextureFormat.BC5RGUnorm || format === GPUTextureFormat.BC5RGSnorm)
-      return { byteLength: 16, width: 4, height: 4 } // RGTC2
-    if (format === GPUTextureFormat.BC6HRGBUFloat || format === GPUTextureFormat.BC6HRGBFloat)
-      return { byteLength: 16, width: 4, height: 4 } // BPTC (float)
-    if (format === GPUTextureFormat.BC7RGBAUnorm || format === GPUTextureFormat.BC7RGBAUnormSRGB)
-      return { byteLength: 16, width: 4, height: 4 } // BPTC (unorm)
+    if (format === GPUTextureFormat.BC1RGBAUnorm || format === GPUTextureFormat.BC1RGBAUnormSRGB) {
+      return { byteLength: 8, width: 4, height: 4 }
+    } // DXT1
+    if (format === GPUTextureFormat.BC2RGBAUnorm || format === GPUTextureFormat.BC2RGBAUnormSRGB) {
+      return { byteLength: 16, width: 4, height: 4 }
+    } // DXT3
+    if (format === GPUTextureFormat.BC3RGBAUnorm || format === GPUTextureFormat.BC3RGBAUnormSRGB) {
+      return { byteLength: 16, width: 4, height: 4 }
+    } // DXT5
+    if (format === GPUTextureFormat.BC4RUnorm || format === GPUTextureFormat.BC4RSNorm) {
+      return { byteLength: 8, width: 4, height: 4 }
+    } // RGTC1
+    if (format === GPUTextureFormat.BC5RGUnorm || format === GPUTextureFormat.BC5RGSnorm) {
+      return { byteLength: 16, width: 4, height: 4 }
+    } // RGTC2
+    if (format === GPUTextureFormat.BC6HRGBUFloat || format === GPUTextureFormat.BC6HRGBFloat) {
+      return { byteLength: 16, width: 4, height: 4 }
+    } // BPTC (float)
+    if (format === GPUTextureFormat.BC7RGBAUnorm || format === GPUTextureFormat.BC7RGBAUnormSRGB) {
+      return { byteLength: 16, width: 4, height: 4 }
+    } // BPTC (unorm)
   }
 
   _getBytesPerTexel(format) {
@@ -468,28 +473,27 @@ class WebGPUTextures {
   _getFormat(texture) {
     const format = texture.format
     const type = texture.type
-    const encoding = texture.encoding
+    const isSRGB = 'colorSpace' in texture ? texture.colorSpace === 'srgb' : texture.encoding === 3001
 
     let formatGPU
 
     switch (format) {
       case RGBA_S3TC_DXT1_Format:
-        formatGPU = encoding === sRGBEncoding ? GPUTextureFormat.BC1RGBAUnormSRGB : GPUTextureFormat.BC1RGBAUnorm
+        formatGPU = isSRGB ? GPUTextureFormat.BC1RGBAUnormSRGB : GPUTextureFormat.BC1RGBAUnorm
         break
 
       case RGBA_S3TC_DXT3_Format:
-        formatGPU = encoding === sRGBEncoding ? GPUTextureFormat.BC2RGBAUnormSRGB : GPUTextureFormat.BC2RGBAUnorm
+        formatGPU = isSRGB ? GPUTextureFormat.BC2RGBAUnormSRGB : GPUTextureFormat.BC2RGBAUnorm
         break
 
       case RGBA_S3TC_DXT5_Format:
-        formatGPU = encoding === sRGBEncoding ? GPUTextureFormat.BC3RGBAUnormSRGB : GPUTextureFormat.BC3RGBAUnorm
+        formatGPU = isSRGB ? GPUTextureFormat.BC3RGBAUnormSRGB : GPUTextureFormat.BC3RGBAUnorm
         break
 
-      case RGBFormat:
       case RGBAFormat:
         switch (type) {
           case UnsignedByteType:
-            formatGPU = encoding === sRGBEncoding ? GPUTextureFormat.RGBA8UnormSRGB : GPUTextureFormat.RGBA8Unorm
+            formatGPU = isSRGB ? GPUTextureFormat.RGBA8UnormSRGB : GPUTextureFormat.RGBA8Unorm
             break
 
           case HalfFloatType:

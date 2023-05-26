@@ -1,13 +1,11 @@
 import {
   Scene,
   WebGLRenderTarget,
-  HalfFloatType,
   FloatType,
   MeshBasicMaterial,
   MeshPhongMaterial,
   DoubleSide,
   PlaneGeometry,
-  PlaneBufferGeometry,
   Mesh,
 } from 'three'
 import potpack from 'potpack'
@@ -278,7 +276,7 @@ class ProgressiveLightMap {
       this.compiled = true
     }
 
-    this.blurringPlane = new Mesh(new PlaneBufferGeometry(1, 1), blurMaterial)
+    this.blurringPlane = new Mesh(new PlaneGeometry(1, 1), blurMaterial)
     this.blurringPlane.name = 'Blurring Plane'
     this.blurringPlane.frustumCulled = false
     this.blurringPlane.renderOrder = 0

@@ -1,34 +1,20 @@
-import { TempNode } from '../core/TempNode'
+import Node from '../core/Node.js'
+import PropertyNode from '../core/PropertyNode.js'
+import ContextNode from '../core/ContextNode.js'
 
-function CondNode(a, b, op, ifNode, elseNode) {
-  TempNode.call(this)
+class CondNode extends Node {
+  constructor(node, ifNode, elseNode) {
+    super()
 
-  this.a = a
-  this.b = b
+    this.node = node
 
-  this.op = op
+    this.ifNode = ifNode
+    this.elseNode = elseNode
+  }
 
-  this.ifNode = ifNode
-  this.elseNode = elseNode
-}
-
-CondNode.EQUAL = '=='
-CondNode.NOT_EQUAL = '!='
-CondNode.GREATER = '>'
-CondNode.GREATER_EQUAL = '>='
-CondNode.LESS = '<'
-CondNode.LESS_EQUAL = '<='
-CondNode.AND = '&&'
-CondNode.OR = '||'
-
-CondNode.prototype = Object.create(TempNode.prototype)
-CondNode.prototype.constructor = CondNode
-CondNode.prototype.nodeType = 'Cond'
-
-CondNode.prototype.getType = function (builder) {
-  if (this.ifNode) {
-    var ifType = this.ifNode.getType(builder)
-    var elseType = this.elseNode.getType(builder)
+  getNodeType(builder) {
+    const ifType = this.ifNode.getNodeType(builder)
+    const elseType = this.elseNode.getNodeType(builder)
 
     if (builder.getTypeLength(elseType) > builder.getTypeLength(ifType)) {
       return elseType
@@ -37,66 +23,28 @@ CondNode.prototype.getType = function (builder) {
     return ifType
   }
 
-  return 'b'
-}
+  generate(builder) {
+    const type = this.getNodeType(builder)
 
-CondNode.prototype.getCondType = function (builder) {
-  if (builder.getTypeLength(this.b.getType(builder)) > builder.getTypeLength(this.a.getType(builder))) {
-    return this.b.getType(builder)
+    const context = { temp: false }
+    const nodeProperty = new PropertyNode(null, type).build(builder)
+
+    const nodeSnippet = new ContextNode(this.node /*, context*/).build(builder, 'bool'),
+      ifSnippet = new ContextNode(this.ifNode, context).build(builder, type),
+      elseSnippet = new ContextNode(this.elseNode, context).build(builder, type)
+
+    builder.addFlowCode(`if ( ${nodeSnippet} ) {
+
+\t\t${nodeProperty} = ${ifSnippet};
+
+\t} else {
+
+\t\t${nodeProperty} = ${elseSnippet};
+
+\t}`)
+
+    return nodeProperty
   }
-
-  return this.a.getType(builder)
 }
 
-CondNode.prototype.generate = function (builder, output) {
-  var type = this.getType(builder),
-    condType = this.getCondType(builder),
-    a = this.a.build(builder, condType),
-    b = this.b.build(builder, condType),
-    code
-
-  if (this.ifNode) {
-    var ifCode = this.ifNode.build(builder, type),
-      elseCode = this.elseNode.build(builder, type)
-
-    code = '( ' + [a, this.op, b, '?', ifCode, ':', elseCode].join(' ') + ' )'
-  } else {
-    code = '( ' + a + ' ' + this.op + ' ' + b + ' )'
-  }
-
-  return builder.format(code, this.getType(builder), output)
-}
-
-CondNode.prototype.copy = function (source) {
-  TempNode.prototype.copy.call(this, source)
-
-  this.a = source.a
-  this.b = source.b
-
-  this.op = source.op
-
-  this.ifNode = source.ifNode
-  this.elseNode = source.elseNode
-
-  return this
-}
-
-CondNode.prototype.toJSON = function (meta) {
-  var data = this.getJSONNode(meta)
-
-  if (!data) {
-    data = this.createJSONNode(meta)
-
-    data.a = this.a.toJSON(meta).uuid
-    data.b = this.b.toJSON(meta).uuid
-
-    data.op = this.op
-
-    if (data.ifNode) data.ifNode = this.ifNode.toJSON(meta).uuid
-    if (data.elseNode) data.elseNode = this.elseNode.toJSON(meta).uuid
-  }
-
-  return data
-}
-
-export { CondNode }
+export default CondNode

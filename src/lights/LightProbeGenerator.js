@@ -1,4 +1,4 @@
-import { Color, LightProbe, LinearEncoding, SphericalHarmonics3, Vector3, sRGBEncoding } from 'three'
+import { Color, LightProbe, SphericalHarmonics3, Vector3 } from 'three'
 
 var LightProbeGenerator = {
   // https://www.ppsloan.org/publications/StupidSH36.pdf
@@ -49,7 +49,14 @@ var LightProbeGenerator = {
         color.setRGB(data[i] / 255, data[i + 1] / 255, data[i + 2] / 255)
 
         // convert to linear color space
-        convertColorToLinear(color, cubeTexture.encoding)
+        if ('colorSpace' in cubeTexture) {
+          if (cubeTexture.colorSpace === 'srgb') {
+            color.convertSRGBToLinear()
+          }
+        } else if (cubeTexture.encoding === 3001) {
+          // sRGBEncoding
+          color.convertSRGBToLinear()
+        }
 
         // pixel coordinate on unit cube
 
@@ -152,7 +159,14 @@ var LightProbeGenerator = {
         color.setRGB(data[i] / 255, data[i + 1] / 255, data[i + 2] / 255)
 
         // convert to linear color space
-        convertColorToLinear(color, cubeRenderTarget.texture.encoding)
+        if ('colorSpace' in cubeRenderTarget.texture) {
+          if (cubeRenderTarget.texture.colorSpace === 'srgb') {
+            color.convertSRGBToLinear()
+          }
+        } else if (cubeRenderTarget.texture.encoding === 3001) {
+          // sRGBEncoding
+          color.convertSRGBToLinear()
+        }
 
         // pixel coordinate on unit cube
 
@@ -222,23 +236,6 @@ var LightProbeGenerator = {
 
     return new LightProbe(sh)
   },
-}
-
-var convertColorToLinear = function (color, encoding) {
-  switch (encoding) {
-    case sRGBEncoding:
-      color.convertSRGBToLinear()
-      break
-
-    case LinearEncoding:
-      break
-
-    default:
-      console.warn('WARNING: LightProbeGenerator convertColorToLinear() encountered an unsupported encoding.')
-      break
-  }
-
-  return color
 }
 
 export { LightProbeGenerator }

@@ -29,10 +29,10 @@ const LUTShader = {
 	`,
 
   fragmentShader: /* glsl */ `
-		precision highp sampler3D;
 
 		uniform float lutSize;
 		#if USE_3DTEXTURE
+		precision highp sampler3D;
 		uniform sampler3D lut3d;
 		#else
 		uniform sampler2D lut;
@@ -110,14 +110,14 @@ class LUTPass extends ShaderPass {
       material.uniforms.lut.value = null
 
       if (v) {
-        const is3dTextureDefine = v.isDataTexture3D ? 1 : 0
+        const is3dTextureDefine = v.isData3DTexture ? 1 : 0
         if (is3dTextureDefine !== material.defines.USE_3DTEXTURE) {
           material.defines.USE_3DTEXTURE = is3dTextureDefine
           material.needsUpdate = true
         }
 
         material.uniforms.lutSize.value = v.image.width
-        if (v.isDataTexture3D) {
+        if (v.isData3DTexture) {
           material.uniforms.lut3d.value = v
         } else {
           material.uniforms.lut.value = v

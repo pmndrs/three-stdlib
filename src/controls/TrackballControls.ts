@@ -29,8 +29,10 @@ class TrackballControls extends EventDispatcher {
 
   public object: PerspectiveCamera | OrthographicCamera
   public domElement: HTMLElement | undefined
+  public cursorZoom: boolean = false
 
   private target = new Vector3()
+  private mousePosition = new Vector2()
 
   // internals
   private STATE = {
@@ -43,9 +45,11 @@ class TrackballControls extends EventDispatcher {
   }
 
   private EPS = 0.000001
+  private lastZoom = 1
 
   private lastPosition = new Vector3()
-  private lastZoom = 1
+  private cursorVector = new Vector3()
+  private targetVector = new Vector3()
 
   private _state = this.STATE.NONE
   private _keyState = this.STATE.NONE
@@ -167,7 +171,7 @@ class TrackballControls extends EventDispatcher {
       if ((this.object as PerspectiveCamera).isPerspectiveCamera) {
         this._eye.multiplyScalar(factor)
       } else if ((this.object as OrthographicCamera).isOrthographicCamera) {
-        this.object.zoom *= factor
+        this.object.zoom /= factor
         this.object.updateProjectionMatrix()
       } else {
         console.warn('THREE.TrackballControls: Unsupported camera type')
@@ -175,12 +179,17 @@ class TrackballControls extends EventDispatcher {
     } else {
       factor = 1.0 + (this._zoomEnd.y - this._zoomStart.y) * this.zoomSpeed
 
-      if (factor !== 1.0 && factor > 0.0) {
+      if (Math.abs(factor - 1.0) > this.EPS && factor > 0.0) {
         if ((this.object as PerspectiveCamera).isPerspectiveCamera) {
+          if (factor > 1.0 && this._eye.length() >= this.maxDistance - this.EPS) {
+            factor = 1.0
+          }
           this._eye.multiplyScalar(factor)
         } else if ((this.object as OrthographicCamera).isOrthographicCamera) {
+          if (factor > 1.0 && this.object.zoom < this.maxDistance * this.maxDistance) {
+            factor = 1.0
+          }
           this.object.zoom /= factor
-          this.object.updateProjectionMatrix()
         } else {
           console.warn('THREE.TrackballControls: Unsupported camera type')
         }
@@ -190,6 +199,22 @@ class TrackballControls extends EventDispatcher {
         this._zoomStart.copy(this._zoomEnd)
       } else {
         this._zoomStart.y += (this._zoomEnd.y - this._zoomStart.y) * this.dynamicDampingFactor
+      }
+
+      if (this.cursorZoom) {
+        //determine 3D position of mouse cursor (on target plane)
+        this.targetVector.copy(this.target).project(this.object)
+        let worldPos = this.cursorVector
+          .set(this.mousePosition.x, this.mousePosition.y, this.targetVector.z)
+          .unproject(this.object)
+
+        //adjust target point so that "point" stays in place
+        this.target.lerpVectors(worldPos, this.target, factor)
+      }
+
+      // Update the projection matrix after all properties are changed
+      if ((this.object as OrthographicCamera).isOrthographicCamera) {
+        this.object.updateProjectionMatrix()
       }
     }
   }
@@ -202,17 +227,17 @@ class TrackballControls extends EventDispatcher {
     if (!this.domElement) return
     this.mouseChange.copy(this._panEnd).sub(this._panStart)
 
-    if (this.mouseChange.lengthSq()) {
+    if (this.mouseChange.lengthSq() > this.EPS) {
       if ((this.object as OrthographicCamera).isOrthographicCamera) {
         const orthoObject = this.object as OrthographicCamera
-        const scale_x = (orthoObject.right - orthoObject.left) / this.object.zoom / this.domElement.clientWidth
-        const scale_y = (orthoObject.top - orthoObject.bottom) / this.object.zoom / this.domElement.clientWidth
+        const scale_x = (orthoObject.right - orthoObject.left) / this.object.zoom
+        const scale_y = (orthoObject.top - orthoObject.bottom) / this.object.zoom
 
         this.mouseChange.x *= scale_x
         this.mouseChange.y *= scale_y
+      } else {
+        this.mouseChange.multiplyScalar(this._eye.length() * this.panSpeed)
       }
-
-      this.mouseChange.multiplyScalar(this._eye.length() * this.panSpeed)
 
       this.pan.copy(this._eye).cross(this.object.up).setLength(this.mouseChange.x)
       this.pan.add(this.objectUp.copy(this.object.up).setLength(this.mouseChange.y))
@@ -470,6 +495,9 @@ class TrackballControls extends EventDispatcher {
         this._zoomStart.y -= event.deltaY * 0.00025
         break
     }
+
+    this.mousePosition.x = (event.offsetX / this.screen.width) * 2 - 1
+    this.mousePosition.y = -(event.offsetY / this.screen.height) * 2 + 1
 
     this.dispatchEvent(this.startEvent)
     this.dispatchEvent(this.endEvent)

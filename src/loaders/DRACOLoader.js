@@ -317,7 +317,7 @@ function DRACOWorker() {
             resolve({ draco: draco })
           }
 
-          DracoDecoderModule(decoderConfig) // eslint-disable-line no-undef
+          DracoDecoderModule(decoderConfig)
         })
         break
 

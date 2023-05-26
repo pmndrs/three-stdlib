@@ -1,11 +1,11 @@
 // Original src: https://github.com/zz85/threejs-path-flow
-const BITS = 3
+const CHANNELS = 4
 const TEXTURE_WIDTH = 1024
 const TEXTURE_HEIGHT = 4
 
 import {
   DataTexture,
-  RGBFormat,
+  RGBAFormat,
   FloatType,
   RepeatWrapping,
   Mesh,
@@ -19,7 +19,7 @@ import {
   BufferGeometry,
 } from 'three'
 
-import { TUniform } from 'types/shared'
+import type { IUniform } from 'three'
 
 /**
  * Make a new DataTexture to store the descriptions of the curves.
@@ -27,8 +27,8 @@ import { TUniform } from 'types/shared'
  * @param { number } numberOfCurves the number of curves needed to be described by this texture.
  */
 export const initSplineTexture = (numberOfCurves = 1): DataTexture => {
-  const dataArray = new Float32Array(TEXTURE_WIDTH * TEXTURE_HEIGHT * numberOfCurves * BITS)
-  const dataTexture = new DataTexture(dataArray, TEXTURE_WIDTH, TEXTURE_HEIGHT * numberOfCurves, RGBFormat, FloatType)
+  const dataArray = new Float32Array(TEXTURE_WIDTH * TEXTURE_HEIGHT * numberOfCurves * CHANNELS)
+  const dataTexture = new DataTexture(dataArray, TEXTURE_WIDTH, TEXTURE_HEIGHT * numberOfCurves, RGBAFormat, FloatType)
 
   dataTexture.wrapS = RepeatWrapping
   dataTexture.wrapT = RepeatWrapping
@@ -76,19 +76,25 @@ export const updateSplineTexture = <TCurve extends Curve<any>>(
 const setTextureValue = (texture: DataTexture, index: number, x: number, y: number, z: number, o: number): void => {
   const image = texture.image
   const { data } = image
-  const i = BITS * TEXTURE_WIDTH * o // Row Offset
-  data[index * BITS + i + 0] = x
-  data[index * BITS + i + 1] = y
-  data[index * BITS + i + 2] = z
+  const i = CHANNELS * TEXTURE_WIDTH * o // Row Offset
+  data[index * CHANNELS + i + 0] = x
+  data[index * CHANNELS + i + 1] = y
+  data[index * CHANNELS + i + 2] = z
+  data[index * CHANNELS + i + 3] = 1
 }
 
-export interface CurveModifierUniforms {
-  spineTexture: TUniform<DataTexture>
-  pathOffset: TUniform<number>
-  pathSegment: TUniform<number>
-  spineOffset: TUniform<number>
-  spineLength: TUniform<number>
-  flow: TUniform<number>
+export interface INumericUniform extends IUniform {
+  type: 'f' | 'i'
+  value: number
+}
+
+export type CurveModifierUniforms = {
+  spineTexture: IUniform<DataTexture>
+  pathOffset: INumericUniform
+  pathSegment: INumericUniform
+  spineOffset: INumericUniform
+  spineLength: INumericUniform
+  flow: INumericUniform
 }
 
 /**
@@ -96,17 +102,14 @@ export interface CurveModifierUniforms {
  *
  * @param { DataTexture } Texture which holds the curve description
  */
-export function getUniforms(splineTexture: DataTexture): CurveModifierUniforms {
-  const uniforms = {
-    spineTexture: { value: splineTexture },
-    pathOffset: { type: 'f', value: 0 }, // time of path curve
-    pathSegment: { type: 'f', value: 1 }, // fractional length of path
-    spineOffset: { type: 'f', value: 161 },
-    spineLength: { type: 'f', value: 400 },
-    flow: { type: 'i', value: 1 },
-  }
-  return uniforms
-}
+export const getUniforms = (splineTexture: DataTexture): CurveModifierUniforms => ({
+  spineTexture: { value: splineTexture },
+  pathOffset: { type: 'f', value: 0 }, // time of path curve
+  pathSegment: { type: 'f', value: 1 }, // fractional length of path
+  spineOffset: { type: 'f', value: 161 },
+  spineLength: { type: 'f', value: 400 },
+  flow: { type: 'i', value: 1 },
+})
 
 export type ModifiedMaterial<TMaterial extends Material> = TMaterial & {
   __ok: boolean
@@ -270,6 +273,7 @@ export class InstancedFlow<
   constructor(count: number, curveCount: number, geometry: TGeometry, material: TMaterial) {
     const mesh = new InstancedMesh(geometry, material, count)
     mesh.instanceMatrix.setUsage(DynamicDrawUsage)
+    mesh.frustumCulled = false
     super(mesh, curveCount)
 
     this.offsets = new Array(count).fill(0)

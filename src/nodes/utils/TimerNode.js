@@ -1,78 +1,48 @@
-import { FloatNode } from '../inputs/FloatNode'
-import { NodeLib } from '../core/NodeLib'
+import UniformNode from '../core/UniformNode.js'
+import { NodeUpdateType } from '../core/constants.js'
 
-function TimerNode(scale, scope, timeScale) {
-  FloatNode.call(this)
+class TimerNode extends UniformNode {
+  static LOCAL = 'local'
+  static GLOBAL = 'global'
+  static DELTA = 'delta'
 
-  this.scale = scale !== undefined ? scale : 1
-  this.scope = scope || TimerNode.GLOBAL
+  constructor(scope = TimerNode.LOCAL) {
+    super(0)
 
-  this.timeScale = timeScale !== undefined ? timeScale : scale !== undefined
-}
+    this.scope = scope
+    this.scale = 1
 
-TimerNode.GLOBAL = 'global'
-TimerNode.LOCAL = 'local'
-TimerNode.DELTA = 'delta'
+    this.updateType = NodeUpdateType.Frame
+  }
 
-TimerNode.prototype = Object.create(FloatNode.prototype)
-TimerNode.prototype.constructor = TimerNode
-TimerNode.prototype.nodeType = 'Timer'
+  update(frame) {
+    const scope = this.scope
+    const scale = this.scale
 
-TimerNode.prototype.getReadonly = function () {
-  // never use TimerNode as readonly but aways as "uniform"
+    if (scope === TimerNode.LOCAL) {
+      this.value += frame.deltaTime * scale
+    } else if (scope === TimerNode.DELTA) {
+      this.value = frame.deltaTime * scale
+    } else {
+      // global
 
-  return false
-}
-
-TimerNode.prototype.getUnique = function () {
-  // share TimerNode "uniform" input if is used on more time with others TimerNode
-
-  return this.timeScale && (this.scope === TimerNode.GLOBAL || this.scope === TimerNode.DELTA)
-}
-
-TimerNode.prototype.updateFrame = function (frame) {
-  var scale = this.timeScale ? this.scale : 1
-
-  switch (this.scope) {
-    case TimerNode.LOCAL:
-      this.value += frame.delta * scale
-
-      break
-
-    case TimerNode.DELTA:
-      this.value = frame.delta * scale
-
-      break
-
-    default:
       this.value = frame.time * scale
+    }
+  }
+
+  serialize(data) {
+    super.serialize(data)
+
+    data.scope = this.scope
+    data.scale = this.scale
+  }
+
+  deserialize(data) {
+    super.deserialize(data)
+
+    this.scope = data.scope
+    this.scale = data.scale
   }
 }
 
-TimerNode.prototype.copy = function (source) {
-  FloatNode.prototype.copy.call(this, source)
-
-  this.scope = source.scope
-  this.scale = source.scale
-
-  this.timeScale = source.timeScale
-
-  return this
-}
-
-TimerNode.prototype.toJSON = function (meta) {
-  var data = FloatNode.prototype.toJSON.call(this, meta)
-
-  data.scope = this.scope
-  data.scale = this.scale
-
-  data.timeScale = this.timeScale
-
-  return data
-}
-
-NodeLib.addKeyword('time', function () {
-  return new TimerNode()
-})
-
-export { TimerNode }
+export default TimerNode

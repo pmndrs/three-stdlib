@@ -1,11 +1,8 @@
 import {
   Color,
-  LinearFilter,
-  MathUtils,
   Matrix4,
   Mesh,
   PerspectiveCamera,
-  RGBFormat,
   ShaderMaterial,
   UniformsUtils,
   Vector2,
@@ -91,17 +88,10 @@ class ReflectorForSSRPass extends Mesh {
     }
 
     const parameters = {
-      minFilter: LinearFilter,
-      magFilter: LinearFilter,
-      format: RGBFormat,
       depthTexture: useDepthTexture ? depthTexture : null,
     }
 
     const renderTarget = new WebGLRenderTarget(textureWidth, textureHeight, parameters)
-
-    if (!MathUtils.isPowerOfTwo(textureWidth) || !MathUtils.isPowerOfTwo(textureHeight)) {
-      renderTarget.texture.generateMipmaps = false
-    }
 
     const material = new ShaderMaterial({
       transparent: useDepthTexture,
@@ -187,7 +177,8 @@ class ReflectorForSSRPass extends Mesh {
 
       // Render
 
-      renderTarget.texture.encoding = renderer.outputEncoding
+      if ('colorSpace' in renderTarget.texture) renderTarget.texture.colorSpace = renderer.outputColorSpace
+      else renderTarget.texture.encoding = renderer.outputEncoding
 
       // scope.visible = false;
 

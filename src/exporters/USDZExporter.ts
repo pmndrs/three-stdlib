@@ -10,7 +10,7 @@ import {
   Texture,
   Vector2,
 } from 'three'
-import { Nullable } from 'types/utils'
+import { Nullable } from '../types/utils'
 
 type MaterialRepresentaion = MeshStandardMaterial | MeshPhysicalMaterial
 
@@ -383,8 +383,8 @@ ${array.join('')}
     }
 
     return `
-  {
-      def Material "Material_${material.id}"
+    def Material "Material_${material.id}"
+    {
         def Shader "PreviewSurface"
         {
             uniform token info:id = "UsdPreviewSurface"

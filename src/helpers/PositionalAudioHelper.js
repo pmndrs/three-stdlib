@@ -1,14 +1,9 @@
 import { BufferGeometry, BufferAttribute, LineBasicMaterial, Line, MathUtils } from 'three'
 
 class PositionalAudioHelper extends Line {
-  constructor(audio, range, divisionsInnerAngle, divisionsOuterAngle) {
-    this.audio = audio
-    this.range = range || 1
-    this.divisionsInnerAngle = divisionsInnerAngle || 16
-    this.divisionsOuterAngle = divisionsOuterAngle || 2
-
+  constructor(audio, range = 1, divisionsInnerAngle = 16, divisionsOuterAngle = 2) {
     const geometry = new BufferGeometry()
-    const divisions = this.divisionsInnerAngle + this.divisionsOuterAngle * 2
+    const divisions = divisionsInnerAngle + divisionsOuterAngle * 2
     const positions = new Float32Array((divisions * 3 + 3) * 3)
     geometry.setAttribute('position', new BufferAttribute(positions, 3))
 
@@ -18,6 +13,10 @@ class PositionalAudioHelper extends Line {
     super(geometry, [materialOuterAngle, materialInnerAngle])
 
     this.type = 'PositionalAudioHelper'
+    this.audio = audio
+    this.range = range
+    this.divisionsInnerAngle = divisionsInnerAngle
+    this.divisionsOuterAngle = divisionsOuterAngle
 
     this.update()
   }

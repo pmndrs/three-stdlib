@@ -2,7 +2,6 @@ import {
   AmbientLight,
   AnimationClip,
   Bone,
-  BufferAttribute,
   BufferGeometry,
   ClampToEdgeWrapping,
   Color,
@@ -40,7 +39,6 @@ import {
   Vector3,
   Vector4,
   VectorKeyframeTrack,
-  sRGBEncoding,
 } from 'three'
 import { unzlibSync } from 'fflate'
 import { NURBSCurve } from '../curves/NURBSCurve'
@@ -54,11 +52,10 @@ import { NURBSCurve } from '../curves/NURBSCurve'
  *  Morph normals / blend shape normals
  *
  * FBX format references:
- * 	https://wiki.blender.org/index.php/User:Mont29/Foundation/FBX_File_Structure
- * 	http://help.autodesk.com/view/FBX/2017/ENU/?guid=__cpp_ref_index_html (C++ SDK reference)
+ * 	https://help.autodesk.com/view/FBX/2017/ENU/?guid=__cpp_ref_index_html (C++ SDK reference)
  *
- * 	Binary format specification:
- *		https://code.blender.org/2013/08/fbx-binary-file-format-specification/
+ * Binary format specification:
+ *	https://code.blender.org/2013/08/fbx-binary-file-format-specification/
  */
 
 let fbxTree
@@ -353,6 +350,7 @@ class FBXTreeParser {
         console.warn('FBXLoader: TGA loader not found, creating placeholder texture for', textureNode.RelativeFilename)
         texture = new Texture()
       } else {
+        loader.setPath(this.textureLoader.path)
         texture = loader.load(fileName)
       }
     } else if (extension === 'psd') {
@@ -502,7 +500,11 @@ class FBXTreeParser {
         case 'DiffuseColor':
         case 'Maya|TEX_color_map':
           parameters.map = scope.getTexture(textureMap, child.ID)
-          parameters.map.encoding = sRGBEncoding
+          if (parameters.map !== undefined) {
+            if ('colorSpace' in parameters.map) parameters.map.colorSpace = 'srgb'
+            else parameters.map.encoding = 3001 // sRGBEncoding
+          }
+
           break
 
         case 'DisplacementColor':
@@ -511,7 +513,11 @@ class FBXTreeParser {
 
         case 'EmissiveColor':
           parameters.emissiveMap = scope.getTexture(textureMap, child.ID)
-          parameters.emissiveMap.encoding = sRGBEncoding
+          if (parameters.emissiveMap !== undefined) {
+            if ('colorSpace' in parameters.emissiveMap) parameters.emissiveMap.colorSpace = 'srgb'
+            else parameters.emissiveMap.encoding = 3001 // sRGBEncoding
+          }
+
           break
 
         case 'NormalMap':
@@ -521,13 +527,22 @@ class FBXTreeParser {
 
         case 'ReflectionColor':
           parameters.envMap = scope.getTexture(textureMap, child.ID)
-          parameters.envMap.mapping = EquirectangularReflectionMapping
-          parameters.envMap.encoding = sRGBEncoding
+          if (parameters.envMap !== undefined) {
+            parameters.envMap.mapping = EquirectangularReflectionMapping
+
+            if ('colorSpace' in parameters.envMap) parameters.envMap.colorSpace = 'srgb'
+            else parameters.envMap.encoding = 3001 // sRGBEncoding
+          }
+
           break
 
         case 'SpecularColor':
           parameters.specularMap = scope.getTexture(textureMap, child.ID)
-          parameters.specularMap.encoding = sRGBEncoding
+          if (parameters.specularMap !== undefined) {
+            if ('colorSpace' in parameters.specularMap) parameters.specularMap.colorSpace = 'srgb'
+            else parameters.specularMap.encoding = 3001 // sRGBEncoding
+          }
+
           break
 
         case 'TransparentColor':
@@ -698,8 +713,6 @@ class FBXTreeParser {
     this.bindSkeleton(deformers.skeletons, geometryMap, modelMap)
 
     this.createAmbientLight()
-
-    this.setupMorphMaterials()
 
     sceneGraph.traverse(function (node) {
       if (node.userData.transformData) {
@@ -1010,10 +1023,6 @@ class FBXTreeParser {
     }
 
     if (geometry.FBX_Deformer) {
-      materials.forEach(function (material) {
-        material.skinning = true
-      })
-
       model = new SkinnedMesh(geometry, material)
       model.normalizeSkinWeights()
     } else {
@@ -1119,7 +1128,7 @@ class FBXTreeParser {
       const BindPoseNode = fbxTree.Objects.Pose
 
       for (const nodeID in BindPoseNode) {
-        if (BindPoseNode[nodeID].attrType === 'BindPose') {
+        if (BindPoseNode[nodeID].attrType === 'BindPose' && BindPoseNode[nodeID].NbPoseNodes > 0) {
           const poseNodes = BindPoseNode[nodeID].PoseNode
 
           if (Array.isArray(poseNodes)) {
@@ -1148,53 +1157,6 @@ class FBXTreeParser {
         const color = new Color(r, g, b)
         sceneGraph.add(new AmbientLight(color, 1))
       }
-    }
-  }
-
-  setupMorphMaterials() {
-    const scope = this
-    sceneGraph.traverse(function (child) {
-      if (child.isMesh) {
-        if (child.geometry.morphAttributes.position && child.geometry.morphAttributes.position.length) {
-          if (Array.isArray(child.material)) {
-            child.material.forEach(function (material, i) {
-              scope.setupMorphMaterial(child, material, i)
-            })
-          } else {
-            scope.setupMorphMaterial(child, child.material)
-          }
-        }
-      }
-    })
-  }
-
-  setupMorphMaterial(child, material, index) {
-    const uuid = child.uuid
-    const matUuid = material.uuid
-
-    // if a geometry has morph targets, it cannot share the material with other geometries
-    let sharedMat = false
-
-    sceneGraph.traverse(function (node) {
-      if (node.isMesh) {
-        if (Array.isArray(node.material)) {
-          node.material.forEach(function (mat) {
-            if (mat.uuid === matUuid && node.uuid !== uuid) sharedMat = true
-          })
-        } else if (node.material.uuid === matUuid && node.uuid !== uuid) {
-          sharedMat = true
-        }
-      }
-    })
-
-    if (sharedMat === true) {
-      const clonedMat = material.clone()
-      clonedMat.morphTargets = true
-
-      if (index === undefined) child.material = clonedMat
-      else child.material[index] = clonedMat
-    } else {
-      material.morphTargets = true
     }
   }
 }
@@ -1869,18 +1831,9 @@ class GeometryParser {
     }
 
     const curve = new NURBSCurve(degree, knots, controlPoints, startKnot, endKnot)
-    const vertices = curve.getPoints(controlPoints.length * 7)
+    const points = curve.getPoints(controlPoints.length * 12)
 
-    const positions = new Float32Array(vertices.length * 3)
-
-    vertices.forEach(function (vertex, i) {
-      vertex.toArray(positions, i * 3)
-    })
-
-    const geometry = new BufferGeometry()
-    geometry.setAttribute('position', new BufferAttribute(positions, 3))
-
-    return geometry
+    return new BufferGeometry().setFromPoints(points)
   }
 }
 
@@ -2850,7 +2803,7 @@ class BinaryParser {
           }
         }
 
-        const data = unzlibSync(new Uint8Array(reader.getArrayBuffer(compressedLength))) // eslint-disable-line no-undef
+        const data = unzlibSync(new Uint8Array(reader.getArrayBuffer(compressedLength)))
         const reader2 = new BinaryReader(data.buffer)
 
         switch (type) {
@@ -3222,7 +3175,7 @@ function generateTransform(transformData) {
     lParentGX.copy(transformData.parentMatrixWorld)
   }
 
-  const lLRM = new Matrix4().copy(lPreRotationM).multiply(lRotationM).multiply(lPostRotationM)
+  const lLRM = lPreRotationM.clone().multiply(lRotationM).multiply(lPostRotationM)
   // Global Rotation
   const lParentGRM = new Matrix4()
   lParentGRM.extractRotation(lParentGX)
@@ -3231,9 +3184,8 @@ function generateTransform(transformData) {
   const lParentTM = new Matrix4()
   lParentTM.copyPosition(lParentGX)
 
-  const lParentGSM = new Matrix4()
-  const lParentGRSM = new Matrix4().copy(lParentTM).invert().multiply(lParentGX)
-  lParentGSM.copy(lParentGRM).invert().multiply(lParentGRSM)
+  const lParentGRSM = lParentTM.clone().invert().multiply(lParentGX)
+  const lParentGSM = lParentGRM.clone().invert().multiply(lParentGRSM)
   const lLSM = lScalingM
 
   const lGlobalRS = new Matrix4()
@@ -3244,20 +3196,17 @@ function generateTransform(transformData) {
     lGlobalRS.copy(lParentGRM).multiply(lParentGSM).multiply(lLRM).multiply(lLSM)
   } else {
     const lParentLSM = new Matrix4().scale(new Vector3().setFromMatrixScale(lParentLX))
-    const lParentLSM_inv = new Matrix4().copy(lParentLSM).invert()
-    const lParentGSM_noLocal = new Matrix4().copy(lParentGSM).multiply(lParentLSM_inv)
+    const lParentLSM_inv = lParentLSM.clone().invert()
+    const lParentGSM_noLocal = lParentGSM.clone().multiply(lParentLSM_inv)
 
     lGlobalRS.copy(lParentGRM).multiply(lLRM).multiply(lParentGSM_noLocal).multiply(lLSM)
   }
 
-  const lRotationPivotM_inv = new Matrix4()
-  lRotationPivotM_inv.copy(lRotationPivotM).invert()
-  const lScalingPivotM_inv = new Matrix4()
-  lScalingPivotM_inv.copy(lScalingPivotM).invert()
+  const lRotationPivotM_inv = lRotationPivotM.clone().invert()
+  const lScalingPivotM_inv = lScalingPivotM.clone().invert()
   // Calculate the local transform matrix
-  let lTransform = new Matrix4()
-  lTransform
-    .copy(lTranslationM)
+  let lTransform = lTranslationM
+    .clone()
     .multiply(lRotationOffsetM)
     .multiply(lRotationPivotM)
     .multiply(lPreRotationM)
@@ -3271,10 +3220,10 @@ function generateTransform(transformData) {
 
   const lLocalTWithAllPivotAndOffsetInfo = new Matrix4().copyPosition(lTransform)
 
-  const lGlobalTranslation = new Matrix4().copy(lParentGX).multiply(lLocalTWithAllPivotAndOffsetInfo)
+  const lGlobalTranslation = lParentGX.clone().multiply(lLocalTWithAllPivotAndOffsetInfo)
   lGlobalT.copyPosition(lGlobalTranslation)
 
-  lTransform = new Matrix4().copy(lGlobalT).multiply(lGlobalRS)
+  lTransform = lGlobalT.clone().multiply(lGlobalRS)
 
   // from global to local
   lTransform.premultiply(lParentGX.invert())

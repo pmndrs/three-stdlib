@@ -1,6 +1,23 @@
-import { DataTextureLoader, UnsignedByteType, RGBAFormat, LinearFilter, CubeTexture, RGBM7Encoding } from 'three'
+import { DataTextureLoader, RGBAFormat, LinearFilter, CubeTexture, HalfFloatType, DataUtils } from 'three'
 
 class RGBMLoader extends DataTextureLoader {
+  constructor(manager) {
+    super(manager)
+
+    this.type = HalfFloatType
+    this.maxRange = 7 // more information about this property at https://iwasbeingirony.blogspot.com/2010/06/difference-between-rgbm-and-rgbd.html
+  }
+
+  setDataType(value) {
+    this.type = value
+    return this
+  }
+
+  setMaxRange(value) {
+    this.maxRange = value
+    return this
+  }
+
   loadCubemap(urls, onLoad, onProgress, onError) {
     const texture = new CubeTexture()
 
@@ -31,7 +48,7 @@ class RGBMLoader extends DataTextureLoader {
       loadTexture(i)
     }
 
-    texture.encoding = RGBM7Encoding
+    texture.type = this.type
     texture.format = RGBAFormat
     texture.minFilter = LinearFilter
     texture.generateMipmaps = false
@@ -43,14 +60,39 @@ class RGBMLoader extends DataTextureLoader {
     const img = UPNG.decode(buffer)
     const rgba = UPNG.toRGBA8(img)[0]
 
+    const data = new Uint8Array(rgba)
+    const size = img.width * img.height * 4
+
+    const output = this.type === HalfFloatType ? new Uint16Array(size) : new Float32Array(size)
+
+    // decode RGBM
+
+    for (let i = 0; i < data.length; i += 4) {
+      const r = data[i + 0] / 255
+      const g = data[i + 1] / 255
+      const b = data[i + 2] / 255
+      const a = data[i + 3] / 255
+
+      if (this.type === HalfFloatType) {
+        output[i + 0] = DataUtils.toHalfFloat(Math.min(r * a * this.maxRange, 65504))
+        output[i + 1] = DataUtils.toHalfFloat(Math.min(g * a * this.maxRange, 65504))
+        output[i + 2] = DataUtils.toHalfFloat(Math.min(b * a * this.maxRange, 65504))
+        output[i + 3] = DataUtils.toHalfFloat(1)
+      } else {
+        output[i + 0] = r * a * this.maxRange
+        output[i + 1] = g * a * this.maxRange
+        output[i + 2] = b * a * this.maxRange
+        output[i + 3] = 1
+      }
+    }
+
     return {
       width: img.width,
       height: img.height,
-      data: new Uint8Array(rgba),
+      data: output,
       format: RGBAFormat,
-      type: UnsignedByteType,
+      type: this.type,
       flipY: true,
-      encoding: RGBM7Encoding,
     }
   }
 }
@@ -86,12 +128,8 @@ UPNG.toRGBA8 = function (out) {
 
     frms.push(img.buffer.slice(0))
 
-    if (frm.dispose == 0) {
-    } else if (frm.dispose == 1) {
-      UPNG._copyTile(empty, fw, fh, img, w, h, fx, fy, 0)
-    } else if (frm.dispose == 2) {
-      for (var j = 0; j < len; j++) img[j] = prev[j]
-    }
+    if (frm.dispose == 1) UPNG._copyTile(empty, fw, fh, img, w, h, fx, fy, 0)
+    else if (frm.dispose == 2) for (var j = 0; j < len; j++) img[j] = prev[j]
   }
 
   return frms
@@ -292,7 +330,7 @@ UPNG.toRGBA8.decodeImage = function (data, w, h, out) {
       } else if (depth == 16) {
         for (var x = 0; x < w; x++) {
           var gr = data[off + (x << 1)],
-            al = rs(data, off + (x << i)) == tr ? 0 : 255
+            al = rs(data, off + (x << 1)) == tr ? 0 : 255
           bf32[to + x] = (al << 24) | (gr << 16) | (gr << 8) | gr
         }
       }
@@ -314,9 +352,10 @@ UPNG.decode = function (buff) {
     doff = 0 // put all IDAT data into it
   var fd,
     foff = 0 // frames
+  var text, keyw, bfr
 
   var mgck = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]
-  for (var i = 0; i < 8; i++) if (data[i] != mgck[i]) throw 'The input is not a PNG file!'
+  for (var i = 0; i < 8; i++) if (data[i] != mgck[i]) throw new Error('The input is not a PNG file!')
 
   while (offset < data.length) {
     var len = bin.readUint(data, offset)
@@ -364,13 +403,12 @@ UPNG.decode = function (buff) {
     } else if (type == 'tEXt' || type == 'zTXt') {
       if (out.tabs[type] == null) out.tabs[type] = {}
       var nz = bin.nextZero(data, offset)
-      var keyw = bin.readASCII(data, offset, nz - offset)
-      var text,
-        tl = offset + len - nz - 1
+      keyw = bin.readASCII(data, offset, nz - offset)
+      var tl = offset + len - nz - 1
       if (type == 'tEXt') {
         text = bin.readASCII(data, nz + 1, tl)
       } else {
-        var bfr = UPNG.decode._inflate(data.slice(nz + 2, nz + 2 + tl))
+        bfr = UPNG.decode._inflate(data.slice(nz + 2, nz + 2 + tl))
         text = bin.readUTF8(bfr, 0, bfr.length)
       }
 
@@ -380,7 +418,7 @@ UPNG.decode = function (buff) {
       var nz = 0,
         off = offset
       nz = bin.nextZero(data, off)
-      var keyw = bin.readASCII(data, off, nz - off)
+      keyw = bin.readASCII(data, off, nz - off)
       off = nz + 1
       var cflag = data[off]
       off += 2
@@ -390,12 +428,11 @@ UPNG.decode = function (buff) {
       nz = bin.nextZero(data, off)
       bin.readUTF8(data, off, nz - off)
       off = nz + 1
-      var text,
-        tl = len - (off - offset)
+      var tl = len - (off - offset)
       if (cflag == 0) {
         text = bin.readUTF8(data, off, tl)
       } else {
-        var bfr = UPNG.decode._inflate(data.slice(off, off + tl))
+        bfr = UPNG.decode._inflate(data.slice(off, off + tl))
         text = bin.readUTF8(bfr, 0, bfr.length)
       }
 
@@ -427,7 +464,7 @@ UPNG.decode = function (buff) {
       break
     }
 
-    //else {  log("unknown chunk type", type, len);  }
+    //else {  console.log("unknown chunk type", type, len);  out.tabs[type]=data.slice(offset,offset+len);  }
     offset += len
     bin.readUint(data, offset)
     offset += 4
@@ -436,7 +473,6 @@ UPNG.decode = function (buff) {
   if (foff != 0) {
     var fr = out.frames[out.frames.length - 1]
     fr.data = UPNG.decode._decompress(out, fd.slice(0, foff), fr.rect.width, fr.rect.height)
-    foff = 0
   }
 
   out.data = UPNG.decode._decompress(out, dd, out.width, out.height)
@@ -917,25 +953,27 @@ UPNG.decode._readInterlace = function (data, out) {
 
     var y = 0,
       row = starting_row[pass]
+    var val
+
     while (row < h) {
       var col = starting_col[pass]
       var cdi = (di + y * bpll) << 3
 
       while (col < w) {
         if (bpp == 1) {
-          var val = data[cdi >> 3]
+          val = data[cdi >> 3]
           val = (val >> (7 - (cdi & 7))) & 1
           img[row * bpl + (col >> 3)] |= val << (7 - ((col & 7) << 0))
         }
 
         if (bpp == 2) {
-          var val = data[cdi >> 3]
+          val = data[cdi >> 3]
           val = (val >> (6 - (cdi & 7))) & 3
           img[row * bpl + (col >> 2)] |= val << (6 - ((col & 3) << 1))
         }
 
         if (bpp == 4) {
-          var val = data[cdi >> 3]
+          val = data[cdi >> 3]
           val = (val >> (4 - (cdi & 7))) & 15
           img[row * bpl + (col >> 1)] |= val << (4 - ((col & 1) << 2))
         }
@@ -971,8 +1009,8 @@ UPNG.decode._filterZero = function (data, out, off, w, h) {
     paeth = UPNG.decode._paeth
   bpp = Math.ceil(bpp / 8)
 
-  var i = 0,
-    di = 1,
+  var i,
+    di,
     type = data[off],
     x = 0
 

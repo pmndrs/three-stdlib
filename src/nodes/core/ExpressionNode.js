@@ -1,11 +1,22 @@
-import { FunctionNode } from './FunctionNode'
+import TempNode from './TempNode.js'
 
-function ExpressionNode(src, type, keywords, extensions, includes) {
-  FunctionNode.call(this, src, includes, extensions, keywords, type)
+class ExpressionNode extends TempNode {
+  constructor(snipped = '', nodeType = 'void') {
+    super(nodeType)
+
+    this.snipped = snipped
+  }
+
+  generate(builder) {
+    const type = this.getNodeType(builder)
+    const snipped = this.snipped
+
+    if (type === 'void') {
+      builder.addFlowCode(snipped)
+    } else {
+      return `( ${snipped} )`
+    }
+  }
 }
 
-ExpressionNode.prototype = Object.create(FunctionNode.prototype)
-ExpressionNode.prototype.constructor = ExpressionNode
-ExpressionNode.prototype.nodeType = 'Expression'
-
-export { ExpressionNode }
+export default ExpressionNode

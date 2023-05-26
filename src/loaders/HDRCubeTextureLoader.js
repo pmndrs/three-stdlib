@@ -1,18 +1,4 @@
-import {
-  CubeTexture,
-  DataTexture,
-  FileLoader,
-  FloatType,
-  HalfFloatType,
-  LinearEncoding,
-  LinearFilter,
-  Loader,
-  NearestFilter,
-  RGBAFormat,
-  RGBEEncoding,
-  RGBFormat,
-  UnsignedByteType,
-} from 'three'
+import { CubeTexture, DataTexture, FileLoader, FloatType, HalfFloatType, LinearFilter, Loader } from 'three'
 import { RGBELoader } from '../loaders/RGBELoader.js'
 
 class HDRCubeTextureLoader extends Loader {
@@ -20,7 +6,7 @@ class HDRCubeTextureLoader extends Loader {
     super(manager)
 
     this.hdrLoader = new RGBELoader()
-    this.type = UnsignedByteType
+    this.type = HalfFloatType
   }
 
   load(urls, onLoad, onProgress, onError) {
@@ -40,25 +26,10 @@ class HDRCubeTextureLoader extends Loader {
     texture.type = this.type
 
     switch (texture.type) {
-      case UnsignedByteType:
-        texture.encoding = RGBEEncoding
-        texture.format = RGBAFormat
-        texture.minFilter = NearestFilter
-        texture.magFilter = NearestFilter
-        texture.generateMipmaps = false
-        break
-
       case FloatType:
-        texture.encoding = LinearEncoding
-        texture.format = RGBFormat
-        texture.minFilter = LinearFilter
-        texture.magFilter = LinearFilter
-        texture.generateMipmaps = false
-        break
-
       case HalfFloatType:
-        texture.encoding = LinearEncoding
-        texture.format = RGBFormat
+        if ('colorSpace' in texture) texture.colorSpace = 'srgb-linear'
+        else texture.encoding = 3000 // LinearEncoding
         texture.minFilter = LinearFilter
         texture.magFilter = LinearFilter
         texture.generateMipmaps = false

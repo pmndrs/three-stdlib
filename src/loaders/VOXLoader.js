@@ -1,6 +1,5 @@
 import {
   BufferGeometry,
-  DataTexture3D,
   FileLoader,
   Float32BufferAttribute,
   Loader,
@@ -10,6 +9,7 @@ import {
   NearestFilter,
   RedFormat,
 } from 'three'
+import { Data3DTexture } from '../_polyfill/Data3DTexture'
 
 class VOXLoader extends Loader {
   load(url, onLoad, onProgress, onError) {
@@ -318,12 +318,11 @@ class VOXLoader extends Loader {
       let id = ''
 
       for (let j = 0; j < 4; j++) {
-        id += String.fromCharCode(data.getUint8(i++, true))
+        id += String.fromCharCode(data.getUint8(i++))
       }
 
       const chunkSize = data.getUint32(i, true)
       i += 4
-      data.getUint32(i, true)
       i += 4 // childChunks
 
       if (id === 'SIZE') {
@@ -456,7 +455,7 @@ class VOXMesh extends Mesh {
   }
 }
 
-class VOXDataTexture3D extends DataTexture3D {
+class VOXData3DTexture extends Data3DTexture {
   constructor(chunk) {
     const data = chunk.data
     const size = chunk.size
@@ -482,7 +481,8 @@ class VOXDataTexture3D extends DataTexture3D {
     this.minFilter = NearestFilter
     this.magFilter = LinearFilter
     this.unpackAlignment = 1
+    this.needsUpdate = true
   }
 }
 
-export { VOXLoader, VOXMesh, VOXDataTexture3D }
+export { VOXLoader, VOXMesh, VOXData3DTexture }

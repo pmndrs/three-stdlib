@@ -1,4 +1,4 @@
-import { Box3, MathUtils, MeshLambertMaterial, Object3D, TextureLoader, UVMapping, sRGBEncoding } from 'three'
+import { Box3, MathUtils, MeshLambertMaterial, Object3D, TextureLoader, UVMapping } from 'three'
 import { MD2Loader } from '../loaders/MD2Loader'
 import { MorphBlendMesh } from '../misc/MorphBlendMesh'
 
@@ -357,10 +357,12 @@ var MD2CharacterComplex = function () {
 
     this.maxReverseSpeed = -this.maxSpeed
 
-    if (controls.moveForward)
+    if (controls.moveForward) {
       this.speed = MathUtils.clamp(this.speed + delta * this.frontAcceleration, this.maxReverseSpeed, this.maxSpeed)
-    if (controls.moveBackward)
+    }
+    if (controls.moveBackward) {
       this.speed = MathUtils.clamp(this.speed - delta * this.backAcceleration, this.maxReverseSpeed, this.maxSpeed)
+    }
 
     // orientation based on controls
     // (don't just stand while turning)
@@ -419,7 +421,8 @@ var MD2CharacterComplex = function () {
       textures[i] = textureLoader.load(baseUrl + textureUrls[i], checkLoadingComplete)
       textures[i].mapping = UVMapping
       textures[i].name = textureUrls[i]
-      textures[i].encoding = sRGBEncoding
+      if ('colorSpace' in textures[i]) textures[i].colorSpace = 'srgb'
+      else textures[i].encoding = 3001 // sRGBEncoding
     }
 
     return textures

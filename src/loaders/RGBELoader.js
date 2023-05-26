@@ -1,16 +1,4 @@
-import {
-  DataTextureLoader,
-  DataUtils,
-  FloatType,
-  HalfFloatType,
-  LinearEncoding,
-  LinearFilter,
-  NearestFilter,
-  RGBEEncoding,
-  RGBEFormat,
-  RGBFormat,
-  UnsignedByteType,
-} from 'three'
+import { DataTextureLoader, DataUtils, FloatType, HalfFloatType, LinearFilter } from 'three'
 
 // https://github.com/mrdoob/three.js/issues/5552
 // http://en.wikipedia.org/wiki/RGBE_image_format
@@ -19,7 +7,7 @@ class RGBELoader extends DataTextureLoader {
   constructor(manager) {
     super(manager)
 
-    this.type = UnsignedByteType
+    this.type = HalfFloatType
   }
 
   // adapted from http://www.graphics.cornell.edu/~bjw/rgbe.html
@@ -148,11 +136,11 @@ class RGBELoader extends DataTextureLoader {
           }
 
           if ((match = line.match(gamma_re))) {
-            header.gamma = parseFloat(match[1], 10)
+            header.gamma = parseFloat(match[1])
           }
 
           if ((match = line.match(exposure_re))) {
-            header.exposure = parseFloat(match[1], 10)
+            header.exposure = parseFloat(match[1])
           }
 
           if ((match = line.match(format_re))) {
@@ -285,15 +273,18 @@ class RGBELoader extends DataTextureLoader {
       destArray[destOffset + 0] = sourceArray[sourceOffset + 0] * scale
       destArray[destOffset + 1] = sourceArray[sourceOffset + 1] * scale
       destArray[destOffset + 2] = sourceArray[sourceOffset + 2] * scale
+      destArray[destOffset + 3] = 1
     }
 
     const RGBEByteToRGBHalf = function (sourceArray, sourceOffset, destArray, destOffset) {
       const e = sourceArray[sourceOffset + 3]
       const scale = Math.pow(2.0, e - 128.0) / 255.0
 
-      destArray[destOffset + 0] = DataUtils.toHalfFloat(sourceArray[sourceOffset + 0] * scale)
-      destArray[destOffset + 1] = DataUtils.toHalfFloat(sourceArray[sourceOffset + 1] * scale)
-      destArray[destOffset + 2] = DataUtils.toHalfFloat(sourceArray[sourceOffset + 2] * scale)
+      // clamping to 65504, the maximum representable value in float16
+      destArray[destOffset + 0] = DataUtils.toHalfFloat(Math.min(sourceArray[sourceOffset + 0] * scale, 65504))
+      destArray[destOffset + 1] = DataUtils.toHalfFloat(Math.min(sourceArray[sourceOffset + 1] * scale, 65504))
+      destArray[destOffset + 2] = DataUtils.toHalfFloat(Math.min(sourceArray[sourceOffset + 2] * scale, 65504))
+      destArray[destOffset + 3] = DataUtils.toHalfFloat(1)
     }
 
     const byteArray = new Uint8Array(buffer)
@@ -306,39 +297,31 @@ class RGBELoader extends DataTextureLoader {
         image_rgba_data = RGBE_ReadPixels_RLE(byteArray.subarray(byteArray.pos), w, h)
 
       if (RGBE_RETURN_FAILURE !== image_rgba_data) {
-        let data, format, type
+        let data, type
         let numElements
 
         switch (this.type) {
-          case UnsignedByteType:
-            data = image_rgba_data
-            format = RGBEFormat // handled as THREE.RGBAFormat in shaders
-            type = UnsignedByteType
-            break
-
           case FloatType:
-            numElements = (image_rgba_data.length / 4) * 3
-            const floatArray = new Float32Array(numElements)
+            numElements = image_rgba_data.length / 4
+            const floatArray = new Float32Array(numElements * 4)
 
             for (let j = 0; j < numElements; j++) {
-              RGBEByteToRGBFloat(image_rgba_data, j * 4, floatArray, j * 3)
+              RGBEByteToRGBFloat(image_rgba_data, j * 4, floatArray, j * 4)
             }
 
             data = floatArray
-            format = RGBFormat
             type = FloatType
             break
 
           case HalfFloatType:
-            numElements = (image_rgba_data.length / 4) * 3
-            const halfArray = new Uint16Array(numElements)
+            numElements = image_rgba_data.length / 4
+            const halfArray = new Uint16Array(numElements * 4)
 
             for (let j = 0; j < numElements; j++) {
-              RGBEByteToRGBHalf(image_rgba_data, j * 4, halfArray, j * 3)
+              RGBEByteToRGBHalf(image_rgba_data, j * 4, halfArray, j * 4)
             }
 
             data = halfArray
-            format = RGBFormat
             type = HalfFloatType
             break
 
@@ -354,7 +337,6 @@ class RGBELoader extends DataTextureLoader {
           header: rgbe_header_info.string,
           gamma: rgbe_header_info.gamma,
           exposure: rgbe_header_info.exposure,
-          format: format,
           type: type,
         }
       }
@@ -371,28 +353,15 @@ class RGBELoader extends DataTextureLoader {
   load(url, onLoad, onProgress, onError) {
     function onLoadCallback(texture, texData) {
       switch (texture.type) {
-        case UnsignedByteType:
-          texture.encoding = RGBEEncoding
-          texture.minFilter = NearestFilter
-          texture.magFilter = NearestFilter
-          texture.generateMipmaps = false
-          texture.flipY = true
-          break
-
         case FloatType:
-          texture.encoding = LinearEncoding
-          texture.minFilter = LinearFilter
-          texture.magFilter = LinearFilter
-          texture.generateMipmaps = false
-          texture.flipY = true
-          break
-
         case HalfFloatType:
-          texture.encoding = LinearEncoding
+          if ('colorSpace' in texture) texture.colorSpace = 'srgb-linear'
+          else texture.encoding = 3000 // LinearEncoding
           texture.minFilter = LinearFilter
           texture.magFilter = LinearFilter
           texture.generateMipmaps = false
           texture.flipY = true
+
           break
       }
 
