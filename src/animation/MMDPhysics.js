@@ -12,6 +12,7 @@ import {
   SphereGeometry,
   Vector3,
 } from 'three'
+import Ammo from '../_polyfill/Ammo'
 
 /**
  * Dependencies
@@ -37,10 +38,6 @@ class MMDPhysics {
    * @param {Vector3} params.gravity - Default is ( 0, - 9.8 * 10, 0 )
    */
   constructor(mesh, rigidBodyParams, constraintParams = [], params = {}) {
-    if (typeof Ammo === 'undefined') {
-      throw new Error('THREE.MMDPhysics: Import ammo.js https://github.com/kripken/ammo.js')
-    }
-
     this.manager = new ResourceManager()
 
     this.mesh = mesh
