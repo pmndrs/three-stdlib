@@ -2,9 +2,8 @@ import { Curve, Vector3 } from 'three'
 import { ParametricGeometry } from './ParametricGeometry'
 
 /**
- * Experimenting of primitive geometry creation using Surface Parametric equations
+ * Experimental primitive geometry creation using Surface Parametric equations
  */
-
 const ParametricGeometries = {
   klein: function (v, u, target) {
     u *= Math.PI
@@ -69,139 +68,113 @@ const ParametricGeometries = {
 
     target.set(x, y, z)
   },
-}
+  TubeGeometry: class TubeGeometry extends ParametricGeometry {
+    constructor(path, segments = 64, radius = 1, segmentsRadius = 8, closed = false) {
+      const numpoints = segments + 1
 
-/*********************************************
- *
- * Parametric Replacement for TubeGeometry
- *
- *********************************************/
+      const frames = path.computeFrenetFrames(segments, closed),
+        tangents = frames.tangents,
+        normals = frames.normals,
+        binormals = frames.binormals
 
-ParametricGeometries.TubeGeometry = class TubeGeometry extends ParametricGeometry {
-  constructor(path, segments = 64, radius = 1, segmentsRadius = 8, closed = false) {
-    const numpoints = segments + 1
+      const position = new Vector3()
 
-    const frames = path.computeFrenetFrames(segments, closed),
-      tangents = frames.tangents,
-      normals = frames.normals,
-      binormals = frames.binormals
+      function ParametricTube(u, v, target) {
+        v *= 2 * Math.PI
 
-    const position = new Vector3()
+        const i = Math.floor(u * (numpoints - 1))
 
-    function ParametricTube(u, v, target) {
-      v *= 2 * Math.PI
+        path.getPointAt(u, position)
 
-      const i = Math.floor(u * (numpoints - 1))
+        const normal = normals[i]
+        const binormal = binormals[i]
 
-      path.getPointAt(u, position)
+        const cx = -radius * Math.cos(v) // TODO: Hack: Negating it so it faces outside.
+        const cy = radius * Math.sin(v)
 
-      const normal = normals[i]
-      const binormal = binormals[i]
+        position.x += cx * normal.x + cy * binormal.x
+        position.y += cx * normal.y + cy * binormal.y
+        position.z += cx * normal.z + cy * binormal.z
 
-      const cx = -radius * Math.cos(v) // TODO: Hack: Negating it so it faces outside.
-      const cy = radius * Math.sin(v)
-
-      position.x += cx * normal.x + cy * binormal.x
-      position.y += cx * normal.y + cy * binormal.y
-      position.z += cx * normal.z + cy * binormal.z
-
-      target.copy(position)
-    }
-
-    super(ParametricTube, segments, segmentsRadius)
-
-    // proxy internals
-
-    this.tangents = tangents
-    this.normals = normals
-    this.binormals = binormals
-
-    this.path = path
-    this.segments = segments
-    this.radius = radius
-    this.segmentsRadius = segmentsRadius
-    this.closed = closed
-  }
-}
-
-/*********************************************
- *
- * Parametric Replacement for TorusKnotGeometry
- *
- *********************************************/
-ParametricGeometries.TorusKnotGeometry = class TorusKnotGeometry extends ParametricGeometries.TubeGeometry {
-  constructor(radius = 200, tube = 40, segmentsT = 64, segmentsR = 8, p = 2, q = 3) {
-    class TorusKnotCurve extends Curve {
-      getPoint(t, optionalTarget = new Vector3()) {
-        const point = optionalTarget
-
-        t *= Math.PI * 2
-
-        const r = 0.5
-
-        const x = (1 + r * Math.cos(q * t)) * Math.cos(p * t)
-        const y = (1 + r * Math.cos(q * t)) * Math.sin(p * t)
-        const z = r * Math.sin(q * t)
-
-        return point.set(x, y, z).multiplyScalar(radius)
+        target.copy(position)
       }
+
+      super(ParametricTube, segments, segmentsRadius)
+
+      // proxy internals
+
+      this.tangents = tangents
+      this.normals = normals
+      this.binormals = binormals
+
+      this.path = path
+      this.segments = segments
+      this.radius = radius
+      this.segmentsRadius = segmentsRadius
+      this.closed = closed
     }
+  },
+  TorusKnotGeometry: class TorusKnotGeometry extends ParametricGeometries.TubeGeometry {
+    constructor(radius = 200, tube = 40, segmentsT = 64, segmentsR = 8, p = 2, q = 3) {
+      class TorusKnotCurve extends Curve {
+        getPoint(t, optionalTarget = new Vector3()) {
+          const point = optionalTarget
 
-    const segments = segmentsT
-    const radiusSegments = segmentsR
-    const extrudePath = new TorusKnotCurve()
+          t *= Math.PI * 2
 
-    super(extrudePath, segments, tube, radiusSegments, true, false)
+          const r = 0.5
 
-    this.radius = radius
-    this.tube = tube
-    this.segmentsT = segmentsT
-    this.segmentsR = segmentsR
-    this.p = p
-    this.q = q
-  }
-}
+          const x = (1 + r * Math.cos(q * t)) * Math.cos(p * t)
+          const y = (1 + r * Math.cos(q * t)) * Math.sin(p * t)
+          const z = r * Math.sin(q * t)
 
-/*********************************************
- *
- * Parametric Replacement for SphereGeometry
- *
- *********************************************/
-ParametricGeometries.SphereGeometry = class SphereGeometry extends ParametricGeometry {
-  constructor(size, u, v) {
-    function sphere(u, v, target) {
-      u *= Math.PI
-      v *= 2 * Math.PI
+          return point.set(x, y, z).multiplyScalar(radius)
+        }
+      }
 
-      const x = size * Math.sin(u) * Math.cos(v)
-      const y = size * Math.sin(u) * Math.sin(v)
-      const z = size * Math.cos(u)
+      const segments = segmentsT
+      const radiusSegments = segmentsR
+      const extrudePath = new TorusKnotCurve()
 
-      target.set(x, y, z)
+      super(extrudePath, segments, tube, radiusSegments, true, false)
+
+      this.radius = radius
+      this.tube = tube
+      this.segmentsT = segmentsT
+      this.segmentsR = segmentsR
+      this.p = p
+      this.q = q
     }
+  },
+  SphereGeometry: class SphereGeometry extends ParametricGeometry {
+    constructor(size, u, v) {
+      function sphere(u, v, target) {
+        u *= Math.PI
+        v *= 2 * Math.PI
 
-    super(sphere, u, v)
-  }
-}
+        const x = size * Math.sin(u) * Math.cos(v)
+        const y = size * Math.sin(u) * Math.sin(v)
+        const z = size * Math.cos(u)
 
-/*********************************************
- *
- * Parametric Replacement for PlaneGeometry
- *
- *********************************************/
+        target.set(x, y, z)
+      }
 
-ParametricGeometries.PlaneGeometry = class PlaneGeometry extends ParametricGeometry {
-  constructor(width, depth, segmentsWidth, segmentsDepth) {
-    function plane(u, v, target) {
-      const x = u * width
-      const y = 0
-      const z = v * depth
-
-      target.set(x, y, z)
+      super(sphere, u, v)
     }
+  },
+  PlaneGeometry: class PlaneGeometry extends ParametricGeometry {
+    constructor(width, depth, segmentsWidth, segmentsDepth) {
+      function plane(u, v, target) {
+        const x = u * width
+        const y = 0
+        const z = v * depth
 
-    super(plane, segmentsWidth, segmentsDepth)
-  }
+        target.set(x, y, z)
+      }
+
+      super(plane, segmentsWidth, segmentsDepth)
+    }
+  },
 }
 
 export { ParametricGeometries }
