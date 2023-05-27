@@ -5,7 +5,7 @@
 
 type TypedArray = Float32Array | Uint32Array | Uint16Array | Uint8Array | Int16Array | Int8Array
 
-export function DracoEncoderModule(DracoEncoderModule?: EncoderModule): EncoderModule
+export function createEncoderModule(object?: Record<string, unknown>): EncoderModule
 
 export interface BaseModule {
   Mesh: new () => Mesh
