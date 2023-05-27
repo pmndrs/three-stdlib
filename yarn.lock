@@ -139,11 +139,6 @@
   resolved "https://registry.yarnpkg.com/@esbuild/win32-x64/-/win32-x64-0.17.19.tgz#8cfaf2ff603e9aabb910e9c0558c26cf32744061"
   integrity sha512-lAhycmKnVOuRYNtRtatQR1LPQf2oYCkRGkSFnseDAKPl8lu5SOsK/e1sXe5a0Pc5kHIHe6P2I/ilntNv2xf3cA==
 
-"@types/draco3d@^1.4.0":
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/@types/draco3d/-/draco3d-1.4.0.tgz#6a57c6295d69b3c69ee72a93f132763afd74c77b"
-  integrity sha512-rXFiyNFUu/sad/VWmc6xdO4GWcc55ny7cq08cxmDFcDIeNg0WXT279ZW7mug+rO51TPS2xlmMY631VKauoot7A==
-
 "@types/offscreencanvas@^2019.6.4":
   version "2019.6.4"
   resolved "https://registry.yarnpkg.com/@types/offscreencanvas/-/offscreencanvas-2019.6.4.tgz#64f6d120b53925028299c744fcdd32d2cd525963"
@@ -239,11 +234,6 @@ core-util-is@~1.0.0:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/core-util-is/-/core-util-is-1.0.2.tgz#b5fd54220aa2bc5ab57aab7140c940754503c1a7"
   integrity sha1-tf1UIgqivFq1eqtxQMlAdUUDwac=
-
-draco3d@^1.4.1:
-  version "1.4.1"
-  resolved "https://registry.yarnpkg.com/draco3d/-/draco3d-1.4.1.tgz#2abdcf7b59caaac50f7e189aec454176c57146b2"
-  integrity sha512-9Rxonc70xiovBC+Bq1h57SNZIHzWTibU1VfIGp5z3Xx8dPtv4yT5uGhiH7P5uvJRR2jkrvHafRxR7bTANkvfpg==
 
 emoji-regex@^8.0.0:
   version "8.0.0"
