@@ -19,7 +19,7 @@ import {
   RGBAFormat,
   RepeatWrapping,
   Scene,
-  Source,
+  Texture,
   CompressedTexture,
   Vector3,
   PlaneGeometry,
@@ -28,7 +28,6 @@ import {
   Mesh,
   PerspectiveCamera,
   WebGLRenderer,
-  Texture,
 } from 'three'
 
 let _renderer
@@ -797,7 +796,8 @@ class GLTFWriter {
 
     const texture = reference.clone()
 
-    texture.source = new Source(canvas)
+    // TODO Use new Source() instead?
+    texture.source = new Texture(canvas).source
     if ('colorSpace' in texture) texture.colorSpace = ''
     else texture.encoding = 3000
     texture.channel = (metalnessMap || roughnessMap).channel

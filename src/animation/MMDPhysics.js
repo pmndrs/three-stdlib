@@ -1,7 +1,6 @@
 import {
   Bone,
   BoxGeometry,
-  CapsuleGeometry,
   Color,
   Euler,
   Matrix4,
@@ -12,6 +11,7 @@ import {
   SphereGeometry,
   Vector3,
 } from 'three'
+import { CapsuleGeometry } from '../_polyfill/CapsuleGeometry'
 
 /**
  * Dependencies
