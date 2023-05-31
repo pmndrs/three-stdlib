@@ -119,6 +119,10 @@ class GLTFLoader extends Loader {
     })
 
     this.register(function (parser) {
+      return new GLTFMaterialsAnisotropyExtension(parser)
+    })
+
+    this.register(function (parser) {
       return new GLTFLightsExtension(parser)
     })
 
@@ -360,6 +364,7 @@ const EXTENSIONS = {
   KHR_MATERIALS_SPECULAR: 'KHR_materials_specular',
   KHR_MATERIALS_TRANSMISSION: 'KHR_materials_transmission',
   KHR_MATERIALS_IRIDESCENCE: 'KHR_materials_iridescence',
+  KHR_MATERIALS_ANISOTROPY: 'KHR_materials_anisotropy',
   KHR_MATERIALS_UNLIT: 'KHR_materials_unlit',
   KHR_MATERIALS_VOLUME: 'KHR_materials_volume',
   KHR_TEXTURE_BASISU: 'KHR_texture_basisu',
@@ -914,6 +919,54 @@ class GLTFMaterialsSpecularExtension {
       pending.push(
         parser.assignTexture(materialParams, 'specularColorMap', extension.specularColorTexture, 3001), // sRGBEncoding
       )
+    }
+
+    return Promise.all(pending)
+  }
+}
+
+/**
+ * Materials anisotropy Extension
+ *
+ * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_anisotropy
+ */
+class GLTFMaterialsAnisotropyExtension {
+  constructor(parser) {
+    this.parser = parser
+    this.name = EXTENSIONS.KHR_MATERIALS_ANISOTROPY
+  }
+
+  getMaterialType(materialIndex) {
+    const parser = this.parser
+    const materialDef = parser.json.materials[materialIndex]
+
+    if (!materialDef.extensions || !materialDef.extensions[this.name]) return null
+
+    return MeshPhysicalMaterial
+  }
+
+  extendMaterialParams(materialIndex, materialParams) {
+    const parser = this.parser
+    const materialDef = parser.json.materials[materialIndex]
+
+    if (!materialDef.extensions || !materialDef.extensions[this.name]) {
+      return Promise.resolve()
+    }
+
+    const pending = []
+
+    const extension = materialDef.extensions[this.name]
+
+    if (extension.anisotropyStrength !== undefined) {
+      materialParams.anisotropy = extension.anisotropyStrength
+    }
+
+    if (extension.anisotropyRotation !== undefined) {
+      materialParams.anisotropyRotation = extension.anisotropyRotation
+    }
+
+    if (extension.anisotropyTexture !== undefined) {
+      pending.push(parser.assignTexture(materialParams, 'anisotropyMap', extension.anisotropyTexture))
     }
 
     return Promise.all(pending)
@@ -1771,8 +1824,9 @@ function updateMorphTargets(mesh, meshDef) {
 }
 
 function createPrimitiveKey(primitiveDef) {
-  const dracoExtension = primitiveDef.extensions && primitiveDef.extensions[EXTENSIONS.KHR_DRACO_MESH_COMPRESSION]
   let geometryKey
+
+  const dracoExtension = primitiveDef.extensions && primitiveDef.extensions[EXTENSIONS.KHR_DRACO_MESH_COMPRESSION]
 
   if (dracoExtension) {
     geometryKey =
@@ -1784,6 +1838,12 @@ function createPrimitiveKey(primitiveDef) {
       createAttributesKey(dracoExtension.attributes)
   } else {
     geometryKey = primitiveDef.indices + ':' + createAttributesKey(primitiveDef.attributes) + ':' + primitiveDef.mode
+  }
+
+  if (primitiveDef.targets !== undefined) {
+    for (let i = 0, il = primitiveDef.targets.length; i < il; i++) {
+      geometryKey += ':' + createAttributesKey(primitiveDef.targets[i])
+    }
   }
 
   return geometryKey
@@ -2739,15 +2799,13 @@ class GLTFParser {
   createUniqueName(originalName) {
     const sanitizedName = PropertyBinding.sanitizeNodeName(originalName || '')
 
-    let name = sanitizedName
+    if (sanitizedName in this.nodeNamesUsed) {
+      return sanitizedName + '_' + ++this.nodeNamesUsed[sanitizedName]
+    } else {
+      this.nodeNamesUsed[sanitizedName] = 0
 
-    for (let i = 1; this.nodeNamesUsed[name]; ++i) {
-      name = sanitizedName + '_' + i
+      return sanitizedName
     }
-
-    this.nodeNamesUsed[name] = true
-
-    return name
   }
 
   /**
@@ -2900,10 +2958,14 @@ class GLTFParser {
       }
 
       if (meshes.length === 1) {
+        if (meshDef.extensions) addUnknownExtensionsToUserData(extensions, meshes[0], meshDef)
+
         return meshes[0]
       }
 
       const group = new Group()
+
+      if (meshDef.extensions) addUnknownExtensionsToUserData(extensions, group, meshDef)
 
       parser.associations.set(group, { meshes: meshIndex })
 
