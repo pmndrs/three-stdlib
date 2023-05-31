@@ -60,7 +60,7 @@ import {
   Vector2,
   Vector3,
   VectorKeyframeTrack,
-  SRGBColorSpace,
+  REVISION,
 } from 'three'
 import { toTrianglesDrawMode } from '../utils/BufferGeometryUtils'
 
@@ -233,12 +233,11 @@ class GLTFLoader extends Loader {
     let json
     const extensions = {}
     const plugins = {}
-    const textDecoder = new TextDecoder()
 
     if (typeof data === 'string') {
       json = JSON.parse(data)
     } else if (data instanceof ArrayBuffer) {
-      const magic = textDecoder.decode(new Uint8Array(data, 0, 4))
+      const magic = LoaderUtils.decodeText(new Uint8Array(data.slice(0, 4)))
 
       if (magic === BINARY_EXTENSION_HEADER_MAGIC) {
         try {
@@ -250,7 +249,7 @@ class GLTFLoader extends Loader {
 
         json = JSON.parse(extensions[EXTENSIONS.KHR_BINARY_GLTF].content)
       } else {
-        json = JSON.parse(textDecoder.decode(data))
+        json = JSON.parse(LoaderUtils.decodeText(new Uint8Array(data)))
       }
     } else {
       json = data
@@ -526,7 +525,7 @@ class GLTFMaterialsUnlitExtension {
       }
 
       if (metallicRoughness.baseColorTexture !== undefined) {
-        pending.push(parser.assignTexture(materialParams, 'map', metallicRoughness.baseColorTexture, SRGBColorSpace))
+        pending.push(parser.assignTexture(materialParams, 'map', metallicRoughness.baseColorTexture, 3001)) // sRGBEncoding
       }
     }
 
@@ -736,7 +735,7 @@ class GLTFMaterialsSheenExtension {
     }
 
     if (extension.sheenColorTexture !== undefined) {
-      pending.push(parser.assignTexture(materialParams, 'sheenColorMap', extension.sheenColorTexture, SRGBColorSpace))
+      pending.push(parser.assignTexture(materialParams, 'sheenColorMap', extension.sheenColorTexture, 3001)) // sRGBEncoding
     }
 
     if (extension.sheenRoughnessTexture !== undefined) {
@@ -918,7 +917,7 @@ class GLTFMaterialsSpecularExtension {
 
     if (extension.specularColorTexture !== undefined) {
       pending.push(
-        parser.assignTexture(materialParams, 'specularColorMap', extension.specularColorTexture, SRGBColorSpace),
+        parser.assignTexture(materialParams, 'specularColorMap', extension.specularColorTexture, 3001), // sRGBEncoding
       )
     }
 
@@ -1332,10 +1331,9 @@ class GLTFBinaryExtension {
     this.body = null
 
     const headerView = new DataView(data, 0, BINARY_EXTENSION_HEADER_LENGTH)
-    const textDecoder = new TextDecoder()
 
     this.header = {
-      magic: textDecoder.decode(new Uint8Array(data.slice(0, 4))),
+      magic: LoaderUtils.decodeText(new Uint8Array(data.slice(0, 4))),
       version: headerView.getUint32(4, true),
       length: headerView.getUint32(8, true),
     }
@@ -1359,7 +1357,7 @@ class GLTFBinaryExtension {
 
       if (chunkType === BINARY_EXTENSION_CHUNK_TYPES.JSON) {
         const contentArray = new Uint8Array(data, BINARY_EXTENSION_HEADER_LENGTH + chunkIndex, chunkLength)
-        this.content = textDecoder.decode(contentArray)
+        this.content = LoaderUtils.decodeText(contentArray)
       } else if (chunkType === BINARY_EXTENSION_CHUNK_TYPES.BIN) {
         const byteOffset = BINARY_EXTENSION_HEADER_LENGTH + chunkIndex
         this.body = data.slice(byteOffset, byteOffset + chunkLength)
@@ -1562,7 +1560,7 @@ class GLTFCubicSplineInterpolant extends Interpolant {
   }
 }
 
-const _q = new Quaternion()
+const _q = /* @__PURE__ */ new Quaternion()
 
 class GLTFCubicSplineQuaternionInterpolant extends GLTFCubicSplineInterpolant {
   interpolate_(i1, t0, t, t1) {
@@ -1640,10 +1638,21 @@ const ATTRIBUTES = {
   POSITION: 'position',
   NORMAL: 'normal',
   TANGENT: 'tangent',
-  TEXCOORD_0: 'uv',
-  TEXCOORD_1: 'uv1',
-  TEXCOORD_2: 'uv2',
-  TEXCOORD_3: 'uv3',
+  // uv => uv1, 4 uv channels
+  // https://github.com/mrdoob/three.js/pull/25943
+  // https://github.com/mrdoob/three.js/pull/25788
+  .../* @__PURE__ */ (REVISION.replace(/\D+/g, '') >= 152
+    ? {
+        TEXCOORD_0: 'uv',
+        TEXCOORD_1: 'uv1',
+        TEXCOORD_2: 'uv2',
+        TEXCOORD_3: 'uv3',
+      }
+    : {
+        TEXCOORD_0: 'uv',
+        TEXCOORD_1: 'uv2',
+      }),
+
   COLOR_0: 'color',
   WEIGHTS_0: 'skinWeight',
   JOINTS_0: 'skinIndex',
@@ -1881,7 +1890,7 @@ function getImageURIMimeType(uri) {
   return 'image/png'
 }
 
-const _identityMatrix = new Matrix4()
+const _identityMatrix = /* @__PURE__ */ new Matrix4()
 
 /* GLTF PARSER */
 
@@ -2542,7 +2551,7 @@ class GLTFParser {
    * @param {Object} mapDef
    * @return {Promise<Texture>}
    */
-  assignTexture(materialParams, mapName, mapDef, colorSpace) {
+  assignTexture(materialParams, mapName, mapDef, encoding) {
     const parser = this
 
     return this.getDependency('texture', mapDef.index).then(function (texture) {
@@ -2564,8 +2573,9 @@ class GLTFParser {
         }
       }
 
-      if (colorSpace !== undefined) {
-        texture.colorSpace = colorSpace
+      if (encoding !== undefined) {
+        if ('colorSpace' in texture) texture.colorSpace = encoding === 3001 ? 'srgb' : 'srgb-linear'
+        else texture.encoding = encoding
       }
 
       materialParams[mapName] = texture
@@ -2698,7 +2708,7 @@ class GLTFParser {
       }
 
       if (metallicRoughness.baseColorTexture !== undefined) {
-        pending.push(parser.assignTexture(materialParams, 'map', metallicRoughness.baseColorTexture, SRGBColorSpace))
+        pending.push(parser.assignTexture(materialParams, 'map', metallicRoughness.baseColorTexture, 3001)) // sRGBEncoding
       }
 
       materialParams.metalness = metallicRoughness.metallicFactor !== undefined ? metallicRoughness.metallicFactor : 1.0
@@ -2767,7 +2777,7 @@ class GLTFParser {
     }
 
     if (materialDef.emissiveTexture !== undefined && materialType !== MeshBasicMaterial) {
-      pending.push(parser.assignTexture(materialParams, 'emissiveMap', materialDef.emissiveTexture, SRGBColorSpace))
+      pending.push(parser.assignTexture(materialParams, 'emissiveMap', materialDef.emissiveTexture, 3001)) // sRGBEncoding
     }
 
     return Promise.all(pending).then(function () {
