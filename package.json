@@ -47,7 +47,7 @@
     "zstddec": "^0.0.2"
   },
   "peerDependencies": {
-    "three": ">=0.128.0"
+    "three": ">=0.144.0"
   },
   "scripts": {
     "build": "rimraf dist && vite build && tsc --emitDeclarationOnly && copyfiles -u 1 \"src/**/*.d.ts\" dist && copyfiles package.json README.md LICENSE dist && json -I -f dist/package.json -e \"this.private=undefined; this.types=\\\"./index.d.ts\\\"; this.main=\\\"./index.cjs\\\"; this.module=\\\"./index.js\\\";\"",
