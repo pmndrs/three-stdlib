@@ -4,60 +4,83 @@ const geometry = /* @__PURE__ */ new BoxGeometry()
 const matrix = /* @__PURE__ */ new Matrix4()
 
 class XRPlanes extends Object3D {
+  public renderer: WebGLRenderer
+  readonly currentPlanes = new Map<XRPlane, Mesh<BoxGeometry, MeshBasicMaterial>>()
+
   constructor(renderer: WebGLRenderer) {
     super()
 
-    const currentPlanes = new Map()
+    this.renderer = renderer
+    this._onPlanesUpdate = this._onPlanesUpdate.bind(this)
+    this.renderer.xr.addEventListener('planesdetected', this._onPlanesUpdate)
+  }
 
-    renderer.xr.addEventListener('planesdetected', (event) => {
-      const frame = event.data
-      const planes = frame.detectedPlanes
+  private _onPlanesUpdate() {
+    // @ts-ignore https://github.com/mrdoob/three.js/pull/22260
+    const frame = this.renderer.xr.getFrame() as XRFrame
 
-      const referenceSpace = renderer.xr.getReferenceSpace()
+    // Event signature changed from XRPlaneSet => XRFRame
+    // https://github.com/mrdoob/three.js/pull/24855
+    // https://github.com/mrdoob/three.js/pull/26098
+    this.update(frame)
+  }
 
-      for (const [plane, mesh] of currentPlanes) {
-        if (planes.has(plane) === false) {
-          mesh.material.dispose()
-          this.remove(mesh)
+  update(frame: XRFrame): void {
+    const planes = (frame as any).detectedPlanes as XRPlaneSet
 
-          currentPlanes.delete(plane)
-        }
+    for (const [plane, mesh] of this.currentPlanes) {
+      if (!planes.has(plane)) {
+        mesh.material.dispose()
+        this.remove(mesh)
+        this.currentPlanes.delete(plane)
       }
+    }
 
-      for (const plane of planes) {
-        if (currentPlanes.has(plane) === false) {
-          const pose = frame.getPose(plane.planeSpace, referenceSpace)
-          matrix.fromArray(pose.transform.matrix)
+    const referenceSpace = this.renderer.xr.getReferenceSpace()
+    for (const plane of planes) {
+      if (!this.currentPlanes.has(plane)) {
+        const pose = frame.getPose(plane.planeSpace, referenceSpace!)!
 
-          const polygon = plane.polygon
+        matrix.fromArray(pose.transform.matrix)
 
-          let minX = Number.MAX_SAFE_INTEGER
-          let maxX = Number.MIN_SAFE_INTEGER
-          let minZ = Number.MAX_SAFE_INTEGER
-          let maxZ = Number.MIN_SAFE_INTEGER
+        let minX = Number.MAX_SAFE_INTEGER
+        let maxX = Number.MIN_SAFE_INTEGER
+        let minZ = Number.MAX_SAFE_INTEGER
+        let maxZ = Number.MIN_SAFE_INTEGER
 
-          for (const point of polygon) {
-            minX = Math.min(minX, point.x)
-            maxX = Math.max(maxX, point.x)
-            minZ = Math.min(minZ, point.z)
-            maxZ = Math.max(maxZ, point.z)
-          }
-
-          const width = maxX - minX
-          const height = maxZ - minZ
-
-          const material = new MeshBasicMaterial({ color: 0xffffff * Math.random() })
-
-          const mesh = new Mesh(geometry, material)
-          mesh.position.setFromMatrixPosition(matrix)
-          mesh.quaternion.setFromRotationMatrix(matrix)
-          mesh.scale.set(width, 0.01, height)
-          this.add(mesh)
-
-          currentPlanes.set(plane, mesh)
+        for (const point of plane.polygon) {
+          minX = Math.min(minX, point.x)
+          maxX = Math.max(maxX, point.x)
+          minZ = Math.min(minZ, point.z)
+          maxZ = Math.max(maxZ, point.z)
         }
+
+        const width = maxX - minX
+        const height = maxZ - minZ
+
+        const material = new MeshBasicMaterial({ color: 0xffffff * Math.random() })
+
+        const mesh = new Mesh(geometry, material)
+        mesh.position.setFromMatrixPosition(matrix)
+        mesh.quaternion.setFromRotationMatrix(matrix)
+        mesh.scale.set(width, 0.01, height)
+
+        this.add(mesh)
+        this.currentPlanes.set(plane, mesh)
       }
-    })
+    }
+  }
+
+  dispose(): void {
+    geometry.dispose()
+
+    for (const [plane, mesh] of this.currentPlanes) {
+      mesh.material.dispose()
+      this.remove(mesh)
+      this.currentPlanes.delete(plane)
+    }
+
+    this.renderer.xr.removeEventListener('planesdetected', this._onPlanesUpdate)
   }
 }
 
