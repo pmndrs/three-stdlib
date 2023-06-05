@@ -1,4 +1,13 @@
-import { DataTextureLoader, DataUtils, FloatType, HalfFloatType, LinearFilter, RedFormat, RGBAFormat } from 'three'
+import {
+  Texture,
+  DataTextureLoader,
+  DataUtils,
+  FloatType,
+  HalfFloatType,
+  LinearFilter,
+  RedFormat,
+  RGBAFormat,
+} from 'three'
 import { unzlibSync } from 'fflate'
 
 /**
@@ -73,6 +82,8 @@ import { unzlibSync } from 'fflate'
 // ///////////////////////////////////////////////////////////////////////////
 
 // // End of OpenEXR license -------------------------------------------------
+
+const hasColorSpace = 'colorSpace' in /* @__PURE__ */ new Texture()
 
 class EXRLoader extends DataTextureLoader {
   constructor(manager) {
@@ -1668,7 +1679,7 @@ class EXRLoader extends DataTextureLoader {
         uncompress: null,
         getter: null,
         format: null,
-        encoding: null,
+        [hasColorSpace ? 'colorSpace' : 'encoding']: null,
       }
 
       switch (EXRHeader.compression) {
@@ -1780,13 +1791,11 @@ class EXRLoader extends DataTextureLoader {
 
       EXRDecoder.bytesPerLine = EXRDecoder.width * EXRDecoder.inputSize * EXRDecoder.channels
 
-      if (EXRDecoder.outputChannels == 4) {
-        EXRDecoder.format = RGBAFormat
-        EXRDecoder.encoding = 3000 // LinearEncoding
-      } else {
-        EXRDecoder.format = RedFormat
-        EXRDecoder.encoding = 3000 // LinearEncoding
-      }
+      if (EXRDecoder.outputChannels == 4) EXRDecoder.format = RGBAFormat
+      else EXRDecoder.format = RedFormat
+
+      if (hasColorSpace) EXRDecoder.colorSpace = 'srgb-linear'
+      else EXRDecoder.encoding = 3000 // LinearEncoding
 
       return EXRDecoder
     }
@@ -1850,7 +1859,7 @@ class EXRLoader extends DataTextureLoader {
       height: EXRDecoder.height,
       data: EXRDecoder.byteArray,
       format: EXRDecoder.format,
-      encoding: EXRDecoder.encoding,
+      [hasColorSpace ? 'colorSpace' : 'encoding']: EXRDecoder[hasColorSpace ? 'colorSpace' : 'encoding'],
       type: this.type,
     }
   }
@@ -1862,7 +1871,7 @@ class EXRLoader extends DataTextureLoader {
 
   load(url, onLoad, onProgress, onError) {
     function onLoadCallback(texture, texData) {
-      if ('colorSpace' in texture) texture.colorSpace = texData.encoding === 3001 ? 'srgb' : 'srgb-linear'
+      if (hasColorSpace) texture.colorSpace = texData.colorSpace
       else texture.encoding = texData.encoding
       texture.minFilter = LinearFilter
       texture.magFilter = LinearFilter
