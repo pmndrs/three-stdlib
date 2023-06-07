@@ -8,7 +8,13 @@ export interface RenderPixelatedPassParameters {
 }
 
 export class RenderPixelatedPass extends Pass {
-  constructor(pixelSize: number, scene: Scene, camera: Camera, options?: RenderPixelatedPassParameters)
+  constructor(
+    resolution: Vector2,
+    pixelSize: number,
+    scene: Scene,
+    camera: Camera,
+    options?: RenderPixelatedPassParameters,
+  )
   pixelSize: number
   resolution: Vector2
   renderResolution: Vector2
@@ -23,6 +29,6 @@ export class RenderPixelatedPass extends Pass {
   normalEdgeStrength: RenderPixelatedPassParameters['normalEdgeStrength']
   depthEdgeStrength: RenderPixelatedPassParameters['depthEdgeStrength']
 
-  beautyRenderTarget: WebGLRenderTarget
+  rgbRenderTarget: WebGLRenderTarget
   normalRenderTarget: WebGLRenderTarget
 }
