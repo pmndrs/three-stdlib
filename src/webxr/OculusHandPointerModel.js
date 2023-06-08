@@ -45,7 +45,7 @@ class OculusHandPointerModel extends THREE.Object3D {
     this._onConnected = this._onConnected.bind(this)
     this._onDisconnected = this._onDisconnected.bind(this)
     this.hand.addEventListener('connected', this._onConnected)
-    this.hand.addEventListener('disconnect', this._onDisconnected)
+    this.hand.addEventListener('disconnected', this._onDisconnected)
   }
 
   _onConnected(event) {
