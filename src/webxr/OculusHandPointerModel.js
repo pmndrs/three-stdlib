@@ -275,7 +275,7 @@ class OculusHandPointerModel extends THREE.Object3D {
   dispose() {
     this._onDisconnected()
     this.hand.removeEventListener('connected', this._onConnected)
-    this.hand.removeEventListener('disconnect', this._onDisconnected)
+    this.hand.removeEventListener('disconnected', this._onDisconnected)
   }
 }
 
