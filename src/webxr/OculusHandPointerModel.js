@@ -25,9 +25,10 @@ class OculusHandPointerModel extends THREE.Object3D {
 
     this.hand = hand
     this.controller = controller
+
+    // Unused
     this.motionController = null
     this.envMap = null
-
     this.mesh = null
 
     this.pointerGeometry = null
@@ -41,15 +42,30 @@ class OculusHandPointerModel extends THREE.Object3D {
 
     this.raycaster = null
 
-    hand.addEventListener('connected', (event) => {
-      const xrInputSource = event.data
-      if (xrInputSource.hand) {
-        this.visible = true
-        this.xrInputSource = xrInputSource
+    this._onConnected = this._onConnected.bind(this)
+    this._onDisconnected = this._onDisconnected.bind(this)
+    this.hand.addEventListener('connected', this._onConnected)
+    this.hand.addEventListener('disconnected', this._onDisconnected)
+  }
 
-        this.createPointer()
-      }
-    })
+  _onConnected(event) {
+    const xrInputSource = event.data
+    if (xrInputSource.hand) {
+      this.visible = true
+      this.xrInputSource = xrInputSource
+
+      this.createPointer()
+    }
+  }
+
+  _onDisconnected() {
+    this.visible = false
+    this.xrInputSource = null
+
+    this.pointerGeometry.dispose()
+    this.pointerMesh.material.dispose()
+
+    this.clear()
   }
 
   _drawVerticesRing(vertices, baseVector, ringIndex) {
@@ -254,6 +270,12 @@ class OculusHandPointerModel extends THREE.Object3D {
     if (this.raycaster && !this.attached) {
       this.cursorObject.position.copy(direction.multiplyScalar(distance))
     }
+  }
+
+  dispose() {
+    this._onDisconnected()
+    this.hand.removeEventListener('connected', this._onConnected)
+    this.hand.removeEventListener('disconnected', this._onDisconnected)
   }
 }
 

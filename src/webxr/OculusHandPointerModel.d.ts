@@ -60,4 +60,6 @@ export class OculusHandPointerModel extends Object3D {
   public checkIntersections(objects: Object3D[], recursive?: boolean): void
 
   public setCursor(distance: number): void
+
+  public dispose(): void
 }
