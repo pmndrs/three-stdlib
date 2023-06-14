@@ -1931,7 +1931,7 @@ class GLTFParser {
     let isFirefox = false
     let firefoxVersion = -1
 
-    if (typeof navigator !== 'undefined') {
+    if (typeof navigator !== 'undefined' && typeof navigator.userAgent !== 'undefined') {
       isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent) === true
       isFirefox = navigator.userAgent.indexOf('Firefox') > -1
       firefoxVersion = isFirefox ? navigator.userAgent.match(/Firefox\/([0-9]+)\./)[1] : -1
