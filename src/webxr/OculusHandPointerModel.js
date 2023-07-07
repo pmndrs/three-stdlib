@@ -62,8 +62,8 @@ class OculusHandPointerModel extends THREE.Object3D {
     this.visible = false
     this.xrInputSource = null
 
-    this.pointerGeometry.dispose()
-    this.pointerMesh.material.dispose()
+    this.pointerGeometry?.dispose()
+    this.pointerMesh?.material.dispose()
 
     this.clear()
   }
