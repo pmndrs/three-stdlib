@@ -199,6 +199,10 @@ class OrbitControls extends EventDispatcher {
       return function update(): boolean {
         const position = scope.object.position
 
+        // update new up direction
+        quat.setFromUnitVectors(object.up, new Vector3(0, 1, 0))
+        quatInverse.copy(quat).invert()
+
         offset.copy(position).sub(scope.target)
 
         // rotate offset to "y-axis-is-up" space
@@ -986,4 +990,5 @@ class MapControls extends OrbitControls {
   }
 }
 
-export { OrbitControls, MapControls }
+export { MapControls, OrbitControls }
+
