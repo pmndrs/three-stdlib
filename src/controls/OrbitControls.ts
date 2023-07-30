@@ -186,9 +186,10 @@ class OrbitControls extends EventDispatcher {
     // this method is exposed, but perhaps it would be better if we can make it private...
     this.update = ((): (() => void) => {
       const offset = new Vector3()
+      const up = new Vector3(0, 1, 0)
 
       // so camera.up is the orbit axis
-      const quat = new Quaternion().setFromUnitVectors(object.up, new Vector3(0, 1, 0))
+      const quat = new Quaternion().setFromUnitVectors(object.up, up)
       const quatInverse = quat.clone().invert()
 
       const lastPosition = new Vector3()
@@ -200,7 +201,7 @@ class OrbitControls extends EventDispatcher {
         const position = scope.object.position
 
         // update new up direction
-        quat.setFromUnitVectors(object.up, new Vector3(0, 1, 0))
+        quat.setFromUnitVectors(object.up, up)
         quatInverse.copy(quat).invert()
 
         offset.copy(position).sub(scope.target)
@@ -991,4 +992,3 @@ class MapControls extends OrbitControls {
 }
 
 export { MapControls, OrbitControls }
-
