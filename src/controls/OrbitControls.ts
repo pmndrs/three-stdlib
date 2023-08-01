@@ -92,6 +92,7 @@ class OrbitControls extends EventDispatcher {
   getDistance: () => number
 
   listenToKeyEvents: (domElement: HTMLElement) => void
+  stopListenToKeyEvents: () => void
   saveState: () => void
   reset: () => void
   update: () => void
@@ -162,6 +163,11 @@ class OrbitControls extends EventDispatcher {
     this.listenToKeyEvents = (domElement: HTMLElement): void => {
       domElement.addEventListener('keydown', onKeyDown)
       this._domElementKeyEvents = domElement
+    }
+
+    this.stopListenToKeyEvents = (): void => {
+      this._domElementKeyEvents.removeEventListener('keydown', onKeyDown)
+      this._domElementKeyEvents = null
     }
 
     this.saveState = (): void => {
