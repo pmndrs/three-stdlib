@@ -1,4 +1,4 @@
-import { Loader, LoadingManager, ShapePath, BufferGeometry, Vector3, Shape } from 'three'
+import { Loader, LoadingManager, ShapePath, BufferGeometry, Vector2, Shape } from 'three'
 
 export interface SVGResultPaths extends ShapePath {
   userData?:
@@ -44,13 +44,13 @@ export class SVGLoader extends Loader {
     miterLimit?: number,
   ): StrokeStyle
   static pointsToStroke(
-    points: Vector3[],
+    points: Vector2[],
     style: StrokeStyle,
     arcDivisions?: number,
     minDistance?: number,
   ): BufferGeometry
   static pointsToStrokeWithBuffers(
-    points: Vector3[],
+    points: Vector2[],
     style: StrokeStyle,
     arcDivisions?: number,
     minDistance?: number,
