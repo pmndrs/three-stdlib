@@ -11,6 +11,7 @@ import {
   Vector3,
   Vector4,
   WebGLRenderTarget,
+  REVISION,
 } from 'three'
 
 /**
@@ -178,7 +179,7 @@ class Water extends Mesh {
 					gl_FragColor = vec4( outgoingLight, alpha );
 
 					#include <tonemapping_fragment>
-					#include <encodings_fragment>
+					#include <${parseInt(REVISION.replace(/\D+/g, '')) >= 154 ? 'colorspace_fragment' : 'encodings_fragment'}>
 					#include <fog_fragment>	
 				}`,
     }

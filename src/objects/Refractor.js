@@ -12,6 +12,7 @@ import {
   WebGLRenderTarget,
   NoToneMapping,
   HalfFloatType,
+  REVISION,
 } from 'three'
 
 class Refractor extends Mesh {
@@ -68,7 +69,7 @@ class Refractor extends Mesh {
 			gl_FragColor = vec4( blendOverlay( base.rgb, color ), 1.0 );
 
 			#include <tonemapping_fragment>
-			#include <encodings_fragment>
+			#include <${parseInt(REVISION.replace(/\D+/g, '')) >= 154 ? 'colorspace_fragment' : 'encodings_fragment'}>
 
 		}`,
   }

@@ -9,6 +9,7 @@ import {
   UniformsUtils,
   Vector2,
   Vector4,
+  REVISION,
 } from 'three'
 import { Reflector } from './Reflector'
 import { Refractor } from './Refractor'
@@ -155,7 +156,7 @@ class Water2 extends Mesh {
 			gl_FragColor = vec4( color, 1.0 ) * mix( refractColor, reflectColor, reflectance );
 
 			#include <tonemapping_fragment>
-			#include <encodings_fragment>
+			#include <${parseInt(REVISION.replace(/\D+/g, '')) >= 154 ? 'colorspace_fragment' : 'encodings_fragment'}>
 			#include <fog_fragment>
 
 		}`,
