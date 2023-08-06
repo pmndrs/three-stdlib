@@ -1,4 +1,4 @@
-import { ShaderMaterial, UniformsUtils, WebGLRenderTarget } from 'three'
+import { NoBlending, ShaderMaterial, UniformsUtils, WebGLRenderTarget } from 'three'
 import { Pass, FullScreenQuad } from './Pass'
 import { CopyShader } from '../shaders/CopyShader'
 
@@ -18,6 +18,7 @@ class SavePass extends Pass {
       uniforms: this.uniforms,
       vertexShader: shader.vertexShader,
       fragmentShader: shader.fragmentShader,
+      blending: NoBlending,
     })
 
     this.renderTarget = renderTarget

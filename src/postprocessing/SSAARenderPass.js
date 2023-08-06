@@ -1,14 +1,4 @@
-import {
-  CustomBlending,
-  OneFactor,
-  AddEquation,
-  SrcAlphaFactor,
-  Color,
-  HalfFloatType,
-  ShaderMaterial,
-  UniformsUtils,
-  WebGLRenderTarget,
-} from 'three'
+import { AdditiveBlending, Color, HalfFloatType, ShaderMaterial, UniformsUtils, WebGLRenderTarget } from 'three'
 import { Pass, FullScreenQuad } from './Pass'
 import { CopyShader } from '../shaders/CopyShader'
 
@@ -47,14 +37,8 @@ class SSAARenderPass extends Pass {
       transparent: true,
       depthTest: false,
       depthWrite: false,
-
-      // do not use AdditiveBlending because it mixes the alpha channel instead of adding
-      blending: CustomBlending,
-      blendEquation: AddEquation,
-      blendDst: OneFactor,
-      blendDstAlpha: OneFactor,
-      blendSrc: SrcAlphaFactor,
-      blendSrcAlpha: OneFactor,
+      premultipliedAlpha: true,
+      blending: AdditiveBlending,
     })
 
     this.fsQuad = new FullScreenQuad(this.copyMaterial)

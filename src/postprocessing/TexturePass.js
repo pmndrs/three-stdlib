@@ -19,6 +19,7 @@ class TexturePass extends Pass {
       fragmentShader: shader.fragmentShader,
       depthTest: false,
       depthWrite: false,
+      premultipliedAlpha: true,
     })
 
     this.needsSwap = false
