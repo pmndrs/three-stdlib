@@ -19,6 +19,7 @@ class TAARenderPass extends SSAARenderPass {
 
     this.sampleLevel = 0
     this.accumulate = false
+    this.accumulateIndex = -1
   }
 
   render(renderer, writeBuffer, readBuffer, deltaTime) {
@@ -50,6 +51,9 @@ class TAARenderPass extends SSAARenderPass {
     const autoClear = renderer.autoClear
     renderer.autoClear = false
 
+    renderer.getClearColor(this._oldClearColor)
+    const oldClearAlpha = renderer.getClearAlpha()
+
     const sampleWeight = 1.0 / jitterOffsets.length
 
     if (this.accumulateIndex >= 0 && this.accumulateIndex < jitterOffsets.length) {
@@ -74,11 +78,16 @@ class TAARenderPass extends SSAARenderPass {
         }
 
         renderer.setRenderTarget(writeBuffer)
+        renderer.setClearColor(this.clearColor, this.clearAlpha)
         renderer.clear()
         renderer.render(this.scene, this.camera)
 
         renderer.setRenderTarget(this.sampleRenderTarget)
-        if (this.accumulateIndex === 0) renderer.clear()
+        if (this.accumulateIndex === 0) {
+          renderer.setClearColor(0x000000, 0.0)
+          renderer.clear()
+        }
+
         this.fsQuad.render(renderer)
 
         this.accumulateIndex++
@@ -89,6 +98,7 @@ class TAARenderPass extends SSAARenderPass {
       if (this.camera.clearViewOffset) this.camera.clearViewOffset()
     }
 
+    renderer.setClearColor(this.clearColor, this.clearAlpha)
     const accumulationWeight = this.accumulateIndex * sampleWeight
 
     if (accumulationWeight > 0) {
@@ -103,11 +113,11 @@ class TAARenderPass extends SSAARenderPass {
       this.copyUniforms['opacity'].value = 1.0 - accumulationWeight
       this.copyUniforms['tDiffuse'].value = this.holdRenderTarget.texture
       renderer.setRenderTarget(writeBuffer)
-      if (accumulationWeight === 0) renderer.clear()
       this.fsQuad.render(renderer)
     }
 
     renderer.autoClear = autoClear
+    renderer.setClearColor(this._oldClearColor, oldClearAlpha)
   }
 
   dispose() {

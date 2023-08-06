@@ -1,4 +1,4 @@
-import { Clock, LinearFilter, RGBAFormat, Vector2, WebGLRenderer, WebGLRenderTarget } from 'three'
+import { Clock, LinearFilter, RGBAFormat, NoBlending, Vector2, WebGLRenderer, WebGLRenderTarget } from 'three'
 import { CopyShader } from '../shaders/CopyShader'
 import { ShaderPass } from './ShaderPass'
 import { MaskPass, ClearMaskPass } from './MaskPass'
@@ -65,6 +65,8 @@ class EffectComposer<TRenderTarget extends WebGLRenderTarget = WebGLRenderTarget
     }
 
     this.copyPass = new ShaderPass(CopyShader)
+    // @ts-ignore
+    this.copyPass.material.blending = NoBlending
 
     this.clock = new Clock()
   }
