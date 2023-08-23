@@ -62,6 +62,8 @@ class OrbitControls extends EventDispatcher {
   autoRotate = false
   autoRotateSpeed = 2.0 // 30 seconds per orbit when fps is 60
   reverseOrbit = false // true if you want to reverse the orbit to mouse drag from left to right = orbits left
+  reverseHorizontalOrbit = false // true if you want to reverse the horizontal orbit direction
+  reverseVerticalOrbit = false // true if you want to reverse the vertical orbit direction
   // The four arrow keys
   keys = { LEFT: 'ArrowLeft', UP: 'ArrowUp', RIGHT: 'ArrowRight', BOTTOM: 'ArrowDown' }
   // Mouse buttons
@@ -398,7 +400,7 @@ class OrbitControls extends EventDispatcher {
     }
 
     function rotateLeft(angle: number): void {
-      if (scope.reverseOrbit) {
+      if (scope.reverseOrbit || scope.reverseHorizontalOrbit) {
         sphericalDelta.theta += angle
       } else {
         sphericalDelta.theta -= angle
@@ -406,7 +408,7 @@ class OrbitControls extends EventDispatcher {
     }
 
     function rotateUp(angle: number): void {
-      if (scope.reverseOrbit) {
+      if (scope.reverseOrbit || scope.reverseVerticalOrbit) {
         sphericalDelta.phi += angle
       } else {
         sphericalDelta.phi -= angle
