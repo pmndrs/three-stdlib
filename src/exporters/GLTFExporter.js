@@ -30,6 +30,14 @@ import {
   WebGLRenderer,
 } from 'three'
 
+async function readAsDataURL(blob) {
+  const url = URL.createObjectURL(blob)
+  const buffer = await fetch(url).then((res) => res.arrayBuffer())
+  URL.revokeObjectURL(url)
+  const data = btoa(String.fromCharCode(...new Uint8Array(buffer)))
+  return `data:${blob.type || ''};base64,${data}`
+}
+
 let _renderer
 let fullscreenQuadGeometry
 let fullscreenQuadMaterial
@@ -561,7 +569,9 @@ class GLTFWriter {
       })
     } else {
       if (json.buffers && json.buffers.length > 0) {
-        json.buffers[0].uri = URL.createObjectURL(blob)
+        readAsDataURL(blob).then((uri) => {
+          json.buffers[0].uri = uri
+        })
       }
 
       onDone(json)
@@ -1098,9 +1108,11 @@ class GLTFWriter {
           imageDef.uri = canvas.toDataURL(mimeType)
         } else {
           pending.push(
-            getToBlobPromise(canvas, mimeType).then((blob) => {
-              imageDef.uri = URL.createObjectURL(blob)
-            }),
+            getToBlobPromise(canvas, mimeType)
+              .then(readAsDataURL)
+              .then((uri) => {
+                imageDef.uri = uri
+              }),
           )
         }
       }
