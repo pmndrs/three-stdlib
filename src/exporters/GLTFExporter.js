@@ -31,9 +31,7 @@ import {
 } from 'three'
 
 async function readAsDataURL(blob) {
-  const url = URL.createObjectURL(blob)
-  const buffer = await fetch(url).then((res) => res.arrayBuffer())
-  URL.revokeObjectURL(url)
+  const buffer = await blob.arrayBuffer()
   const data = btoa(String.fromCharCode(...new Uint8Array(buffer)))
   return `data:${blob.type || ''};base64,${data}`
 }
