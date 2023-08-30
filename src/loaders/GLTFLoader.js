@@ -63,49 +63,7 @@ import {
   REVISION,
 } from 'three'
 import { toTrianglesDrawMode } from '../utils/BufferGeometryUtils'
-
-// https://github.com/davidchambers/Base64.js
-const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/='
-const encode =
-  typeof btoa !== 'undefined'
-    ? btoa
-    : function (input) {
-        let data = String(input),
-          o1,
-          o2,
-          o3,
-          bits,
-          i = 0,
-          acc = ''
-
-        while (i < data.length) {
-          // pack three octets into four hextets
-          o1 = data.charCodeAt(i++)
-          o2 = data.charCodeAt(i++)
-          o3 = data.charCodeAt(i++)
-
-          if (o1 > 128 || o2 > 128 || o3 > 128) {
-            throw 'The string to be encoded contains characters outside of the Latin1 range.'
-          }
-
-          bits = (o1 << 16) | (o2 << 8) | o3
-          // use hextets to index into b64, and append result to encoded string
-          acc +=
-            chars.charAt((bits >> 18) & 0x3f) +
-            chars.charAt((bits >> 12) & 0x3f) +
-            chars.charAt((bits >> 6) & 0x3f) +
-            chars.charAt(bits & 0x3f)
-        }
-
-        switch (data.length % 3) {
-          case 0:
-            return acc
-          case 1:
-            return acc.slice(0, -2) + '=='
-          case 2:
-            return acc.slice(0, -1) + '='
-        }
-      }
+import { fromByteArray } from 'base64-js'
 
 class GLTFLoader extends Loader {
   constructor(manager) {
@@ -2547,7 +2505,9 @@ class GLTFParser {
           const blob = new Blob([bufferView], { type: sourceDef.mimeType })
           sourceURI = URL.createObjectURL(blob)
         } catch (_) {
-          const data = encode(String.fromCharCode(...bufferView))
+          const data = fromByteArray(
+            new Uint8Array(bufferView).reduce((data, byte) => data + String.fromCharCode(byte), ''),
+          )
           sourceURI = `data:${sourceDef.mimeType};base64,${data}`
         }
 
