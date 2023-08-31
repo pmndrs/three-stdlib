@@ -2499,11 +2499,10 @@ class GLTFParser {
       // Load binary image data from bufferView, if provided.
 
       sourceURI = parser.getDependency('bufferView', sourceDef.bufferView).then(function (bufferView) {
-        isObjectURL = true
-
         try {
           const blob = new Blob([bufferView], { type: sourceDef.mimeType })
           sourceURI = URL.createObjectURL(blob)
+          isObjectURL = true
         } catch (_) {
           const data = fromByteArray(
             new Uint8Array(bufferView).reduce((data, byte) => data + String.fromCharCode(byte), ''),
