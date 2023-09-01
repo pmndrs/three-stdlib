@@ -37,7 +37,7 @@
     "@types/draco3d": "^1.4.0",
     "@types/offscreencanvas": "^2019.6.4",
     "@types/webxr": "^0.5.2",
-    "chevrotain": "^10.1.2",
+    "chevrotain": "^11.0.3",
     "draco3d": "^1.4.1",
     "fflate": "^0.6.9",
     "ktx-parse": "^0.4.5",
