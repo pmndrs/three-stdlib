@@ -1,5 +1,5 @@
-import type { EncoderModule } from 'draco3d'
 import { BufferGeometry, Mesh, Points } from 'three'
+import { createEncoderModule } from '../_polyfill/draco_encoder'
 
 /**
  * Export draco compressed files from threejs geometry objects.
@@ -14,8 +14,6 @@ import { BufferGeometry, Mesh, Points } from 'three'
  *  - exportUvs
  *  - exportNormals
  */
-
-declare const DracoEncoderModule: () => EncoderModule
 
 class DRACOExporter {
   // Encoder methods
@@ -52,13 +50,9 @@ class DRACOExporter {
       throw new Error('DRACOExporter: The first parameter of parse() is now an instance of Mesh or Points.')
     }
 
-    if (DracoEncoderModule === undefined) {
-      throw new Error('THREE.DRACOExporter: required the draco_encoder to work.')
-    }
-
     const geometry = object.geometry
 
-    const dracoEncoder = DracoEncoderModule()
+    const dracoEncoder = createEncoderModule()
     const encoder = new dracoEncoder.Encoder()
     let builder
     let dracoObject

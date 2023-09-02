@@ -34,11 +34,9 @@
     "vite": "^4.3.8"
   },
   "dependencies": {
-    "@types/draco3d": "^1.4.0",
     "@types/offscreencanvas": "^2019.6.4",
     "@types/webxr": "^0.5.2",
     "chevrotain": "^10.1.2",
-    "draco3d": "^1.4.1",
     "fflate": "^0.6.9",
     "ktx-parse": "^0.4.5",
     "mmd-parser": "^1.0.4",
