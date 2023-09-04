@@ -19,12 +19,26 @@
   "homepage": "https://github.com/pmndrs/three-stdlib",
   "repository": "https://github.com/pmndrs/three-stdlib",
   "license": "MIT",
-  "types": "./dist/index.d.ts",
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
+  "type": "module",
+  "types": "./index.d.ts",
+  "main": "./index.cjs",
+  "module": "./index.js",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "require": "./index.cjs",
+      "import": "./index.js"
+    },
+    "./*": {
+      "types": "./index.d.ts",
+      "require": "./index.cjs",
+      "import": "./index.js"
+    }
+  },
   "sideEffects": false,
   "devDependencies": {
     "@types/three": "^0.128.0",
+    "chevrotain": "^11.0.3",
     "copyfiles": "^2.4.1",
     "json": "^11.0.0",
     "prettier": "^2.2.1",
@@ -37,7 +51,6 @@
     "@types/draco3d": "^1.4.0",
     "@types/offscreencanvas": "^2019.6.4",
     "@types/webxr": "^0.5.2",
-    "chevrotain": "^10.1.2",
     "draco3d": "^1.4.1",
     "fflate": "^0.6.9",
     "ktx-parse": "^0.4.5",
@@ -50,7 +63,7 @@
     "three": ">=0.128.0"
   },
   "scripts": {
-    "build": "rimraf dist && vite build && tsc --emitDeclarationOnly && copyfiles -u 1 \"src/**/*.d.ts\" dist && copyfiles package.json README.md LICENSE dist && json -I -f dist/package.json -e \"this.private=undefined; this.types=\\\"./index.d.ts\\\"; this.main=\\\"./index.cjs\\\"; this.module=\\\"./index.js\\\";\"",
+    "build": "rimraf dist && vite build && tsc --emitDeclarationOnly && copyfiles -u 1 \"src/**/*.d.ts\" dist && copyfiles package.json README.md LICENSE dist && json -I -f dist/package.json -e \"this.private=undefined;\"",
     "lint": "tsc --noEmit"
   }
 }

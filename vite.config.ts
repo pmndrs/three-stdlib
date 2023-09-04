@@ -1,6 +1,16 @@
 import * as path from 'path'
 import { defineConfig } from 'vite'
 
+const inline: string[] = [
+  'chevrotain',
+  '@chevrotain/cst-dts-gen',
+  '@chevrotain/gast',
+  '@chevrotain/regexp-to-ast',
+  '@chevrotain/types',
+  '@chevrotain/utils',
+  'lodash-es',
+]
+
 export default defineConfig({
   build: {
     minify: false,
@@ -11,9 +21,7 @@ export default defineConfig({
       fileName: (format) => (format === 'es' ? '[name].js' : '[name].cjs'),
     },
     rollupOptions: {
-      external: (id: string) => !id.startsWith('.') && !path.isAbsolute(id),
-      treeshake: false,
-      output: { preserveModules: true },
+      external: (id: string) => !id.startsWith('.') && !path.isAbsolute(id) && !inline.includes(id),
     },
   },
 })
