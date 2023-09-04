@@ -19,7 +19,6 @@
   "homepage": "https://github.com/pmndrs/three-stdlib",
   "repository": "https://github.com/pmndrs/three-stdlib",
   "license": "MIT",
-  "type": "module",
   "types": "./index.d.ts",
   "main": "./index.cjs",
   "module": "./index.js",
@@ -63,7 +62,7 @@
     "three": ">=0.128.0"
   },
   "scripts": {
-    "build": "rimraf dist && vite build && tsc --emitDeclarationOnly && copyfiles -u 1 \"src/**/*.d.ts\" dist && copyfiles package.json README.md LICENSE dist && json -I -f dist/package.json -e \"this.private=undefined;\"",
+    "build": "rimraf dist && vite build && tsc --emitDeclarationOnly && copyfiles -u 1 \"src/**/*.d.ts\" dist && copyfiles package.json README.md LICENSE dist && json -I -f dist/package.json -e \"this.private=undefined;this.type=\\\"module\\\";\"",
     "lint": "tsc --noEmit"
   }
 }
