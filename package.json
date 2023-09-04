@@ -24,7 +24,12 @@
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "exports": {
-    "*": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.js"
+    },
+    "./*": {
       "types": "./dist/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.js"
