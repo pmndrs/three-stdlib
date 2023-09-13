@@ -9,7 +9,14 @@ import {
   TOUCH,
   Vector2,
   Vector3,
+  Ray,
+  Plane,
+  MathUtils,
 } from 'three'
+
+const _ray = /* @__PURE__ */ new Ray()
+const _plane = /* @__PURE__ */ new Plane()
+const TILT_LIMIT = Math.cos(70 * MathUtils.DEG2RAD)
 
 // This set of controls performs orbiting, dollying (zooming), and panning.
 // Unlike TrackballControls, it maintains the "up" direction object.up (+Y by default).
@@ -57,6 +64,7 @@ class OrbitControls extends EventDispatcher {
   panSpeed = 1.0
   screenSpacePanning = true // if false, pan orthogonal to world-space direction camera.up
   keyPanSpeed = 7.0 // pixels moved per arrow key push
+  zoomToCursor = false
   // Set to true to automatically rotate around the target
   // If auto-rotate is enabled, you must call controls.update() in your animation loop
   autoRotate = false
@@ -255,10 +263,6 @@ class OrbitControls extends EventDispatcher {
         // restrict phi to be between desired limits
         spherical.phi = Math.max(scope.minPolarAngle, Math.min(scope.maxPolarAngle, spherical.phi))
         spherical.makeSafe()
-        spherical.radius *= scale
-
-        // restrict radius to be between desired limits
-        spherical.radius = Math.max(scope.minDistance, Math.min(scope.maxDistance, spherical.radius))
 
         // move target to panned location
 
@@ -266,6 +270,17 @@ class OrbitControls extends EventDispatcher {
           scope.target.addScaledVector(panOffset, scope.dampingFactor)
         } else {
           scope.target.add(panOffset)
+        }
+
+        // adjust the camera position based on zoom only if we're not zooming to the cursor or if it's an ortho camera
+        // we adjust zoom later in these cases
+        if (
+          (scope.zoomToCursor && performCursorZoom) ||
+          (scope.object as THREE.OrthographicCamera).isOrthographicCamera
+        ) {
+          spherical.radius = clampDistance(spherical.radius)
+        } else {
+          spherical.radius = clampDistance(spherical.radius * scale)
         }
 
         offset.setFromSpherical(spherical)
@@ -288,7 +303,72 @@ class OrbitControls extends EventDispatcher {
           panOffset.set(0, 0, 0)
         }
 
+        // adjust camera position
+        let zoomChanged = false
+        if (scope.zoomToCursor && performCursorZoom) {
+          let newRadius = null
+          if (scope.object instanceof PerspectiveCamera && scope.object.isPerspectiveCamera) {
+            // move the camera down the pointer ray
+            // this method avoids floating point error
+            const prevRadius = offset.length()
+            newRadius = clampDistance(prevRadius * scale)
+
+            const radiusDelta = prevRadius - newRadius
+            scope.object.position.addScaledVector(dollyDirection, radiusDelta)
+            scope.object.updateMatrixWorld()
+          } else if ((scope.object as THREE.OrthographicCamera).isOrthographicCamera) {
+            // adjust the ortho camera position based on zoom changes
+            const mouseBefore = new Vector3(mouse.x, mouse.y, 0)
+            mouseBefore.unproject(scope.object)
+
+            scope.object.zoom = Math.max(scope.minZoom, Math.min(scope.maxZoom, scope.object.zoom / scale))
+            scope.object.updateProjectionMatrix()
+            zoomChanged = true
+
+            const mouseAfter = new Vector3(mouse.x, mouse.y, 0)
+            mouseAfter.unproject(scope.object)
+
+            scope.object.position.sub(mouseAfter).add(mouseBefore)
+            scope.object.updateMatrixWorld()
+
+            newRadius = offset.length()
+          } else {
+            console.warn('WARNING: OrbitControls.js encountered an unknown camera type - zoom to cursor disabled.')
+            scope.zoomToCursor = false
+          }
+
+          // handle the placement of the target
+          if (newRadius !== null) {
+            if (scope.screenSpacePanning) {
+              // position the orbit target in front of the new camera position
+              scope.target
+                .set(0, 0, -1)
+                .transformDirection(scope.object.matrix)
+                .multiplyScalar(newRadius)
+                .add(scope.object.position)
+            } else {
+              // get the ray and translation plane to compute target
+              _ray.origin.copy(scope.object.position)
+              _ray.direction.set(0, 0, -1).transformDirection(scope.object.matrix)
+
+              // if the camera is 20 degrees above the horizon then don't adjust the focus target to avoid
+              // extremely large values
+              if (Math.abs(scope.object.up.dot(_ray.direction)) < TILT_LIMIT) {
+                object.lookAt(scope.target)
+              } else {
+                _plane.setFromNormalAndCoplanarPoint(scope.object.up, scope.target)
+                _ray.intersectPlane(_plane, scope.target)
+              }
+            }
+          }
+        } else if (scope.object instanceof OrthographicCamera && scope.object.isOrthographicCamera) {
+          scope.object.zoom = Math.max(scope.minZoom, Math.min(scope.maxZoom, scope.object.zoom / scale))
+          scope.object.updateProjectionMatrix()
+          zoomChanged = true
+        }
+
         scale = 1
+        performCursorZoom = false
 
         // update condition is:
         // min(camera displacement, camera rotation in radians)^2 > EPS
@@ -374,7 +454,6 @@ class OrbitControls extends EventDispatcher {
 
     let scale = 1
     const panOffset = new Vector3()
-    let zoomChanged = false
 
     const rotateStart = new Vector2()
     const rotateEnd = new Vector2()
@@ -387,6 +466,10 @@ class OrbitControls extends EventDispatcher {
     const dollyStart = new Vector2()
     const dollyEnd = new Vector2()
     const dollyDelta = new Vector2()
+
+    const dollyDirection = new Vector3()
+    const mouse = new Vector2()
+    let performCursorZoom = false
 
     const pointers: PointerEvent[] = []
     const pointerPositions: { [key: string]: Vector2 } = {}
@@ -481,12 +564,11 @@ class OrbitControls extends EventDispatcher {
     })()
 
     function dollyOut(dollyScale: number) {
-      if (scope.object instanceof PerspectiveCamera && scope.object.isPerspectiveCamera) {
+      if (
+        (scope.object instanceof PerspectiveCamera && scope.object.isPerspectiveCamera) ||
+        (scope.object instanceof OrthographicCamera && scope.object.isOrthographicCamera)
+      ) {
         scale /= dollyScale
-      } else if (scope.object instanceof OrthographicCamera && scope.object.isOrthographicCamera) {
-        scope.object.zoom = Math.max(scope.minZoom, Math.min(scope.maxZoom, scope.object.zoom * dollyScale))
-        scope.object.updateProjectionMatrix()
-        zoomChanged = true
       } else {
         console.warn('WARNING: OrbitControls.js encountered an unknown camera type - dolly/zoom disabled.')
         scope.enableZoom = false
@@ -494,16 +576,38 @@ class OrbitControls extends EventDispatcher {
     }
 
     function dollyIn(dollyScale: number) {
-      if (scope.object instanceof PerspectiveCamera && scope.object.isPerspectiveCamera) {
+      if (
+        (scope.object instanceof PerspectiveCamera && scope.object.isPerspectiveCamera) ||
+        (scope.object instanceof OrthographicCamera && scope.object.isOrthographicCamera)
+      ) {
         scale *= dollyScale
-      } else if (scope.object instanceof OrthographicCamera && scope.object.isOrthographicCamera) {
-        scope.object.zoom = Math.max(scope.minZoom, Math.min(scope.maxZoom, scope.object.zoom / dollyScale))
-        scope.object.updateProjectionMatrix()
-        zoomChanged = true
       } else {
         console.warn('WARNING: OrbitControls.js encountered an unknown camera type - dolly/zoom disabled.')
         scope.enableZoom = false
       }
+    }
+
+    function updateMouseParameters(event: MouseEvent): void {
+      if (!scope.zoomToCursor || !scope.domElement) {
+        return
+      }
+
+      performCursorZoom = true
+
+      const rect = scope.domElement.getBoundingClientRect()
+      const x = event.clientX - rect.left
+      const y = event.clientY - rect.top
+      const w = rect.width
+      const h = rect.height
+
+      mouse.x = (x / w) * 2 - 1
+      mouse.y = -(y / h) * 2 + 1
+
+      dollyDirection.set(mouse.x, mouse.y, 1).unproject(scope.object).sub(scope.object.position).normalize()
+    }
+
+    function clampDistance(dist: number): number {
+      return Math.max(scope.minDistance, Math.min(scope.maxDistance, dist))
     }
 
     //
@@ -515,6 +619,7 @@ class OrbitControls extends EventDispatcher {
     }
 
     function handleMouseDownDolly(event: MouseEvent) {
+      updateMouseParameters(event)
       dollyStart.set(event.clientX, event.clientY)
     }
 
@@ -559,6 +664,8 @@ class OrbitControls extends EventDispatcher {
     }
 
     function handleMouseWheel(event: WheelEvent) {
+      updateMouseParameters(event)
+
       if (event.deltaY < 0) {
         dollyIn(getZoomScale())
       } else if (event.deltaY > 0) {
