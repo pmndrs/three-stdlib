@@ -5,10 +5,10 @@ const inline: string[] = [
   'chevrotain',
   '@chevrotain/cst-dts-gen',
   '@chevrotain/gast',
-  '@chevrotain/regexp-to-ast',
   '@chevrotain/types',
   '@chevrotain/utils',
   'lodash-es',
+  'regexp-to-ast',
 ]
 
 export default defineConfig({
