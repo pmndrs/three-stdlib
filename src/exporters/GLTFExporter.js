@@ -30,6 +30,12 @@ import {
   WebGLRenderer,
 } from 'three'
 
+async function readAsDataURL(blob) {
+  const buffer = await blob.arrayBuffer()
+  const data = btoa(String.fromCharCode(...new Uint8Array(buffer)))
+  return `data:${blob.type || ''};base64,${data}`
+}
+
 let _renderer
 let fullscreenQuadGeometry
 let fullscreenQuadMaterial
@@ -527,11 +533,9 @@ class GLTFWriter {
     if (options.binary === true) {
       // https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#glb-file-format-specification
 
-      const reader = new FileReader()
-      reader.readAsArrayBuffer(blob)
-      reader.onloadend = function () {
+      blob.arrayBuffer().then((result) => {
         // Binary chunk.
-        const binaryChunk = getPaddedArrayBuffer(reader.result)
+        const binaryChunk = getPaddedArrayBuffer(result)
         const binaryChunkPrefix = new DataView(new ArrayBuffer(GLB_CHUNK_PREFIX_BYTES))
         binaryChunkPrefix.setUint32(0, binaryChunk.byteLength, true)
         binaryChunkPrefix.setUint32(4, GLB_CHUNK_TYPE_BIN, true)
@@ -559,24 +563,16 @@ class GLTFWriter {
           type: 'application/octet-stream',
         })
 
-        const glbReader = new FileReader()
-        glbReader.readAsArrayBuffer(glbBlob)
-        glbReader.onloadend = function () {
-          onDone(glbReader.result)
-        }
-      }
+        glbBlob.arrayBuffer().then(onDone)
+      })
     } else {
       if (json.buffers && json.buffers.length > 0) {
-        const reader = new FileReader()
-        reader.readAsDataURL(blob)
-        reader.onloadend = function () {
-          const base64data = reader.result
-          json.buffers[0].uri = base64data
-          onDone(json)
-        }
-      } else {
-        onDone(json)
+        readAsDataURL(blob).then((uri) => {
+          json.buffers[0].uri = uri
+        })
       }
+
+      onDone(json)
     }
   }
 
@@ -941,21 +937,17 @@ class GLTFWriter {
 
     if (!json.bufferViews) json.bufferViews = []
 
-    return new Promise(function (resolve) {
-      const reader = new FileReader()
-      reader.readAsArrayBuffer(blob)
-      reader.onloadend = function () {
-        const buffer = getPaddedArrayBuffer(reader.result)
+    return blob.arrayBuffer().then((result) => {
+      const buffer = getPaddedArrayBuffer(result)
 
-        const bufferViewDef = {
-          buffer: writer.processBuffer(buffer),
-          byteOffset: writer.byteOffset,
-          byteLength: buffer.byteLength,
-        }
-
-        writer.byteOffset += buffer.byteLength
-        resolve(json.bufferViews.push(bufferViewDef) - 1)
+      const bufferViewDef = {
+        buffer: writer.processBuffer(buffer),
+        byteOffset: writer.byteOffset,
+        byteLength: buffer.byteLength,
       }
+
+      writer.byteOffset += buffer.byteLength
+      return json.bufferViews.push(bufferViewDef) - 1
     })
   }
 
@@ -1115,9 +1107,9 @@ class GLTFWriter {
         } else {
           pending.push(
             getToBlobPromise(canvas, mimeType)
-              .then((blob) => new FileReader().readAsDataURL(blob))
-              .then((dataURL) => {
-                imageDef.uri = dataURL
+              .then(readAsDataURL)
+              .then((uri) => {
+                imageDef.uri = uri
               }),
           )
         }
