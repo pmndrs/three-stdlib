@@ -32,7 +32,7 @@ import {
   Vector2,
   Vector3,
 } from 'three'
-import { Lexer, CstParser, createToken } from 'chevrotain'
+import { Lexer, CstParser, createToken } from '../libs/chevrotain'
 
 class VRMLLoader extends Loader {
   constructor(manager) {

@@ -12,8 +12,8 @@ import {
   WebGLRenderTarget,
   NoToneMapping,
   HalfFloatType,
-  REVISION,
 } from 'three'
+import { version } from '../_polyfill/constants'
 
 class Refractor extends Mesh {
   static RefractorShader = {
@@ -69,7 +69,7 @@ class Refractor extends Mesh {
 			gl_FragColor = vec4( blendOverlay( base.rgb, color ), 1.0 );
 
 			#include <tonemapping_fragment>
-			#include <${parseInt(REVISION.replace(/\D+/g, '')) >= 154 ? 'colorspace_fragment' : 'encodings_fragment'}>
+			#include <${version >= 154 ? 'colorspace_fragment' : 'encodings_fragment'}>
 
 		}`,
   }

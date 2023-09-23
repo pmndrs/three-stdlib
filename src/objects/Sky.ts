@@ -1,4 +1,5 @@
-import { BackSide, BoxGeometry, Mesh, ShaderMaterial, UniformsUtils, Vector3, REVISION } from 'three'
+import { BackSide, BoxGeometry, Mesh, ShaderMaterial, UniformsUtils, Vector3 } from 'three'
+import { version } from '../_polyfill/constants'
 
 const SkyShader = {
   uniforms: {
@@ -166,7 +167,7 @@ const SkyShader = {
         gl_FragColor = vec4( retColor, 1.0 );
 
       #include <tonemapping_fragment>
-      #include <${parseInt(REVISION.replace(/\D+/g, '')) >= 154 ? 'colorspace_fragment' : 'encodings_fragment'}>
+      #include <${version >= 154 ? 'colorspace_fragment' : 'encodings_fragment'}>
 
       }
     `,

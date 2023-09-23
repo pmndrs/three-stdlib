@@ -60,9 +60,9 @@ import {
   Vector2,
   Vector3,
   VectorKeyframeTrack,
-  REVISION,
 } from 'three'
 import { toTrianglesDrawMode } from '../utils/BufferGeometryUtils'
+import { version } from '../_polyfill/constants'
 
 class GLTFLoader extends Loader {
   constructor(manager) {
@@ -1641,7 +1641,7 @@ const ATTRIBUTES = {
   // uv => uv1, 4 uv channels
   // https://github.com/mrdoob/three.js/pull/25943
   // https://github.com/mrdoob/three.js/pull/25788
-  .../* @__PURE__ */ (REVISION.replace(/\D+/g, '') >= 152
+  ...(version >= 152
     ? {
         TEXCOORD_0: 'uv',
         TEXCOORD_1: 'uv1',

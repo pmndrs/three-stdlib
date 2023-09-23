@@ -36,8 +36,10 @@
   },
   "sideEffects": false,
   "devDependencies": {
+    "@babel/core": "^7.22.20",
+    "@types/babel__core": "^7.20.2",
+    "@types/node": "^20.6.3",
     "@types/three": "^0.128.0",
-    "chevrotain": "^11.0.3",
     "copyfiles": "^2.4.1",
     "json": "^11.0.0",
     "prettier": "^2.2.1",
