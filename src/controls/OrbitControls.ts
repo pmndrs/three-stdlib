@@ -11,12 +11,11 @@ import {
   Vector3,
   Ray,
   Plane,
-  MathUtils,
 } from 'three'
 
 const _ray = /* @__PURE__ */ new Ray()
 const _plane = /* @__PURE__ */ new Plane()
-const TILT_LIMIT = Math.cos(70 * MathUtils.DEG2RAD)
+const TILT_LIMIT = Math.cos(70 * (Math.PI / 180))
 
 // This set of controls performs orbiting, dollying (zooming), and panning.
 // Unlike TrackballControls, it maintains the "up" direction object.up (+Y by default).

@@ -1,5 +1,8 @@
 import { BackSide, BoxGeometry, Mesh, ShaderMaterial, UniformsUtils, Vector3, REVISION } from 'three'
 
+let _version: any = /* @__PURE__ */ REVISION.replace(/\D+/g, '')
+_version = /* @__PURE__ */ parseInt(_version)
+
 const SkyShader = {
   uniforms: {
     turbidity: { value: 2 },
@@ -166,7 +169,7 @@ const SkyShader = {
         gl_FragColor = vec4( retColor, 1.0 );
 
       #include <tonemapping_fragment>
-      #include <${parseInt(REVISION.replace(/\D+/g, '')) >= 154 ? 'colorspace_fragment' : 'encodings_fragment'}>
+      #include <${_version >= 154 ? 'colorspace_fragment' : 'encodings_fragment'}>
 
       }
     `,
@@ -199,8 +202,10 @@ class Sky extends Mesh {
     super(new BoxGeometry(1, 1, 1), material)
   }
 
-  static SkyShader = SkyShader
-  public static material = material
+  static SkyShader: typeof SkyShader
+  static material: typeof material
 }
+
+/* @__PURE__ */ Object.assign(Sky, { SkyShader, material })
 
 export { Sky }

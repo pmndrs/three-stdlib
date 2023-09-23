@@ -1634,6 +1634,8 @@ const WEBGL_TYPE_SIZES = {
   MAT4: 16,
 }
 
+const _version = /* @__PURE__ */ REVISION.replace(/\D+/g, '')
+
 const ATTRIBUTES = {
   POSITION: 'position',
   NORMAL: 'normal',
@@ -1641,7 +1643,7 @@ const ATTRIBUTES = {
   // uv => uv1, 4 uv channels
   // https://github.com/mrdoob/three.js/pull/25943
   // https://github.com/mrdoob/three.js/pull/25788
-  .../* @__PURE__ */ (REVISION.replace(/\D+/g, '') >= 152
+  ...(_version >= 152
     ? {
         TEXCOORD_0: 'uv',
         TEXCOORD_1: 'uv1',
