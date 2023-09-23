@@ -20,7 +20,7 @@ export default defineConfig({
       name: 'vite-tree-shake',
       renderChunk: {
         order: 'post',
-        async handler(code, { fileName }) {
+        async handler(code) {
           return babel.transform(code, {
             plugins: [
               {
@@ -32,7 +32,7 @@ export default defineConfig({
                           babel.types.isCallExpression(statement.expression) ||
                           babel.types.isNewExpression(statement.expression)
                         ) {
-                          statement.expression.leadingComments ??= []
+                          statement.expression.leadingComments ||= []
                           statement.expression.leadingComments.push({
                             type: 'CommentBlock',
                             value: ' @__PURE__ ',
@@ -44,7 +44,7 @@ export default defineConfig({
                             declaration.init?.type === 'CallExpression' ||
                             declaration.init?.type === 'NewExpression'
                           ) {
-                            declaration.init.leadingComments ??= []
+                            declaration.init.leadingComments ||= []
                             declaration.init.leadingComments.push({
                               type: 'CommentBlock',
                               value: ' @__PURE__ ',
