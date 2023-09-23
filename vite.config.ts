@@ -23,9 +23,9 @@ export default defineConfig({
         order: 'post',
         async handler(code) {
           function annotate(path: babel.NodePath): void {
-            if (path.getFunctionParent() || path.node.leadingComments?.some((c) => c.value === '@__PURE__')) return
-
-            path.addComment('leading', '@__PURE__')
+            if (!path.getFunctionParent()) {
+              path.addComment('leading', '@__PURE__')
+            }
           }
 
           return babel.transform(code, {
