@@ -21,29 +21,18 @@ export default defineConfig({
       renderChunk: {
         order: 'post',
         async handler(code) {
-          function annotate(statement?: babel.types.Expression | null): void {
-            if (statement?.type !== 'CallExpression' && statement?.type !== 'NewExpression') return
-            if (!statement.leadingComments) statement.leadingComments = []
-            statement.leadingComments.push({
-              type: 'CommentBlock',
-              value: ' @__PURE__ ',
-            })
+          function annotate(statement: babel.NodePath): void {
+            if (statement?.parent.type === 'Program') {
+              statement.addComment('leading', ' @__PURE__ ')
+            }
           }
+
           return babel.transform(code, {
             plugins: [
               {
                 visitor: {
-                  Program(path) {
-                    for (const statement of path.node.body) {
-                      if (babel.types.isExpressionStatement(statement)) {
-                        annotate(statement.expression)
-                      } else if (babel.types.isVariableDeclaration(statement)) {
-                        for (const declaration of statement.declarations) {
-                          annotate(declaration.init)
-                        }
-                      }
-                    }
-                  },
+                  ExpressionStatement: annotate,
+                  VariableDeclaration: annotate,
                 },
               },
             ],
