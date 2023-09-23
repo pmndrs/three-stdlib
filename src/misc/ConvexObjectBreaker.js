@@ -30,7 +30,7 @@ import { ConvexGeometry } from '../geometries/ConvexGeometry'
  *
  */
 
-const _v1 = /* @__PURE__ */ new Vector3()
+const _v1 = new Vector3()
 
 class ConvexObjectBreaker {
   constructor(minSizeForBreak = 1.4, smallDelta = 0.0001) {

@@ -78,7 +78,7 @@ export const BokehShader2: {
     pentagon: { value: 0 },
 
     shaderFocus: { value: 1 },
-    focusCoords: { value: /* @__PURE__ */ new Vector2() },
+    focusCoords: { value: new Vector2() },
   },
 
   vertexShader: [

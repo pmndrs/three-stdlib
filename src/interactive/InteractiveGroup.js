@@ -1,6 +1,6 @@
 import { Group, Matrix4, Raycaster, Vector2 } from 'three'
 
-const _pointer = /* @__PURE__ */ new Vector2()
+const _pointer = new Vector2()
 const _event = { type: '', data: _pointer }
 
 class InteractiveGroup extends Group {

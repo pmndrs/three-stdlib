@@ -20,7 +20,7 @@ function init() {
   return _p
 }
 
-const _p = /* @__PURE__ */ init()
+const _p = init()
 
 function fade(t) {
   return t * t * t * (t * (t * 6 - 15) + 10)

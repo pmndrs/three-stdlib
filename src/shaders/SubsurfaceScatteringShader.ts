@@ -22,11 +22,11 @@ function get() {
   )
 
   _SubsurfaceScatteringShader = {
-    uniforms: /* @__PURE__ */ UniformsUtils.merge([
+    uniforms: UniformsUtils.merge([
       ShaderLib['phong'].uniforms,
       {
         thicknessMap: { value: null },
-        thicknessColor: { value: /* @__PURE__ */ new Color(0xffffff) },
+        thicknessColor: { value: new Color(0xffffff) },
         thicknessDistortion: { value: 0.1 },
         thicknessAmbient: { value: 0.0 },
         thicknessAttenuation: { value: 0.1 },

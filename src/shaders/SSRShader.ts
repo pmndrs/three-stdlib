@@ -21,9 +21,9 @@ export const SSRShader = {
     tDepth: { value: null },
     cameraNear: { value: null },
     cameraFar: { value: null },
-    resolution: { value: /* @__PURE__ */ new Vector2() },
-    cameraProjectionMatrix: { value: /* @__PURE__ */ new Matrix4() },
-    cameraInverseProjectionMatrix: { value: /* @__PURE__ */ new Matrix4() },
+    resolution: { value: new Vector2() },
+    cameraProjectionMatrix: { value: new Matrix4() },
+    cameraInverseProjectionMatrix: { value: new Matrix4() },
     opacity: { value: 0.5 },
     maxDistance: { value: 180 },
     cameraRange: { value: 0 },
@@ -278,7 +278,7 @@ export const SSRDepthShader = {
 export const SSRBlurShader = {
   uniforms: {
     tDiffuse: { value: null },
-    resolution: { value: /* @__PURE__ */ new Vector2() },
+    resolution: { value: new Vector2() },
     opacity: { value: 0.5 },
   },
 

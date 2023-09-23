@@ -6,6 +6,7 @@ export default defineConfig({
   build: {
     minify: false,
     target: 'es2018',
+    sourcemap: true,
     lib: {
       formats: ['cjs', 'es'],
       entry: 'src/index.ts',
@@ -21,29 +22,19 @@ export default defineConfig({
       renderChunk: {
         order: 'post',
         async handler(code) {
-          function annotate(statement?: babel.types.Expression | null): void {
-            if (statement?.type !== 'CallExpression' && statement?.type !== 'NewExpression') return
-            if (!statement.leadingComments) statement.leadingComments = []
-            statement.leadingComments.push({
-              type: 'CommentBlock',
-              value: ' @__PURE__ ',
-            })
+          function annotate(path: babel.NodePath): void {
+            if (!path.getFunctionParent()) {
+              path.addComment('leading', '@__PURE__')
+            }
           }
+
           return babel.transform(code, {
+            sourceMaps: true,
             plugins: [
               {
                 visitor: {
-                  Program(path) {
-                    for (const statement of path.node.body) {
-                      if (babel.types.isExpressionStatement(statement)) {
-                        annotate(statement.expression)
-                      } else if (babel.types.isVariableDeclaration(statement)) {
-                        for (const declaration of statement.declarations) {
-                          annotate(declaration.init)
-                        }
-                      }
-                    }
-                  },
+                  CallExpression: annotate,
+                  NewExpression: annotate,
                 },
               },
             ],

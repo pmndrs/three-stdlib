@@ -33,8 +33,8 @@ export const DepthLimitedBlurShader: IDepthLimitedBlurShader = {
   },
   uniforms: {
     tDiffuse: { value: null },
-    size: { value: /* @__PURE__ */ new Vector2(512, 512) },
-    sampleUvOffsets: { value: [/* @__PURE__ */ new Vector2(0, 0)] },
+    size: { value: new Vector2(512, 512) },
+    sampleUvOffsets: { value: [new Vector2(0, 0)] },
     sampleWeights: { value: [1.0] },
     tDepth: { value: null },
     cameraNear: { value: 10 },

@@ -7,8 +7,8 @@ const SkyShader = {
     rayleigh: { value: 1 },
     mieCoefficient: { value: 0.005 },
     mieDirectionalG: { value: 0.8 },
-    sunPosition: { value: /* @__PURE__ */ new Vector3() },
-    up: { value: /* @__PURE__ */ new Vector3(0, 1, 0) },
+    sunPosition: { value: new Vector3() },
+    up: { value: new Vector3(0, 1, 0) },
   },
 
   vertexShader: /* glsl */ `
@@ -173,11 +173,11 @@ const SkyShader = {
     `,
 }
 
-const material = /* @__PURE__ */ new ShaderMaterial({
+const material = new ShaderMaterial({
   name: 'SkyShader',
   fragmentShader: SkyShader.fragmentShader,
   vertexShader: SkyShader.vertexShader,
-  uniforms: /* @__PURE__ */ UniformsUtils.clone(SkyShader.uniforms),
+  uniforms: UniformsUtils.clone(SkyShader.uniforms),
   side: BackSide,
   depthWrite: false,
 })

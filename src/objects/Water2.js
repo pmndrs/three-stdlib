@@ -53,7 +53,7 @@ class Water2 extends Mesh {
       },
 
       config: {
-        value: /* @__PURE__ */ new Vector4(),
+        value: new Vector4(),
       },
     },
 
