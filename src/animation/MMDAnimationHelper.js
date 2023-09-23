@@ -861,7 +861,7 @@ class AudioManager {
   }
 }
 
-const _q = /* @__PURE__ */ new Quaternion()
+const _q = new Quaternion()
 
 /**
  * Solver for Grant (Fuyo in Japanese. I just google translated because

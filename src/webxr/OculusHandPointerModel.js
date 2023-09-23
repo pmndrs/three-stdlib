@@ -13,8 +13,8 @@ const POINTER_LENGTH = 0.035
 const POINTER_SEGMENTS = 16
 const POINTER_RINGS = 12
 const POINTER_HEMISPHERE_ANGLE = 110
-const YAXIS = /* @__PURE__ */ new THREE.Vector3(0, 1, 0)
-const ZAXIS = /* @__PURE__ */ new THREE.Vector3(0, 0, 1)
+const YAXIS = new THREE.Vector3(0, 1, 0)
+const ZAXIS = new THREE.Vector3(0, 0, 1)
 
 const CURSOR_RADIUS = 0.02
 const CURSOR_MAX_DISTANCE = 1.5

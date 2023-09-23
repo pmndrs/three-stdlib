@@ -17,21 +17,15 @@ import {
   Vector4,
 } from 'three'
 
-const geometry = /* @__PURE__ */ new BufferGeometry()
+const geometry = new BufferGeometry()
 
-const float32Array = /* @__PURE__ */ new Float32Array([-1, -1, 0, 0, 0, 1, -1, 0, 1, 0, 1, 1, 0, 1, 1, -1, 1, 0, 0, 1])
+const float32Array = new Float32Array([-1, -1, 0, 0, 0, 1, -1, 0, 1, 0, 1, 1, 0, 1, 1, -1, 1, 0, 0, 1])
 
-const interleavedBuffer = /* @__PURE__ */ new InterleavedBuffer(float32Array, 5)
+const interleavedBuffer = new InterleavedBuffer(float32Array, 5)
 
-/* @__PURE__ */ geometry.setIndex([0, 1, 2, 0, 2, 3])
-/* @__PURE__ */ geometry.setAttribute(
-  'position',
-  /* @__PURE__ */ new InterleavedBufferAttribute(interleavedBuffer, 3, 0, false),
-)
-/* @__PURE__ */ geometry.setAttribute(
-  'uv',
-  /* @__PURE__ */ new InterleavedBufferAttribute(interleavedBuffer, 2, 3, false),
-)
+geometry.setIndex([0, 1, 2, 0, 2, 3])
+geometry.setAttribute('position', new InterleavedBufferAttribute(interleavedBuffer, 3, 0, false))
+geometry.setAttribute('uv', new InterleavedBufferAttribute(interleavedBuffer, 2, 3, false))
 
 class Lensflare extends Mesh {
   static Geometry = geometry

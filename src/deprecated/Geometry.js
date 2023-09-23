@@ -14,9 +14,9 @@ import {
   Vector3,
 } from 'three'
 
-const _m1 = /* @__PURE__ */ new Matrix4()
-const _obj = /* @__PURE__ */ new Object3D()
-const _offset = /* @__PURE__ */ new Vector3()
+const _m1 = new Matrix4()
+const _obj = new Object3D()
+const _offset = new Vector3()
 
 class Geometry extends EventDispatcher {
   static createBufferGeometryFromObject(object) {

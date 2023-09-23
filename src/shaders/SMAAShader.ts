@@ -13,7 +13,7 @@ export const SMAAEdgesShader = {
 
   uniforms: {
     tDiffuse: { value: null },
-    resolution: { value: /* @__PURE__ */ new Vector2(1 / 1024, 1 / 512) },
+    resolution: { value: new Vector2(1 / 1024, 1 / 512) },
   },
 
   vertexShader: [
@@ -117,7 +117,7 @@ export const SMAAWeightsShader = {
     tDiffuse: { value: null },
     tArea: { value: null },
     tSearch: { value: null },
-    resolution: { value: /* @__PURE__ */ new Vector2(1 / 1024, 1 / 512) },
+    resolution: { value: new Vector2(1 / 1024, 1 / 512) },
   },
 
   vertexShader: [
@@ -357,7 +357,7 @@ export const SMAABlendShader = {
   uniforms: {
     tDiffuse: { value: null },
     tColor: { value: null },
-    resolution: { value: /* @__PURE__ */ new Vector2(1 / 1024, 1 / 512) },
+    resolution: { value: new Vector2(1 / 1024, 1 / 512) },
   },
 
   vertexShader: [

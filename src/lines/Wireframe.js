@@ -2,8 +2,8 @@ import { InstancedInterleavedBuffer, InterleavedBufferAttribute, Mesh, Vector3 }
 import { LineSegmentsGeometry } from '../lines/LineSegmentsGeometry'
 import { LineMaterial } from '../lines/LineMaterial'
 
-const _start = /* @__PURE__ */ new Vector3()
-const _end = /* @__PURE__ */ new Vector3()
+const _start = new Vector3()
+const _end = new Vector3()
 
 class Wireframe extends Mesh {
   constructor(geometry = new LineSegmentsGeometry(), material = new LineMaterial({ color: Math.random() * 0xffffff })) {

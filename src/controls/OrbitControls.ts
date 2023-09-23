@@ -13,8 +13,8 @@ import {
   Plane,
 } from 'three'
 
-const _ray = /* @__PURE__ */ new Ray()
-const _plane = /* @__PURE__ */ new Plane()
+const _ray = new Ray()
+const _plane = new Plane()
 const TILT_LIMIT = Math.cos(70 * (Math.PI / 180))
 
 // This set of controls performs orbiting, dollying (zooming), and panning.

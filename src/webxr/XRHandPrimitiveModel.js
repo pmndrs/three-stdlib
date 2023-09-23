@@ -8,8 +8,8 @@ import {
   Vector3,
 } from 'three'
 
-const _matrix = /* @__PURE__ */ /* @__PURE__ */ new Matrix4()
-const _vector = /* @__PURE__ */ new Vector3()
+const _matrix = new Matrix4()
+const _vector = new Vector3()
 
 class XRHandPrimitiveModel {
   constructor(handModel, controller, path, handedness, options) {

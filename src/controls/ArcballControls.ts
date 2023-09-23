@@ -67,8 +67,8 @@ const _center = {
 
 //transformation matrices for gizmos and camera
 const _transformation: Transformation = {
-  camera: /* @__PURE__ */ new Matrix4(),
-  gizmos: /* @__PURE__ */ new Matrix4(),
+  camera: new Matrix4(),
+  gizmos: new Matrix4(),
 }
 
 //events

@@ -23,8 +23,8 @@ import { LuminosityHighPassShader } from '../shaders/LuminosityHighPassShader'
  * - https://docs.unrealengine.com/latest/INT/Engine/Rendering/PostProcessEffects/Bloom/
  */
 class UnrealBloomPass extends Pass {
-  static BlurDirectionX = /* @__PURE__ */ new Vector2(1.0, 0.0)
-  static BlurDirectionY = /* @__PURE__ */ new Vector2(0.0, 1.0)
+  static BlurDirectionX = new Vector2(1.0, 0.0)
+  static BlurDirectionY = new Vector2(0.0, 1.0)
 
   constructor(resolution, strength, radius, threshold) {
     super()
