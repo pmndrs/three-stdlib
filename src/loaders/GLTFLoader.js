@@ -60,9 +60,9 @@ import {
   Vector2,
   Vector3,
   VectorKeyframeTrack,
-  REVISION,
 } from 'three'
 import { toTrianglesDrawMode } from '../utils/BufferGeometryUtils'
+import { version } from '../_polyfill/constants'
 
 class GLTFLoader extends Loader {
   constructor(manager) {
@@ -1634,8 +1634,6 @@ const WEBGL_TYPE_SIZES = {
   MAT4: 16,
 }
 
-const _version = /* @__PURE__ */ REVISION.replace(/\D+/g, '')
-
 const ATTRIBUTES = {
   POSITION: 'position',
   NORMAL: 'normal',
@@ -1643,7 +1641,7 @@ const ATTRIBUTES = {
   // uv => uv1, 4 uv channels
   // https://github.com/mrdoob/three.js/pull/25943
   // https://github.com/mrdoob/three.js/pull/25788
-  ...(_version >= 152
+  ...(version >= 152
     ? {
         TEXCOORD_0: 'uv',
         TEXCOORD_1: 'uv1',
