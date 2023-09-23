@@ -21,6 +21,14 @@ export default defineConfig({
       renderChunk: {
         order: 'post',
         async handler(code) {
+          function annotate(statement?: babel.types.Expression | null): void {
+            if (statement?.type !== 'CallExpression' && statement?.type !== 'NewExpression') return
+            if (!statement.leadingComments) statement.leadingComments = []
+            statement.leadingComments.push({
+              type: 'CommentBlock',
+              value: ' @__PURE__ ',
+            })
+          }
           return babel.transform(code, {
             plugins: [
               {
@@ -28,28 +36,10 @@ export default defineConfig({
                   Program(path) {
                     for (const statement of path.node.body) {
                       if (babel.types.isExpressionStatement(statement)) {
-                        if (
-                          babel.types.isCallExpression(statement.expression) ||
-                          babel.types.isNewExpression(statement.expression)
-                        ) {
-                          statement.expression.leadingComments ||= []
-                          statement.expression.leadingComments.push({
-                            type: 'CommentBlock',
-                            value: ' @__PURE__ ',
-                          })
-                        }
+                        annotate(statement.expression)
                       } else if (babel.types.isVariableDeclaration(statement)) {
                         for (const declaration of statement.declarations) {
-                          if (
-                            declaration.init?.type === 'CallExpression' ||
-                            declaration.init?.type === 'NewExpression'
-                          ) {
-                            declaration.init.leadingComments ||= []
-                            declaration.init.leadingComments.push({
-                              type: 'CommentBlock',
-                              value: ' @__PURE__ ',
-                            })
-                          }
+                          annotate(declaration.init)
                         }
                       }
                     }
