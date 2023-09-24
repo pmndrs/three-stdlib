@@ -137,7 +137,7 @@ class VRButton {
   static xrSessionIsGranted = false
 
   static registerSessionGrantedListener(): void {
-    if ('xr' in navigator) {
+    if (typeof navigator !== 'undefined' && 'xr' in navigator) {
       ;(navigator as Navigator).xr!.addEventListener('sessiongranted', () => {
         VRButton.xrSessionIsGranted = true
       })
