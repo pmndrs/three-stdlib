@@ -9264,30 +9264,6 @@ const { parseBuffer } = (() => {
     return undefined
   }
 
-  function isBrowser() {
-    return typeof window !== 'undefined'
-  }
-
-  function nodeBufferToArrayBuffer(buffer) {
-    var ab = new ArrayBuffer(buffer.length)
-    var view = new Uint8Array(ab)
-    for (var i = 0; i < buffer.length; ++i) {
-      view[i] = buffer[i]
-    }
-
-    return ab
-  }
-
-  function arrayBufferToNodeBuffer(ab) {
-    var buffer = new Buffer(ab.byteLength)
-    var view = new Uint8Array(ab)
-    for (var i = 0; i < buffer.length; ++i) {
-      buffer[i] = view[i]
-    }
-
-    return buffer
-  }
-
   function checkArgument(expression, message) {
     if (!expression) {
       throw message
@@ -15223,38 +15199,6 @@ vim: set ts=4 sw=4 expandtab:
   }
 
   /**
-   * Initiate a download of the OpenType font.
-   */
-  Font.prototype.download = function (fileName) {
-    var familyName = this.getEnglishName('fontFamily')
-    var styleName = this.getEnglishName('fontSubfamily')
-    fileName = fileName || familyName.replace(/\s/g, '') + '-' + styleName + '.otf'
-    var arrayBuffer = this.toArrayBuffer()
-
-    if (isBrowser()) {
-      window.URL = window.URL || window.webkitURL
-
-      if (window.URL) {
-        var dataView = new DataView(arrayBuffer)
-        var blob = new Blob([dataView], { type: 'font/opentype' })
-
-        var link = document.createElement('a')
-        link.href = window.URL.createObjectURL(blob)
-        link.download = fileName
-
-        var event = document.createEvent('MouseEvents')
-        event.initEvent('click', true, false)
-        link.dispatchEvent(event)
-      } else {
-        console.warn('Font file could not be downloaded. Try using a different browser.')
-      }
-    } else {
-      var fs = require('fs')
-      var buffer = arrayBufferToNodeBuffer(arrayBuffer)
-      fs.writeFileSync(fileName, buffer)
-    }
-  }
-  /**
    * @private
    */
   Font.prototype.fsSelectionValues = {
@@ -15733,53 +15677,6 @@ vim: set ts=4 sw=4 expandtab:
   var loca = { parse: parseLocaTable }
 
   // opentype.js
-
-  /**
-   * The opentype library.
-   * @namespace opentype
-   */
-
-  // File loaders /////////////////////////////////////////////////////////
-  /**
-   * Loads a font from a file. The callback throws an error message as the first parameter if it fails
-   * and the font as an ArrayBuffer in the second parameter if it succeeds.
-   * @param  {string} path - The path of the file
-   * @param  {Function} callback - The function to call when the font load completes
-   */
-  function loadFromFile(path, callback) {
-    var fs = require('fs')
-    fs.readFile(path, function (err, buffer) {
-      if (err) {
-        return callback(err.message)
-      }
-
-      callback(null, nodeBufferToArrayBuffer(buffer))
-    })
-  }
-  /**
-   * Loads a font from a URL. The callback throws an error message as the first parameter if it fails
-   * and the font as an ArrayBuffer in the second parameter if it succeeds.
-   * @param  {string} url - The URL of the font file.
-   * @param  {Function} callback - The function to call when the font load completes
-   */
-  function loadFromUrl(url, callback) {
-    var request = new XMLHttpRequest()
-    request.open('get', url, true)
-    request.responseType = 'arraybuffer'
-    request.onload = function () {
-      if (request.response) {
-        return callback(null, request.response)
-      } else {
-        return callback('Font could not be loaded: ' + request.statusText)
-      }
-    }
-
-    request.onerror = function () {
-      callback('Font could not be loaded')
-    }
-
-    request.send()
-  }
 
   // Table Directory Entries //////////////////////////////////////////////
   /**
