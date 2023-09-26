@@ -32,7 +32,9 @@ import {
   Vector2,
   Vector3,
 } from 'three'
-import { Lexer, CstParser, createToken } from '../libs/chevrotain'
+import chevrotain from '../libs/chevrotain'
+
+const { Lexer, CstParser, createToken } = chevrotain()
 
 class VRMLLoader extends Loader {
   constructor(manager) {

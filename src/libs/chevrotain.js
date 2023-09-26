@@ -1,4 +1,4 @@
-const { CstParser, Lexer, createToken } = (() => {
+const chevrotain = () => {
   /** Detect free variable `global` from Node.js. */
   var freeGlobal = typeof global == 'object' && global && global.Object === Object && global
 
@@ -13296,6 +13296,6 @@ const { CstParser, Lexer, createToken } = (() => {
   }
 
   return { CstParser, Lexer, createToken }
-})()
+}
 
-export { CstParser, Lexer, createToken }
+export default chevrotain

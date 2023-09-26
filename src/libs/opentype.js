@@ -1,4 +1,4 @@
-const { parseBuffer } = (() => {
+const opentype = () => {
   /**
    * https://opentype.js.org v1.3.4 | (c) Frederik De Bleser and other contributors | MIT License | Uses tiny-inflate by Devon Govett and string.prototype.codepointat polyfill by Mathias Bynens
    */
@@ -15974,7 +15974,7 @@ vim: set ts=4 sw=4 expandtab:
     return font
   }
 
-  return { parseBuffer }
-})()
+  return { parseBuffer: parse }
+}
 
-export { parseBuffer as parse }
+export default opentype

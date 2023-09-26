@@ -1,5 +1,7 @@
 import { FileLoader, Loader } from 'three'
-import { parse } from '../libs/opentype.js'
+import opentype from '../libs/opentype.js'
+
+const { parse } = opentype()
 
 /**
  * Requires opentype.js to be included in the project.
