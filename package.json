@@ -55,6 +55,7 @@
     "draco3d": "^1.4.1",
     "fflate": "^0.6.9",
     "ktx-parse": "^0.4.5",
+    "lottie-web": "^5.12.2",
     "mmd-parser": "^1.0.4",
     "potpack": "^1.0.1",
     "zstddec": "^0.0.2"
