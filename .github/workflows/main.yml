@@ -26,6 +26,12 @@ jobs:
         run: yarn lint
       - name: Check build health
         run: yarn build
+      - name: Check for SSR compat
+        run: node dist/index.cjs && node dist/index.js
+      - name: Check tree-shaking
+        run: npx agadoo@latest dist/index.js
+      - name: Check NPM config
+        run: npx publint@latest dist
   release:
     needs: test
     runs-on: ubuntu-latest
