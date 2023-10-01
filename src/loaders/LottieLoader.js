@@ -1,5 +1,5 @@
 import { FileLoader, Loader, CanvasTexture, NearestFilter } from 'three'
-import lottie from 'lottie-web'
+import lottie from '../libs/lottie'
 
 class LottieLoader extends Loader {
   setQuality(value) {
