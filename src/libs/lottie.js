@@ -1,4 +1,6 @@
 const lottie = (() => {
+  if (typeof navigator === 'undefined') return {}
+
   const svgNS = 'http://www.w3.org/2000/svg'
 
   let locationHref = ''
