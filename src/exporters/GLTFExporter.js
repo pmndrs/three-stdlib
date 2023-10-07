@@ -29,6 +29,7 @@ import {
   PerspectiveCamera,
   WebGLRenderer,
 } from 'three'
+import { version } from '../_polyfill/constants'
 
 async function readAsDataURL(blob) {
   const buffer = await blob.arrayBuffer()
@@ -1529,8 +1530,17 @@ class GLTFWriter {
 
     // Conversion between attributes names in threejs and gltf spec
     const nameConversion = {
-      uv: 'TEXCOORD_0',
-      [REVISION.replace(/\D+/g, '') >= 152 ? 'uv1' : 'uv2']: 'TEXCOORD_1',
+      ...(version >= 152
+        ? {
+            uv: 'TEXCOORD_0',
+            uv1: 'TEXCOORD_1',
+            uv2: 'TEXCOORD_2',
+            uv3: 'TEXCOORD_3',
+          }
+        : {
+            uv: 'TEXCOORD_0',
+            uv2: 'TEXCOORD_1',
+          }),
       color: 'COLOR_0',
       skinWeight: 'WEIGHTS_0',
       skinIndex: 'JOINTS_0',
