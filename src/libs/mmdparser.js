@@ -11049,4 +11049,4 @@ class Parser {
   }
 }
 
-export { Parser }
+export { CharsetEncoder, Parser }
