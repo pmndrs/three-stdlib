@@ -55,7 +55,7 @@ import {
   VK_FORMAT_R8G8B8A8_SRGB,
   VK_FORMAT_R8G8B8A8_UNORM,
 } from 'ktx-parse'
-import { ZSTDDecoder } from 'zstddec'
+import { ZSTDDecoder } from '../libs/zstddec'
 import { CompressedArrayTexture } from '../_polyfill/CompressedArrayTexture'
 import { Data3DTexture } from '../_polyfill/Data3DTexture'
 
