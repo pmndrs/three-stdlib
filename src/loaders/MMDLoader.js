@@ -31,7 +31,7 @@ import {
   VectorKeyframeTrack,
 } from 'three'
 import { TGALoader } from '../loaders/TGALoader'
-import { Parser } from 'mmd-parser'
+import { Parser } from '../libs/mmdparser'
 
 /**
  * Dependencies
