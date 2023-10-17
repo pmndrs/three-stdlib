@@ -1,4 +1,5 @@
 import * as path from 'node:path'
+import * as babel from '@babel/core'
 import { defineConfig } from 'vite'
 
 export default defineConfig({
@@ -13,9 +14,33 @@ export default defineConfig({
     },
     rollupOptions: {
       external: (id: string) => !id.startsWith('.') && !path.isAbsolute(id),
-      output: {
-        preserveModules: true,
-      },
     },
   },
+  plugins: [
+    {
+      name: 'vite-tree-shake',
+      renderChunk: {
+        order: 'post',
+        async handler(code) {
+          function annotate(path: babel.NodePath): void {
+            if (!path.getFunctionParent()) {
+              path.addComment('leading', '@__PURE__')
+            }
+          }
+
+          return babel.transform(code, {
+            sourceMaps: true,
+            plugins: [
+              {
+                visitor: {
+                  CallExpression: annotate,
+                  NewExpression: annotate,
+                },
+              },
+            ],
+          }) as any
+        },
+      },
+    },
+  ],
 })
