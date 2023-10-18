@@ -23,16 +23,9 @@
   "main": "./index.cjs",
   "module": "./index.js",
   "exports": {
-    ".": {
-      "types": "./index.d.ts",
-      "require": "./index.cjs",
-      "import": "./index.js"
-    },
-    "./*": {
-      "types": "./index.d.ts",
-      "require": "./index.cjs",
-      "import": "./index.js"
-    }
+    "types": "./index.d.ts",
+    "require": "./index.cjs",
+    "import": "./index.js"
   },
   "sideEffects": false,
   "devDependencies": {
