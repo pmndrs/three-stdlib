@@ -1,15 +1,14 @@
 import {
-  BufferAttribute,
-  BufferGeometry,
-  DataTexture,
-  FloatType,
-  IUniform,
-  InterleavedBufferAttribute,
-  Material,
-  MathUtils,
   Matrix4,
   Mesh,
+  BufferGeometry,
+  Material,
+  DataTexture,
+  IUniform,
+  MathUtils,
   RGBAFormat,
+  FloatType,
+  BufferAttribute,
 } from 'three'
 
 const _identityMatrix = new Matrix4()
@@ -87,7 +86,7 @@ class BatchedMesh extends Mesh<BufferGeometry, Material> {
     maxIndexCount = maxVertexCount * 2,
     material?: Material,
   ) {
-    super(new BufferGeometry(), material?.clone())
+    super(new BufferGeometry(), material)
 
     this._vertexStarts = []
     this._vertexCounts = []
@@ -114,7 +113,7 @@ class BatchedMesh extends Mesh<BufferGeometry, Material> {
     this._matricesTexture = null
     this._matricesTextureSize = null
 
-    // @TODO: Calculate the entire binding box and make frustomCulled true
+    // @TODO: Calculate the entire binding box and make frustumCulled true
     this.frustumCulled = false
 
     this._customUniforms = {
@@ -150,31 +149,28 @@ class BatchedMesh extends Mesh<BufferGeometry, Material> {
   }
 
   _initShader() {
-    const material = this.material as Material
-    const currentOnBeforeCompile = material.onBeforeCompile
+    const currentOnBeforeCompile = this.material.onBeforeCompile
     const customUniforms = this._customUniforms
 
-    material.onBeforeCompile = function onBeforeCompile(parameters, renderer) {
+    this.material.onBeforeCompile = function onBeforeCompile(parameters, renderer) {
       // Is this replacement stable across any materials?
       parameters.vertexShader = parameters.vertexShader
-        .replace('#include <morphcolor_vertex>', '#include <morphcolor_vertex>\n' + batchingbaseVertex)
         .replace('#include <skinning_pars_vertex>', '#include <skinning_pars_vertex>\n' + batchingParsVertex)
-        .replace('#include <skinnormal_vertex>', '#include <skinnormal_vertex>\n' + batchingnormalVertex)
+        .replace(
+          '#include <skinnormal_vertex>',
+          '#include <skinnormal_vertex>\n' + batchingbaseVertex + batchingnormalVertex,
+        )
         .replace('#include <skinning_vertex>', '#include <skinning_vertex>\n' + batchingVertex)
 
       for (const uniformName in customUniforms) {
         parameters.uniforms[uniformName] = customUniforms[uniformName]
       }
 
-      //currentOnBeforeCompile.call(this, parameters, renderer)
+      currentOnBeforeCompile.call(this, parameters, renderer)
     }
-    material.customProgramCacheKey = () =>
-      Object.entries(customUniforms)
-        .map(([k, v]) => (k + v.value) as string)
-        .reduce((x, y) => x + y)
-    material.defines = material.defines || {}
-    material.defines.BATCHING = false
-    material.needsUpdate = true
+
+    this.material.defines = this.material.defines || {}
+    this.material.defines.BATCHING = false
   }
 
   getGeometryCount() {
@@ -251,8 +247,8 @@ class BatchedMesh extends Mesh<BufferGeometry, Material> {
     // @TODO: Error handling if exceeding maxVertexCount or maxIndexCount
 
     for (const attributeName in geometry.attributes) {
-      const srcAttribute = geometry.getAttribute(attributeName) as BufferAttribute | InterleavedBufferAttribute
-      const dstAttribute = this.geometry.getAttribute(attributeName) as BufferAttribute | InterleavedBufferAttribute
+      const srcAttribute = geometry.getAttribute(attributeName)
+      const dstAttribute = this.geometry.getAttribute(attributeName)
       ;(dstAttribute.array as Float32Array).set(srcAttribute.array, this._vertexCount * dstAttribute.itemSize)
       dstAttribute.needsUpdate = true
     }
@@ -269,7 +265,7 @@ class BatchedMesh extends Mesh<BufferGeometry, Material> {
     const geometryId = this._geometryCount
     this._geometryCount++
 
-    const idAttribute = this.geometry.getAttribute('id') as BufferAttribute | InterleavedBufferAttribute
+    const idAttribute = this.geometry.getAttribute('id')
 
     for (let i = 0; i < srcPositionAttribute.count; i++) {
       idAttribute.setX(this._vertexCount + i, geometryId)
@@ -400,26 +396,6 @@ class BatchedMesh extends Mesh<BufferGeometry, Material> {
       this.material.defines.BATCHING = false
     }
   }
-}
-
-export function convertToBatchedMesh(meshes: Mesh<BufferGeometry, Material>[]): BatchedMesh {
-  let totalVertices = 0
-  let totalIndices = 0
-
-  for (const mesh of meshes) {
-    totalVertices += mesh.geometry.attributes.position.count
-    totalIndices += mesh.geometry.index!.count
-  }
-
-  const material = meshes[0].material
-  const result = new BatchedMesh(meshes.length, totalVertices, totalIndices, material)
-
-  for (const mesh of meshes) {
-    const geoId = result.applyGeometry(mesh.geometry)
-    result.setMatrixAt(geoId, mesh.matrixWorld)
-  }
-
-  return result
 }
 
 export { BatchedMesh }
