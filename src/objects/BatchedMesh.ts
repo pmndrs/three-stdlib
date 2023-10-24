@@ -12,7 +12,7 @@ import {
 } from 'three'
 
 const _identityMatrix = new Matrix4()
-const _zeroMatrix = new Matrix4().set(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+const _zeroScaleMatrix = new Matrix4().set(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1)
 
 // Custom shaders
 const batchingParsVertex = /* glsl */ `
@@ -302,7 +302,7 @@ class BatchedMesh extends Mesh<BufferGeometry, Material> {
     }
 
     this._alives[geometryId] = false
-    _zeroMatrix.toArray(this._matricesArray!, geometryId * 16)
+    _zeroScaleMatrix.toArray(this._matricesArray!, geometryId * 16)
     this._matricesTexture!.needsUpdate = true
 
     // User needs to call optimize() to pack the data.
@@ -354,7 +354,7 @@ class BatchedMesh extends Mesh<BufferGeometry, Material> {
     if (visible === true) {
       this._matrices[geometryId].toArray(this._matricesArray!, geometryId * 16)
     } else {
-      _zeroMatrix.toArray(this._matricesArray!, geometryId * 16)
+      _zeroScaleMatrix.toArray(this._matricesArray!, geometryId * 16)
     }
 
     this._matricesTexture!.needsUpdate = true
