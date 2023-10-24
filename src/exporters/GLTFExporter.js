@@ -731,10 +731,11 @@ class GLTFWriter {
       if (json.buffers && json.buffers.length > 0) {
         readAsDataURL(blob).then((uri) => {
           json.buffers[0].uri = uri
+          onDone(json)
         })
+      } else {
+        onDone(json)
       }
-
-      onDone(json)
     }
   }
 
