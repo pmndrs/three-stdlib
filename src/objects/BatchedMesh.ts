@@ -123,6 +123,20 @@ class BatchedMesh extends Mesh<BufferGeometry, Material> {
 
     this._initMatricesTexture()
     this._initShader()
+
+    this.onBeforeRender = function () {
+      if (this.material.defines) {
+        this.material.defines.BATCHING = true
+      }
+
+      // @TODO: Implement frustum culling for each geometry
+    }
+
+    this.onAfterRender = function () {
+      if (this.material.defines) {
+        this.material.defines.BATCHING = false
+      }
+    }
   }
 
   _initMatricesTexture() {
@@ -379,22 +393,6 @@ class BatchedMesh extends Mesh<BufferGeometry, Material> {
     this._matricesTexture = null
 
     return this
-  }
-
-  // @ts-ignore
-  onBeforeRender() {
-    if (this.material.defines) {
-      this.material.defines.BATCHING = true
-    }
-
-    // @TODO: Implement frustum culling for each geometry
-  }
-
-  // @ts-ignore
-  onAfterRender() {
-    if (this.material.defines) {
-      this.material.defines.BATCHING = false
-    }
   }
 }
 
