@@ -104,7 +104,7 @@ class BatchedMesh extends Mesh<BufferGeometry, Material> {
   _geometryInitialized: boolean
   _geometryCount: number
   _matrices: Matrix4[]
-  _matricesTexture: DataTexture
+  _matricesTexture: DataTexture | null
   _customUniforms: Record<string, IUniform>
 
   constructor(
@@ -488,7 +488,7 @@ class BatchedMesh extends Mesh<BufferGeometry, Material> {
     // Note: User needs to call optimize() afterward to pack the data.
 
     const active = this._active
-    const matricesTexture = this._matricesTexture
+    const matricesTexture = this._matricesTexture!
     const matricesArray = matricesTexture.image.data
     if (geometryId >= active.length || active[geometryId] === false) {
       return this
@@ -511,7 +511,7 @@ class BatchedMesh extends Mesh<BufferGeometry, Material> {
 
     const visible = this._visible
     const active = this._active
-    const matricesTexture = this._matricesTexture
+    const matricesTexture = this._matricesTexture!
     const matrices = this._matrices
     const matricesArray = matricesTexture.image.data
     if (geometryId >= matrices.length || active[geometryId] === false) {
@@ -541,7 +541,7 @@ class BatchedMesh extends Mesh<BufferGeometry, Material> {
   setVisibleAt(geometryId: number, value: boolean): this {
     const visible = this._visible
     const active = this._active
-    const matricesTexture = this._matricesTexture
+    const matricesTexture = this._matricesTexture!
     const matrices = this._matrices
     const matricesArray = matricesTexture.image.data
 
