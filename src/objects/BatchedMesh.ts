@@ -407,6 +407,13 @@ class BatchedMesh extends Mesh<BufferGeometry, Material> {
     return geometryId
   }
 
+  /**
+   * @deprecated use `addGeometry` instead.
+   */
+  applyGeometry(geometry: BufferGeometry): number {
+    return this.addGeometry(geometry)
+  }
+
   setGeometryAt(id: number, geometry: BufferGeometry): number {
     if (id >= this._geometryCount) {
       throw new Error('BatchedMesh: Maximum geometry count reached.')
