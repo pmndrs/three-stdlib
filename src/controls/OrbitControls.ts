@@ -289,6 +289,7 @@ class OrbitControls extends EventDispatcher {
 
         position.copy(scope.target).add(offset)
 
+        if (!scope.object.matrixAutoUpdate) scope.object.updateMatrix()
         scope.object.lookAt(scope.target)
 
         if (scope.enableDamping === true) {
