@@ -1,9 +1,9 @@
-import type { IUniform, Shader } from 'three'
+import type { IUniform } from 'three'
 
-type Defines = { [key: string]: boolean | number | string }
-type Uniforms = { [key: string]: IUniform }
+export type Defines = { [key: string]: boolean | number | string }
+export type Uniforms = { [key: string]: IUniform }
 
-export interface IShader<U extends Uniforms, D extends Defines | undefined = undefined> extends Shader {
+export interface IShader<U extends Uniforms, D extends Defines | undefined = undefined> {
   defines?: D
   fragmentShader: string
   uniforms: U
