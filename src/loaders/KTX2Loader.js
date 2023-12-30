@@ -70,7 +70,7 @@ const LinearEncoding = 3000
 const sRGBEncoding = 3001
 
 const NoColorSpace = ''
-const DisplayP3ColorSpace = 'DisplayP3ColorSpace'
+const DisplayP3ColorSpace = 'display-p3'
 const LinearDisplayP3ColorSpace = 'display-p3-linear'
 const LinearSRGBColorSpace = 'srgb-linear'
 const SRGBColorSpace = 'srgb'
