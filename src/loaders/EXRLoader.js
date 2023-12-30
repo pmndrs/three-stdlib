@@ -1655,7 +1655,8 @@ class EXRLoader extends DataTextureLoader {
         }
       }
 
-      if (spec != 0) {
+      if ((spec & ~0x04) != 0) {
+        // unsupported tiled, deep-image, multi-part
         console.error('EXRHeader:', EXRHeader)
         throw 'THREE.EXRLoader: provided file is currently unsupported.'
       }
