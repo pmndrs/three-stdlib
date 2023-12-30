@@ -26,6 +26,7 @@ import {
   RGB_PVRTC_4BPPV1_Format,
   RGB_S3TC_DXT1_Format,
   RGBA_ASTC_4x4_Format,
+  RGBA_ASTC_6x6_Format,
   RGBA_BPTC_Format,
   RGBA_ETC2_EAC_Format,
   RGBA_PVRTC_4BPPV1_Format,
@@ -54,10 +55,25 @@ import {
   VK_FORMAT_R8G8_UNORM,
   VK_FORMAT_R8G8B8A8_SRGB,
   VK_FORMAT_R8G8B8A8_UNORM,
+  VK_FORMAT_ASTC_6x6_SRGB_BLOCK,
+  VK_FORMAT_ASTC_6x6_UNORM_BLOCK,
+  KHR_DF_PRIMARIES_UNSPECIFIED,
+  KHR_DF_PRIMARIES_BT709,
+  KHR_DF_PRIMARIES_DISPLAYP3,
 } from '../libs/ktx-parse'
 import { ZSTDDecoder } from '../libs/zstddec'
+import { CompressedCubeTexture } from '../_polyfill/CompressedCubeTexture'
 import { CompressedArrayTexture } from '../_polyfill/CompressedArrayTexture'
 import { Data3DTexture } from '../_polyfill/Data3DTexture'
+
+const LinearEncoding = 3000
+const sRGBEncoding = 3001
+
+const NoColorSpace = ''
+const DisplayP3ColorSpace = 'display-p3'
+const LinearDisplayP3ColorSpace = 'display-p3-linear'
+const LinearSRGBColorSpace = 'srgb-linear'
+const SRGBColorSpace = 'srgb'
 
 const _taskCache = new WeakMap()
 
@@ -113,9 +129,9 @@ class KTX2Loader extends Loader {
     let transcoderPending
     let BasisModule
 
-    const EngineFormat = _EngineFormat
-    const TranscoderFormat = _TranscoderFormat
-    const BasisFormat = _BasisFormat
+    const EngineFormat = KTX2Loader.EngineFormat
+    const TranscoderFormat = KTX2Loader.TranscoderFormat
+    const BasisFormat = KTX2Loader.BasisFormat
 
     self.addEventListener('message', function (e) {
       const message = e.data
@@ -129,26 +145,10 @@ class KTX2Loader extends Loader {
         case 'transcode':
           transcoderPending.then(() => {
             try {
-              const { width, height, hasAlpha, mipmaps, format, dfdTransferFn, dfdFlags } = transcode(message.buffer)
-
-              const buffers = []
-
-              for (let i = 0; i < mipmaps.length; ++i) {
-                buffers.push(mipmaps[i].data.buffer)
-              }
+              const { faces, buffers, width, height, hasAlpha, format, dfdFlags } = transcode(message.buffer)
 
               self.postMessage(
-                {
-                  type: 'transcode',
-                  id: message.id,
-                  width,
-                  height,
-                  hasAlpha,
-                  mipmaps,
-                  format,
-                  dfdTransferFn,
-                  dfdFlags,
-                },
+                { type: 'transcode', id: message.id, faces, width, height, hasAlpha, format, dfdFlags },
                 buffers,
               )
             } catch (error) {
@@ -190,15 +190,15 @@ class KTX2Loader extends Loader {
       const basisFormat = ktx2File.isUASTC() ? BasisFormat.UASTC_4x4 : BasisFormat.ETC1S
       const width = ktx2File.getWidth()
       const height = ktx2File.getHeight()
-      const layers = ktx2File.getLayers() || 1
-      const levels = ktx2File.getLevels()
+      const layerCount = ktx2File.getLayers() || 1
+      const levelCount = ktx2File.getLevels()
+      const faceCount = ktx2File.getFaces()
       const hasAlpha = ktx2File.getHasAlpha()
-      const dfdTransferFn = ktx2File.getDFDTransferFunc()
       const dfdFlags = ktx2File.getDFDFlags()
 
       const { transcoderFormat, engineFormat } = getTranscoderFormat(basisFormat, width, height, hasAlpha)
 
-      if (!width || !height || !levels) {
+      if (!width || !height || !levelCount) {
         cleanup()
         throw new Error('THREE.KTX2Loader:	Invalid texture')
       }
@@ -208,34 +208,63 @@ class KTX2Loader extends Loader {
         throw new Error('THREE.KTX2Loader: .startTranscoding failed')
       }
 
-      const mipmaps = []
+      const faces = []
+      const buffers = []
 
-      for (let mip = 0; mip < levels; mip++) {
-        const layerMips = []
+      for (let face = 0; face < faceCount; face++) {
+        const mipmaps = []
 
-        let mipWidth, mipHeight
+        for (let mip = 0; mip < levelCount; mip++) {
+          const layerMips = []
 
-        for (let layer = 0; layer < layers; layer++) {
-          const levelInfo = ktx2File.getImageLevelInfo(mip, layer, 0)
-          mipWidth = levelInfo.origWidth < 4 ? levelInfo.origWidth : levelInfo.width
-          mipHeight = levelInfo.origHeight < 4 ? levelInfo.origHeight : levelInfo.height
-          const dst = new Uint8Array(ktx2File.getImageTranscodedSizeInBytes(mip, layer, 0, transcoderFormat))
-          const status = ktx2File.transcodeImage(dst, mip, layer, 0, transcoderFormat, 0, -1, -1)
+          let mipWidth, mipHeight
 
-          if (!status) {
-            cleanup()
-            throw new Error('THREE.KTX2Loader: .transcodeImage failed.')
+          for (let layer = 0; layer < layerCount; layer++) {
+            const levelInfo = ktx2File.getImageLevelInfo(mip, layer, face)
+
+            if (
+              face === 0 &&
+              mip === 0 &&
+              layer === 0 &&
+              (levelInfo.origWidth % 4 !== 0 || levelInfo.origHeight % 4 !== 0)
+            ) {
+              console.warn('THREE.KTX2Loader: ETC1S and UASTC textures should use multiple-of-four dimensions.')
+            }
+
+            if (levelCount > 1) {
+              mipWidth = levelInfo.origWidth
+              mipHeight = levelInfo.origHeight
+            } else {
+              // Handles non-multiple-of-four dimensions in textures without mipmaps. Textures with
+              // mipmaps must use multiple-of-four dimensions, for some texture formats and APIs.
+              // See mrdoob/three.js#25908.
+              mipWidth = levelInfo.width
+              mipHeight = levelInfo.height
+            }
+
+            const dst = new Uint8Array(ktx2File.getImageTranscodedSizeInBytes(mip, layer, 0, transcoderFormat))
+            const status = ktx2File.transcodeImage(dst, mip, layer, face, transcoderFormat, 0, -1, -1)
+
+            if (!status) {
+              cleanup()
+              throw new Error('THREE.KTX2Loader: .transcodeImage failed.')
+            }
+
+            layerMips.push(dst)
           }
 
-          layerMips.push(dst)
+          const mipData = concat(layerMips)
+
+          mipmaps.push({ data: mipData, width: mipWidth, height: mipHeight })
+          buffers.push(mipData.buffer)
         }
 
-        mipmaps.push({ data: concat(layerMips), width: mipWidth, height: mipHeight })
+        faces.push({ mipmaps, width, height, format: engineFormat })
       }
 
       cleanup()
 
-      return { width, height, hasAlpha, mipmaps, format: engineFormat, dfdTransferFn, dfdFlags }
+      return { faces, buffers, width, height, hasAlpha, format: engineFormat, dfdFlags }
     }
 
     //
@@ -347,6 +376,8 @@ class KTX2Loader extends Loader {
 
     /** Concatenates N byte arrays. */
     function concat(arrays) {
+      if (arrays.length === 1) return arrays[0]
+
       let totalByteLength = 0
 
       for (let i = 0; i < arrays.length; i++) {
@@ -508,21 +539,32 @@ class KTX2Loader extends Loader {
   }
 
   _createTextureFrom(transcodeResult, container) {
-    const { mipmaps, width, height, format, type, error, dfdTransferFn, dfdFlags } = transcodeResult
+    const { faces, width, height, format, type, error, dfdFlags } = transcodeResult
 
     if (type === 'error') return Promise.reject(error)
 
-    const texture =
-      container.layerCount > 1
-        ? new CompressedArrayTexture(mipmaps, width, height, container.layerCount, format, UnsignedByteType)
-        : new CompressedTexture(mipmaps, width, height, format, UnsignedByteType)
+    let texture
 
-    texture.minFilter = mipmaps.length === 1 ? LinearFilter : LinearMipmapLinearFilter
+    if (container.faceCount === 6) {
+      texture = new CompressedCubeTexture(faces, format, UnsignedByteType)
+    } else {
+      const mipmaps = faces[0].mipmaps
+
+      texture =
+        container.layerCount > 1
+          ? new CompressedArrayTexture(mipmaps, width, height, container.layerCount, format, UnsignedByteType)
+          : new CompressedTexture(mipmaps, width, height, format, UnsignedByteType)
+    }
+
+    texture.minFilter = faces[0].mipmaps.length === 1 ? LinearFilter : LinearMipmapLinearFilter
     texture.magFilter = LinearFilter
     texture.generateMipmaps = false
     texture.needsUpdate = true
-    if ('colorSpace' in texture) texture.colorSpace = dfdTransferFn === KHR_DF_TRANSFER_SRGB ? 'srgb' : 'srgb-linear'
-    else texture.encoding = dfdTransferFn === KHR_DF_TRANSFER_SRGB ? 3001 : 3000
+
+    const colorSpace = parseColorSpace(container)
+    if ('colorSpace' in texture) texture.colorSpace = colorSpace
+    else texture.encoding = colorSpace === SRGBColorSpace ? sRGBEncoding : LinearEncoding
+
     texture.premultiplyAlpha = !!(dfdFlags & KHR_DF_FLAG_ALPHA_PREMULTIPLIED)
 
     return texture
@@ -537,7 +579,7 @@ class KTX2Loader extends Loader {
     const container = read(new Uint8Array(buffer))
 
     if (container.vkFormat !== VK_FORMAT_UNDEFINED) {
-      return createDataTexture(container)
+      return createRawTexture(container)
     }
 
     //
@@ -566,7 +608,10 @@ class KTX2Loader extends Loader {
 }
 
 //
-// DataTexture and Data3DTexture parsing.
+// Parsing for non-Basis textures. These textures are may have supercompression
+// like Zstd, but they do not require transcoding.
+
+const UNCOMPRESSED_FORMATS = new Set([RGBAFormat, RGFormat, RedFormat])
 
 const FORMAT_MAP = {
   [VK_FORMAT_R32G32B32A32_SFLOAT]: RGBAFormat,
@@ -583,6 +628,9 @@ const FORMAT_MAP = {
   [VK_FORMAT_R16_SFLOAT]: RedFormat,
   [VK_FORMAT_R8_SRGB]: RedFormat,
   [VK_FORMAT_R8_UNORM]: RedFormat,
+
+  [VK_FORMAT_ASTC_6x6_SRGB_BLOCK]: RGBA_ASTC_6x6_Format,
+  [VK_FORMAT_ASTC_6x6_UNORM_BLOCK]: RGBA_ASTC_6x6_Format,
 }
 
 const TYPE_MAP = {
@@ -600,16 +648,13 @@ const TYPE_MAP = {
   [VK_FORMAT_R16_SFLOAT]: HalfFloatType,
   [VK_FORMAT_R8_SRGB]: UnsignedByteType,
   [VK_FORMAT_R8_UNORM]: UnsignedByteType,
+
+  [VK_FORMAT_ASTC_6x6_SRGB_BLOCK]: UnsignedByteType,
+  [VK_FORMAT_ASTC_6x6_UNORM_BLOCK]: UnsignedByteType,
 }
 
-const ENCODING_MAP = {
-  [VK_FORMAT_R8G8B8A8_SRGB]: 3001, // sRGBEncoding
-  [VK_FORMAT_R8G8_SRGB]: 3001, // sRGBEncoding
-  [VK_FORMAT_R8_SRGB]: 3001, // sRGBEncoding
-}
-
-async function createDataTexture(container) {
-  const { vkFormat, pixelWidth, pixelHeight, pixelDepth } = container
+async function createRawTexture(container) {
+  const { vkFormat } = container
 
   if (FORMAT_MAP[vkFormat] === undefined) {
     throw new Error('THREE.KTX2Loader: Unsupported vkFormat.')
@@ -617,14 +662,9 @@ async function createDataTexture(container) {
 
   //
 
-  const level = container.levels[0]
+  let zstd
 
-  let levelData
-  let view
-
-  if (container.supercompressionScheme === KHR_SUPERCOMPRESSION_NONE) {
-    levelData = level.levelData
-  } else if (container.supercompressionScheme === KHR_SUPERCOMPRESSION_ZSTD) {
+  if (container.supercompressionScheme === KHR_SUPERCOMPRESSION_ZSTD) {
     if (!_zstd) {
       _zstd = new Promise(async (resolve) => {
         const zstd = new ZSTDDecoder()
@@ -633,39 +673,97 @@ async function createDataTexture(container) {
       })
     }
 
-    levelData = (await _zstd).decode(level.levelData, level.uncompressedByteLength)
-  } else {
-    throw new Error('THREE.KTX2Loader: Unsupported supercompressionScheme.')
-  }
-
-  if (TYPE_MAP[vkFormat] === FloatType) {
-    view = new Float32Array(
-      levelData.buffer,
-      levelData.byteOffset,
-      levelData.byteLength / Float32Array.BYTES_PER_ELEMENT,
-    )
-  } else if (TYPE_MAP[vkFormat] === HalfFloatType) {
-    view = new Uint16Array(levelData.buffer, levelData.byteOffset, levelData.byteLength / Uint16Array.BYTES_PER_ELEMENT)
-  } else {
-    view = levelData
+    zstd = await _zstd
   }
 
   //
 
-  const texture =
-    pixelDepth === 0
-      ? new DataTexture(view, pixelWidth, pixelHeight)
-      : new Data3DTexture(view, pixelWidth, pixelHeight, pixelDepth)
+  const mipmaps = []
+
+  for (let levelIndex = 0; levelIndex < container.levels.length; levelIndex++) {
+    const levelWidth = Math.max(1, container.pixelWidth >> levelIndex)
+    const levelHeight = Math.max(1, container.pixelHeight >> levelIndex)
+    const levelDepth = container.pixelDepth ? Math.max(1, container.pixelDepth >> levelIndex) : 0
+
+    const level = container.levels[levelIndex]
+
+    let levelData
+
+    if (container.supercompressionScheme === KHR_SUPERCOMPRESSION_NONE) {
+      levelData = level.levelData
+    } else if (container.supercompressionScheme === KHR_SUPERCOMPRESSION_ZSTD) {
+      levelData = zstd.decode(level.levelData, level.uncompressedByteLength)
+    } else {
+      throw new Error('THREE.KTX2Loader: Unsupported supercompressionScheme.')
+    }
+
+    let data
+
+    if (TYPE_MAP[vkFormat] === FloatType) {
+      data = new Float32Array(
+        levelData.buffer,
+        levelData.byteOffset,
+        levelData.byteLength / Float32Array.BYTES_PER_ELEMENT,
+      )
+    } else if (TYPE_MAP[vkFormat] === HalfFloatType) {
+      data = new Uint16Array(
+        levelData.buffer,
+        levelData.byteOffset,
+        levelData.byteLength / Uint16Array.BYTES_PER_ELEMENT,
+      )
+    } else {
+      data = levelData
+    }
+
+    mipmaps.push({
+      data: data,
+      width: levelWidth,
+      height: levelHeight,
+      depth: levelDepth,
+    })
+  }
+
+  let texture
+
+  if (UNCOMPRESSED_FORMATS.has(FORMAT_MAP[vkFormat])) {
+    texture =
+      container.pixelDepth === 0
+        ? new DataTexture(mipmaps[0].data, container.pixelWidth, container.pixelHeight)
+        : new Data3DTexture(mipmaps[0].data, container.pixelWidth, container.pixelHeight, container.pixelDepth)
+  } else {
+    if (container.pixelDepth > 0) throw new Error('THREE.KTX2Loader: Unsupported pixelDepth.')
+
+    texture = new CompressedTexture(mipmaps, container.pixelWidth, container.pixelHeight)
+  }
+
+  texture.mipmaps = mipmaps
 
   texture.type = TYPE_MAP[vkFormat]
   texture.format = FORMAT_MAP[vkFormat]
-  texture.encoding = ENCODING_MAP[vkFormat] || 3000 // LinearEncoding
-
   texture.needsUpdate = true
+
+  const colorSpace = parseColorSpace(container)
+  if ('colorSpace' in texture) texture.colorSpace = colorSpace
+  else texture.encoding = colorSpace === SRGBColorSpace ? sRGBEncoding : LinearEncoding
 
   //
 
   return Promise.resolve(texture)
+}
+
+function parseColorSpace(container) {
+  const dfd = container.dataFormatDescriptor[0]
+
+  if (dfd.colorPrimaries === KHR_DF_PRIMARIES_BT709) {
+    return dfd.transferFunction === KHR_DF_TRANSFER_SRGB ? SRGBColorSpace : LinearSRGBColorSpace
+  } else if (dfd.colorPrimaries === KHR_DF_PRIMARIES_DISPLAYP3) {
+    return dfd.transferFunction === KHR_DF_TRANSFER_SRGB ? DisplayP3ColorSpace : LinearDisplayP3ColorSpace
+  } else if (dfd.colorPrimaries === KHR_DF_PRIMARIES_UNSPECIFIED) {
+    return NoColorSpace
+  } else {
+    console.warn(`THREE.KTX2Loader: Unsupported color primaries, "${dfd.colorPrimaries}"`)
+    return NoColorSpace
+  }
 }
 
 export { KTX2Loader }
