@@ -235,6 +235,7 @@ class FlyControls extends EventDispatcher {
       this.lastPosition.distanceToSquared(this.object.position) > this.EPS ||
       8 * (1 - this.lastQuaternion.dot(this.object.quaternion)) > this.EPS
     ) {
+      // @ts-ignore
       this.dispatchEvent(this.changeEvent)
       this.lastQuaternion.copy(this.object.quaternion)
       this.lastPosition.copy(this.object.position)
@@ -276,7 +277,7 @@ class FlyControls extends EventDispatcher {
   public connect = (domElement: HTMLElement | Document): void => {
     this.domElement = domElement
 
-    if (domElement && !(domElement instanceof Document)) {
+    if (!(domElement instanceof Document)) {
       domElement.setAttribute('tabindex', -1 as any)
     }
 

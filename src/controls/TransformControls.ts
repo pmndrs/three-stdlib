@@ -220,7 +220,9 @@ class TransformControls<TCamera extends Camera = Camera> extends Object3D {
         this.object.position.copy(this.positionStart)
         this.object.quaternion.copy(this.quaternionStart)
         this.object.scale.copy(this.scaleStart)
+        // @ts-ignore
         this.dispatchEvent(this.changeEvent)
+        // @ts-ignore
         this.dispatchEvent(this.objectChangeEvent)
         this.pointStart.copy(this.pointEnd)
       }
@@ -309,6 +311,7 @@ class TransformControls<TCamera extends Camera = Camera> extends Object3D {
 
       this.dragging = true
       this.mouseDownEvent.mode = this.mode
+      // @ts-ignore
       this.dispatchEvent(this.mouseDownEvent)
     }
   }
@@ -493,7 +496,9 @@ class TransformControls<TCamera extends Camera = Camera> extends Object3D {
       }
     }
 
+    // @ts-ignore
     this.dispatchEvent(this.changeEvent)
+    // @ts-ignore
     this.dispatchEvent(this.objectChangeEvent)
   }
 
@@ -502,6 +507,7 @@ class TransformControls<TCamera extends Camera = Camera> extends Object3D {
 
     if (this.dragging && this.axis !== null) {
       this.mouseUpEvent.mode = this.mode
+      // @ts-ignore
       this.dispatchEvent(this.mouseUpEvent)
     }
 
@@ -521,7 +527,7 @@ class TransformControls<TCamera extends Camera = Camera> extends Object3D {
         ? (event as TouchEvent).changedTouches[0]
         : (event as MouseEvent)
 
-      const rect = (this.domElement as HTMLElement)?.getBoundingClientRect()
+      const rect = this.domElement!.getBoundingClientRect()
 
       return {
         x: ((pointer.clientX - rect.left) / rect.width) * 2 - 1,

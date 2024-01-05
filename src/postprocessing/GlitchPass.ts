@@ -9,6 +9,7 @@ import {
   UniformsUtils,
   WebGLRenderTarget,
   WebGLRenderer,
+  IUniform,
 } from 'three'
 import { DigitalGlitch } from '../shaders/DigitalGlitch'
 
@@ -19,7 +20,7 @@ class GlitchPass extends Pass {
   public curF: number
   public randX!: number
 
-  public uniforms
+  public uniforms: Record<keyof typeof DigitalGlitch['uniforms'], IUniform<any>>
 
   constructor(dt_size = 64) {
     super()

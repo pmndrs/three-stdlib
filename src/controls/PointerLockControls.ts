@@ -40,15 +40,18 @@ class PointerLockControls extends EventDispatcher {
     _euler.x -= movementY * 0.002 * this.pointerSpeed
     _euler.x = Math.max(_PI_2 - this.maxPolarAngle, Math.min(_PI_2 - this.minPolarAngle, _euler.x))
     this.camera.quaternion.setFromEuler(_euler)
+    // @ts-ignore
     this.dispatchEvent(_changeEvent)
   }
 
   private onPointerlockChange = (): void => {
     if (!this.domElement) return
     if (this.domElement.ownerDocument.pointerLockElement === this.domElement) {
+      // @ts-ignore
       this.dispatchEvent(_lockEvent)
       this.isLocked = true
     } else {
+      // @ts-ignore
       this.dispatchEvent(_unlockEvent)
       this.isLocked = false
     }

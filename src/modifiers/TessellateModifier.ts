@@ -65,11 +65,11 @@ class TessellateModifier {
     let uvs = hasUVs ? attributes.uv.array : null
     let uv2s = hasUV2s ? attributes.uv2.array : null
 
-    let positions2 = positions as number[]
-    let normals2 = normals
-    let colors2 = colors
-    let uvs2 = uvs
-    let uv2s2 = uv2s
+    let positions2 = (positions as unknown) as number[]
+    let normals2 = (normals as unknown) as number[]
+    let colors2 = (colors as unknown) as number[]
+    let uvs2 = (uvs as unknown) as number[]
+    let uv2s2 = (uv2s as unknown) as number[]
 
     let iteration = 0
     let tessellating = true
@@ -88,9 +88,9 @@ class TessellateModifier {
         const n2 = ns[b]
         const n3 = ns[c]
 
-        ;(normals2 as number[]).push(n1.x, n1.y, n1.z)
-        ;(normals2 as number[]).push(n2.x, n2.y, n2.z)
-        ;(normals2 as number[]).push(n3.x, n3.y, n3.z)
+        normals2.push(n1.x, n1.y, n1.z)
+        normals2.push(n2.x, n2.y, n2.z)
+        normals2.push(n3.x, n3.y, n3.z)
       }
 
       if (hasColors) {
@@ -98,9 +98,9 @@ class TessellateModifier {
         const c2 = cs[b]
         const c3 = cs[c]
 
-        ;(colors2 as number[]).push(c1.r, c1.g, c1.b)
-        ;(colors2 as number[]).push(c2.r, c2.g, c2.b)
-        ;(colors2 as number[]).push(c3.r, c3.g, c3.b)
+        colors2.push(c1.r, c1.g, c1.b)
+        colors2.push(c2.r, c2.g, c2.b)
+        colors2.push(c3.r, c3.g, c3.b)
       }
 
       if (hasUVs) {
@@ -108,9 +108,9 @@ class TessellateModifier {
         const u2 = us[b]
         const u3 = us[c]
 
-        ;(uvs2 as number[]).push(u1.x, u1.y)
-        ;(uvs2 as number[]).push(u2.x, u2.y)
-        ;(uvs2 as number[]).push(u3.x, u3.y)
+        uvs2.push(u1.x, u1.y)
+        uvs2.push(u2.x, u2.y)
+        uvs2.push(u3.x, u3.y)
       }
 
       if (hasUV2s) {
@@ -118,9 +118,9 @@ class TessellateModifier {
         const u22 = u2s[b]
         const u23 = u2s[c]
 
-        ;(uv2s2 as number[]).push(u21.x, u21.y)
-        ;(uv2s2 as number[]).push(u22.x, u22.y)
-        ;(uv2s2 as number[]).push(u23.x, u23.y)
+        uv2s2.push(u21.x, u21.y)
+        uv2s2.push(u22.x, u22.y)
+        uv2s2.push(u23.x, u23.y)
       }
     }
 
@@ -128,26 +128,26 @@ class TessellateModifier {
       iteration++
       tessellating = false
 
-      positions = positions2
+      positions = positions2 as any
       positions2 = []
 
       if (hasNormals) {
-        normals = normals2
+        normals = normals2 as any
         normals2 = []
       }
 
       if (hasColors) {
-        colors = colors2
+        colors = colors2 as any
         colors2 = []
       }
 
       if (hasUVs) {
-        uvs = uvs2
+        uvs = uvs2 as any
         uvs2 = []
       }
 
       if (hasUV2s) {
-        uv2s = uv2s2
+        uv2s = uv2s2 as any
         uv2s2 = []
       }
 
@@ -226,19 +226,19 @@ class TessellateModifier {
     geometry2.setAttribute('position', new Float32BufferAttribute(positions2, 3))
 
     if (hasNormals) {
-      geometry2.setAttribute('normal', new Float32BufferAttribute(normals2 as number[], 3))
+      geometry2.setAttribute('normal', new Float32BufferAttribute(normals2 as any, 3))
     }
 
     if (hasColors) {
-      geometry2.setAttribute('color', new Float32BufferAttribute(colors2 as number[], 3))
+      geometry2.setAttribute('color', new Float32BufferAttribute(colors2 as any, 3))
     }
 
     if (hasUVs) {
-      geometry2.setAttribute('uv', new Float32BufferAttribute(uvs2 as number[], 2))
+      geometry2.setAttribute('uv', new Float32BufferAttribute(uvs2 as any, 2))
     }
 
     if (hasUV2s) {
-      geometry2.setAttribute('uv2', new Float32BufferAttribute(uv2s2 as number[], 2))
+      geometry2.setAttribute('uv2', new Float32BufferAttribute(uv2s2 as any, 2))
     }
 
     return geometry2

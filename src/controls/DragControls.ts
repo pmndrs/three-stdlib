@@ -72,6 +72,7 @@ class DragControls extends EventDispatcher {
         this._selected.position.copy(this._intersection.sub(this._offset).applyMatrix4(this._inverseMatrix))
       }
 
+      // @ts-ignore
       this.dispatchEvent({ type: 'drag', object: this._selected })
 
       return
@@ -91,6 +92,7 @@ class DragControls extends EventDispatcher {
       )
 
       if (this._hovered !== object) {
+        // @ts-ignore
         this.dispatchEvent({ type: 'hoveron', object })
 
         this._domElement.style.cursor = 'pointer'
@@ -98,6 +100,7 @@ class DragControls extends EventDispatcher {
       }
     } else {
       if (this._hovered !== null) {
+        // @ts-ignore
         this.dispatchEvent({ type: 'hoveroff', object: this._hovered })
 
         this._domElement.style.cursor = 'auto'
@@ -122,12 +125,14 @@ class DragControls extends EventDispatcher {
 
       this._domElement.style.cursor = 'move'
 
+      // @ts-ignore
       this.dispatchEvent({ type: 'dragstart', object: this._selected })
     }
   }
 
   private onMouseCancel = (): void => {
     if (this._selected) {
+      // @ts-ignore
       this.dispatchEvent({ type: 'dragend', object: this._selected })
 
       this._selected = null
@@ -185,6 +190,7 @@ class DragControls extends EventDispatcher {
         this._selected.position.copy(this._intersection.sub(this._offset).applyMatrix4(this._inverseMatrix))
       }
 
+      // @ts-ignore
       this.dispatchEvent({ type: 'drag', object: this._selected })
 
       return
@@ -220,6 +226,7 @@ class DragControls extends EventDispatcher {
 
       this._domElement.style.cursor = 'move'
 
+      // @ts-ignore
       this.dispatchEvent({ type: 'dragstart', object: this._selected })
     }
   }
@@ -228,6 +235,7 @@ class DragControls extends EventDispatcher {
     event.preventDefault()
 
     if (this._selected) {
+      // @ts-ignore
       this.dispatchEvent({ type: 'dragend', object: this._selected })
 
       this._selected = null

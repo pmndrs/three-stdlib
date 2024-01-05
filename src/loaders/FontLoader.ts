@@ -36,7 +36,7 @@ export class FontLoader extends Loader {
         if (onLoad) onLoad(font)
       },
       onProgress,
-      onError,
+      onError as (event: unknown) => void,
     )
   }
 
