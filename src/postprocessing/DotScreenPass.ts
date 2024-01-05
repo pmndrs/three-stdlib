@@ -1,12 +1,12 @@
 import { Pass, FullScreenQuad } from './Pass'
-import { ShaderMaterial, UniformsUtils, Vector2, WebGLRenderer, WebGLRenderTarget } from 'three'
+import { IUniform, ShaderMaterial, UniformsUtils, Vector2, WebGLRenderer, WebGLRenderTarget } from 'three'
 import { DotScreenShader } from '../shaders/DotScreenShader'
 
 class DotScreenPass extends Pass {
   public material: ShaderMaterial
   public fsQuad: FullScreenQuad
 
-  public uniforms
+  public uniforms: Record<keyof typeof DotScreenShader['uniforms'], IUniform<any>>
 
   constructor(center?: Vector2, angle?: number, scale?: number) {
     super()

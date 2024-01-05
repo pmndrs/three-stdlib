@@ -370,6 +370,7 @@ class ArcballControls extends EventDispatcher {
       child.geometry = curveGeometry
     }
 
+    // @ts-ignore
     this.dispatchEvent(_changeEvent)
   }
 
@@ -630,6 +631,7 @@ class ArcballControls extends EventDispatcher {
 
       if (mouseOp) {
         event.preventDefault()
+        // @ts-ignore
         this.dispatchEvent(_startEvent)
 
         const notchDeltaY = 125 //distance of one notch of mouse wheel
@@ -681,7 +683,9 @@ class ArcballControls extends EventDispatcher {
 
             this.updateTbState(STATE.IDLE, false)
 
+            // @ts-ignore
             this.dispatchEvent(_changeEvent)
+            // @ts-ignore
             this.dispatchEvent(_endEvent)
 
             break
@@ -748,7 +752,9 @@ class ArcballControls extends EventDispatcher {
 
             this.updateTbState(STATE.IDLE, false)
 
+            // @ts-ignore
             this.dispatchEvent(_changeEvent)
+            // @ts-ignore
             this.dispatchEvent(_endEvent)
 
             break
@@ -759,6 +765,7 @@ class ArcballControls extends EventDispatcher {
 
   private onSinglePanStart = (event: PointerEvent, operation: Operation): void => {
     if (this.enabled && this.domElement) {
+      // @ts-ignore
       this.dispatchEvent(_startEvent)
 
       this.setCenter(event.clientX, event.clientY)
@@ -773,6 +780,7 @@ class ArcballControls extends EventDispatcher {
             this._timeStart = -1
 
             this.activateGizmos(false)
+            // @ts-ignore
             this.dispatchEvent(_changeEvent)
           }
 
@@ -784,6 +792,7 @@ class ArcballControls extends EventDispatcher {
             }
             if (this.enableGrid) {
               this.drawGrid()
+              // @ts-ignore
               this.dispatchEvent(_changeEvent)
             }
           }
@@ -816,6 +825,7 @@ class ArcballControls extends EventDispatcher {
             }
           }
 
+          // @ts-ignore
           this.dispatchEvent(_changeEvent)
           break
 
@@ -829,6 +839,7 @@ class ArcballControls extends EventDispatcher {
               this._timeStart = -1
 
               this.activateGizmos(false)
+              // @ts-ignore
               this.dispatchEvent(_changeEvent)
             }
 
@@ -847,6 +858,7 @@ class ArcballControls extends EventDispatcher {
             this._timeStart = -1
 
             this.activateGizmos(false)
+            // @ts-ignore
             this.dispatchEvent(_changeEvent)
           }
 
@@ -869,7 +881,9 @@ class ArcballControls extends EventDispatcher {
             if (restart) {
               //switch to pan operation
 
+              // @ts-ignore
               this.dispatchEvent(_endEvent)
+              // @ts-ignore
               this.dispatchEvent(_startEvent)
 
               this.updateTbState(opState, true)
@@ -899,7 +913,9 @@ class ArcballControls extends EventDispatcher {
             if (restart) {
               //switch to rotate operation
 
+              // @ts-ignore
               this.dispatchEvent(_endEvent)
+              // @ts-ignore
               this.dispatchEvent(_startEvent)
 
               this.updateTbState(opState, true)
@@ -965,7 +981,9 @@ class ArcballControls extends EventDispatcher {
             if (restart) {
               //switch to zoom operation
 
+              // @ts-ignore
               this.dispatchEvent(_endEvent)
+              // @ts-ignore
               this.dispatchEvent(_startEvent)
 
               this.updateTbState(opState, true)
@@ -1003,7 +1021,9 @@ class ArcballControls extends EventDispatcher {
             if (restart) {
               //switch to fov operation
 
+              // @ts-ignore
               this.dispatchEvent(_endEvent)
+              // @ts-ignore
               this.dispatchEvent(_startEvent)
 
               this.updateTbState(opState, true)
@@ -1065,6 +1085,7 @@ class ArcballControls extends EventDispatcher {
           break
       }
 
+      // @ts-ignore
       this.dispatchEvent(_changeEvent)
     }
   }
@@ -1092,11 +1113,13 @@ class ArcballControls extends EventDispatcher {
           //cursor has been standing still for over 120 ms since last movement
           this.updateTbState(STATE.IDLE, false)
           this.activateGizmos(false)
+          // @ts-ignore
           this.dispatchEvent(_changeEvent)
         }
       } else {
         this.updateTbState(STATE.IDLE, false)
         this.activateGizmos(false)
+        // @ts-ignore
         this.dispatchEvent(_changeEvent)
       }
     } else if (this._state == STATE.PAN || this._state == STATE.IDLE) {
@@ -1107,14 +1130,17 @@ class ArcballControls extends EventDispatcher {
       }
 
       this.activateGizmos(false)
+      // @ts-ignore
       this.dispatchEvent(_changeEvent)
     }
 
+    // @ts-ignore
     this.dispatchEvent(_endEvent)
   }
 
   private onDoubleTap = (event: PointerEvent): void => {
     if (this.enabled && this.enablePan && this.scene && this.camera && this.domElement) {
+      // @ts-ignore
       this.dispatchEvent(_startEvent)
 
       this.setCenter(event.clientX, event.clientY)
@@ -1135,15 +1161,18 @@ class ArcballControls extends EventDispatcher {
         this.updateTbState(STATE.FOCUS, true)
         this.focus(hitP, this.scaleFactor)
         this.updateTbState(STATE.IDLE, false)
+        // @ts-ignore
         this.dispatchEvent(_changeEvent)
       }
     }
 
+    // @ts-ignore
     this.dispatchEvent(_endEvent)
   }
 
   private onDoublePanStart = (): void => {
     if (this.enabled && this.enablePan && this.camera && this.domElement) {
+      // @ts-ignore
       this.dispatchEvent(_startEvent)
 
       this.updateTbState(STATE.PAN, true)
@@ -1178,17 +1207,20 @@ class ArcballControls extends EventDispatcher {
       const rayDir = this.unprojectOnTbPlane(this.camera, _center.x, _center.y, this.domElement, true)
       if (rayDir !== undefined) this._currentCursorPosition.copy(rayDir)
       this.applyTransformMatrix(this.pan(this._startCursorPosition, this._currentCursorPosition, true))
+      // @ts-ignore
       this.dispatchEvent(_changeEvent)
     }
   }
 
   private onDoublePanEnd = (): void => {
     this.updateTbState(STATE.IDLE, false)
+    // @ts-ignore
     this.dispatchEvent(_endEvent)
   }
 
   private onRotateStart = (): void => {
     if (this.enabled && this.enableRotate) {
+      // @ts-ignore
       this.dispatchEvent(_startEvent)
 
       this.updateTbState(STATE.ZROTATE, true)
@@ -1241,6 +1273,7 @@ class ArcballControls extends EventDispatcher {
       if (rotationPoint !== undefined) {
         this.applyTransformMatrix(this.zRotate(rotationPoint, amount))
       }
+      // @ts-ignore
       this.dispatchEvent(_changeEvent)
     }
   }
@@ -1248,11 +1281,13 @@ class ArcballControls extends EventDispatcher {
   private onRotateEnd = (): void => {
     this.updateTbState(STATE.IDLE, false)
     this.activateGizmos(false)
+    // @ts-ignore
     this.dispatchEvent(_endEvent)
   }
 
   private onPinchStart = (): void => {
     if (this.enabled && this.enableZoom) {
+      // @ts-ignore
       this.dispatchEvent(_startEvent)
       this.updateTbState(STATE.SCALE, true)
 
@@ -1302,17 +1337,20 @@ class ArcballControls extends EventDispatcher {
       if (scalePoint !== undefined) {
         this.applyTransformMatrix(this.applyScale(amount, scalePoint))
       }
+      // @ts-ignore
       this.dispatchEvent(_changeEvent)
     }
   }
 
   private onPinchEnd = (): void => {
     this.updateTbState(STATE.IDLE, false)
+    // @ts-ignore
     this.dispatchEvent(_endEvent)
   }
 
   private onTriplePanStart = (): void => {
     if (this.enabled && this.enableZoom && this.domElement) {
+      // @ts-ignore
       this.dispatchEvent(_startEvent)
 
       this.updateTbState(STATE.SCALE, true)
@@ -1401,12 +1439,14 @@ class ArcballControls extends EventDispatcher {
         .multiplyScalar(newDistance / x)
       this._m4_1.makeTranslation(direction.x, direction.y, direction.z)
 
+      // @ts-ignore
       this.dispatchEvent(_changeEvent)
     }
   }
 
   private onTriplePanEnd = (): void => {
     this.updateTbState(STATE.IDLE, false)
+    // @ts-ignore
     this.dispatchEvent(_endEvent)
     //this.dispatchEvent( _changeEvent );
   }
@@ -1933,6 +1973,7 @@ class ArcballControls extends EventDispatcher {
    */
   public setGizmosVisible(value: boolean): void {
     this._gizmos.visible = value
+    // @ts-ignore
     this.dispatchEvent(_changeEvent)
   }
 
@@ -2017,6 +2058,7 @@ class ArcballControls extends EventDispatcher {
         this.updateTbState(STATE.IDLE, false)
         this.activateGizmos(false)
 
+        // @ts-ignore
         this.dispatchEvent(_changeEvent)
       } else {
         const amount = this.easeOutCubic(animTime)
@@ -2025,6 +2067,7 @@ class ArcballControls extends EventDispatcher {
         this._gizmoMatrixState.decompose(this._gizmos.position, this._gizmos.quaternion, this._gizmos.scale)
         this.focus(point, size, amount)
 
+        // @ts-ignore
         this.dispatchEvent(_changeEvent)
         const self = this
         this._animationId = window.requestAnimationFrame(function (t) {
@@ -2062,6 +2105,7 @@ class ArcballControls extends EventDispatcher {
         //tetha = 0.5 * alpha * t^2 + w0 * t + tetha0
         this._angleCurrent = 0.5 * -this.dampingFactor * Math.pow(deltaTime, 2) + w0 * deltaTime + 0
         this.applyTransformMatrix(this.rotate(rotationAxis, this._angleCurrent))
+        // @ts-ignore
         this.dispatchEvent(_changeEvent)
         const self = this
         this._animationId = window.requestAnimationFrame(function (t) {
@@ -2074,6 +2118,7 @@ class ArcballControls extends EventDispatcher {
         this.updateTbState(STATE.IDLE, false)
         this.activateGizmos(false)
 
+        // @ts-ignore
         this.dispatchEvent(_changeEvent)
       }
     } else {
@@ -2084,6 +2129,7 @@ class ArcballControls extends EventDispatcher {
 
       if (this._state != STATE.ROTATE) {
         this.activateGizmos(false)
+        // @ts-ignore
         this.dispatchEvent(_changeEvent)
       }
     }
@@ -2156,6 +2202,7 @@ class ArcballControls extends EventDispatcher {
 
       this.updateTbState(STATE.IDLE, false)
 
+      // @ts-ignore
       this.dispatchEvent(_changeEvent)
     }
   }
@@ -2774,6 +2821,7 @@ class ArcballControls extends EventDispatcher {
       this.camera.lookAt(this._gizmos.position)
       this.updateTbState(STATE.IDLE, false)
 
+      // @ts-ignore
       this.dispatchEvent(_changeEvent)
     }
   }

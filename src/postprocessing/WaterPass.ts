@@ -1,4 +1,4 @@
-import { WebGLRenderer, WebGLRenderTarget, ShaderMaterial, UniformsUtils, Vector2 } from 'three'
+import { WebGLRenderer, WebGLRenderTarget, ShaderMaterial, Vector2, IUniform, Texture } from 'three'
 import { Pass, FullScreenQuad } from '../postprocessing/Pass'
 
 /**
@@ -25,16 +25,21 @@ class WaterPass extends Pass {
   public fsQuad: FullScreenQuad
   public factor: number
   public time: number
-  public uniforms
+  public uniforms: {
+    tex: IUniform<Texture>
+    time: IUniform<number>
+    factor: IUniform<number>
+    resolution: IUniform<Vector2>
+  }
 
   constructor() {
     super()
-    this.uniforms = UniformsUtils.clone({
-      tex: { value: null },
+    this.uniforms = {
+      tex: { value: null! },
       time: { value: 0.0 },
       factor: { value: 0.0 },
       resolution: { value: new Vector2(64, 64) },
-    })
+    }
     this.material = new ShaderMaterial({
       uniforms: this.uniforms,
       vertexShader: `

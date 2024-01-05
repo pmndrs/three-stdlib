@@ -1,5 +1,13 @@
 import { Pass, FullScreenQuad } from './Pass'
-import { AdditiveBlending, ShaderMaterial, UniformsUtils, Vector2, WebGLRenderer, WebGLRenderTarget } from 'three'
+import {
+  AdditiveBlending,
+  IUniform,
+  ShaderMaterial,
+  UniformsUtils,
+  Vector2,
+  WebGLRenderer,
+  WebGLRenderTarget,
+} from 'three'
 import { ConvolutionShader } from '../shaders/ConvolutionShader'
 
 class BloomPass extends Pass {
@@ -8,8 +16,8 @@ class BloomPass extends Pass {
   public materialCombine: ShaderMaterial
   public materialConvolution: ShaderMaterial
   public fsQuad: FullScreenQuad
-  public combineUniforms
-  public convolutionUniforms
+  public combineUniforms: Record<keyof typeof CombineShader['uniforms'], IUniform<any>>
+  public convolutionUniforms: Record<keyof typeof ConvolutionShader['uniforms'], IUniform<any>>
 
   public blurX = new Vector2(0.001953125, 0.0)
   public blurY = new Vector2(0.0, 0.001953125)

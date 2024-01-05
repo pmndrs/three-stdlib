@@ -103,6 +103,7 @@ class DeviceOrientationControls extends EventDispatcher {
 
       if (8 * (1 - this.lastQuaternion.dot(this.object.quaternion)) > this.EPS) {
         this.lastQuaternion.copy(this.object.quaternion)
+        // @ts-ignore
         this.dispatchEvent(this.changeEvent)
       }
     }

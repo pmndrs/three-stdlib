@@ -10,7 +10,9 @@ class HDRCubeTextureLoader extends Loader {
   }
 
   load(urls, onLoad, onProgress, onError) {
-    if (!Array.isArray(urls)) {
+    if (typeof urls === 'string') {
+      urls = [urls]
+    } else if (!Array.isArray(urls)) {
       console.warn('THREE.HDRCubeTextureLoader signature has changed. Use .setDataType() instead.')
 
       this.setDataType(urls)
