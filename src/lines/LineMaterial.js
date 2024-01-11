@@ -36,7 +36,6 @@ class LineMaterial extends ShaderMaterial {
 
       vertexShader: /* glsl */ `
 				#include <common>
-				#include <color_pars_vertex>
 				#include <fog_pars_vertex>
 				#include <logdepthbuf_pars_vertex>
 				#include <clipping_planes_pars_vertex>
@@ -47,8 +46,15 @@ class LineMaterial extends ShaderMaterial {
 				attribute vec3 instanceStart;
 				attribute vec3 instanceEnd;
 
-				attribute vec3 instanceColorStart;
-				attribute vec3 instanceColorEnd;
+				#ifdef USE_LINE_COLOR_ALPHA
+					varying vec4 vLineColor;
+					attribute vec4 instanceColorStart;
+					attribute vec4 instanceColorEnd;
+				#else
+					varying vec3 vLineColor;
+					attribute vec3 instanceColorStart;
+					attribute vec3 instanceColorEnd;
+				#endif
 
 				#ifdef WORLD_UNITS
 
@@ -94,11 +100,7 @@ class LineMaterial extends ShaderMaterial {
 
 				void main() {
 
-					#ifdef USE_COLOR
-
-						vColor.xyz = ( position.y < 0.5 ) ? instanceColorStart : instanceColorEnd;
-
-					#endif
+					vLineColor = ( position.y < 0.5 ) ? instanceColorStart : instanceColorEnd;
 
 					#ifdef USE_DASH
 
@@ -297,10 +299,15 @@ class LineMaterial extends ShaderMaterial {
 				#endif
 
 				#include <common>
-				#include <color_pars_fragment>
 				#include <fog_pars_fragment>
 				#include <logdepthbuf_pars_fragment>
 				#include <clipping_planes_pars_fragment>
+
+				#ifdef USE_LINE_COLOR_ALPHA
+					varying vec4 vLineColor;
+				#else
+					varying vec3 vLineColor;
+				#endif
 
 				vec2 closestLineToLine(vec3 p1, vec3 p2, vec3 p3, vec3 p4) {
 
@@ -410,11 +417,15 @@ class LineMaterial extends ShaderMaterial {
 					#endif
 
 					vec4 diffuseColor = vec4( diffuse, alpha );
+					#ifdef USE_LINE_COLOR_ALPHA
+						diffuseColor *= vLineColor;
+					#else
+						diffuseColor.rgb *= vLineColor;
+					#endif
 
 					#include <logdepthbuf_fragment>
-					#include <color_fragment>
 
-					gl_FragColor = vec4( diffuseColor.rgb, alpha );
+					gl_FragColor = diffuseColor;
 
 					#include <tonemapping_fragment>
 					#include <${parseInt(REVISION.replace(/\D+/g, '')) >= 154 ? 'colorspace_fragment' : 'encodings_fragment'}>
@@ -427,6 +438,14 @@ class LineMaterial extends ShaderMaterial {
     })
 
     this.isLineMaterial = true
+
+    this.onBeforeCompile = function () {
+      if (this.transparent) {
+        this.defines.USE_LINE_COLOR_ALPHA = '1'
+      } else {
+        delete this.defines.USE_LINE_COLOR_ALPHA
+      }
+    }
 
     Object.defineProperties(this, {
       color: {

@@ -11,6 +11,6 @@ export class LineSegmentsGeometry extends InstancedBufferGeometry {
   fromLineSegments(lineSegments: LineSegments): this
   fromMesh(mesh: Mesh): this
   fromWireframeGeometry(geometry: WireframeGeometry): this
-  setColors(array: number[] | Float32Array): this
+  setColors(array: number[] | Float32Array, itemSize?: 3 | 4): this
   setPositions(array: number[] | Float32Array): this
 }
