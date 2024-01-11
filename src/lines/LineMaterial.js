@@ -47,8 +47,13 @@ class LineMaterial extends ShaderMaterial {
 				attribute vec3 instanceStart;
 				attribute vec3 instanceEnd;
 
-				attribute vec3 instanceColorStart;
-				attribute vec3 instanceColorEnd;
+				#ifdef USE_COLOR_ALPHA
+					attribute vec4 instanceColorStart;
+					attribute vec4 instanceColorEnd;
+				#else
+					attribute vec3 instanceColorStart;
+					attribute vec3 instanceColorEnd;
+				#endif
 
 				#ifdef WORLD_UNITS
 
@@ -96,7 +101,7 @@ class LineMaterial extends ShaderMaterial {
 
 					#ifdef USE_COLOR
 
-						vColor.xyz = ( position.y < 0.5 ) ? instanceColorStart : instanceColorEnd;
+						vColor = ( position.y < 0.5 ) ? instanceColorStart : instanceColorEnd;
 
 					#endif
 
