@@ -29,7 +29,7 @@ class OculusHandModel extends Object3D {
     this.xrInputSource = null
 
     controller.addEventListener('connected', (event) => {
-      const xrInputSource = event.data
+      const xrInputSource = (event as any).data
 
       if (xrInputSource.hand && !this.motionController) {
         this.xrInputSource = xrInputSource

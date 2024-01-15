@@ -1,13 +1,14 @@
-import { Shader, ShaderMaterial, UniformsUtils, WebGLRenderer, WebGLRenderTarget } from 'three'
+import { ShaderMaterial, UniformsUtils, WebGLRenderer, WebGLRenderTarget } from 'three'
 import { Pass, FullScreenQuad } from './Pass'
+import { Defines, IShader, Uniforms } from '../shaders/types'
 
 class ShaderPass extends Pass {
   public textureID: string
-  public uniforms: Shader['uniforms']
+  public uniforms: Uniforms
   public material: ShaderMaterial
   public fsQuad: FullScreenQuad
 
-  constructor(shader: ShaderMaterial | (Shader & { defines?: Object }), textureID = 'tDiffuse') {
+  constructor(shader: ShaderMaterial | IShader<Uniforms, Defines | undefined>, textureID = 'tDiffuse') {
     super()
 
     this.textureID = textureID

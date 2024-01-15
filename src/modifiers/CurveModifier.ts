@@ -14,7 +14,6 @@ import {
   DynamicDrawUsage,
   Matrix4,
   Material,
-  Shader,
   Curve,
   BufferGeometry,
 } from 'three'
@@ -123,9 +122,9 @@ export function modifyShader<TMaterial extends Material = Material>(
   if (material.__ok) return
   material.__ok = true
 
-  material.onBeforeCompile = (shader: Shader & { __modified: boolean }): void => {
-    if (shader.__modified) return
-    shader.__modified = true
+  material.onBeforeCompile = (shader: { vertexShader: string; uniforms: { [uniform: string]: IUniform } }): void => {
+    if ((shader as any).__modified) return
+    ;(shader as any).__modified = true
 
     Object.assign(shader.uniforms, uniforms)
 

@@ -1,12 +1,12 @@
 import { Pass, FullScreenQuad } from './Pass'
-import { ShaderMaterial, UniformsUtils, WebGLRenderer, WebGLRenderTarget } from 'three'
+import { IUniform, ShaderMaterial, UniformsUtils, WebGLRenderer, WebGLRenderTarget } from 'three'
 import { FilmShader } from '../shaders/FilmShader'
 
 class FilmPass extends Pass {
   public material: ShaderMaterial
   public fsQuad: FullScreenQuad
 
-  public uniforms
+  public uniforms: Record<keyof typeof FilmShader['uniforms'], IUniform<any>>
 
   constructor(noiseIntensity?: number, scanlinesIntensity?: number, scanlinesCount?: number, grayscale?: boolean) {
     super()

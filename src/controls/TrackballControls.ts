@@ -303,6 +303,7 @@ class TrackballControls extends EventDispatcher {
       this.object.lookAt(this.target)
 
       if (this.lastPosition.distanceToSquared(this.object.position) > this.EPS) {
+        // @ts-ignore
         this.dispatchEvent(this.changeEvent)
 
         this.lastPosition.copy(this.object.position)
@@ -311,6 +312,7 @@ class TrackballControls extends EventDispatcher {
       this.object.lookAt(this.target)
 
       if (this.lastPosition.distanceToSquared(this.object.position) > this.EPS || this.lastZoom !== this.object.zoom) {
+        // @ts-ignore
         this.dispatchEvent(this.changeEvent)
 
         this.lastPosition.copy(this.object.position)
@@ -336,6 +338,7 @@ class TrackballControls extends EventDispatcher {
 
     this.object.lookAt(this.target)
 
+    // @ts-ignore
     this.dispatchEvent(this.changeEvent)
 
     this.lastPosition.copy(this.object.position)
@@ -420,9 +423,6 @@ class TrackballControls extends EventDispatcher {
         case this.mouseButtons.RIGHT:
           this._state = this.STATE.PAN
           break
-
-        default:
-          this._state = this.STATE.NONE
       }
     }
 
@@ -442,6 +442,7 @@ class TrackballControls extends EventDispatcher {
     this.domElement.ownerDocument.addEventListener('pointermove', this.onPointerMove)
     this.domElement.ownerDocument.addEventListener('pointerup', this.onPointerUp)
 
+    // @ts-ignore
     this.dispatchEvent(this.startEvent)
   }
 
@@ -469,6 +470,7 @@ class TrackballControls extends EventDispatcher {
     this.domElement.ownerDocument.removeEventListener('pointermove', this.onPointerMove)
     this.domElement.ownerDocument.removeEventListener('pointerup', this.onPointerUp)
 
+    // @ts-ignore
     this.dispatchEvent(this.endEvent)
   }
 
@@ -499,7 +501,9 @@ class TrackballControls extends EventDispatcher {
     this.mousePosition.x = (event.offsetX / this.screen.width) * 2 - 1
     this.mousePosition.y = -(event.offsetY / this.screen.height) * 2 + 1
 
+    // @ts-ignore
     this.dispatchEvent(this.startEvent)
+    // @ts-ignore
     this.dispatchEvent(this.endEvent)
   }
 
@@ -529,6 +533,7 @@ class TrackballControls extends EventDispatcher {
         break
     }
 
+    // @ts-ignore
     this.dispatchEvent(this.startEvent)
   }
 
@@ -571,6 +576,7 @@ class TrackballControls extends EventDispatcher {
         break
     }
 
+    // @ts-ignore
     this.dispatchEvent(this.endEvent)
   }
 

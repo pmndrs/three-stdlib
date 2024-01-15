@@ -230,6 +230,7 @@ class CameraControls extends EventDispatcher {
     this.object.zoom = this.zoom0
 
     this.object.updateProjectionMatrix()
+    // @ts-ignore
     this.dispatchEvent(this.changeEvent)
 
     this.update()
@@ -361,6 +362,7 @@ class CameraControls extends EventDispatcher {
       this.lastPosition.distanceToSquared(this.object.position) > this.EPS ||
       8 * (1 - this.lastQuaternion.dot(this.object.quaternion)) > this.EPS
     ) {
+      // @ts-ignore
       this.dispatchEvent(this.changeEvent)
 
       this.lastPosition.copy(this.object.position)
@@ -773,6 +775,7 @@ class CameraControls extends EventDispatcher {
       document.addEventListener('mousemove', this.onMouseMove, false)
       document.addEventListener('mouseup', this.onMouseUp, false)
 
+      // @ts-ignore
       this.dispatchEvent(this.startEvent)
     }
   }
@@ -814,6 +817,7 @@ class CameraControls extends EventDispatcher {
     document.removeEventListener('mousemove', this.onMouseMove, false)
     document.removeEventListener('mouseup', this.onMouseUp, false)
 
+    // @ts-ignore
     this.dispatchEvent(this.endEvent)
 
     this.state = STATE.NONE
@@ -830,10 +834,12 @@ class CameraControls extends EventDispatcher {
 
     event.preventDefault()
 
+    // @ts-ignore
     this.dispatchEvent(this.startEvent)
 
     this.handleMouseWheel(event)
 
+    // @ts-ignore
     this.dispatchEvent(this.endEvent)
   }
 
@@ -906,6 +912,7 @@ class CameraControls extends EventDispatcher {
     }
 
     if (this.state !== STATE.NONE) {
+      // @ts-ignore
       this.dispatchEvent(this.startEvent)
     }
   }
@@ -962,6 +969,7 @@ class CameraControls extends EventDispatcher {
 
     // this.handleTouchEnd()
 
+    // @ts-ignore
     this.dispatchEvent(this.endEvent)
 
     this.state = STATE.NONE
