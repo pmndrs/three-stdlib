@@ -1,12 +1,4 @@
-import {
-  BufferAttribute,
-  InterleavedBufferAttribute,
-  Mesh,
-  Object3D,
-  PlaneGeometry,
-  SkinnedMesh,
-  Vector3,
-} from 'three'
+import { BufferAttribute, InterleavedBufferAttribute, Mesh, Object3D, PlaneGeometry, SkinnedMesh, Vector3 } from 'three'
 
 interface STLExporterOptions {
   binary?: boolean
@@ -135,9 +127,26 @@ export class STLExporter {
     this.vC.fromBufferAttribute(positionAttribute, c)
 
     if (object.isSkinnedMesh) {
-      object.applyBoneTransform(a, this.vA)
-      object.applyBoneTransform(b, this.vB)
-      object.applyBoneTransform(c, this.vC)
+      const mesh = object as Omit<SkinnedMesh, 'boneTransform' | 'applyBoneTransform'> &
+        (
+          | {
+              boneTransform(index: number, vector: Vector3): Vector3
+            }
+          | {
+              applyBoneTransform(index: number, vector: Vector3): Vector3
+            }
+        )
+
+      // r151 https://github.com/mrdoob/three.js/pull/25586
+      if ('applyBoneTransform' in mesh) {
+        mesh.applyBoneTransform(a, this.vA)
+        mesh.applyBoneTransform(b, this.vB)
+        mesh.applyBoneTransform(c, this.vC)
+      } else {
+        mesh.boneTransform(a, this.vA)
+        mesh.boneTransform(b, this.vB)
+        mesh.boneTransform(c, this.vC)
+      }
     }
 
     this.vA.applyMatrix4(object.matrixWorld)
