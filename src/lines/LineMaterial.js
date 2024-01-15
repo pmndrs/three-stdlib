@@ -46,14 +46,16 @@ class LineMaterial extends ShaderMaterial {
 				attribute vec3 instanceStart;
 				attribute vec3 instanceEnd;
 
-				#ifdef USE_LINE_COLOR_ALPHA
-					varying vec4 vLineColor;
-					attribute vec4 instanceColorStart;
-					attribute vec4 instanceColorEnd;
-				#else
-					varying vec3 vLineColor;
-					attribute vec3 instanceColorStart;
-					attribute vec3 instanceColorEnd;
+				#ifdef USE_COLOR
+					#ifdef USE_LINE_COLOR_ALPHA
+						varying vec4 vLineColor;
+						attribute vec4 instanceColorStart;
+						attribute vec4 instanceColorEnd;
+					#else
+						varying vec3 vLineColor;
+						attribute vec3 instanceColorStart;
+						attribute vec3 instanceColorEnd;
+					#endif
 				#endif
 
 				#ifdef WORLD_UNITS
@@ -100,7 +102,11 @@ class LineMaterial extends ShaderMaterial {
 
 				void main() {
 
-					vLineColor = ( position.y < 0.5 ) ? instanceColorStart : instanceColorEnd;
+					#ifdef USE_COLOR
+
+						vLineColor = ( position.y < 0.5 ) ? instanceColorStart : instanceColorEnd;
+
+					#endif
 
 					#ifdef USE_DASH
 
@@ -303,10 +309,12 @@ class LineMaterial extends ShaderMaterial {
 				#include <logdepthbuf_pars_fragment>
 				#include <clipping_planes_pars_fragment>
 
-				#ifdef USE_LINE_COLOR_ALPHA
-					varying vec4 vLineColor;
-				#else
-					varying vec3 vLineColor;
+				#ifdef USE_COLOR
+					#ifdef USE_LINE_COLOR_ALPHA
+						varying vec4 vLineColor;
+					#else
+						varying vec3 vLineColor;
+					#endif
 				#endif
 
 				vec2 closestLineToLine(vec3 p1, vec3 p2, vec3 p3, vec3 p4) {
@@ -417,10 +425,12 @@ class LineMaterial extends ShaderMaterial {
 					#endif
 
 					vec4 diffuseColor = vec4( diffuse, alpha );
-					#ifdef USE_LINE_COLOR_ALPHA
-						diffuseColor *= vLineColor;
-					#else
-						diffuseColor.rgb *= vLineColor;
+					#ifdef USE_COLOR
+						#ifdef USE_LINE_COLOR_ALPHA
+							diffuseColor *= vLineColor;
+						#else
+							diffuseColor.rgb *= vLineColor;
+						#endif
 					#endif
 
 					#include <logdepthbuf_fragment>
