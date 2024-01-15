@@ -1,4 +1,12 @@
-import { BufferAttribute, InterleavedBufferAttribute, Mesh, Object3D, PlaneGeometry, SkinnedMesh, Vector3 } from 'three'
+import {
+  BufferAttribute,
+  BufferGeometry,
+  InterleavedBufferAttribute,
+  Mesh,
+  Object3D,
+  SkinnedMesh,
+  Vector3,
+} from 'three'
 
 export interface STLExporterOptionsBinary {
   binary: true
@@ -12,38 +20,23 @@ export interface STLExporterOptions {
   binary?: boolean
 }
 
+const isMesh = (object: unknown): object is Mesh => (object as any).isMesh
+
 export class STLExporter {
-  private binary
+  private binary = false
 
-  private output: string | DataView
-  private offset
+  private output: string | DataView = ''
+  private offset: number = 80 // skip header
 
-  private objects: { object3d: Object3D; geometry: PlaneGeometry }[]
-  private triangles
+  private objects: { object3d: Object3D; geometry: BufferGeometry }[] = []
+  private triangles: number = 0
 
-  private vA
-  private vB
-  private vC
-  private cb
-  private ab
-  private normal
-
-  constructor() {
-    this.binary = false
-
-    this.output = ''
-    this.offset = 80 // skip header
-
-    this.objects = []
-    this.triangles = 0
-
-    this.vA = new Vector3()
-    this.vB = new Vector3()
-    this.vC = new Vector3()
-    this.cb = new Vector3()
-    this.ab = new Vector3()
-    this.normal = new Vector3()
-  }
+  private vA = new Vector3()
+  private vB = new Vector3()
+  private vC = new Vector3()
+  private cb = new Vector3()
+  private ab = new Vector3()
+  private normal = new Vector3()
 
   parse(scene: Object3D, options: STLExporterOptionsBinary): DataView
   parse(scene: Object3D, options?: STLExporterOptionsString): string
@@ -51,7 +44,7 @@ export class STLExporter {
     this.binary = options?.binary !== undefined ? options?.binary : false
 
     scene.traverse((object: Object3D) => {
-      if (object instanceof Mesh && object.isMesh) {
+      if (isMesh(object)) {
         const geometry = object.geometry
 
         if (!geometry.isBufferGeometry) {
