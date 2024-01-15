@@ -1,14 +1,17 @@
 import { BufferAttribute, InterleavedBufferAttribute, Mesh, Object3D, PlaneGeometry, SkinnedMesh, Vector3 } from 'three'
 
-interface STLExporterOptions {
+export interface STLExporterOptionsBinary {
+  binary: true
+}
+
+export interface STLExporterOptionsString {
+  binary?: false
+}
+
+export interface STLExporterOptions {
   binary?: boolean
 }
 
-/**
- * The official threejs build breaks on empty BufferGeometries,
- * while the three-stdlib has a broken non-binary export.
- * This implementation is derived from the latter, with fixes.
- */
 export class STLExporter {
   private binary
 
@@ -42,10 +45,9 @@ export class STLExporter {
     this.normal = new Vector3()
   }
 
-  parse(scene: Object3D, options: { binary: true }): DataView
-  parse(scene: Object3D, options: { binary: false }): string
-
-  public parse(scene: Object3D, options?: STLExporterOptions): string | DataView {
+  parse(scene: Object3D, options: STLExporterOptionsBinary): DataView
+  parse(scene: Object3D, options?: STLExporterOptionsString): string
+  parse(scene: Object3D, options?: STLExporterOptions): string | DataView {
     this.binary = options?.binary !== undefined ? options?.binary : false
 
     scene.traverse((object: Object3D) => {
