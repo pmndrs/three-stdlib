@@ -60,7 +60,8 @@ class HDRCubeTextureLoader extends Loader {
               const dataTexture = new DataTexture(texData.data, texData.width, texData.height)
 
               dataTexture.type = texture.type
-              dataTexture.encoding = texture.encoding
+              if ('colorSpace' in dataTexture) dataTexture.colorSpace = texture.SRGBColorSpace
+              else dataTexture.encoding = texture.encoding
               dataTexture.format = texture.format
               dataTexture.minFilter = texture.minFilter
               dataTexture.magFilter = texture.magFilter
