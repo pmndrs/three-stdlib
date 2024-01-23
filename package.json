@@ -32,12 +32,6 @@
       "default": "./index.js"
     }
   },
-  "files": [
-    "package.json",
-    "README.md",
-    "LICENSE",
-    "dist"
-  ],
   "sideEffects": false,
   "devDependencies": {
     "@types/node": "^20.6.3",
