@@ -19,9 +19,11 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v4
         with:
-          node-version: '18.x'
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+          cache-dependency-path: 'package-lock.json'
       - name: Install deps
-        run: npm ci
+        run: npm ci --audit=false --fund=false
       - name: Check for regressions
         run: npm run lint
       - name: Check build health
@@ -40,14 +42,16 @@ jobs:
         with:
           access_token: ${{ secrets.GITHUB_TOKEN }}
       - name: Checkout repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Setup node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
-          node-version: '14.x'
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+          cache-dependency-path: 'package-lock.json'
       - name: Install deps
-        # this runs a build script so there is no dedicated build
-        run: npm ci
+      # this runs a build script so there is no dedicated build
+        run: npm ci --audit=false --fund=false
       - name: Check build health
         run: npm run build
       - name: 🚀 Release
