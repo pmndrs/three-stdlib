@@ -19,3 +19,10 @@ export type TypedArrayConstructors =
   | Uint32Array['constructor']
   | Float32Array['constructor']
   | Float64Array['constructor']
+
+type LinearEncoding = 3000
+type sRGBEncoding = 3001
+/**
+ * Stub for `TextureEncoding` type since it was removed in r162.
+ */
+export type TextureEncoding = LinearEncoding | sRGBEncoding

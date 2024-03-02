@@ -1,4 +1,5 @@
-import { Mesh, BufferGeometry, Color, TextureEncoding, WebGLRenderTarget, PerspectiveCamera } from 'three'
+import { Mesh, BufferGeometry, Color, WebGLRenderTarget, PerspectiveCamera } from 'three'
+import { TextureEncoding } from '../types/shared'
 
 export interface ReflectorOptions {
   color?: Color | string | number
