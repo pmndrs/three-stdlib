@@ -274,10 +274,7 @@ class OrbitControls extends EventDispatcher {
 
         // adjust the camera position based on zoom only if we're not zooming to the cursor or if it's an ortho camera
         // we adjust zoom later in these cases
-        if (
-          (scope.zoomToCursor && performCursorZoom) ||
-          (scope.object as THREE.OrthographicCamera).isOrthographicCamera
-        ) {
+        if ((scope.zoomToCursor && performCursorZoom) || (scope.object as OrthographicCamera).isOrthographicCamera) {
           spherical.radius = clampDistance(spherical.radius)
         } else {
           spherical.radius = clampDistance(spherical.radius * scale)
@@ -317,7 +314,7 @@ class OrbitControls extends EventDispatcher {
             const radiusDelta = prevRadius - newRadius
             scope.object.position.addScaledVector(dollyDirection, radiusDelta)
             scope.object.updateMatrixWorld()
-          } else if ((scope.object as THREE.OrthographicCamera).isOrthographicCamera) {
+          } else if ((scope.object as OrthographicCamera).isOrthographicCamera) {
             // adjust the ortho camera position based on zoom changes
             const mouseBefore = new Vector3(mouse.x, mouse.y, 0)
             mouseBefore.unproject(scope.object)
