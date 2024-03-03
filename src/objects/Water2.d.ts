@@ -1,4 +1,5 @@
-import { BufferGeometry, Color, Mesh, ShaderMaterial, Texture, TextureEncoding, Vector2 } from 'three'
+import { BufferGeometry, Color, Mesh, ShaderMaterial, Texture, Vector2 } from 'three'
+import { TextureEncoding } from '../types/shared'
 
 export interface Water2Options {
   color?: Color | string | number
