@@ -414,7 +414,9 @@ class OrbitControls extends EventDispatcher {
 
     this.dispose = (): void => {
       // Enabling touch scroll
-      scope.domElement?.style.touchAction = 'auto'
+      if(scope.domElement) {
+        scope.domElement.style.touchAction = 'auto'
+      }
       scope.domElement?.removeEventListener('contextmenu', onContextMenu)
       scope.domElement?.removeEventListener('pointerdown', onPointerDown)
       scope.domElement?.removeEventListener('pointercancel', onPointerCancel)
