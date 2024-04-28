@@ -13,6 +13,8 @@ import {
   Vector3,
 } from 'three'
 
+const COLOR_SPACE_SVG = 'srgb'
+
 class SVGLoader extends Loader {
   constructor(manager) {
     super(manager)
@@ -59,12 +61,13 @@ class SVGLoader extends Loader {
 
       const transform = getNodeTransform(node)
 
-      let traverseChildNodes = true
+      let isDefsNode = false
 
       let path = null
 
       switch (node.nodeName) {
         case 'svg':
+          style = parseStyle(node, style)
           break
 
         case 'style':
@@ -111,16 +114,14 @@ class SVGLoader extends Loader {
           break
 
         case 'defs':
-          traverseChildNodes = false
-          break
-
-        case 'mask':
-          traverseChildNodes = false
+          isDefsNode = true
           break
 
         case 'use':
           style = parseStyle(node, style)
-          const usedNodeId = node.href.baseVal.substring(1)
+
+          const href = node.getAttributeNS('http://www.w3.org/1999/xlink', 'href') || ''
+          const usedNodeId = href.substring(1)
           const usedNode = node.viewportElement.getElementById(usedNodeId)
           if (usedNode) {
             parseNode(usedNode, style)
@@ -136,7 +137,7 @@ class SVGLoader extends Loader {
 
       if (path) {
         if (style.fill !== undefined && style.fill !== 'none') {
-          path.color.setStyle(style.fill)
+          path.color.setStyle(style.fill, COLOR_SPACE_SVG)
         }
 
         transformPath(path, currentTransform)
@@ -146,12 +147,19 @@ class SVGLoader extends Loader {
         path.userData = { node: node, style: style }
       }
 
-      if (traverseChildNodes) {
-        const nodes = node.childNodes
+      const childNodes = node.childNodes
 
-        for (let i = 0; i < nodes.length; i++) {
-          parseNode(nodes[i], style)
+      for (let i = 0; i < childNodes.length; i++) {
+        const node = childNodes[i]
+
+        if (isDefsNode && node.nodeName !== 'style' && node.nodeName !== 'defs') {
+          // Ignore everything in defs except CSS style definitions
+          // and nested defs, because it is OK by the standard to have
+          // <style/> there.
+          continue
         }
+
+        parseNode(node, style)
       }
 
       if (transform) {
@@ -177,6 +185,8 @@ class SVGLoader extends Loader {
 
       const d = node.getAttribute('d')
 
+      if (d === '' || d === 'none') return null
+
       // console.log( d );
 
       const commands = d.match(/[a-df-z][^a-df-z]*/gi)
@@ -185,7 +195,7 @@ class SVGLoader extends Loader {
         const command = commands[i]
 
         const type = command.charAt(0)
-        const data = command.substr(1).trim()
+        const data = command.slice(1).trim()
 
         if (isFirstPoint === true) {
           doSetFirstPoint = true
@@ -572,7 +582,10 @@ class SVGLoader extends Loader {
           .map((i) => i.trim())
 
         for (let j = 0; j < selectorList.length; j++) {
-          stylesheets[selectorList[j]] = Object.assign(stylesheets[selectorList[j]] || {}, stylesheet.style)
+          // Remove empty rules
+          const definitions = Object.fromEntries(Object.entries(stylesheet.style).filter(([, v]) => v !== ''))
+
+          stylesheets[selectorList[j]] = Object.assign(stylesheets[selectorList[j]] || {}, definitions)
         }
       }
     }
@@ -711,7 +724,7 @@ class SVGLoader extends Loader {
         index++
       }
 
-      const regex = /(-?[\d\.?]+)[,|\s](-?[\d\.?]+)/g
+      const regex = /([+-]?\d*\.?\d+(?:e[+-]?\d+)?)(?:,|\s)([+-]?\d*\.?\d+(?:e[+-]?\d+)?)/g
 
       const path = new ShapePath()
 
@@ -738,7 +751,7 @@ class SVGLoader extends Loader {
         index++
       }
 
-      const regex = /(-?[\d\.?]+)[,|\s](-?[\d\.?]+)/g
+      const regex = /([+-]?\d*\.?\d+(?:e[+-]?\d+)?)(?:,|\s)([+-]?\d*\.?\d+(?:e[+-]?\d+)?)/g
 
       const path = new ShapePath()
 
@@ -818,13 +831,12 @@ class SVGLoader extends Loader {
       }
 
       function addStyle(svgName, jsName, adjustFunction) {
-        if (adjustFunction === undefined) {
+        if (adjustFunction === undefined)
           adjustFunction = function copy(v) {
             if (v.startsWith('url')) console.warn('SVGLoader: url access in attributes is not implemented.')
 
             return v
           }
-        }
 
         if (node.hasAttribute(svgName)) style[jsName] = adjustFunction(node.getAttribute(svgName))
         if (stylesheetStyles[svgName]) style[jsName] = adjustFunction(stylesheetStyles[svgName])
@@ -1172,9 +1184,9 @@ class SVGLoader extends Loader {
           const closeParPos = transformText.length
 
           if (openParPos > 0 && openParPos < closeParPos) {
-            const transformType = transformText.substr(0, openParPos)
+            const transformType = transformText.slice(0, openParPos)
 
-            const array = parseFloats(transformText.substr(openParPos + 1, closeParPos - openParPos - 1))
+            const array = parseFloats(transformText.slice(openParPos + 1))
 
             currentTransform.identity()
 
@@ -1182,7 +1194,7 @@ class SVGLoader extends Loader {
               case 'translate':
                 if (array.length >= 1) {
                   const tx = array[0]
-                  let ty = tx
+                  let ty = 0
 
                   if (array.length >= 2) {
                     ty = array[1]
@@ -1200,7 +1212,7 @@ class SVGLoader extends Loader {
                   let cy = 0
 
                   // Angle
-                  angle = (-array[0] * Math.PI) / 180
+                  angle = (array[0] * Math.PI) / 180
 
                   if (array.length >= 3) {
                     // Center x, y
@@ -1209,10 +1221,10 @@ class SVGLoader extends Loader {
                   }
 
                   // Rotate around center (cx, cy)
-                  tempTransform1.identity().translate(-cx, -cy)
-                  tempTransform2.identity().rotate(angle)
+                  tempTransform1.makeTranslation(-cx, -cy)
+                  tempTransform2.makeRotation(angle)
                   tempTransform3.multiplyMatrices(tempTransform2, tempTransform1)
-                  tempTransform1.identity().translate(cx, cy)
+                  tempTransform1.makeTranslation(cx, cy)
                   currentTransform.multiplyMatrices(tempTransform1, tempTransform3)
                 }
 
@@ -1269,7 +1281,92 @@ class SVGLoader extends Loader {
         v2.set(tempV3.x, tempV3.y)
       }
 
-      const isRotated = isTransformRotated(m)
+      function transfEllipseGeneric(curve) {
+        // For math description see:
+        // https://math.stackexchange.com/questions/4544164
+
+        const a = curve.xRadius
+        const b = curve.yRadius
+
+        const cosTheta = Math.cos(curve.aRotation)
+        const sinTheta = Math.sin(curve.aRotation)
+
+        const v1 = new Vector3(a * cosTheta, a * sinTheta, 0)
+        const v2 = new Vector3(-b * sinTheta, b * cosTheta, 0)
+
+        const f1 = v1.applyMatrix3(m)
+        const f2 = v2.applyMatrix3(m)
+
+        const mF = tempTransform0.set(f1.x, f2.x, 0, f1.y, f2.y, 0, 0, 0, 1)
+
+        const mFInv = tempTransform1.copy(mF).invert()
+        const mFInvT = tempTransform2.copy(mFInv).transpose()
+        const mQ = mFInvT.multiply(mFInv)
+        const mQe = mQ.elements
+
+        const ed = eigenDecomposition(mQe[0], mQe[1], mQe[4])
+        const rt1sqrt = Math.sqrt(ed.rt1)
+        const rt2sqrt = Math.sqrt(ed.rt2)
+
+        curve.xRadius = 1 / rt1sqrt
+        curve.yRadius = 1 / rt2sqrt
+        curve.aRotation = Math.atan2(ed.sn, ed.cs)
+
+        const isFullEllipse = (curve.aEndAngle - curve.aStartAngle) % (2 * Math.PI) < Number.EPSILON
+
+        // Do not touch angles of a full ellipse because after transformation they
+        // would converge to a sinle value effectively removing the whole curve
+
+        if (!isFullEllipse) {
+          const mDsqrt = tempTransform1.set(rt1sqrt, 0, 0, 0, rt2sqrt, 0, 0, 0, 1)
+
+          const mRT = tempTransform2.set(ed.cs, ed.sn, 0, -ed.sn, ed.cs, 0, 0, 0, 1)
+
+          const mDRF = mDsqrt.multiply(mRT).multiply(mF)
+
+          const transformAngle = (phi) => {
+            const { x: cosR, y: sinR } = new Vector3(Math.cos(phi), Math.sin(phi), 0).applyMatrix3(mDRF)
+
+            return Math.atan2(sinR, cosR)
+          }
+
+          curve.aStartAngle = transformAngle(curve.aStartAngle)
+          curve.aEndAngle = transformAngle(curve.aEndAngle)
+
+          if (isTransformFlipped(m)) {
+            curve.aClockwise = !curve.aClockwise
+          }
+        }
+      }
+
+      function transfEllipseNoSkew(curve) {
+        // Faster shortcut if no skew is applied
+        // (e.g, a euclidean transform of a group containing the ellipse)
+
+        const sx = getTransformScaleX(m)
+        const sy = getTransformScaleY(m)
+
+        curve.xRadius *= sx
+        curve.yRadius *= sy
+
+        // Extract rotation angle from the matrix of form:
+        //
+        //  | cosθ sx   -sinθ sy |
+        //  | sinθ sx    cosθ sy |
+        //
+        // Remembering that tanθ = sinθ / cosθ; and that
+        // `sx`, `sy`, or both might be zero.
+        const theta =
+          sx > Number.EPSILON ? Math.atan2(m.elements[1], m.elements[0]) : Math.atan2(-m.elements[3], m.elements[4])
+
+        curve.aRotation += theta
+
+        if (isTransformFlipped(m)) {
+          curve.aStartAngle *= -1
+          curve.aEndAngle *= -1
+          curve.aClockwise = !curve.aClockwise
+        }
+      }
 
       const subPaths = path.subPaths
 
@@ -1293,24 +1390,41 @@ class SVGLoader extends Loader {
             transfVec2(curve.v1)
             transfVec2(curve.v2)
           } else if (curve.isEllipseCurve) {
-            if (isRotated) {
-              console.warn('SVGLoader: Elliptic arc or ellipse rotation or skewing is not implemented.')
-            }
+            // Transform ellipse center point
 
             tempV2.set(curve.aX, curve.aY)
             transfVec2(tempV2)
             curve.aX = tempV2.x
             curve.aY = tempV2.y
 
-            curve.xRadius *= getTransformScaleX(m)
-            curve.yRadius *= getTransformScaleY(m)
+            // Transform ellipse shape parameters
+
+            if (isTransformSkewed(m)) {
+              transfEllipseGeneric(curve)
+            } else {
+              transfEllipseNoSkew(curve)
+            }
           }
         }
       }
     }
 
-    function isTransformRotated(m) {
-      return m.elements[1] !== 0 || m.elements[3] !== 0
+    function isTransformFlipped(m) {
+      const te = m.elements
+      return te[0] * te[4] - te[1] * te[3] < 0
+    }
+
+    function isTransformSkewed(m) {
+      const te = m.elements
+      const basisDot = te[0] * te[3] + te[1] * te[4]
+
+      // Shortcut for trivial rotations and transformations
+      if (basisDot === 0) return false
+
+      const sx = getTransformScaleX(m)
+      const sy = getTransformScaleY(m)
+
+      return Math.abs(basisDot / (sx * sy)) > Number.EPSILON
     }
 
     function getTransformScaleX(m) {
@@ -1321,6 +1435,65 @@ class SVGLoader extends Loader {
     function getTransformScaleY(m) {
       const te = m.elements
       return Math.sqrt(te[3] * te[3] + te[4] * te[4])
+    }
+
+    // Calculates the eigensystem of a real symmetric 2x2 matrix
+    //    [ A  B ]
+    //    [ B  C ]
+    // in the form
+    //    [ A  B ]  =  [ cs  -sn ] [ rt1   0  ] [  cs  sn ]
+    //    [ B  C ]     [ sn   cs ] [  0   rt2 ] [ -sn  cs ]
+    // where rt1 >= rt2.
+    //
+    // Adapted from: https://www.mpi-hd.mpg.de/personalhomes/globes/3x3/index.html
+    // -> Algorithms for real symmetric matrices -> Analytical (2x2 symmetric)
+    function eigenDecomposition(A, B, C) {
+      let rt1, rt2, cs, sn, t
+      const sm = A + C
+      const df = A - C
+      const rt = Math.sqrt(df * df + 4 * B * B)
+
+      if (sm > 0) {
+        rt1 = 0.5 * (sm + rt)
+        t = 1 / rt1
+        rt2 = A * t * C - B * t * B
+      } else if (sm < 0) {
+        rt2 = 0.5 * (sm - rt)
+      } else {
+        // This case needs to be treated separately to avoid div by 0
+
+        rt1 = 0.5 * rt
+        rt2 = -0.5 * rt
+      }
+
+      // Calculate eigenvectors
+
+      if (df > 0) {
+        cs = df + rt
+      } else {
+        cs = df - rt
+      }
+
+      if (Math.abs(cs) > 2 * Math.abs(B)) {
+        t = (-2 * B) / cs
+        sn = 1 / Math.sqrt(1 + t * t)
+        cs = t * sn
+      } else if (Math.abs(B) === 0) {
+        cs = 1
+        sn = 0
+      } else {
+        t = (-0.5 * cs) / B
+        cs = 1 / Math.sqrt(1 + t * t)
+        sn = t * cs
+      }
+
+      if (df > 0) {
+        t = cs
+        cs = -sn
+        sn = t
+      }
+
+      return { rt1, rt2, cs, sn }
     }
 
     //
@@ -1620,8 +1793,6 @@ class SVGLoader extends Loader {
     // TODO
 
     // prepare paths for hole detection
-    let identifier = 0
-
     let scanlineMinX = BIGNUMBER
     let scanlineMaxX = -BIGNUMBER
 
@@ -1667,16 +1838,26 @@ class SVGLoader extends Loader {
         curves: p.curves,
         points: points,
         isCW: ShapeUtils.isClockWise(points),
-        identifier: identifier++,
+        identifier: -1,
         boundingBox: new Box2(new Vector2(minX, minY), new Vector2(maxX, maxY)),
       }
     })
 
     simplePaths = simplePaths.filter((sp) => sp.points.length > 1)
 
+    for (let identifier = 0; identifier < simplePaths.length; identifier++) {
+      simplePaths[identifier].identifier = identifier
+    }
+
     // check if path is solid or a hole
     const isAHole = simplePaths.map((p) =>
-      isHoleTo(p, simplePaths, scanlineMinX, scanlineMaxX, shapePath.userData.style.fillRule),
+      isHoleTo(
+        p,
+        simplePaths,
+        scanlineMinX,
+        scanlineMaxX,
+        shapePath.userData ? shapePath.userData.style.fillRule : undefined,
+      ),
     )
 
     const shapesToReturn = []
@@ -1724,7 +1905,7 @@ class SVGLoader extends Loader {
   }
 
   static pointsToStroke(points, style, arcDivisions, minDistance) {
-    // Generates a stroke with some witdh around the given path.
+    // Generates a stroke with some width around the given path.
     // The path can be open or closed (last point equals to first point)
     // Param points: Array of Vector2D (the path). Minimum 2 points.
     // Param style: Object with SVG properties as returned by SVGLoader.getStrokeStyle(), or SVGLoader.parse() in the path.userData.style object
@@ -1821,9 +2002,7 @@ class SVGLoader extends Loader {
         if (isClosed) {
           // Skip duplicated initial point
           nextPoint = points[1]
-        } else {
-          nextPoint = undefined
-        }
+        } else nextPoint = undefined
       } else {
         nextPoint = points[iPoint + 1]
       }
@@ -1861,7 +2040,7 @@ class SVGLoader extends Loader {
         const dot = Math.abs(normal1.dot(tempV2_3))
 
         // If path is straight, don't create join
-        if (dot !== 0) {
+        if (dot > Number.EPSILON) {
           // Compute inner and outer segment intersections
           const miterSide = strokeWidth2 / dot
           tempV2_3.multiplyScalar(-miterSide)
@@ -2158,8 +2337,8 @@ class SVGLoader extends Loader {
       addVertex(currentPointL, u1, 0)
 
       addVertex(lastPointR, u0, 1)
-      addVertex(currentPointL, u1, 1)
-      addVertex(currentPointR, u1, 0)
+      addVertex(currentPointL, u1, 0)
+      addVertex(currentPointR, u1, 1)
     }
 
     function makeSegmentWithBevelJoin(joinIsOnLeftSide, innerSideModified, u) {
@@ -2196,8 +2375,8 @@ class SVGLoader extends Loader {
           // Bevel join triangle
 
           addVertex(currentPointR, u, 1)
-          addVertex(nextPointR, u, 0)
-          addVertex(innerPoint, u, 0.5)
+          addVertex(innerPoint, u, 0)
+          addVertex(nextPointR, u, 1)
         }
       } else {
         // Bevel join triangle. The segment triangles are done in the main loop
@@ -2281,7 +2460,8 @@ class SVGLoader extends Loader {
               tempV2_4.toArray(vertices, 3 * 3)
             } else {
               tempV2_3.toArray(vertices, 1 * 3)
-              tempV2_3.toArray(vertices, 3 * 3)
+              // using tempV2_4 to update 3rd vertex if the uv.y of 3rd vertex is 1
+              uvs[3 * 2 + 1] === 1 ? tempV2_4.toArray(vertices, 3 * 3) : tempV2_3.toArray(vertices, 3 * 3)
               tempV2_4.toArray(vertices, 0 * 3)
             }
           } else {
@@ -2299,8 +2479,8 @@ class SVGLoader extends Loader {
               tempV2_4.toArray(vertices, vl - 2 * 3)
               tempV2_4.toArray(vertices, vl - 4 * 3)
             } else {
-              tempV2_3.toArray(vertices, vl - 2 * 3)
-              tempV2_4.toArray(vertices, vl - 1 * 3)
+              tempV2_4.toArray(vertices, vl - 2 * 3)
+              tempV2_3.toArray(vertices, vl - 1 * 3)
               tempV2_4.toArray(vertices, vl - 4 * 3)
             }
           }
