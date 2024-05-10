@@ -409,12 +409,12 @@ class OrbitControls extends EventDispatcher {
       scope.domElement.addEventListener('contextmenu', onContextMenu)
       scope.domElement.addEventListener('pointerdown', onPointerDown)
       scope.domElement.addEventListener('pointercancel', onPointerCancel)
-      scope.domElement.addEventListener('wheel', onMouseWheel, { passive: true })
+      scope.domElement.addEventListener('wheel', onMouseWheel)
     }
 
     this.dispose = (): void => {
       // Enabling touch scroll
-      if (scope.domElement) {
+      if(scope.domElement) {
         scope.domElement.style.touchAction = 'auto'
       }
       scope.domElement?.removeEventListener('contextmenu', onContextMenu)
@@ -948,6 +948,8 @@ class OrbitControls extends EventDispatcher {
       if (scope.enabled === false || scope.enableZoom === false || (state !== STATE.NONE && state !== STATE.ROTATE)) {
         return
       }
+
+      event.preventDefault()
 
       // @ts-ignore
       scope.dispatchEvent(startEvent)
