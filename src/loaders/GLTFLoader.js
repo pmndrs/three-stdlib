@@ -60,9 +60,15 @@ import {
   Vector2,
   Vector3,
   VectorKeyframeTrack,
+  InstancedBufferAttribute,
 } from 'three'
 import { toTrianglesDrawMode } from '../utils/BufferGeometryUtils'
 import { version } from '../_polyfill/constants'
+
+const SRGBColorSpace = 'srgb'
+const LinearSRGBColorSpace = 'srgb-linear'
+const sRGBEncoding = 3001
+const LinearEncoding = 3000
 
 class GLTFLoader extends Loader {
   constructor(manager) {
@@ -76,6 +82,10 @@ class GLTFLoader extends Loader {
 
     this.register(function (parser) {
       return new GLTFMaterialsClearcoatExtension(parser)
+    })
+
+    this.register(function (parser) {
+      return new GLTFMaterialsDispersionExtension(parser)
     })
 
     this.register(function (parser) {
@@ -123,6 +133,10 @@ class GLTFLoader extends Loader {
     })
 
     this.register(function (parser) {
+      return new GLTFMaterialsBumpExtension(parser)
+    })
+
+    this.register(function (parser) {
       return new GLTFLightsExtension(parser)
     })
 
@@ -143,7 +157,13 @@ class GLTFLoader extends Loader {
     if (this.resourcePath !== '') {
       resourcePath = this.resourcePath
     } else if (this.path !== '') {
-      resourcePath = this.path
+      // If a base path is set, resources will be relative paths from that plus the relative path of the gltf file
+      // Example  path = 'https://my-cnd-server.com/', url = 'assets/models/model.gltf'
+      // resourcePath = 'https://my-cnd-server.com/assets/models/'
+      // referenced resource 'model.bin' will be loaded from 'https://my-cnd-server.com/assets/models/model.bin'
+      // referenced resource '../textures/texture.png' will be loaded from 'https://my-cnd-server.com/assets/textures/texture.png'
+      const relativeUrl = LoaderUtils.extractUrlBase(url)
+      resourcePath = LoaderUtils.resolveURL(relativeUrl, this.path)
     } else {
       resourcePath = LoaderUtils.extractUrlBase(url)
     }
@@ -273,6 +293,9 @@ class GLTFLoader extends Loader {
 
     for (let i = 0; i < this.pluginCallbacks.length; i++) {
       const plugin = this.pluginCallbacks[i](parser)
+
+      if (!plugin.name) console.error('THREE.GLTFLoader: Invalid plugin found: missing name')
+
       plugins[plugin.name] = plugin
 
       // Workaround to avoid determining as unknown extension
@@ -359,6 +382,7 @@ const EXTENSIONS = {
   KHR_DRACO_MESH_COMPRESSION: 'KHR_draco_mesh_compression',
   KHR_LIGHTS_PUNCTUAL: 'KHR_lights_punctual',
   KHR_MATERIALS_CLEARCOAT: 'KHR_materials_clearcoat',
+  KHR_MATERIALS_DISPERSION: 'KHR_materials_dispersion',
   KHR_MATERIALS_IOR: 'KHR_materials_ior',
   KHR_MATERIALS_SHEEN: 'KHR_materials_sheen',
   KHR_MATERIALS_SPECULAR: 'KHR_materials_specular',
@@ -371,6 +395,7 @@ const EXTENSIONS = {
   KHR_TEXTURE_TRANSFORM: 'KHR_texture_transform',
   KHR_MESH_QUANTIZATION: 'KHR_mesh_quantization',
   KHR_MATERIALS_EMISSIVE_STRENGTH: 'KHR_materials_emissive_strength',
+  EXT_MATERIALS_BUMP: 'EXT_materials_bump',
   EXT_TEXTURE_WEBP: 'EXT_texture_webp',
   EXT_TEXTURE_AVIF: 'EXT_texture_avif',
   EXT_MESHOPT_COMPRESSION: 'EXT_meshopt_compression',
@@ -419,7 +444,8 @@ class GLTFLightsExtension {
 
     const color = new Color(0xffffff)
 
-    if (lightDef.color !== undefined) color.fromArray(lightDef.color)
+    if (lightDef.color !== undefined)
+      color.setRGB(lightDef.color[0], lightDef.color[1], lightDef.color[2], LinearSRGBColorSpace)
 
     const range = lightDef.range !== undefined ? lightDef.range : 0
 
@@ -520,12 +546,12 @@ class GLTFMaterialsUnlitExtension {
       if (Array.isArray(metallicRoughness.baseColorFactor)) {
         const array = metallicRoughness.baseColorFactor
 
-        materialParams.color.fromArray(array)
+        materialParams.color.setRGB(array[0], array[1], array[2], LinearSRGBColorSpace)
         materialParams.opacity = array[3]
       }
 
       if (metallicRoughness.baseColorTexture !== undefined) {
-        pending.push(parser.assignTexture(materialParams, 'map', metallicRoughness.baseColorTexture, 3001)) // sRGBEncoding
+        pending.push(parser.assignTexture(materialParams, 'map', metallicRoughness.baseColorTexture, SRGBColorSpace))
       }
     }
 
@@ -621,6 +647,42 @@ class GLTFMaterialsClearcoatExtension {
     }
 
     return Promise.all(pending)
+  }
+}
+
+/**
+ * Materials dispersion Extension
+ *
+ * Specification: https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_materials_dispersion
+ */
+class GLTFMaterialsDispersionExtension {
+  constructor(parser) {
+    this.parser = parser
+    this.name = EXTENSIONS.KHR_MATERIALS_DISPERSION
+  }
+
+  getMaterialType(materialIndex) {
+    const parser = this.parser
+    const materialDef = parser.json.materials[materialIndex]
+
+    if (!materialDef.extensions || !materialDef.extensions[this.name]) return null
+
+    return MeshPhysicalMaterial
+  }
+
+  extendMaterialParams(materialIndex, materialParams) {
+    const parser = this.parser
+    const materialDef = parser.json.materials[materialIndex]
+
+    if (!materialDef.extensions || !materialDef.extensions[this.name]) {
+      return Promise.resolve()
+    }
+
+    const extension = materialDef.extensions[this.name]
+
+    materialParams.dispersion = extension.dispersion !== undefined ? extension.dispersion : 0
+
+    return Promise.resolve()
   }
 }
 
@@ -727,7 +789,8 @@ class GLTFMaterialsSheenExtension {
     const extension = materialDef.extensions[this.name]
 
     if (extension.sheenColorFactor !== undefined) {
-      materialParams.sheenColor.fromArray(extension.sheenColorFactor)
+      const colorFactor = extension.sheenColorFactor
+      materialParams.sheenColor.setRGB(colorFactor[0], colorFactor[1], colorFactor[2], LinearSRGBColorSpace)
     }
 
     if (extension.sheenRoughnessFactor !== undefined) {
@@ -735,7 +798,7 @@ class GLTFMaterialsSheenExtension {
     }
 
     if (extension.sheenColorTexture !== undefined) {
-      pending.push(parser.assignTexture(materialParams, 'sheenColorMap', extension.sheenColorTexture, 3001)) // sRGBEncoding
+      pending.push(parser.assignTexture(materialParams, 'sheenColorMap', extension.sheenColorTexture, SRGBColorSpace))
     }
 
     if (extension.sheenRoughnessTexture !== undefined) {
@@ -832,7 +895,12 @@ class GLTFMaterialsVolumeExtension {
     materialParams.attenuationDistance = extension.attenuationDistance || Infinity
 
     const colorArray = extension.attenuationColor || [1, 1, 1]
-    materialParams.attenuationColor = new Color(colorArray[0], colorArray[1], colorArray[2])
+    materialParams.attenuationColor = new Color().setRGB(
+      colorArray[0],
+      colorArray[1],
+      colorArray[2],
+      LinearSRGBColorSpace,
+    )
 
     return Promise.all(pending)
   }
@@ -913,12 +981,54 @@ class GLTFMaterialsSpecularExtension {
     }
 
     const colorArray = extension.specularColorFactor || [1, 1, 1]
-    materialParams.specularColor = new Color(colorArray[0], colorArray[1], colorArray[2])
+    materialParams.specularColor = new Color().setRGB(colorArray[0], colorArray[1], colorArray[2], LinearSRGBColorSpace)
 
     if (extension.specularColorTexture !== undefined) {
       pending.push(
-        parser.assignTexture(materialParams, 'specularColorMap', extension.specularColorTexture, 3001), // sRGBEncoding
+        parser.assignTexture(materialParams, 'specularColorMap', extension.specularColorTexture, SRGBColorSpace),
       )
+    }
+
+    return Promise.all(pending)
+  }
+}
+
+/**
+ * Materials bump Extension
+ *
+ * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/EXT_materials_bump
+ */
+class GLTFMaterialsBumpExtension {
+  constructor(parser) {
+    this.parser = parser
+    this.name = EXTENSIONS.EXT_MATERIALS_BUMP
+  }
+
+  getMaterialType(materialIndex) {
+    const parser = this.parser
+    const materialDef = parser.json.materials[materialIndex]
+
+    if (!materialDef.extensions || !materialDef.extensions[this.name]) return null
+
+    return MeshPhysicalMaterial
+  }
+
+  extendMaterialParams(materialIndex, materialParams) {
+    const parser = this.parser
+    const materialDef = parser.json.materials[materialIndex]
+
+    if (!materialDef.extensions || !materialDef.extensions[this.name]) {
+      return Promise.resolve()
+    }
+
+    const pending = []
+
+    const extension = materialDef.extensions[this.name]
+
+    materialParams.bumpScale = extension.bumpFactor !== undefined ? extension.bumpFactor : 1.0
+
+    if (extension.bumpTexture !== undefined) {
+      pending.push(parser.assignTexture(materialParams, 'bumpMap', extension.bumpTexture))
     }
 
     return Promise.all(pending)
@@ -1293,7 +1403,10 @@ class GLTFMeshGpuInstancing {
 
         // Add instance attributes to the geometry, excluding TRS.
         for (const attributeName in attributes) {
-          if (attributeName !== 'TRANSLATION' && attributeName !== 'ROTATION' && attributeName !== 'SCALE') {
+          if (attributeName === '_COLOR_0') {
+            const attr = attributes[attributeName]
+            instancedMesh.instanceColor = new InstancedBufferAttribute(attr.array, attr.itemSize, attr.normalized)
+          } else if (attributeName !== 'TRANSLATION' && attributeName !== 'ROTATION' && attributeName !== 'SCALE') {
             mesh.geometry.setAttribute(attributeName, attributes[attributeName])
           }
         }
@@ -1419,7 +1532,7 @@ class GLTFDracoMeshCompressionExtension {
     }
 
     return parser.getDependency('bufferView', bufferViewIndex).then(function (bufferView) {
-      return new Promise(function (resolve) {
+      return new Promise(function (resolve, reject) {
         dracoLoader.decodeDracoFile(
           bufferView,
           function (geometry) {
@@ -1434,6 +1547,8 @@ class GLTFDracoMeshCompressionExtension {
           },
           threeAttributeMap,
           attributeTypeMap,
+          LinearSRGBColorSpace,
+          reject,
         )
       })
     })
@@ -2003,11 +2118,15 @@ class GLTFParser {
 
         assignExtrasToUserData(result, json)
 
-        Promise.all(
+        return Promise.all(
           parser._invokeAll(function (ext) {
             return ext.afterRoot && ext.afterRoot(result)
           }),
         ).then(function () {
+          for (const scene of result.scenes) {
+            scene.updateMatrixWorld()
+          }
+
           onLoad(result)
         })
       })
@@ -2531,6 +2650,8 @@ class GLTFParser {
           URL.revokeObjectURL(sourceURI)
         }
 
+        assignExtrasToUserData(texture, sourceDef)
+
         texture.userData.mimeType = sourceDef.mimeType || getImageURIMimeType(sourceDef.uri)
 
         return texture
@@ -2551,7 +2672,7 @@ class GLTFParser {
    * @param {Object} mapDef
    * @return {Promise<Texture>}
    */
-  assignTexture(materialParams, mapName, mapDef, encoding) {
+  assignTexture(materialParams, mapName, mapDef, colorSpace) {
     const parser = this
 
     return this.getDependency('texture', mapDef.index).then(function (texture) {
@@ -2573,9 +2694,14 @@ class GLTFParser {
         }
       }
 
-      if (encoding !== undefined) {
-        if ('colorSpace' in texture) texture.colorSpace = encoding === 3001 ? 'srgb' : 'srgb-linear'
-        else texture.encoding = encoding
+      if (colorSpace !== undefined) {
+        // Convert from legacy encoding to colorSpace
+        if (typeof colorSpace === 'number')
+          colorSpace = colorSpace === sRGBEncoding ? SRGBColorSpace : LinearSRGBColorSpace
+
+        // Set colorSpace if able, fallback to legacy encoding
+        if ('colorSpace' in texture) texture.colorSpace = colorSpace
+        else texture.encoding = colorSpace === SRGBColorSpace ? sRGBEncoding : LinearEncoding
       }
 
       materialParams[mapName] = texture
@@ -2703,12 +2829,12 @@ class GLTFParser {
       if (Array.isArray(metallicRoughness.baseColorFactor)) {
         const array = metallicRoughness.baseColorFactor
 
-        materialParams.color.fromArray(array)
+        materialParams.color.setRGB(array[0], array[1], array[2], LinearSRGBColorSpace)
         materialParams.opacity = array[3]
       }
 
       if (metallicRoughness.baseColorTexture !== undefined) {
-        pending.push(parser.assignTexture(materialParams, 'map', metallicRoughness.baseColorTexture, 3001)) // sRGBEncoding
+        pending.push(parser.assignTexture(materialParams, 'map', metallicRoughness.baseColorTexture, SRGBColorSpace))
       }
 
       materialParams.metalness = metallicRoughness.metallicFactor !== undefined ? metallicRoughness.metallicFactor : 1.0
@@ -2773,11 +2899,17 @@ class GLTFParser {
     }
 
     if (materialDef.emissiveFactor !== undefined && materialType !== MeshBasicMaterial) {
-      materialParams.emissive = new Color().fromArray(materialDef.emissiveFactor)
+      const emissiveFactor = materialDef.emissiveFactor
+      materialParams.emissive = new Color().setRGB(
+        emissiveFactor[0],
+        emissiveFactor[1],
+        emissiveFactor[2],
+        LinearSRGBColorSpace,
+      )
     }
 
     if (materialDef.emissiveTexture !== undefined && materialType !== MeshBasicMaterial) {
-      pending.push(parser.assignTexture(materialParams, 'emissiveMap', materialDef.emissiveTexture, 3001)) // sRGBEncoding
+      pending.push(parser.assignTexture(materialParams, 'emissiveMap', materialDef.emissiveTexture, SRGBColorSpace))
     }
 
     return Promise.all(pending).then(function () {
@@ -3069,6 +3201,7 @@ class GLTFParser {
    */
   loadAnimation(animationIndex) {
     const json = this.json
+    const parser = this
 
     const animationDef = json.animations[animationIndex]
     const animationName = animationDef.name ? animationDef.name : 'animation_' + animationIndex
@@ -3120,84 +3253,16 @@ class GLTFParser {
 
         if (node === undefined) continue
 
-        node.updateMatrix()
-
-        let TypedKeyframeTrack
-
-        switch (PATH_PROPERTIES[target.path]) {
-          case PATH_PROPERTIES.weights:
-            TypedKeyframeTrack = NumberKeyframeTrack
-            break
-
-          case PATH_PROPERTIES.rotation:
-            TypedKeyframeTrack = QuaternionKeyframeTrack
-            break
-
-          case PATH_PROPERTIES.position:
-          case PATH_PROPERTIES.scale:
-          default:
-            TypedKeyframeTrack = VectorKeyframeTrack
-            break
+        if (node.updateMatrix) {
+          node.updateMatrix()
         }
 
-        const targetName = node.name ? node.name : node.uuid
+        const createdTracks = parser._createAnimationTracks(node, inputAccessor, outputAccessor, sampler, target)
 
-        const interpolation =
-          sampler.interpolation !== undefined ? INTERPOLATION[sampler.interpolation] : InterpolateLinear
-
-        const targetNames = []
-
-        if (PATH_PROPERTIES[target.path] === PATH_PROPERTIES.weights) {
-          node.traverse(function (object) {
-            if (object.morphTargetInfluences) {
-              targetNames.push(object.name ? object.name : object.uuid)
-            }
-          })
-        } else {
-          targetNames.push(targetName)
-        }
-
-        let outputArray = outputAccessor.array
-
-        if (outputAccessor.normalized) {
-          const scale = getNormalizedComponentScale(outputArray.constructor)
-          const scaled = new Float32Array(outputArray.length)
-
-          for (let j = 0, jl = outputArray.length; j < jl; j++) {
-            scaled[j] = outputArray[j] * scale
+        if (createdTracks) {
+          for (let k = 0; k < createdTracks.length; k++) {
+            tracks.push(createdTracks[k])
           }
-
-          outputArray = scaled
-        }
-
-        for (let j = 0, jl = targetNames.length; j < jl; j++) {
-          const track = new TypedKeyframeTrack(
-            targetNames[j] + '.' + PATH_PROPERTIES[target.path],
-            inputAccessor.array,
-            outputArray,
-            interpolation,
-          )
-
-          // Override interpolation with custom factory method.
-          if (sampler.interpolation === 'CUBICSPLINE') {
-            track.createInterpolant = function InterpolantFactoryMethodGLTFCubicSpline(result) {
-              // A CUBICSPLINE keyframe in glTF has three output values for each input value,
-              // representing inTangent, splineVertex, and outTangent. As a result, track.getValueSize()
-              // must be divided by three to get the interpolant's sampleSize argument.
-
-              const interpolantType =
-                this instanceof QuaternionKeyframeTrack
-                  ? GLTFCubicSplineQuaternionInterpolant
-                  : GLTFCubicSplineInterpolant
-
-              return new interpolantType(this.times, this.values, this.getValueSize() / 3, result)
-            }
-
-            // Mark as CUBICSPLINE. `track.getInterpolation()` doesn't support custom interpolants.
-            track.createInterpolant.isInterpolantFactoryMethodGLTFCubicSpline = true
-          }
-
-          tracks.push(track)
         }
       }
 
@@ -3438,6 +3503,109 @@ class GLTFParser {
 
       return scene
     })
+  }
+
+  _createAnimationTracks(node, inputAccessor, outputAccessor, sampler, target) {
+    const tracks = []
+
+    const targetName = node.name ? node.name : node.uuid
+    const targetNames = []
+
+    if (PATH_PROPERTIES[target.path] === PATH_PROPERTIES.weights) {
+      node.traverse(function (object) {
+        if (object.morphTargetInfluences) {
+          targetNames.push(object.name ? object.name : object.uuid)
+        }
+      })
+    } else {
+      targetNames.push(targetName)
+    }
+
+    let TypedKeyframeTrack
+
+    switch (PATH_PROPERTIES[target.path]) {
+      case PATH_PROPERTIES.weights:
+        TypedKeyframeTrack = NumberKeyframeTrack
+        break
+
+      case PATH_PROPERTIES.rotation:
+        TypedKeyframeTrack = QuaternionKeyframeTrack
+        break
+
+      case PATH_PROPERTIES.position:
+      case PATH_PROPERTIES.scale:
+        TypedKeyframeTrack = VectorKeyframeTrack
+        break
+
+      default:
+        switch (outputAccessor.itemSize) {
+          case 1:
+            TypedKeyframeTrack = NumberKeyframeTrack
+            break
+          case 2:
+          case 3:
+          default:
+            TypedKeyframeTrack = VectorKeyframeTrack
+            break
+        }
+
+        break
+    }
+
+    const interpolation = sampler.interpolation !== undefined ? INTERPOLATION[sampler.interpolation] : InterpolateLinear
+
+    const outputArray = this._getArrayFromAccessor(outputAccessor)
+
+    for (let j = 0, jl = targetNames.length; j < jl; j++) {
+      const track = new TypedKeyframeTrack(
+        targetNames[j] + '.' + PATH_PROPERTIES[target.path],
+        inputAccessor.array,
+        outputArray,
+        interpolation,
+      )
+
+      // Override interpolation with custom factory method.
+      if (sampler.interpolation === 'CUBICSPLINE') {
+        this._createCubicSplineTrackInterpolant(track)
+      }
+
+      tracks.push(track)
+    }
+
+    return tracks
+  }
+
+  _getArrayFromAccessor(accessor) {
+    let outputArray = accessor.array
+
+    if (accessor.normalized) {
+      const scale = getNormalizedComponentScale(outputArray.constructor)
+      const scaled = new Float32Array(outputArray.length)
+
+      for (let j = 0, jl = outputArray.length; j < jl; j++) {
+        scaled[j] = outputArray[j] * scale
+      }
+
+      outputArray = scaled
+    }
+
+    return outputArray
+  }
+
+  _createCubicSplineTrackInterpolant(track) {
+    track.createInterpolant = function InterpolantFactoryMethodGLTFCubicSpline(result) {
+      // A CUBICSPLINE keyframe in glTF has three output values for each input value,
+      // representing inTangent, splineVertex, and outTangent. As a result, track.getValueSize()
+      // must be divided by three to get the interpolant's sampleSize argument.
+
+      const interpolantType =
+        this instanceof QuaternionKeyframeTrack ? GLTFCubicSplineQuaternionInterpolant : GLTFCubicSplineInterpolant
+
+      return new interpolantType(this.times, this.values, this.getValueSize() / 3, result)
+    }
+
+    // Mark as CUBICSPLINE. `track.getInterpolation()` doesn't support custom interpolants.
+    track.createInterpolant.isInterpolantFactoryMethodGLTFCubicSpline = true
   }
 }
 
