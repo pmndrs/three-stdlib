@@ -213,7 +213,7 @@ class Reflector extends Mesh {
 
       renderer.xr.enabled = false // Avoid camera modification
       renderer.shadowMap.autoUpdate = false // Avoid re-computing shadows
-      if ('outputColorSpace' in renderer) renderer.outputColorSpace = 'linear-srgb'
+      if ('outputColorSpace' in renderer) renderer.outputColorSpace = 'srgb-linear'
       else renderer.outputEncoding = 3000 // LinearEncoding
       renderer.toneMapping = NoToneMapping
 

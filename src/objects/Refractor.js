@@ -241,7 +241,7 @@ class Refractor extends Mesh {
 
       renderer.xr.enabled = false // avoid camera modification
       renderer.shadowMap.autoUpdate = false // avoid re-computing shadows
-      if ('outputColorSpace' in renderer) renderer.outputColorSpace = 'linear-srgb'
+      if ('outputColorSpace' in renderer) renderer.outputColorSpace = 'srgb-linear'
       else renderer.outputEncoding = 3000 // LinearEncoding
       renderer.toneMapping = NoToneMapping
 
