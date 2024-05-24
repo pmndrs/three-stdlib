@@ -57,8 +57,8 @@ class Lut {
           const min = this.map[j][0]
           const max = this.map[j + 1][0]
 
-          minColor.setHex(this.map[j][1], 'linear-srgb')
-          maxColor.setHex(this.map[j + 1][1], 'linear-srgb')
+          minColor.setHex(this.map[j][1], 'srgb-linear')
+          maxColor.setHex(this.map[j + 1][1], 'srgb-linear')
 
           const color = new Color().lerpColors(minColor, maxColor, (alpha - min) / (max - min))
 
@@ -131,8 +131,8 @@ class Lut {
           const min = this.map[j - 1][0]
           const max = this.map[j][0]
 
-          minColor.setHex(this.map[j - 1][1], 'linear-srgb')
-          maxColor.setHex(this.map[j][1], 'linear-srgb')
+          minColor.setHex(this.map[j - 1][1], 'srgb-linear')
+          maxColor.setHex(this.map[j][1], 'srgb-linear')
 
           finalColor.lerpColors(minColor, maxColor, (i - min) / (max - min))
 
