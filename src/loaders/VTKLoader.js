@@ -1,5 +1,6 @@
 import { BufferAttribute, BufferGeometry, FileLoader, Float32BufferAttribute, Loader, LoaderUtils } from 'three'
 import { unzlibSync } from 'fflate'
+import { decodeText } from '../_polyfill/LoaderUtils'
 
 class VTKLoader extends Loader {
   constructor(manager) {
@@ -885,12 +886,12 @@ class VTKLoader extends Loader {
     }
 
     // get the 5 first lines of the files to check if there is the key word binary
-    var meta = LoaderUtils.decodeText(new Uint8Array(data, 0, 250)).split('\n')
+    var meta = decodeText(new Uint8Array(data, 0, 250)).split('\n')
 
     if (meta[0].indexOf('xml') !== -1) {
-      return parseXML(LoaderUtils.decodeText(data))
+      return parseXML(decodeText(data))
     } else if (meta[2].includes('ASCII')) {
-      return parseASCII(LoaderUtils.decodeText(data))
+      return parseASCII(decodeText(data))
     } else {
       return parseBinary(data)
     }

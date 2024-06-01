@@ -1,4 +1,5 @@
 import { BufferGeometry, FileLoader, Float32BufferAttribute, Loader, LoaderUtils, Points, PointsMaterial } from 'three'
+import { decodeText } from '../_polyfill/LoaderUtils'
 
 class PCDLoader extends Loader {
   constructor(manager) {
@@ -158,7 +159,7 @@ class PCDLoader extends Loader {
       return PCDheader
     }
 
-    const textData = LoaderUtils.decodeText(new Uint8Array(data))
+    const textData = decodeText(new Uint8Array(data))
 
     // parse header (always ascii format)
 

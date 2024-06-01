@@ -20,6 +20,7 @@ import {
   TextureLoader,
 } from 'three'
 import { unzipSync } from 'fflate'
+import { decodeText } from '../_polyfill/LoaderUtils'
 
 /**
  *
@@ -121,14 +122,14 @@ class ThreeMFLoader extends Loader {
       //
 
       const relsView = zip[relsName]
-      const relsFileText = LoaderUtils.decodeText(relsView)
+      const relsFileText = decodeText(relsView)
       const rels = parseRelsXml(relsFileText)
 
       //
 
       if (modelRelsName) {
         const relsView = zip[modelRelsName]
-        const relsFileText = LoaderUtils.decodeText(relsView)
+        const relsFileText = decodeText(relsView)
         modelRels = parseRelsXml(relsFileText)
       }
 
@@ -138,7 +139,7 @@ class ThreeMFLoader extends Loader {
         const modelPart = modelPartNames[i]
         const view = zip[modelPart]
 
-        const fileText = LoaderUtils.decodeText(view)
+        const fileText = decodeText(view)
         const xmlData = new DOMParser().parseFromString(fileText, 'application/xml')
 
         if (xmlData.documentElement.nodeName.toLowerCase() !== 'model') {
