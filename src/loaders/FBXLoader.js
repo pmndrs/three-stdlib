@@ -42,6 +42,7 @@ import {
 } from 'three'
 import { unzlibSync } from 'fflate'
 import { NURBSCurve } from '../curves/NURBSCurve'
+import { decodeText } from '../_polyfill/LoaderUtils'
 
 /**
  * Loader loads FBX file and generates Group representing FBX scene.
@@ -3005,7 +3006,7 @@ class BinaryReader {
     const nullByte = a.indexOf(0)
     if (nullByte >= 0) a = a.slice(0, nullByte)
 
-    return LoaderUtils.decodeText(new Uint8Array(a))
+    return decodeText(new Uint8Array(a))
   }
 }
 
@@ -3268,7 +3269,7 @@ function convertArrayBufferToString(buffer, from, to) {
   if (from === undefined) from = 0
   if (to === undefined) to = buffer.byteLength
 
-  return LoaderUtils.decodeText(new Uint8Array(buffer, from, to))
+  return decodeText(new Uint8Array(buffer, from, to))
 }
 
 function append(a, b) {

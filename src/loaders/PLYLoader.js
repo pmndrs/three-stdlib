@@ -1,4 +1,5 @@
 import { BufferGeometry, FileLoader, Float32BufferAttribute, Loader, LoaderUtils } from 'three'
+import { decodeText } from '../_polyfill/LoaderUtils'
 
 /**
  * Description: A THREE loader for PLY ASCII files (known as the Polygon
@@ -421,7 +422,7 @@ class PLYLoader extends Loader {
     const scope = this
 
     if (data instanceof ArrayBuffer) {
-      const text = LoaderUtils.decodeText(new Uint8Array(data))
+      const text = decodeText(new Uint8Array(data))
       const header = parseHeader(text)
 
       geometry = header.format === 'ascii' ? parseASCII(text, header) : parseBinary(data, header)
