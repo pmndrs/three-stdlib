@@ -190,7 +190,7 @@ class ArcballControls extends EventDispatcher {
   public minZoom: number
   public maxZoom: number
 
-  private target: Vector3
+  readonly target: Vector3
   private _currentTarget: Vector3
 
   private _tbRadius: number

@@ -49,7 +49,7 @@ export class FirstPersonControls extends EventDispatcher {
 
   private lookDirection = new Vector3()
   private spherical = new Spherical()
-  private target = new Vector3()
+  readonly target = new Vector3()
 
   constructor(object: Camera, domElement?: HTMLElement | null) {
     super()
