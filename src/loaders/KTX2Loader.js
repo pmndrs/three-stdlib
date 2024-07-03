@@ -129,9 +129,12 @@ class KTX2Loader extends Loader {
     let transcoderPending
     let BasisModule
 
-    const EngineFormat = KTX2Loader.EngineFormat
-    const TranscoderFormat = KTX2Loader.TranscoderFormat
-    const BasisFormat = KTX2Loader.BasisFormat
+    /** @type KTX2Loader.EngineFormat */
+    const EngineFormat = _EngineFormat
+    /** @type KTX2Loader.TranscoderFormat */
+    const TranscoderFormat = _TranscoderFormat
+    /** @type KTX2Loader.BasisFormat */
+    const BasisFormat = _BasisFormat
 
     self.addEventListener('message', function (e) {
       const message = e.data
