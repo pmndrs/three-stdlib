@@ -7,7 +7,6 @@ import {
   Sphere,
   Matrix4,
   BufferGeometry,
-  Matrix,
   Mesh,
   Bone,
   AnimationClip,
@@ -232,7 +231,7 @@ export class Geometry extends EventDispatcher {
    */
   computeBoundingSphere(): void
 
-  merge(geometry: Geometry, matrix?: Matrix, materialIndexOffset?: number): void
+  merge(geometry: Geometry, matrix?: Matrix4, materialIndexOffset?: number): void
 
   mergeMesh(mesh: Mesh): void
 
