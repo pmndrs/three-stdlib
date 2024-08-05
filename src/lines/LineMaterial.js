@@ -7,7 +7,6 @@
  *  dashSize: <float>,
  *  dashOffset: <float>,
  *  gapSize: <float>,
- *  resolution: <Vector2>, // to be set by renderer
  * }
  */
 
