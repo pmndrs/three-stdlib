@@ -31,7 +31,7 @@ const _box = new Box3()
 const _sphere = new Sphere()
 const _clipToWorldVector = new Vector4()
 
-let _ray, _instanceStart, _instanceEnd, _lineWidth
+let _ray, _lineWidth
 
 // Returns the margin required to expand by in world space given the distance from the camera,
 // line width, resolution, and camera projection
@@ -50,9 +50,18 @@ function getWorldSpaceHalfWidth(camera, distance, resolution) {
 }
 
 function raycastWorldUnits(lineSegments, intersects) {
-  for (let i = 0, l = _instanceStart.count; i < l; i++) {
-    _line.start.fromBufferAttribute(_instanceStart, i)
-    _line.end.fromBufferAttribute(_instanceEnd, i)
+
+	const matrixWorld = lineSegments.matrixWorld;
+	const geometry = lineSegments.geometry;
+	const instanceStart = geometry.attributes.instanceStart;
+	const instanceEnd = geometry.attributes.instanceEnd;
+	const segmentCount = Math.min(geometry.instanceCount, instanceStart.count);
+
+  for (let i = 0, l = segmentCount; i < l; i++) {
+    _line.start.fromBufferAttribute(instanceStart, i)
+    _line.end.fromBufferAttribute(instanceEnd, i)
+
+		_line.applyMatrix4(matrixWorld);
 
     const pointOnLine = new Vector3()
     const point = new Vector3()
@@ -84,6 +93,7 @@ function raycastScreenSpace(lineSegments, camera, intersects) {
   const geometry = lineSegments.geometry
   const instanceStart = geometry.attributes.instanceStart
   const instanceEnd = geometry.attributes.instanceEnd
+  const segmentCount = Math.min( geometry.instanceCount, instanceStart.count );
 
   const near = -camera.near
 
@@ -109,7 +119,7 @@ function raycastScreenSpace(lineSegments, camera, intersects) {
 
   _mvMatrix.multiplyMatrices(camera.matrixWorldInverse, matrixWorld)
 
-  for (let i = 0, l = instanceStart.count; i < l; i++) {
+  for (let i = 0, l = segmentCount; i < l; i++) {
     _start4.fromBufferAttribute(instanceStart, i)
     _end4.fromBufferAttribute(instanceEnd, i)
 
@@ -248,9 +258,6 @@ class LineSegments2 extends Mesh {
     const material = this.material
 
     _lineWidth = material.linewidth + threshold
-
-    _instanceStart = geometry.attributes.instanceStart
-    _instanceEnd = geometry.attributes.instanceEnd
 
     // check if we intersect the sphere bounds
     if (geometry.boundingSphere === null) {
