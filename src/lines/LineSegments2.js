@@ -51,17 +51,17 @@ function getWorldSpaceHalfWidth(camera, distance, resolution) {
 
 function raycastWorldUnits(lineSegments, intersects) {
 
-	const matrixWorld = lineSegments.matrixWorld;
-	const geometry = lineSegments.geometry;
-	const instanceStart = geometry.attributes.instanceStart;
-	const instanceEnd = geometry.attributes.instanceEnd;
-	const segmentCount = Math.min(geometry.instanceCount, instanceStart.count);
+  const matrixWorld = lineSegments.matrixWorld;
+  const geometry = lineSegments.geometry;
+  const instanceStart = geometry.attributes.instanceStart;
+  const instanceEnd = geometry.attributes.instanceEnd;
+  const segmentCount = Math.min(geometry.instanceCount, instanceStart.count);
 
   for (let i = 0, l = segmentCount; i < l; i++) {
     _line.start.fromBufferAttribute(instanceStart, i)
     _line.end.fromBufferAttribute(instanceEnd, i)
 
-		_line.applyMatrix4(matrixWorld);
+    _line.applyMatrix4(matrixWorld);
 
     const pointOnLine = new Vector3()
     const point = new Vector3()
@@ -93,7 +93,7 @@ function raycastScreenSpace(lineSegments, camera, intersects) {
   const geometry = lineSegments.geometry
   const instanceStart = geometry.attributes.instanceStart
   const instanceEnd = geometry.attributes.instanceEnd
-  const segmentCount = Math.min( geometry.instanceCount, instanceStart.count );
+  const segmentCount = Math.min(geometry.instanceCount, instanceStart.count);
 
   const near = -camera.near
 

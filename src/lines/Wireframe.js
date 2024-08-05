@@ -40,18 +40,18 @@ class Wireframe extends Mesh {
     return this
   }
 
-	onBeforeRender( renderer ) {
+  onBeforeRender(renderer) {
 
-		const uniforms = this.material.uniforms;
+    const uniforms = this.material.uniforms;
 
-		if ( uniforms && uniforms.resolution ) {
+    if (uniforms && uniforms.resolution) {
 
-			renderer.getViewport( _viewport );
-			this.material.uniforms.resolution.value.set( _viewport.z, _viewport.w );
+      renderer.getViewport(_viewport);
+      this.material.uniforms.resolution.value.set(_viewport.z, _viewport.w);
 
-		}
+    }
 
-	}
+  }
 }
 
 export { Wireframe }
