@@ -39,6 +39,7 @@ import {
   VectorKeyframeTrack,
 } from 'three'
 import { TGALoader } from '../loaders/TGALoader'
+import { UV1 } from '../_polyfill/uv1'
 
 class ColladaLoader extends Loader {
   constructor(manager) {
@@ -2025,7 +2026,7 @@ class ColladaLoader extends Loader {
       }
       if (color.array.length > 0) geometry.setAttribute('color', new Float32BufferAttribute(color.array, color.stride))
       if (uv.array.length > 0) geometry.setAttribute('uv', new Float32BufferAttribute(uv.array, uv.stride))
-      if (uv1.array.length > 0) geometry.setAttribute('uv1', new Float32BufferAttribute(uv1.array, uv1.stride))
+      if (uv1.array.length > 0) geometry.setAttribute(UV1, new Float32BufferAttribute(uv1.array, uv1.stride))
 
       if (skinIndex.array.length > 0) {
         geometry.setAttribute('skinIndex', new Float32BufferAttribute(skinIndex.array, skinIndex.stride))

@@ -43,6 +43,7 @@ import {
 import { unzlibSync } from 'fflate'
 import { NURBSCurve } from '../curves/NURBSCurve'
 import { decodeText } from '../_polyfill/LoaderUtils'
+import { UV1 } from '../_polyfill/uv1'
 
 /**
  * Loader loads FBX file and generates Group representing FBX scene.
@@ -1274,6 +1275,7 @@ class GeometryParser {
     }
 
     buffers.uvs.forEach(function (uvBuffer, i) {
+      if (UV1 === 'uv2') i++;
       const name = i === 0 ? 'uv' : `uv${i}`;
 
       geo.setAttribute(name, new Float32BufferAttribute(buffers.uvs[i], 2))

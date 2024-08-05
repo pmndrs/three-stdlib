@@ -1,4 +1,5 @@
 import { BufferGeometry, Color, Float32BufferAttribute, Vector2, Vector3 } from 'three'
+import { UV1 } from '../_polyfill/uv1'
 
 /**
  * Break faces with edges longer than maxEdgeLength
@@ -57,7 +58,7 @@ class TessellateModifier {
     const hasNormals = attributes.normal !== undefined
     const hasColors = attributes.color !== undefined
     const hasUVs = attributes.uv !== undefined
-    const hasUV1s = attributes.uv1 !== undefined
+    const hasUV1s = attributes[UV1] !== undefined
 
     let positions = attributes.position.array
     let normals = hasNormals ? attributes.normal.array : null
@@ -238,7 +239,7 @@ class TessellateModifier {
     }
 
     if (hasUV1s) {
-      geometry2.setAttribute('uv1', new Float32BufferAttribute(uv1s2 as any, 2))
+      geometry2.setAttribute(UV1, new Float32BufferAttribute(uv1s2 as any, 2))
     }
 
     return geometry2
