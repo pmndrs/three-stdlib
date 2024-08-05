@@ -9,6 +9,7 @@ import {
   Mesh,
 } from 'three'
 import potpack from 'potpack'
+import { UV1 } from '../_polyfill/uv1'
 
 /**
  * Progressive Light Map Accumulator, by [zalo](https://github.com/zalo/)
@@ -52,16 +53,16 @@ class ProgressiveLightMap {
       shader.vertexShader =
         '#define USE_LIGHTMAP\n' +
         shader.vertexShader.slice(0, -1) +
-        '	gl_Position = vec4((uv2 - 0.5) * 2.0, 1.0, 1.0); }'
+        `	gl_Position = vec4((${UV1} - 0.5) * 2.0, 1.0, 1.0); }`
 
       // Fragment Shader: Set Pixels to average in the Previous frame's Shadows
       const bodyStart = shader.fragmentShader.indexOf('void main() {')
       shader.fragmentShader =
-        'varying vec2 vUv2;\n' +
+        `varying vec2 v${UV1 === 'uv1' ? UV1 : 'Uv2'};\n` +
         shader.fragmentShader.slice(0, bodyStart) +
         '	uniform sampler2D previousShadowMap;\n	uniform float averagingWindow;\n' +
         shader.fragmentShader.slice(bodyStart - 1, -1) +
-        `\nvec3 texelOld = texture2D(previousShadowMap, vUv2).rgb;
+        `\nvec3 texelOld = texture2D(previousShadowMap, v${UV1 === 'uv1' ? UV1 : 'Uv2'}).rgb;
 				gl_FragColor.rgb = mix(texelOld, gl_FragColor.rgb, 1.0/averagingWindow);
 			}`
 
@@ -79,7 +80,7 @@ class ProgressiveLightMap {
   }
 
   /**
-   * Sets these objects' materials' lightmaps and modifies their uv2's.
+   * Sets these objects' materials' lightmaps and modifies their uv1's.
    * @param {Object3D} objects An array of objects and lights to set up your lightmap.
    */
   addObjectsToLightMap(objects) {
@@ -124,14 +125,14 @@ class ProgressiveLightMap {
     // Pack the objects' lightmap UVs into the same global space
     const dimensions = potpack(this.uv_boxes)
     this.uv_boxes.forEach((box) => {
-      const uv2 = objects[box.index].geometry.getAttribute('uv').clone()
-      for (let i = 0; i < uv2.array.length; i += uv2.itemSize) {
-        uv2.array[i] = (uv2.array[i] + box.x + padding) / dimensions.w
-        uv2.array[i + 1] = (uv2.array[i + 1] + box.y + padding) / dimensions.h
+      const uv1 = objects[box.index].geometry.getAttribute('uv').clone()
+      for (let i = 0; i < uv1.array.length; i += uv1.itemSize) {
+        uv1.array[i] = (uv1.array[i] + box.x + padding) / dimensions.w
+        uv1.array[i + 1] = (uv1.array[i + 1] + box.y + padding) / dimensions.h
       }
 
-      objects[box.index].geometry.setAttribute('uv2', uv2)
-      objects[box.index].geometry.getAttribute('uv2').needsUpdate = true
+      objects[box.index].geometry.setAttribute(UV1, uv1)
+      objects[box.index].geometry.getAttribute(UV1).needsUpdate = true
     })
   }
 

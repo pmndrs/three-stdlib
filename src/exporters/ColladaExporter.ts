@@ -14,6 +14,7 @@ import {
   Texture,
 } from 'three'
 import type { TypedArray, TypedArrayConstructors } from '../types/shared'
+import { UV1 } from '../_polyfill/uv1'
 
 /**
  * https://github.com/gkjohnson/collada-exporter-js
@@ -346,9 +347,9 @@ class ColladaExporter {
       }
 
       // serialize lightmap uvs
-      if ('uv2' in bufferGeometry.attributes) {
+      if (UV1 in bufferGeometry.attributes) {
         const uvName = `${meshid}-texcoord2`
-        gnode += this.getAttribute(bufferGeometry.attributes.uv2, uvName, ['S', 'T'], 'float')
+        gnode += this.getAttribute(bufferGeometry.attributes[UV1], uvName, ['S', 'T'], 'float')
         triangleInputs += `<input semantic="TEXCOORD" source="#${uvName}" offset="0" set="1" />`
       }
 

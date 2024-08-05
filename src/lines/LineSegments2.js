@@ -12,6 +12,7 @@ import {
 } from 'three'
 import { LineSegmentsGeometry } from '../lines/LineSegmentsGeometry'
 import { LineMaterial } from '../lines/LineMaterial'
+import { UV1 } from '../_polyfill/uv1'
 
 const _viewport = new Vector4();
 
@@ -78,7 +79,7 @@ function raycastWorldUnits(lineSegments, intersects) {
         face: null,
         faceIndex: i,
         uv: null,
-        uv2: null,
+        [UV1]: null,
       })
     }
   }
@@ -199,7 +200,7 @@ function raycastScreenSpace(lineSegments, camera, intersects) {
         face: null,
         faceIndex: i,
         uv: null,
-        uv2: null,
+        [UV1]: null,
       })
     }
   }
