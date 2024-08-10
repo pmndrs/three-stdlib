@@ -396,11 +396,6 @@ class OrbitControls extends EventDispatcher {
 
     // https://github.com/mrdoob/three.js/issues/20575
     this.connect = (domElement: HTMLElement): void => {
-      if ((domElement as any) === document) {
-        console.error(
-          'THREE.OrbitControls: "document" should not be used as the target "domElement". Please use "renderer.domElement" instead.',
-        )
-      }
       scope.domElement = domElement
       // disables touch scroll
       // touch-action needs to be defined for pointer events to work on mobile
