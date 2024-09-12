@@ -15,7 +15,7 @@ class EffectComposer<TRenderTarget extends WebGLRenderTarget = WebGLRenderTarget
   public readBuffer: WebGLRenderTarget
   public renderToScreen: boolean
   public passes: Pass[] = []
-  public copyPass: ShaderPass
+  public copyPass: Pass
   public clock: Clock
 
   constructor(renderer: WebGLRenderer, renderTarget?: TRenderTarget) {

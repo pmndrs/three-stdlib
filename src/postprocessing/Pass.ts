@@ -24,6 +24,8 @@ class Pass {
   ): void {
     console.error('THREE.Pass: .render() must be implemented in derived pass.')
   }
+
+  public dispose() {}
 }
 
 // Helper for passes that need to fill the viewport with a single quad.
