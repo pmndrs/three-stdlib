@@ -195,6 +195,13 @@ class EffectComposer<TRenderTarget extends WebGLRenderTarget = WebGLRenderTarget
 
     this.setSize(this._width, this._height)
   }
+
+  public dispose() {
+    this.renderTarget1.dispose()
+    this.renderTarget2.dispose()
+
+    this.copyPass.dispose()
+  }
 }
 
 export { EffectComposer }
