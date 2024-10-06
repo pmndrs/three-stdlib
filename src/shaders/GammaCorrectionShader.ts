@@ -37,7 +37,11 @@ export const GammaCorrectionShader: IGammaCorrectionShader = {
 
     '	vec4 tex = texture2D( tDiffuse, vUv );',
 
-    '	gl_FragColor = LinearTosRGB( tex );',
+    '	#ifdef LinearTosRGB',
+    '		gl_FragColor = LinearTosRGB( tex );',
+    '	#else',
+    '		gl_FragColor = sRGBTransferOETF( tex );',
+    '	#endif',
 
     '}',
   ].join('\n'),
