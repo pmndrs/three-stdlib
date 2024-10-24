@@ -99,6 +99,7 @@ class OrbitControls extends EventDispatcher {
   setPolarAngle: (x: number) => void
   setAzimuthalAngle: (x: number) => void
   getDistance: () => number
+  // Not used in most scenarios, however they can be useful for specific use cases
   getZoomScale: () => number
 
   listenToKeyEvents: (domElement: HTMLElement) => void
@@ -109,8 +110,14 @@ class OrbitControls extends EventDispatcher {
   connect: (domElement: HTMLElement) => void
   dispose: () => void
 
+  // Dolly in programatically
   dollyIn: (dollyScale?: number) => void
+  // Dolly out programatically
   dollyOut: (dollyScale?: number) => void
+  // Get the current scale
+  getScale: () => number
+  // Set the current scale (these are not used in most scenarios, however they can be useful for specific use cases)
+  setScale: (newScale: number) => void
   
 
   constructor(object: PerspectiveCamera | OrthographicCamera, domElement?: HTMLElement) {
@@ -569,28 +576,24 @@ class OrbitControls extends EventDispatcher {
       }
     })()
 
-    function dollyOut(dollyScale: number) {
+    function setScale(newScale: number) {
       if (
         (scope.object instanceof PerspectiveCamera && scope.object.isPerspectiveCamera) ||
         (scope.object instanceof OrthographicCamera && scope.object.isOrthographicCamera)
       ) {
-        scale /= dollyScale
+        scale = newScale
       } else {
         console.warn('WARNING: OrbitControls.js encountered an unknown camera type - dolly/zoom disabled.')
         scope.enableZoom = false
       }
     }
 
+    function dollyOut(dollyScale: number) {
+      setScale(scale / dollyScale)
+    }
+
     function dollyIn(dollyScale: number) {
-      if (
-        (scope.object instanceof PerspectiveCamera && scope.object.isPerspectiveCamera) ||
-        (scope.object instanceof OrthographicCamera && scope.object.isOrthographicCamera)
-      ) {
-        scale *= dollyScale
-      } else {
-        console.warn('WARNING: OrbitControls.js encountered an unknown camera type - dolly/zoom disabled.')
-        scope.enableZoom = false
-      }
+      setScale(scale * dollyScale)
     }
 
     function updateMouseParameters(event: MouseEvent): void {
@@ -1093,6 +1096,15 @@ class OrbitControls extends EventDispatcher {
 
     this.dollyOut = (dollyScale = getZoomScale()) => {
         dollyOut(dollyScale)
+        scope.update()
+    }
+
+    this.getScale = () => {
+        return scale;
+    }
+
+    this.setScale = (newScale) => {
+        setScale(newScale)
         scope.update()
     }
 
