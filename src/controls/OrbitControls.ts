@@ -110,9 +110,9 @@ class OrbitControls extends EventDispatcher {
   connect: (domElement: HTMLElement) => void
   dispose: () => void
 
-  // Dolly in programatically
+  // Dolly in programmatically
   dollyIn: (dollyScale?: number) => void
-  // Dolly out programatically
+  // Dolly out programmatically
   dollyOut: (dollyScale?: number) => void
   // Get the current scale
   getScale: () => number
