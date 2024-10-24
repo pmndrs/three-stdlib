@@ -99,6 +99,7 @@ class OrbitControls extends EventDispatcher {
   setPolarAngle: (x: number) => void
   setAzimuthalAngle: (x: number) => void
   getDistance: () => number
+  getZoomScale: () => number
 
   listenToKeyEvents: (domElement: HTMLElement) => void
   stopListenToKeyEvents: () => void
@@ -107,6 +108,10 @@ class OrbitControls extends EventDispatcher {
   update: () => void
   connect: (domElement: HTMLElement) => void
   dispose: () => void
+
+  dollyIn: (dollyScale?: number) => void
+  dollyOut: (dollyScale?: number) => void
+  
 
   constructor(object: PerspectiveCamera | OrthographicCamera, domElement?: HTMLElement) {
     super()
@@ -1077,6 +1082,22 @@ class OrbitControls extends EventDispatcher {
     function getSecondPointerPosition(event: PointerEvent) {
       const pointer = event.pointerId === pointers[0].pointerId ? pointers[1] : pointers[0]
       return pointerPositions[pointer.pointerId]
+    }
+
+    // Add dolly in/out methods for public API
+
+    this.dollyIn = (dollyScale = getZoomScale()) => {
+      dollyIn(dollyScale)
+      scope.update()
+    }
+
+    this.dollyOut = (dollyScale = getZoomScale()) => {
+        dollyOut(dollyScale)
+        scope.update()
+    }
+
+    this.getZoomScale = () => {
+        return getZoomScale();
     }
 
     // connect events
