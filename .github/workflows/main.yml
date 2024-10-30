@@ -15,11 +15,11 @@ jobs:
         with:
           access_token: ${{ secrets.GITHUB_TOKEN }}
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v2
       - name: Setup node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v2
         with:
-          node-version: '20.x'
+          node-version: '14.x'
       - name: Install deps
         run: yarn install
       - name: Check for regressions
@@ -28,8 +28,9 @@ jobs:
         run: yarn build
       - name: Check for SSR compat
         run: node dist/index.cjs && node dist/index.js
-      - name: Check NPM config
-        run: npx publint@latest dist
+      # TODO: upgrade Nodes
+      # - name: Check NPM config
+      #   run: npx publint@latest dist
   release:
     needs: test
     runs-on: ubuntu-latest
@@ -40,11 +41,11 @@ jobs:
         with:
           access_token: ${{ secrets.GITHUB_TOKEN }}
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v2
       - name: Setup node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v2
         with:
-          node-version: '20.x'
+          node-version: '14.x'
       - name: Install deps
         # this runs a build script so there is no dedicated build
         run: yarn install
