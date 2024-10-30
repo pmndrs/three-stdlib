@@ -99,6 +99,8 @@ class OrbitControls extends EventDispatcher {
   setPolarAngle: (x: number) => void
   setAzimuthalAngle: (x: number) => void
   getDistance: () => number
+  // Not used in most scenarios, however they can be useful for specific use cases
+  getZoomScale: () => number
 
   listenToKeyEvents: (domElement: HTMLElement) => void
   stopListenToKeyEvents: () => void
@@ -107,6 +109,16 @@ class OrbitControls extends EventDispatcher {
   update: () => void
   connect: (domElement: HTMLElement) => void
   dispose: () => void
+
+  // Dolly in programmatically
+  dollyIn: (dollyScale?: number) => void
+  // Dolly out programmatically
+  dollyOut: (dollyScale?: number) => void
+  // Get the current scale
+  getScale: () => number
+  // Set the current scale (these are not used in most scenarios, however they can be useful for specific use cases)
+  setScale: (newScale: number) => void
+  
 
   constructor(object: PerspectiveCamera | OrthographicCamera, domElement?: HTMLElement) {
     super()
@@ -564,28 +576,24 @@ class OrbitControls extends EventDispatcher {
       }
     })()
 
-    function dollyOut(dollyScale: number) {
+    function setScale(newScale: number) {
       if (
         (scope.object instanceof PerspectiveCamera && scope.object.isPerspectiveCamera) ||
         (scope.object instanceof OrthographicCamera && scope.object.isOrthographicCamera)
       ) {
-        scale /= dollyScale
+        scale = newScale
       } else {
         console.warn('WARNING: OrbitControls.js encountered an unknown camera type - dolly/zoom disabled.')
         scope.enableZoom = false
       }
     }
 
+    function dollyOut(dollyScale: number) {
+      setScale(scale / dollyScale)
+    }
+
     function dollyIn(dollyScale: number) {
-      if (
-        (scope.object instanceof PerspectiveCamera && scope.object.isPerspectiveCamera) ||
-        (scope.object instanceof OrthographicCamera && scope.object.isOrthographicCamera)
-      ) {
-        scale *= dollyScale
-      } else {
-        console.warn('WARNING: OrbitControls.js encountered an unknown camera type - dolly/zoom disabled.')
-        scope.enableZoom = false
-      }
+      setScale(scale * dollyScale)
     }
 
     function updateMouseParameters(event: MouseEvent): void {
@@ -1077,6 +1085,31 @@ class OrbitControls extends EventDispatcher {
     function getSecondPointerPosition(event: PointerEvent) {
       const pointer = event.pointerId === pointers[0].pointerId ? pointers[1] : pointers[0]
       return pointerPositions[pointer.pointerId]
+    }
+
+    // Add dolly in/out methods for public API
+
+    this.dollyIn = (dollyScale = getZoomScale()) => {
+      dollyIn(dollyScale)
+      scope.update()
+    }
+
+    this.dollyOut = (dollyScale = getZoomScale()) => {
+        dollyOut(dollyScale)
+        scope.update()
+    }
+
+    this.getScale = () => {
+        return scale;
+    }
+
+    this.setScale = (newScale) => {
+        setScale(newScale)
+        scope.update()
+    }
+
+    this.getZoomScale = () => {
+        return getZoomScale();
     }
 
     // connect events
