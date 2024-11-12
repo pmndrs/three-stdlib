@@ -33,11 +33,9 @@ class PointerLockControls extends EventDispatcher {
 
   private onMouseMove = (event: MouseEvent): void => {
     if (!this.domElement || this.isLocked === false) return
-    const movementX = event.movementX || (event as any).mozMovementX || (event as any).webkitMovementX || 0
-    const movementY = event.movementY || (event as any).mozMovementY || (event as any).webkitMovementY || 0
     _euler.setFromQuaternion(this.camera.quaternion)
-    _euler.y -= movementX * 0.002 * this.pointerSpeed
-    _euler.x -= movementY * 0.002 * this.pointerSpeed
+    _euler.y -= event.movementX * 0.002 * this.pointerSpeed
+    _euler.x -= event.movementY * 0.002 * this.pointerSpeed
     _euler.x = Math.max(_PI_2 - this.maxPolarAngle, Math.min(_PI_2 - this.minPolarAngle, _euler.x))
     this.camera.quaternion.setFromEuler(_euler)
     // @ts-ignore
