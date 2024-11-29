@@ -1,5 +1,4 @@
 import {
-  EventDispatcher,
   MOUSE,
   Matrix4,
   OrthographicCamera,
@@ -10,6 +9,7 @@ import {
   Vector2,
   Vector3,
 } from 'three'
+import { EventDispatcher } from '../EventDispatcher'
 
 export type CHANGE_EVENT = {
   type: 'change' | 'start' | 'end'
@@ -26,7 +26,7 @@ export const STATE = {
   TOUCH_DOLLY_ROTATE: 6,
 }
 
-class CameraControls extends EventDispatcher {
+class CameraControls extends EventDispatcher<Record<string, {}>> {
   object: PerspectiveCamera | OrthographicCamera
   domElement: HTMLElement
 

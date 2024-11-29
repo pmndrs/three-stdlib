@@ -1,10 +1,18 @@
-import { Camera, EventDispatcher, Quaternion, Vector3 } from 'three'
+import { Camera, Quaternion, Vector3 } from 'three'
+import { EventDispatcher } from './EventDispatcher'
 
 function contextmenu(event: Event): void {
   event.preventDefault()
 }
 
-class FlyControls extends EventDispatcher {
+export interface FlyControlsEventMap {
+  /**
+   * Fires when the camera has been transformed by the controls.
+   */
+  change: {};
+}
+
+class FlyControls extends EventDispatcher<FlyControlsEventMap> {
   public object: Camera
   public domElement: HTMLElement | Document = null!
 

@@ -1,5 +1,4 @@
 import {
-  EventDispatcher,
   Matrix4,
   MOUSE,
   OrthographicCamera,
@@ -12,6 +11,8 @@ import {
   Ray,
   Plane,
 } from 'three'
+import { EventDispatcher } from './EventDispatcher'
+import { StandardControlsEventMap } from './StandardControlsEventMap'
 
 const _ray = new Ray()
 const _plane = new Plane()
@@ -26,7 +27,7 @@ const TILT_LIMIT = Math.cos(70 * (Math.PI / 180))
 
 const moduloWrapAround = (offset: number, capacity: number) => ((offset % capacity) + capacity) % capacity
 
-class OrbitControls extends EventDispatcher {
+class OrbitControls extends EventDispatcher<StandardControlsEventMap> {
   object: PerspectiveCamera | OrthographicCamera
   domElement: HTMLElement | undefined
   // Set to false to disable this control

@@ -1,6 +1,34 @@
-import { Camera, EventDispatcher, Intersection, Matrix4, Object3D, Plane, Raycaster, Vector2, Vector3 } from 'three'
+import { Camera, Intersection, Matrix4, Object3D, Plane, Raycaster, Vector2, Vector3 } from 'three'
+import { EventDispatcher } from './EventDispatcher'
 
-class DragControls extends EventDispatcher {
+export interface DragControlsEventMap {
+  /**
+   * Fires when the pointer is moved onto a 3D object, or onto one of its children.
+   */
+  hoveron: { object: Object3D };
+
+  /**
+   * Fires when the pointer is moved out of a 3D object.
+   */
+  hoveroff: { object: Object3D };
+
+  /**
+   * Fires when the user starts to drag a 3D object.
+   */
+  dragstart: { object: Object3D };
+
+  /**
+   * Fires when the user drags a 3D object.
+   */
+  drag: { object: Object3D };
+
+  /**
+   * Fires when the user has finished dragging a 3D object.
+   */
+  dragend: { object: Object3D };
+}
+
+class DragControls extends EventDispatcher<DragControlsEventMap> {
   public enabled = true
   public transformGroup = false
 

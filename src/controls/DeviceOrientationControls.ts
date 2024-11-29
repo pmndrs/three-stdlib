@@ -1,10 +1,12 @@
-import { Camera, Euler, EventDispatcher, MathUtils, Quaternion, Vector3 } from 'three'
+import { Camera, Euler, MathUtils, Quaternion, Vector3 } from 'three'
+import { EventDispatcher } from './EventDispatcher'
+import { StandardControlsEventMap } from './StandardControlsEventMap'
 
 /**
  * W3C Device Orientation control (http://w3c.github.io/deviceorientation/spec-source-orientation.html)
  */
 
-class DeviceOrientationControls extends EventDispatcher {
+class DeviceOrientationControls extends EventDispatcher<StandardControlsEventMap> {
   public object: Camera
 
   private changeEvent = { type: 'change' }

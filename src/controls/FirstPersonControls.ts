@@ -1,8 +1,10 @@
-import { MathUtils, Spherical, Vector3, EventDispatcher, Camera } from 'three'
+import { MathUtils, Spherical, Vector3, Camera } from 'three'
+import { EventDispatcher } from './EventDispatcher'
+import { StandardControlsEventMap } from './StandardControlsEventMap'
 
 const targetPosition = new Vector3()
 
-export class FirstPersonControls extends EventDispatcher {
+export class FirstPersonControls extends EventDispatcher<{}> {
   public object: Camera
   public domElement?: HTMLElement | null
 
