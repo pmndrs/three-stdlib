@@ -12,6 +12,7 @@ import {
   Plane,
 } from 'three'
 import { EventDispatcher } from './EventDispatcher'
+import { StandardControlsEventMap } from './StandardControlsEventMap'
 
 const _ray = new Ray()
 const _plane = new Plane()
@@ -26,24 +27,7 @@ const TILT_LIMIT = Math.cos(70 * (Math.PI / 180))
 
 const moduloWrapAround = (offset: number, capacity: number) => ((offset % capacity) + capacity) % capacity
 
-interface OrbitControlsEventMap {
-  /**
-   * Fires when the camera has been transformed by the controls.
-   */
-  change: {};
-
-  /**
-   * Fires when an interaction was initiated.
-   */
-  start: {};
-
-  /**
-   * Fires when an interaction has finished.
-   */
-  end: {};
-}
-
-class OrbitControls extends EventDispatcher<OrbitControlsEventMap> {
+class OrbitControls extends EventDispatcher<StandardControlsEventMap> {
   object: PerspectiveCamera | OrthographicCamera
   domElement: HTMLElement | undefined
   // Set to false to disable this control
@@ -1158,4 +1142,4 @@ class MapControls extends OrbitControls {
   }
 }
 
-export { OrbitControls, MapControls, OrbitControlsEventMap }
+export { OrbitControls, MapControls }

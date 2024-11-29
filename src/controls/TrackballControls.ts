@@ -1,6 +1,8 @@
-import { EventDispatcher, MOUSE, Quaternion, Vector2, Vector3, PerspectiveCamera, OrthographicCamera } from 'three'
+import { MOUSE, Quaternion, Vector2, Vector3, PerspectiveCamera, OrthographicCamera } from 'three'
+import { EventDispatcher } from './EventDispatcher'
+import { StandardControlsEventMap } from './StandardControlsEventMap'
 
-class TrackballControls extends EventDispatcher {
+class TrackballControls extends EventDispatcher<StandardControlsEventMap> {
   public enabled = true
 
   public screen = { left: 0, top: 0, width: 0, height: 0 }
