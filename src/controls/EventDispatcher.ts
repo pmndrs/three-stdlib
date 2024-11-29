@@ -3,6 +3,7 @@ Due to @types/three r168 breaking change
 we have to manually copy the EventDispatcher class from three.js.
 So this files merges the declarations from https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/three/src/core/EventDispatcher.d.ts
 with the implementation from https://github.com/mrdoob/three.js/blob/dev/src/core/EventDispatcher.js
+More info in https://github.com/pmndrs/three-stdlib/issues/387
 */
 
 /**
