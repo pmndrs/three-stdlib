@@ -1,5 +1,4 @@
 import {
-  EventDispatcher,
   Matrix4,
   MOUSE,
   OrthographicCamera,
@@ -12,6 +11,7 @@ import {
   Ray,
   Plane,
 } from 'three'
+import { EventDispatcher } from './EventDispatcher'
 
 const _ray = new Ray()
 const _plane = new Plane()
@@ -26,7 +26,24 @@ const TILT_LIMIT = Math.cos(70 * (Math.PI / 180))
 
 const moduloWrapAround = (offset: number, capacity: number) => ((offset % capacity) + capacity) % capacity
 
-class OrbitControls extends EventDispatcher {
+interface OrbitControlsEventMap {
+  /**
+   * Fires when the camera has been transformed by the controls.
+   */
+  change: {};
+
+  /**
+   * Fires when an interaction was initiated.
+   */
+  start: {};
+
+  /**
+   * Fires when an interaction has finished.
+   */
+  end: {};
+}
+
+class OrbitControls extends EventDispatcher<OrbitControlsEventMap> {
   object: PerspectiveCamera | OrthographicCamera
   domElement: HTMLElement | undefined
   // Set to false to disable this control
@@ -1141,4 +1158,4 @@ class MapControls extends OrbitControls {
   }
 }
 
-export { OrbitControls, MapControls }
+export { OrbitControls, MapControls, OrbitControlsEventMap }
