@@ -1,4 +1,5 @@
-import { Euler, Camera, EventDispatcher, Vector3 } from 'three'
+import { Euler, Camera, Vector3 } from 'three'
+import { EventDispatcher } from './EventDispatcher'
 
 const _euler = new Euler(0, 0, 0, 'YXZ')
 const _vector = new Vector3()
@@ -7,7 +8,24 @@ const _lockEvent = { type: 'lock' }
 const _unlockEvent = { type: 'unlock' }
 const _PI_2 = Math.PI / 2
 
-class PointerLockControls extends EventDispatcher {
+export interface PointerLockControlsEventMap {
+  /**
+   * Fires when the user moves the mouse.
+   */
+  change: {};
+
+  /**
+   * Fires when the pointer lock status is "locked" (in other words: the mouse is captured).
+   */
+  lock: {};
+
+  /**
+   * Fires when the pointer lock status is "unlocked" (in other words: the mouse is not captured anymore).
+   */
+  unlock: {};
+}
+
+class PointerLockControls extends EventDispatcher<PointerLockControlsEventMap> {
   public camera: Camera
   public domElement?: HTMLElement
   public isLocked: boolean
