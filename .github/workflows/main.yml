@@ -15,17 +15,19 @@ jobs:
         with:
           access_token: ${{ secrets.GITHUB_TOKEN }}
       - name: Checkout repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Setup node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
-          node-version: '14.x'
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+          cache-dependency-path: 'package-lock.json'
       - name: Install deps
-        run: yarn install
+        run: npm ci --audit=false --fund=false
       - name: Check for regressions
-        run: yarn lint
+        run: npm run lint
       - name: Check build health
-        run: yarn build
+        run: npm run build
       - name: Check for SSR compat
         run: node dist/index.cjs && node dist/index.js
       # TODO: upgrade Nodes
@@ -41,16 +43,18 @@ jobs:
         with:
           access_token: ${{ secrets.GITHUB_TOKEN }}
       - name: Checkout repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Setup node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
-          node-version: '14.x'
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+          cache-dependency-path: 'package-lock.json'
       - name: Install deps
-        # this runs a build script so there is no dedicated build
-        run: yarn install
+      # this runs a build script so there is no dedicated build
+        run: npm ci --audit=false --fund=false
       - name: Check build health
-        run: yarn build
+        run: npm run build
       - name: 🚀 Release
         uses: cycjimmy/semantic-release-action@v2
         with:
