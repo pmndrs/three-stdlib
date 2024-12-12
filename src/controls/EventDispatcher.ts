@@ -36,10 +36,16 @@ export class EventDispatcher<TEventMap extends {} = {}> {
      * @param type The type of event to listen to.
      * @param listener The function that gets called when the event is fired.
      */
+	addEventListener(type: string, listener: EventListener<{}, string, this>): void
 	addEventListener<T extends Extract<keyof TEventMap, string>>(
         type: T,
         listener: EventListener<TEventMap[T], T, this>,
-    ): void {
+    ): void
+	addEventListener<T extends Extract<keyof TEventMap, string>>(
+        type: T | string,
+        listener: EventListener<TEventMap[T], T, this> | EventListener<{}, string, this>,
+    ): void
+	 {
 
 		if ( this._listeners === undefined ) this._listeners = {};
 
@@ -64,9 +70,14 @@ export class EventDispatcher<TEventMap extends {} = {}> {
      * @param type The type of event to listen to.
      * @param listener The function that gets called when the event is fired.
      */
+	hasEventListener(type: string, listener: EventListener<{}, string, this>): boolean;
     hasEventListener<T extends Extract<keyof TEventMap, string>>(
         type: T,
         listener: EventListener<TEventMap[T], T, this>,
+    ): boolean;
+	hasEventListener<T extends Extract<keyof TEventMap, string>>(
+        type: T | string,
+        listener: EventListener<TEventMap[T], T, this> | EventListener<{}, string, this>,
     ): boolean {
 
 		if ( this._listeners === undefined ) return false;
@@ -82,9 +93,14 @@ export class EventDispatcher<TEventMap extends {} = {}> {
      * @param type The type of the listener that gets removed.
      * @param listener The listener function that gets removed.
      */
+	removeEventListener(type: string, listener: EventListener<{}, string, this>): void;
     removeEventListener<T extends Extract<keyof TEventMap, string>>(
         type: T,
         listener: EventListener<TEventMap[T], T, this>,
+    ): void
+	removeEventListener<T extends Extract<keyof TEventMap, string>>(
+        type: T|string,
+        listener: EventListener<TEventMap[T], T, this> | EventListener<{}, string, this>,
     ): void {
 
 		if ( this._listeners === undefined ) return;
