@@ -1,4 +1,4 @@
-import { Light, Renderer } from 'three'
+import { Light, WebGLRenderer } from 'three'
 
 export interface Size {
   width: number
@@ -18,7 +18,7 @@ export class ShadowMapViewer {
   enabled: boolean
   size: Size
   position: Position
-  render(renderer: Renderer): void
+  render(renderer: WebGLRenderer): void
   updateForWindowResize(): void
   update(): void
 }
