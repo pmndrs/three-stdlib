@@ -2,8 +2,8 @@ import { MathUtils } from 'three'
 
 const _hsl = {}
 
-class ColorConverter {
-  static setHSV(color, h, s, v) {
+const ColorConverter = {
+  setHSV(color, h, s, v) {
     // https://gist.github.com/xpansive/1337890#file-index-js
 
     h = MathUtils.euclideanModulo(h, 1)
@@ -11,9 +11,9 @@ class ColorConverter {
     v = MathUtils.clamp(v, 0, 1)
 
     return color.setHSL(h, (s * v) / ((h = (2 - s) * v) < 1 ? h : 2 - h), h * 0.5)
-  }
+  },
 
-  static getHSV(color, target) {
+  getHSV(color, target) {
     color.getHSL(_hsl)
 
     // based on https://gist.github.com/xpansive/1337890#file-index-js
@@ -24,19 +24,19 @@ class ColorConverter {
     target.v = _hsl.l + _hsl.s
 
     return target
-  }
+  },
 
   // where c, m, y, k is between 0 and 1
 
-  static setCMYK(color, c, m, y, k) {
+  setCMYK(color, c, m, y, k) {
     const r = (1 - c) * (1 - k)
     const g = (1 - m) * (1 - k)
     const b = (1 - y) * (1 - k)
 
     return color.setRGB(r, g, b)
-  }
+  },
 
-  static getCMYK(color, target) {
+  getCMYK(color, target) {
     const r = color.r
     const g = color.g
     const b = color.b
@@ -52,7 +52,7 @@ class ColorConverter {
     target.k = k
 
     return target
-  }
+  },
 }
 
 export { ColorConverter }

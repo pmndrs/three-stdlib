@@ -21,7 +21,7 @@ import {
 } from 'three'
 import { decodeText } from '../_polyfill/LoaderUtils'
 
-var XLoader = (function () {
+var XLoader = /* @__PURE__ */ (function () {
   var classCallCheck = function (instance, Constructor) {
     if (!(instance instanceof Constructor)) {
       throw new TypeError('Cannot call a class as a function')

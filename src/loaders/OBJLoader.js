@@ -23,12 +23,12 @@ const _material_use_pattern = /^usemtl /
 // usemap map_name
 const _map_use_pattern = /^usemap /
 
-const _vA = new Vector3()
-const _vB = new Vector3()
-const _vC = new Vector3()
+const _vA = /* @__PURE__ */ new Vector3()
+const _vB = /* @__PURE__ */ new Vector3()
+const _vC = /* @__PURE__ */ new Vector3()
 
-const _ab = new Vector3()
-const _cb = new Vector3()
+const _ab = /* @__PURE__ */ new Vector3()
+const _cb = /* @__PURE__ */ new Vector3()
 
 function ParserState() {
   const state = {
