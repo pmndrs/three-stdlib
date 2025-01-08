@@ -9,6 +9,7 @@ import {
   RGBAFormat,
 } from 'three'
 import { unzlibSync } from 'fflate'
+import { version } from '../_polyfill/constants'
 
 /**
  * OpenEXR loader currently supports uncompressed, ZIP(S), RLE, PIZ and DWA/B compression.
@@ -83,7 +84,8 @@ import { unzlibSync } from 'fflate'
 
 // // End of OpenEXR license -------------------------------------------------
 
-const hasColorSpace = /* @__PURE__ */ (() => 'colorSpace' in new Texture())()
+// https://github.com/mrdoob/three.js/pull/25771
+const hasColorSpace = version >= 152
 
 class EXRLoader extends DataTextureLoader {
   constructor(manager) {
