@@ -83,7 +83,7 @@ import { unzlibSync } from 'fflate'
 
 // // End of OpenEXR license -------------------------------------------------
 
-const hasColorSpace = 'colorSpace' in new Texture()
+const hasColorSpace = /* @__PURE__ */ (() => 'colorSpace' in new Texture())()
 
 class EXRLoader extends DataTextureLoader {
   constructor(manager) {

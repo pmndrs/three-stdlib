@@ -1,3 +1,3 @@
 import { REVISION } from 'three'
 
-export const version = parseInt(REVISION.replace(/\D+/g, ''))
+export const version = /* @__PURE__ */ (() => parseInt(REVISION.replace(/\D+/g, '')))()

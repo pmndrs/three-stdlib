@@ -168,65 +168,69 @@ function decodePrwm(buffer) {
 
 // Define the public interface
 
-class PRWMLoader extends Loader {
-  constructor(manager) {
-    super(manager)
-  }
+const PRWMLoader = /* @__PURE__ */ (() => {
+  class PRWMLoader extends Loader {
+    constructor(manager) {
+      super(manager)
+    }
 
-  load(url, onLoad, onProgress, onError) {
-    const scope = this
+    load(url, onLoad, onProgress, onError) {
+      const scope = this
 
-    const loader = new FileLoader(scope.manager)
-    loader.setPath(scope.path)
-    loader.setResponseType('arraybuffer')
-    loader.setRequestHeader(scope.requestHeader)
-    loader.setWithCredentials(scope.withCredentials)
+      const loader = new FileLoader(scope.manager)
+      loader.setPath(scope.path)
+      loader.setResponseType('arraybuffer')
+      loader.setRequestHeader(scope.requestHeader)
+      loader.setWithCredentials(scope.withCredentials)
 
-    url = url.replace(/\*/g, isBigEndianPlatform() ? 'be' : 'le')
+      url = url.replace(/\*/g, isBigEndianPlatform() ? 'be' : 'le')
 
-    loader.load(
-      url,
-      function (arrayBuffer) {
-        try {
-          onLoad(scope.parse(arrayBuffer))
-        } catch (e) {
-          if (onError) {
-            onError(e)
-          } else {
-            console.error(e)
+      loader.load(
+        url,
+        function (arrayBuffer) {
+          try {
+            onLoad(scope.parse(arrayBuffer))
+          } catch (e) {
+            if (onError) {
+              onError(e)
+            } else {
+              console.error(e)
+            }
+
+            scope.manager.itemError(url)
           }
-
-          scope.manager.itemError(url)
-        }
-      },
-      onProgress,
-      onError,
-    )
-  }
-
-  parse(arrayBuffer) {
-    const data = decodePrwm(arrayBuffer),
-      attributesKey = Object.keys(data.attributes),
-      bufferGeometry = new BufferGeometry()
-
-    for (let i = 0; i < attributesKey.length; i++) {
-      const attribute = data.attributes[attributesKey[i]]
-      bufferGeometry.setAttribute(
-        attributesKey[i],
-        new BufferAttribute(attribute.values, attribute.cardinality, attribute.normalized),
+        },
+        onProgress,
+        onError,
       )
     }
 
-    if (data.indices !== null) {
-      bufferGeometry.setIndex(new BufferAttribute(data.indices, 1))
+    parse(arrayBuffer) {
+      const data = decodePrwm(arrayBuffer),
+        attributesKey = Object.keys(data.attributes),
+        bufferGeometry = new BufferGeometry()
+
+      for (let i = 0; i < attributesKey.length; i++) {
+        const attribute = data.attributes[attributesKey[i]]
+        bufferGeometry.setAttribute(
+          attributesKey[i],
+          new BufferAttribute(attribute.values, attribute.cardinality, attribute.normalized),
+        )
+      }
+
+      if (data.indices !== null) {
+        bufferGeometry.setIndex(new BufferAttribute(data.indices, 1))
+      }
+
+      return bufferGeometry
     }
 
-    return bufferGeometry
+    static isBigEndianPlatform() {
+      return isBigEndianPlatform()
+    }
   }
 
-  static isBigEndianPlatform() {
-    return isBigEndianPlatform()
-  }
-}
+  return PRWMLoader
+})()
 
 export { PRWMLoader }
