@@ -14,7 +14,7 @@ import { version } from '../_polyfill/constants'
  *
  * Three.js integration by zz85 http://twitter.com/blurspline
  */
-const Sky = /* @__PURE__ */ () => {
+const Sky = /* @__PURE__ */ (() => {
   const SkyShader = {
     uniforms: {
       turbidity: { value: 2 },
@@ -206,6 +206,6 @@ const Sky = /* @__PURE__ */ () => {
   }
 
   return Sky
-}
+})()
 
 export { Sky }

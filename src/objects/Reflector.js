@@ -14,7 +14,7 @@ import {
 } from 'three'
 import { version } from '../_polyfill/constants'
 
-const Reflector = /* @__PURE__ */ () => {
+const Reflector = /* @__PURE__ */ (() => {
   class Reflector extends Mesh {
     static ReflectorShader = {
       uniforms: {
@@ -262,6 +262,6 @@ const Reflector = /* @__PURE__ */ () => {
   }
 
   return Reflector
-}
+})()
 
 export { Reflector }
