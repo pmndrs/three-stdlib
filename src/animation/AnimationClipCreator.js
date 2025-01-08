@@ -7,8 +7,8 @@ import {
   VectorKeyframeTrack,
 } from 'three'
 
-class AnimationClipCreator {
-  static CreateRotationAnimation(period, axis = 'x') {
+const AnimationClipCreator = {
+  CreateRotationAnimation(period, axis = 'x') {
     const times = [0, period],
       values = [0, 360]
 
@@ -17,9 +17,9 @@ class AnimationClipCreator {
     const track = new NumberKeyframeTrack(trackName, times, values)
 
     return new AnimationClip(null, period, [track])
-  }
+  },
 
-  static CreateScaleAxisAnimation(period, axis = 'x') {
+  CreateScaleAxisAnimation(period, axis = 'x') {
     const times = [0, period],
       values = [0, 1]
 
@@ -28,9 +28,9 @@ class AnimationClipCreator {
     const track = new NumberKeyframeTrack(trackName, times, values)
 
     return new AnimationClip(null, period, [track])
-  }
+  },
 
-  static CreateShakeAnimation(duration, shakeScale) {
+  CreateShakeAnimation(duration, shakeScale) {
     const times = [],
       values = [],
       tmp = new Vector3()
@@ -49,9 +49,9 @@ class AnimationClipCreator {
     const track = new VectorKeyframeTrack(trackName, times, values)
 
     return new AnimationClip(null, duration, [track])
-  }
+  },
 
-  static CreatePulsationAnimation(duration, pulseScale) {
+  CreatePulsationAnimation(duration, pulseScale) {
     const times = [],
       values = [],
       tmp = new Vector3()
@@ -68,9 +68,9 @@ class AnimationClipCreator {
     const track = new VectorKeyframeTrack(trackName, times, values)
 
     return new AnimationClip(null, duration, [track])
-  }
+  },
 
-  static CreateVisibilityAnimation(duration) {
+  CreateVisibilityAnimation(duration) {
     const times = [0, duration / 2, duration],
       values = [true, false, true]
 
@@ -79,9 +79,9 @@ class AnimationClipCreator {
     const track = new BooleanKeyframeTrack(trackName, times, values)
 
     return new AnimationClip(null, duration, [track])
-  }
+  },
 
-  static CreateMaterialColorAnimation(duration, colors) {
+  CreateMaterialColorAnimation(duration, colors) {
     const times = [],
       values = [],
       timeStep = duration / colors.length
@@ -98,7 +98,7 @@ class AnimationClipCreator {
     const track = new ColorKeyframeTrack(trackName, times, values)
 
     return new AnimationClip(null, duration, [track])
-  }
+  },
 }
 
 export { AnimationClipCreator }

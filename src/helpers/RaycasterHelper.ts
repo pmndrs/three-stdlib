@@ -18,8 +18,8 @@ import {
   Vector3,
 } from 'three'
 
-const _o = new Object3D()
-const _v = new Vector3()
+const _o = /* @__PURE__ */ new Object3D()
+const _v = /* @__PURE__ */ new Vector3()
 
 class RaycasterHelper extends Object3D {
   raycaster: Raycaster

@@ -14,8 +14,8 @@ import {
 import { EventDispatcher } from './EventDispatcher'
 import { StandardControlsEventMap } from './StandardControlsEventMap'
 
-const _ray = new Ray()
-const _plane = new Plane()
+const _ray = /* @__PURE__ */ new Ray()
+const _plane = /* @__PURE__ */ new Plane()
 const TILT_LIMIT = Math.cos(70 * (Math.PI / 180))
 
 // This set of controls performs orbiting, dollying (zooming), and panning.
@@ -119,7 +119,6 @@ class OrbitControls extends EventDispatcher<StandardControlsEventMap> {
   getScale: () => number
   // Set the current scale (these are not used in most scenarios, however they can be useful for specific use cases)
   setScale: (newScale: number) => void
-  
 
   constructor(object: PerspectiveCamera | OrthographicCamera, domElement?: HTMLElement) {
     super()
@@ -1096,21 +1095,21 @@ class OrbitControls extends EventDispatcher<StandardControlsEventMap> {
     }
 
     this.dollyOut = (dollyScale = getZoomScale()) => {
-        dollyOut(dollyScale)
-        scope.update()
+      dollyOut(dollyScale)
+      scope.update()
     }
 
     this.getScale = () => {
-        return scale;
+      return scale
     }
 
     this.setScale = (newScale) => {
-        setScale(newScale)
-        scope.update()
+      setScale(newScale)
+      scope.update()
     }
 
     this.getZoomScale = () => {
-        return getZoomScale();
+      return getZoomScale()
     }
 
     // connect events

@@ -66,8 +66,8 @@ type FontData = {
 
 export class Font {
   public data: FontData
-  public static isFont: true
-  public static type: 'Font'
+  public isFont = true
+  public type = 'Font'
 
   constructor(data: FontData) {
     this.data = data

@@ -1,4 +1,5 @@
-import { BackSide, Color, ShaderMaterial, UniformsLib, UniformsUtils, REVISION } from 'three'
+import { BackSide, Color, ShaderMaterial, UniformsLib, UniformsUtils } from 'three'
+import { version } from '../_polyfill/constants'
 
 /**
  * Reference: https://en.wikipedia.org/wiki/Cel_shading
@@ -157,7 +158,7 @@ class OutlineEffect {
       '	gl_FragColor = vec4( outlineColor, outlineAlpha );',
 
       '	#include <tonemapping_fragment>',
-      `	#include <${parseInt(REVISION.replace(/\D+/g, '')) >= 154 ? 'colorspace_fragment' : 'encodings_fragment'}>`,
+      `	#include <${version >= 154 ? 'colorspace_fragment' : 'encodings_fragment'}>`,
       '	#include <fog_fragment>',
       '	#include <premultiplied_alpha_fragment>',
 

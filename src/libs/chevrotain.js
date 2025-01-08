@@ -1,4 +1,4 @@
-const { CstParser, Lexer, createToken } = (() => {
+const { CstParser, Lexer, createToken } = /* @__PURE__ */ (() => {
   /** Detect free variable `global` from Node.js. */
   var freeGlobal = typeof global == 'object' && global && global.Object === Object && global
 

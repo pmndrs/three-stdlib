@@ -2,9 +2,9 @@ import { InstancedInterleavedBuffer, InterleavedBufferAttribute, Mesh, Vector3, 
 import { LineSegmentsGeometry } from '../lines/LineSegmentsGeometry'
 import { LineMaterial } from '../lines/LineMaterial'
 
-const _start = new Vector3()
-const _end = new Vector3()
-const _viewport = new Vector4();
+const _start = /* @__PURE__ */ new Vector3()
+const _end = /* @__PURE__ */ new Vector3()
+const _viewport = /* @__PURE__ */ new Vector4()
 
 class Wireframe extends Mesh {
   constructor(geometry = new LineSegmentsGeometry(), material = new LineMaterial({ color: Math.random() * 0xffffff })) {
@@ -41,16 +41,12 @@ class Wireframe extends Mesh {
   }
 
   onBeforeRender(renderer) {
-
-    const uniforms = this.material.uniforms;
+    const uniforms = this.material.uniforms
 
     if (uniforms && uniforms.resolution) {
-
-      renderer.getViewport(_viewport);
-      this.material.uniforms.resolution.value.set(_viewport.z, _viewport.w);
-
+      renderer.getViewport(_viewport)
+      this.material.uniforms.resolution.value.set(_viewport.z, _viewport.w)
     }
-
   }
 }
 
