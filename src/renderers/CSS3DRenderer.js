@@ -4,9 +4,9 @@ import { Matrix4, Object3D, Quaternion, Vector3 } from 'three'
  * Based on http://www.emagix.net/academic/mscs-project/item/camera-sync-with-css3-and-webgl-threejs
  */
 
-const _position = /* @__PURE__ */ new Vector3()
-const _quaternion = /* @__PURE__ */ new Quaternion()
-const _scale = /* @__PURE__ */ new Vector3()
+const _position = new Vector3()
+const _quaternion = new Quaternion()
+const _scale = new Vector3()
 
 class CSS3DObject extends Object3D {
   constructor(element = document.createElement('div')) {
@@ -59,8 +59,8 @@ class CSS3DSprite extends CSS3DObject {
 
 //
 
-const _matrix = /* @__PURE__ */ new Matrix4()
-const _matrix2 = /* @__PURE__ */ new Matrix4()
+const _matrix = new Matrix4()
+const _matrix2 = new Matrix4()
 
 class CSS3DRenderer {
   constructor(parameters = {}) {

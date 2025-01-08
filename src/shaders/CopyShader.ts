@@ -18,29 +18,29 @@ export const CopyShader: ICopyShader = {
     opacity: { value: 1.0 },
   },
 
-  vertexShader: /* glsl */ `
-    varying vec2 vUv;
+  vertexShader: [
+    'varying vec2 vUv;',
 
-    void main() {
+    'void main() {',
 
-    	vUv = uv;
-    	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+    '	vUv = uv;',
+    '	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
 
-    }
-  `,
+    '}',
+  ].join('\n'),
 
-  fragmentShader: /* glsl */ `
-    uniform float opacity;
+  fragmentShader: [
+    'uniform float opacity;',
 
-    uniform sampler2D tDiffuse;
+    'uniform sampler2D tDiffuse;',
 
-    varying vec2 vUv;
+    'varying vec2 vUv;',
 
-    void main() {
+    'void main() {',
 
-    	vec4 texel = texture2D( tDiffuse, vUv );
-    	gl_FragColor = opacity * texel;
+    '	vec4 texel = texture2D( tDiffuse, vUv );',
+    '	gl_FragColor = opacity * texel;',
 
-    }
-  `,
+    '}',
+  ].join('\n'),
 }

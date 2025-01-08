@@ -1275,8 +1275,8 @@ class GeometryParser {
     }
 
     buffers.uvs.forEach(function (uvBuffer, i) {
-      if (UV1 === 'uv2') i++
-      const name = i === 0 ? 'uv' : `uv${i}`
+      if (UV1 === 'uv2') i++;
+      const name = i === 0 ? 'uv' : `uv${i}`;
 
       geo.setAttribute(name, new Float32BufferAttribute(buffers.uvs[i], 2))
     })
@@ -3113,8 +3113,8 @@ function getData(polygonVertexIndex, polygonIndex, vertexIndex, infoObject) {
   return slice(dataArray, infoObject.buffer, from, to)
 }
 
-const tempEuler = /* @__PURE__ */ new Euler()
-const tempVec = /* @__PURE__ */ new Vector3()
+const tempEuler = new Euler()
+const tempVec = new Vector3()
 
 // generate transformation from FBX transform data
 // ref: https://help.autodesk.com/view/FBX/2017/ENU/?guid=__files_GUID_10CDD63C_79C1_4F2D_BB28_AD2BE65A02ED_htm

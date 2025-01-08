@@ -17,11 +17,11 @@ import {
   WebGLRenderTarget,
 } from 'three'
 
-var _mipmapMaterial = /* @__PURE__ */ _getMipmapMaterial()
+var _mipmapMaterial = _getMipmapMaterial()
 
-var _mesh = /* @__PURE__ */ new Mesh(/* @__PURE__ */ new PlaneGeometry(2, 2), _mipmapMaterial)
+var _mesh = new Mesh(new PlaneGeometry(2, 2), _mipmapMaterial)
 
-var _flatCamera = /* @__PURE__ */ new OrthographicCamera(0, 1, 0, 1, 0, 1)
+var _flatCamera = new OrthographicCamera(0, 1, 0, 1, 0, 1)
 
 var _tempTarget = null
 

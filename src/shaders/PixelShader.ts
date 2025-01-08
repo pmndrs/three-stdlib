@@ -9,30 +9,30 @@ export const PixelShader = {
     pixelSize: { value: 1 },
   },
 
-  vertexShader: /* glsl */ `
-    varying highp vec2 vUv;
+  vertexShader: [
+    'varying highp vec2 vUv;',
 
-    void main() {
+    'void main() {',
 
-      vUv = uv;
-      gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+    'vUv = uv;',
+    'gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
 
-    }
-  `,
+    '}',
+  ].join('\n'),
 
-  fragmentShader: /* glsl */ `
-    uniform sampler2D tDiffuse;
-    uniform float pixelSize;
-    uniform vec2 resolution;
+  fragmentShader: [
+    'uniform sampler2D tDiffuse;',
+    'uniform float pixelSize;',
+    'uniform vec2 resolution;',
 
-    varying highp vec2 vUv;
+    'varying highp vec2 vUv;',
 
-    void main(){
+    'void main(){',
 
-      vec2 dxy = pixelSize / resolution;
-      vec2 coord = dxy * floor( vUv / dxy );
-      gl_FragColor = texture2D(tDiffuse, coord);
+    'vec2 dxy = pixelSize / resolution;',
+    'vec2 coord = dxy * floor( vUv / dxy );',
+    'gl_FragColor = texture2D(tDiffuse, coord);',
 
-    }
-  `,
+    '}',
+  ].join('\n'),
 }

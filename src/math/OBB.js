@@ -4,13 +4,13 @@ import { Box3, MathUtils, Matrix4, Matrix3, Ray, Vector3 } from 'three'
 
 const a = {
   c: null, // center
-  u: [/* @__PURE__ */ new Vector3(), /* @__PURE__ */ new Vector3(), /* @__PURE__ */ new Vector3()], // basis vectors
+  u: [new Vector3(), new Vector3(), new Vector3()], // basis vectors
   e: [], // half width
 }
 
 const b = {
   c: null, // center
-  u: [/* @__PURE__ */ new Vector3(), /* @__PURE__ */ new Vector3(), /* @__PURE__ */ new Vector3()], // basis vectors
+  u: [new Vector3(), new Vector3(), new Vector3()], // basis vectors
   e: [], // half width
 }
 
@@ -18,17 +18,17 @@ const R = [[], [], []]
 const AbsR = [[], [], []]
 const t = []
 
-const xAxis = /* @__PURE__ */ new Vector3()
-const yAxis = /* @__PURE__ */ new Vector3()
-const zAxis = /* @__PURE__ */ new Vector3()
-const v1 = /* @__PURE__ */ new Vector3()
-const size = /* @__PURE__ */ new Vector3()
-const closestPoint = /* @__PURE__ */ new Vector3()
-const rotationMatrix = /* @__PURE__ */ new Matrix3()
-const aabb = /* @__PURE__ */ new Box3()
-const matrix = /* @__PURE__ */ new Matrix4()
-const inverse = /* @__PURE__ */ new Matrix4()
-const localRay = /* @__PURE__ */ new Ray()
+const xAxis = new Vector3()
+const yAxis = new Vector3()
+const zAxis = new Vector3()
+const v1 = new Vector3()
+const size = new Vector3()
+const closestPoint = new Vector3()
+const rotationMatrix = new Matrix3()
+const aabb = new Box3()
+const matrix = new Matrix4()
+const inverse = new Matrix4()
+const localRay = new Ray()
 
 // OBB
 
@@ -361,6 +361,6 @@ class OBB {
   }
 }
 
-const obb = /* @__PURE__ */ new OBB()
+const obb = new OBB()
 
 export { OBB }

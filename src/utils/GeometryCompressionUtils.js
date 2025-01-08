@@ -14,8 +14,8 @@ import {
   ShaderLib,
   UniformsUtils,
   Vector3,
+  REVISION,
 } from 'three'
-import { version } from '../_polyfill/constants'
 
 var GeometryCompressionUtils = {
   /**
@@ -732,7 +732,7 @@ class PackedPhongMaterial extends MeshPhongMaterial {
       'gl_FragColor = vec4( outgoingLight, diffuseColor.a );',
 
       ShaderChunk.tonemapping_fragment,
-      version >= 154 ? ShaderChunk.colorspace_fragment : ShaderChunk.encodings_fragment,
+      parseInt(REVISION.replace(/\D+/g, '')) >= 154 ? ShaderChunk.colorspace_fragment : ShaderChunk.encodings_fragment,
       ShaderChunk.fog_fragment,
       ShaderChunk.premultiplied_alpha_fragment,
       ShaderChunk.dithering_fragment,

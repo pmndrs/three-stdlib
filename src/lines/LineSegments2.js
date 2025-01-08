@@ -14,23 +14,23 @@ import { LineSegmentsGeometry } from '../lines/LineSegmentsGeometry'
 import { LineMaterial } from '../lines/LineMaterial'
 import { UV1 } from '../_polyfill/uv1'
 
-const _viewport = /* @__PURE__ */ new Vector4()
+const _viewport = new Vector4();
 
-const _start = /* @__PURE__ */ new Vector3()
-const _end = /* @__PURE__ */ new Vector3()
+const _start = new Vector3()
+const _end = new Vector3()
 
-const _start4 = /* @__PURE__ */ new Vector4()
-const _end4 = /* @__PURE__ */ new Vector4()
+const _start4 = new Vector4()
+const _end4 = new Vector4()
 
-const _ssOrigin = /* @__PURE__ */ new Vector4()
-const _ssOrigin3 = /* @__PURE__ */ new Vector3()
-const _mvMatrix = /* @__PURE__ */ new Matrix4()
-const _line = /* @__PURE__ */ new Line3()
-const _closestPoint = /* @__PURE__ */ new Vector3()
+const _ssOrigin = new Vector4()
+const _ssOrigin3 = new Vector3()
+const _mvMatrix = new Matrix4()
+const _line = new Line3()
+const _closestPoint = new Vector3()
 
-const _box = /* @__PURE__ */ new Box3()
-const _sphere = /* @__PURE__ */ new Sphere()
-const _clipToWorldVector = /* @__PURE__ */ new Vector4()
+const _box = new Box3()
+const _sphere = new Sphere()
+const _clipToWorldVector = new Vector4()
 
 let _ray, _lineWidth
 
@@ -51,17 +51,18 @@ function getWorldSpaceHalfWidth(camera, distance, resolution) {
 }
 
 function raycastWorldUnits(lineSegments, intersects) {
-  const matrixWorld = lineSegments.matrixWorld
-  const geometry = lineSegments.geometry
-  const instanceStart = geometry.attributes.instanceStart
-  const instanceEnd = geometry.attributes.instanceEnd
-  const segmentCount = Math.min(geometry.instanceCount, instanceStart.count)
+
+  const matrixWorld = lineSegments.matrixWorld;
+  const geometry = lineSegments.geometry;
+  const instanceStart = geometry.attributes.instanceStart;
+  const instanceEnd = geometry.attributes.instanceEnd;
+  const segmentCount = Math.min(geometry.instanceCount, instanceStart.count);
 
   for (let i = 0, l = segmentCount; i < l; i++) {
     _line.start.fromBufferAttribute(instanceStart, i)
     _line.end.fromBufferAttribute(instanceEnd, i)
 
-    _line.applyMatrix4(matrixWorld)
+    _line.applyMatrix4(matrixWorld);
 
     const pointOnLine = new Vector3()
     const point = new Vector3()
@@ -93,7 +94,7 @@ function raycastScreenSpace(lineSegments, camera, intersects) {
   const geometry = lineSegments.geometry
   const instanceStart = geometry.attributes.instanceStart
   const instanceEnd = geometry.attributes.instanceEnd
-  const segmentCount = Math.min(geometry.instanceCount, instanceStart.count)
+  const segmentCount = Math.min(geometry.instanceCount, instanceStart.count);
 
   const near = -camera.near
 
@@ -311,12 +312,16 @@ class LineSegments2 extends Mesh {
   }
 
   onBeforeRender(renderer) {
-    const uniforms = this.material.uniforms
+
+    const uniforms = this.material.uniforms;
 
     if (uniforms && uniforms.resolution) {
-      renderer.getViewport(_viewport)
-      this.material.uniforms.resolution.value.set(_viewport.z, _viewport.w)
+
+      renderer.getViewport(_viewport);
+      this.material.uniforms.resolution.value.set(_viewport.z, _viewport.w);
+
     }
+
   }
 }
 

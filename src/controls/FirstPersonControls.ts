@@ -2,7 +2,7 @@ import { MathUtils, Spherical, Vector3, Camera } from 'three'
 import { EventDispatcher } from './EventDispatcher'
 import { StandardControlsEventMap } from './StandardControlsEventMap'
 
-const targetPosition = /* @__PURE__ */ new Vector3()
+const targetPosition = new Vector3()
 
 export class FirstPersonControls extends EventDispatcher<{}> {
   public object: Camera

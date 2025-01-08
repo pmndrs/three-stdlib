@@ -9,8 +9,8 @@ import {
   ShaderMaterial,
   StereoCamera,
   WebGLRenderTarget,
+  REVISION,
 } from 'three'
-import { version } from '../_polyfill/constants'
 
 class ParallaxBarrierEffect {
   constructor(renderer) {
@@ -62,7 +62,7 @@ class ParallaxBarrierEffect {
         '	}',
 
         '	#include <tonemapping_fragment>',
-        `	#include <${version >= 154 ? 'colorspace_fragment' : 'encodings_fragment'}>`,
+        `	#include <${parseInt(REVISION.replace(/\D+/g, '')) >= 154 ? 'colorspace_fragment' : 'encodings_fragment'}>`,
 
         '}',
       ].join('\n'),

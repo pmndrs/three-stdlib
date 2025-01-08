@@ -32,47 +32,47 @@ export const ConvolutionShader: IConvolutionShader = {
 
   uniforms: {
     tDiffuse: { value: null },
-    uImageIncrement: { value: /* @__PURE__ */ new Vector2(0.001953125, 0.0) },
+    uImageIncrement: { value: new Vector2(0.001953125, 0.0) },
     cKernel: { value: [] },
   },
 
-  vertexShader: /* glsl */ `
-    uniform vec2 uImageIncrement;
+  vertexShader: [
+    'uniform vec2 uImageIncrement;',
 
-    varying vec2 vUv;
+    'varying vec2 vUv;',
 
-    void main() {
+    'void main() {',
 
-    	vUv = uv - ( ( KERNEL_SIZE_FLOAT - 1.0 ) / 2.0 ) * uImageIncrement;
-    	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+    '	vUv = uv - ( ( KERNEL_SIZE_FLOAT - 1.0 ) / 2.0 ) * uImageIncrement;',
+    '	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
 
-    }
-  `,
+    '}',
+  ].join('\n'),
 
-  fragmentShader: /* glsl */ `
-    uniform float cKernel[ KERNEL_SIZE_INT ];
+  fragmentShader: [
+    'uniform float cKernel[ KERNEL_SIZE_INT ];',
 
-    uniform sampler2D tDiffuse;
-    uniform vec2 uImageIncrement;
+    'uniform sampler2D tDiffuse;',
+    'uniform vec2 uImageIncrement;',
 
-    varying vec2 vUv;
+    'varying vec2 vUv;',
 
-    void main() {
+    'void main() {',
 
-    	vec2 imageCoord = vUv;
-    	vec4 sum = vec4( 0.0, 0.0, 0.0, 0.0 );
+    '	vec2 imageCoord = vUv;',
+    '	vec4 sum = vec4( 0.0, 0.0, 0.0, 0.0 );',
 
-    	for( int i = 0; i < KERNEL_SIZE_INT; i ++ ) {
+    '	for( int i = 0; i < KERNEL_SIZE_INT; i ++ ) {',
 
-    		sum += texture2D( tDiffuse, imageCoord ) * cKernel[ i ];
-    		imageCoord += uImageIncrement;
+    '		sum += texture2D( tDiffuse, imageCoord ) * cKernel[ i ];',
+    '		imageCoord += uImageIncrement;',
 
-    	}
+    '	}',
 
-    	gl_FragColor = sum;
+    '	gl_FragColor = sum;',
 
-    }
-  `,
+    '}',
+  ].join('\n'),
 
   buildKernel: function (sigma) {
     // We lop off the sqrt(2 * pi) * sigma term, since we're going to normalize anyway.

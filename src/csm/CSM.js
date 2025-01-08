@@ -2,10 +2,10 @@ import { Vector2, Vector3, DirectionalLight, MathUtils, ShaderChunk, Matrix4, Bo
 import { CSMFrustum } from './CSMFrustum'
 import { CSMShader } from './CSMShader'
 
-const _cameraToLightMatrix = /* @__PURE__ */ new Matrix4()
-const _lightSpaceFrustum = /* @__PURE__ */ new CSMFrustum()
-const _center = /* @__PURE__ */ new Vector3()
-const _bbox = /* @__PURE__ */ new Box3()
+const _cameraToLightMatrix = new Matrix4()
+const _lightSpaceFrustum = new CSMFrustum()
+const _center = new Vector3()
+const _bbox = new Box3()
 const _uniformArray = []
 const _logArray = []
 

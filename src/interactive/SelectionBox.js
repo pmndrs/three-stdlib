@@ -1,24 +1,24 @@
 import { Frustum, Vector3 } from 'three'
 
-const frustum = /* @__PURE__ */ new Frustum()
-const center = /* @__PURE__ */ new Vector3()
+const frustum = new Frustum()
+const center = new Vector3()
 
-const tmpPoint = /* @__PURE__ */ new Vector3()
+const tmpPoint = new Vector3()
 
-const vecNear = /* @__PURE__ */ new Vector3()
-const vecTopLeft = /* @__PURE__ */ new Vector3()
-const vecTopRight = /* @__PURE__ */ new Vector3()
-const vecDownRight = /* @__PURE__ */ new Vector3()
-const vecDownLeft = /* @__PURE__ */ new Vector3()
+const vecNear = new Vector3()
+const vecTopLeft = new Vector3()
+const vecTopRight = new Vector3()
+const vecDownRight = new Vector3()
+const vecDownLeft = new Vector3()
 
-const vecFarTopLeft = /* @__PURE__ */ new Vector3()
-const vecFarTopRight = /* @__PURE__ */ new Vector3()
-const vecFarDownRight = /* @__PURE__ */ new Vector3()
-const vecFarDownLeft = /* @__PURE__ */ new Vector3()
+const vecFarTopLeft = new Vector3()
+const vecFarTopRight = new Vector3()
+const vecFarDownRight = new Vector3()
+const vecFarDownLeft = new Vector3()
 
-const vectemp1 = /* @__PURE__ */ new Vector3()
-const vectemp2 = /* @__PURE__ */ new Vector3()
-const vectemp3 = /* @__PURE__ */ new Vector3()
+const vectemp1 = new Vector3()
+const vectemp2 = new Vector3()
+const vectemp3 = new Vector3()
 
 class SelectionBox {
   constructor(camera, scene, deep) {

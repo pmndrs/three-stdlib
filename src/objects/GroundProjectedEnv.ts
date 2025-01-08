@@ -1,5 +1,13 @@
-import { Mesh, IcosahedronGeometry, ShaderMaterial, DoubleSide, Texture, CubeTexture, BufferGeometry } from 'three'
-import { version } from '../_polyfill/constants'
+import {
+  Mesh,
+  IcosahedronGeometry,
+  ShaderMaterial,
+  DoubleSide,
+  Texture,
+  CubeTexture,
+  BufferGeometry,
+  REVISION,
+} from 'three'
 
 export interface GroundProjectedEnvParameters {
   height?: number
@@ -106,7 +114,7 @@ export class GroundProjectedEnv extends Mesh<BufferGeometry, ShaderMaterial> {
             #endif
             gl_FragColor = vec4( outcolor, 1.0 );
             #include <tonemapping_fragment>
-            #include <${version >= 154 ? 'colorspace_fragment' : 'encodings_fragment'}>
+            #include <${parseInt(REVISION.replace(/\D+/g, '')) >= 154 ? 'colorspace_fragment' : 'encodings_fragment'}>
         }
         `
 

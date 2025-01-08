@@ -10,8 +10,8 @@ import {
   ShaderMaterial,
   StereoCamera,
   WebGLRenderTarget,
+  REVISION,
 } from 'three'
-import { version } from '../_polyfill/constants'
 
 class AnaglyphEffect {
   constructor(renderer, width = 512, height = 512) {
@@ -96,7 +96,7 @@ class AnaglyphEffect {
         '			max( colorL.a, colorR.a ) );',
 
         '	#include <tonemapping_fragment>',
-        `	#include <${version >= 154 ? 'colorspace_fragment' : 'encodings_fragment'}>`,
+        `	#include <${parseInt(REVISION.replace(/\D+/g, '')) >= 154 ? 'colorspace_fragment' : 'encodings_fragment'}>`,
 
         '}',
       ].join('\n'),

@@ -11,8 +11,8 @@ import { Triangle, Vector3 } from 'three'
  * - https://stackoverflow.com/a/4322940/1314762
  */
 
-const _face = /* @__PURE__ */ new Triangle()
-const _color = /* @__PURE__ */ new Vector3()
+const _face = new Triangle()
+const _color = new Vector3()
 
 class MeshSurfaceSampler {
   constructor(mesh) {

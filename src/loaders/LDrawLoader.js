@@ -15,8 +15,8 @@ import {
   UniformsUtils,
   Vector3,
   Ray,
+  REVISION,
 } from 'three'
-import { version } from '../_polyfill/constants'
 
 // Special surface finish tag types.
 // Note: "MATERIAL" tag (e.g. GLITTER, SPECKLE) is not implemented
@@ -40,8 +40,8 @@ const FILE_LOCATION_NOT_FOUND = 6
 const MAIN_COLOUR_CODE = '16'
 const MAIN_EDGE_COLOUR_CODE = '24'
 
-const _tempVec0 = /* @__PURE__ */ new Vector3()
-const _tempVec1 = /* @__PURE__ */ new Vector3()
+const _tempVec0 = new Vector3()
+const _tempVec1 = new Vector3()
 
 class LDrawConditionalLineMaterial extends ShaderMaterial {
   constructor(parameters) {
@@ -129,7 +129,7 @@ class LDrawConditionalLineMaterial extends ShaderMaterial {
           outgoingLight = diffuseColor.rgb; // simple shader
           gl_FragColor = vec4(outgoingLight, diffuseColor.a);
           #include <tonemapping_fragment>
-          #include <${version >= 154 ? 'colorspace_fragment' : 'encodings_fragment'}>
+          #include <${parseInt(REVISION.replace(/\D+/g, '')) >= 154 ? 'colorspace_fragment' : 'encodings_fragment'}>
           #include <fog_fragment>
           #include <premultiplied_alpha_fragment>
         }
@@ -180,7 +180,7 @@ function generateFaceNormals(faces) {
   }
 }
 
-const _ray = /* @__PURE__ */ new Ray()
+const _ray = new Ray()
 function smoothNormals(faces, lineSegments, checkSubSegments = false) {
   // NOTE: 1e2 is pretty coarse but was chosen to quantize the resulting value because
   // it allows edges to be smoothed as expected (see minifig arms).

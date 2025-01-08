@@ -1,31 +1,17 @@
 import { BackSide, BoxGeometry, Mesh, ShaderMaterial, UniformsUtils, Vector3 } from 'three'
 import { version } from '../_polyfill/constants'
 
-/**
- * Based on "A Practical Analytic Model for Daylight"
- * aka The Preetham Model, the de facto standard analytic skydome model
- * https://www.researchgate.net/publication/220720443_A_Practical_Analytic_Model_for_Daylight
- *
- * First implemented by Simon Wallner
- * http://www.simonwallner.at/projects/atmospheric-scattering
- *
- * Improved by Martin Upitis
- * http://blenderartists.org/forum/showthread.php?245954-preethams-sky-impementation-HDR
- *
- * Three.js integration by zz85 http://twitter.com/blurspline
- */
-const Sky = /* @__PURE__ */ (() => {
-  const SkyShader = {
-    uniforms: {
-      turbidity: { value: 2 },
-      rayleigh: { value: 1 },
-      mieCoefficient: { value: 0.005 },
-      mieDirectionalG: { value: 0.8 },
-      sunPosition: { value: new Vector3() },
-      up: { value: new Vector3(0, 1, 0) },
-    },
+const SkyShader = {
+  uniforms: {
+    turbidity: { value: 2 },
+    rayleigh: { value: 1 },
+    mieCoefficient: { value: 0.005 },
+    mieDirectionalG: { value: 0.8 },
+    sunPosition: { value: new Vector3() },
+    up: { value: new Vector3(0, 1, 0) },
+  },
 
-    vertexShader: /* glsl */ `
+  vertexShader: /* glsl */ `
       uniform vec3 sunPosition;
       uniform float rayleigh;
       uniform float turbidity;
@@ -98,7 +84,7 @@ const Sky = /* @__PURE__ */ (() => {
       }
     `,
 
-    fragmentShader: /* glsl */ `
+  fragmentShader: /* glsl */ `
       varying vec3 vWorldPosition;
       varying vec3 vSunDirection;
       varying float vSunfade;
@@ -185,27 +171,37 @@ const Sky = /* @__PURE__ */ (() => {
 
       }
     `,
+}
+
+const material = new ShaderMaterial({
+  name: 'SkyShader',
+  fragmentShader: SkyShader.fragmentShader,
+  vertexShader: SkyShader.vertexShader,
+  uniforms: UniformsUtils.clone(SkyShader.uniforms),
+  side: BackSide,
+  depthWrite: false,
+})
+
+/**
+ * Based on "A Practical Analytic Model for Daylight"
+ * aka The Preetham Model, the de facto standard analytic skydome model
+ * https://www.researchgate.net/publication/220720443_A_Practical_Analytic_Model_for_Daylight
+ *
+ * First implemented by Simon Wallner
+ * http://www.simonwallner.at/projects/atmospheric-scattering
+ *
+ * Improved by Martin Upitis
+ * http://blenderartists.org/forum/showthread.php?245954-preethams-sky-impementation-HDR
+ *
+ * Three.js integration by zz85 http://twitter.com/blurspline
+ */
+class Sky extends Mesh {
+  constructor() {
+    super(new BoxGeometry(1, 1, 1), material)
   }
 
-  const material = new ShaderMaterial({
-    name: 'SkyShader',
-    fragmentShader: SkyShader.fragmentShader,
-    vertexShader: SkyShader.vertexShader,
-    uniforms: UniformsUtils.clone(SkyShader.uniforms),
-    side: BackSide,
-    depthWrite: false,
-  })
-
-  class Sky extends Mesh {
-    constructor() {
-      super(new BoxGeometry(1, 1, 1), material)
-    }
-
-    static SkyShader = SkyShader
-    public static material = material
-  }
-
-  return Sky
-})()
+  static SkyShader = SkyShader
+  public static material = material
+}
 
 export { Sky }

@@ -1,8 +1,8 @@
 import { Color, LightProbe, SphericalHarmonics3, Vector3 } from 'three'
 
-const LightProbeGenerator = {
+class LightProbeGenerator {
   // https://www.ppsloan.org/publications/StupidSH36.pdf
-  fromCubeTexture(cubeTexture) {
+  static fromCubeTexture(cubeTexture) {
     let totalWeight = 0
 
     const coord = new Vector3()
@@ -122,9 +122,9 @@ const LightProbeGenerator = {
     }
 
     return new LightProbe(sh)
-  },
+  }
 
-  fromCubeRenderTarget(renderer, cubeRenderTarget) {
+  static fromCubeRenderTarget(renderer, cubeRenderTarget) {
     // The renderTarget must be set to RGBA in order to make readRenderTargetPixels works
     let totalWeight = 0
 
@@ -229,7 +229,7 @@ const LightProbeGenerator = {
     }
 
     return new LightProbe(sh)
-  },
+  }
 }
 
 export { LightProbeGenerator }

@@ -17,32 +17,32 @@ export const GammaCorrectionShader: IGammaCorrectionShader = {
     tDiffuse: { value: null },
   },
 
-  vertexShader: /* glsl */ `
-    varying vec2 vUv;
+  vertexShader: [
+    'varying vec2 vUv;',
 
-    void main() {
+    'void main() {',
 
-    	vUv = uv;
-    	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+    '	vUv = uv;',
+    '	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
 
-    }
-  `,
+    '}',
+  ].join('\n'),
 
-  fragmentShader: /* glsl */ `
-    uniform sampler2D tDiffuse;
+  fragmentShader: [
+    'uniform sampler2D tDiffuse;',
 
-    varying vec2 vUv;
+    'varying vec2 vUv;',
 
-    void main() {
+    'void main() {',
 
-    	vec4 tex = texture2D( tDiffuse, vUv );
+    '	vec4 tex = texture2D( tDiffuse, vUv );',
 
-    	#ifdef LinearTosRGB
-    		gl_FragColor = LinearTosRGB( tex );
-    	#else
-    		gl_FragColor = sRGBTransferOETF( tex );
-    	#endif
+    '	#ifdef LinearTosRGB',
+    '		gl_FragColor = LinearTosRGB( tex );',
+    '	#else',
+    '		gl_FragColor = sRGBTransferOETF( tex );',
+    '	#endif',
 
-    }
-  `,
+    '}',
+  ].join('\n'),
 }
