@@ -2,15 +2,13 @@ import {
   AdditiveBlending,
   Box2,
   BufferGeometry,
-  ClampToEdgeWrapping,
   Color,
-  DataTexture,
+  Texture,
+  NearestFilter,
   InterleavedBuffer,
   InterleavedBufferAttribute,
   Mesh,
   MeshBasicMaterial,
-  NearestFilter,
-  RGBAFormat,
   RawShaderMaterial,
   Vector2,
   Vector3,
@@ -34,17 +32,19 @@ const Lensflare = /* @__PURE__ */ (() => {
       const positionView = new Vector3()
 
       // textures
-      const tempMap = new DataTexture(new Uint8Array(16 * 16 * 3), 16, 16, RGBAFormat)
-      tempMap.minFilter = NearestFilter
+      const tempMap = new Texture({ width: 16, height: 16 })
+      tempMap.isFramebufferTexture = true
       tempMap.magFilter = NearestFilter
-      tempMap.wrapS = ClampToEdgeWrapping
-      tempMap.wrapT = ClampToEdgeWrapping
+      tempMap.minFilter = NearestFilter
+      tempMap.generateMipmaps = false
+      tempMap.needsUpdate = true
 
-      const occlusionMap = new DataTexture(new Uint8Array(16 * 16 * 3), 16, 16, RGBAFormat)
-      occlusionMap.minFilter = NearestFilter
+      const occlusionMap = new Texture({ width: 16, height: 16 })
+      occlusionMap.isFramebufferTexture = true
       occlusionMap.magFilter = NearestFilter
-      occlusionMap.wrapS = ClampToEdgeWrapping
-      occlusionMap.wrapT = ClampToEdgeWrapping
+      occlusionMap.minFilter = NearestFilter
+      occlusionMap.generateMipmaps = false
+      occlusionMap.needsUpdate = true
 
       // material
 
