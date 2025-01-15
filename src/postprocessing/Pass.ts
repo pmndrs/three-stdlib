@@ -1,4 +1,4 @@
-import { OrthographicCamera, PlaneGeometry, Mesh, Material, Renderer, WebGLRenderer, WebGLRenderTarget } from 'three'
+import { OrthographicCamera, PlaneGeometry, Mesh, Material, WebGLRenderer, WebGLRenderTarget } from 'three'
 
 class Pass {
   // if set to true, the pass is processed by the composer
@@ -24,6 +24,8 @@ class Pass {
   ): void {
     console.error('THREE.Pass: .render() must be implemented in derived pass.')
   }
+
+  public dispose() {}
 }
 
 // Helper for passes that need to fill the viewport with a single quad.
@@ -48,7 +50,7 @@ class FullScreenQuad<TMaterial extends Material = Material> {
     this.mesh.geometry.dispose()
   }
 
-  public render(renderer: Renderer): void {
+  public render(renderer: WebGLRenderer): void {
     renderer.render(this.mesh, this.camera)
   }
 }

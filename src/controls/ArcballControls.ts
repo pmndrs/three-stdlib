@@ -18,8 +18,9 @@ import {
   OrthographicCamera,
   Mesh,
   Material,
-  EventDispatcher,
 } from 'three'
+import { EventDispatcher } from './EventDispatcher'
+import { StandardControlsEventMap } from './StandardControlsEventMap'
 
 type Camera = OrthographicCamera | PerspectiveCamera
 type Operation = 'PAN' | 'ROTATE' | 'ZOOM' | 'FOV'
@@ -67,8 +68,8 @@ const _center = {
 
 //transformation matrices for gizmos and camera
 const _transformation: Transformation = {
-  camera: new Matrix4(),
-  gizmos: new Matrix4(),
+  camera: /* @__PURE__ */ new Matrix4(),
+  gizmos: /* @__PURE__ */ new Matrix4(),
 }
 
 //events
@@ -82,7 +83,7 @@ const _endEvent = { type: 'end' }
  * @param {HTMLElement=null} domElement Renderer's dom element
  * @param {Scene=null} scene The scene to be rendered
  */
-class ArcballControls extends EventDispatcher {
+class ArcballControls extends EventDispatcher<StandardControlsEventMap> {
   private camera: OrthographicCamera | PerspectiveCamera | null
   private domElement: HTMLElement | null | undefined
   private scene: Scene | null | undefined
@@ -190,7 +191,7 @@ class ArcballControls extends EventDispatcher {
   public minZoom: number
   public maxZoom: number
 
-  private target: Vector3
+  readonly target: Vector3
   private _currentTarget: Vector3
 
   private _tbRadius: number

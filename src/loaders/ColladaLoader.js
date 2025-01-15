@@ -39,6 +39,7 @@ import {
   VectorKeyframeTrack,
 } from 'three'
 import { TGALoader } from '../loaders/TGALoader'
+import { UV1 } from '../_polyfill/uv1'
 
 class ColladaLoader extends Loader {
   constructor(manager) {
@@ -1866,7 +1867,7 @@ class ColladaLoader extends Loader {
       const position = { array: [], stride: 0 }
       const normal = { array: [], stride: 0 }
       const uv = { array: [], stride: 0 }
-      const uv2 = { array: [], stride: 0 }
+      const uv1 = { array: [], stride: 0 }
       const color = { array: [], stride: 0 }
 
       const skinIndex = { array: [], stride: 4 }
@@ -1981,7 +1982,7 @@ class ColladaLoader extends Loader {
                     break
 
                   case 'TEXCOORD1':
-                    buildGeometryData(primitive, sources[id], input.offset, uv2.array)
+                    buildGeometryData(primitive, sources[id], input.offset, uv1.array)
                     uv.stride = sources[id].stride
                     break
 
@@ -2008,8 +2009,8 @@ class ColladaLoader extends Loader {
               break
 
             case 'TEXCOORD1':
-              buildGeometryData(primitive, sources[input.id], input.offset, uv2.array)
-              uv2.stride = sources[input.id].stride
+              buildGeometryData(primitive, sources[input.id], input.offset, uv1.array)
+              uv1.stride = sources[input.id].stride
               break
           }
         }
@@ -2025,7 +2026,7 @@ class ColladaLoader extends Loader {
       }
       if (color.array.length > 0) geometry.setAttribute('color', new Float32BufferAttribute(color.array, color.stride))
       if (uv.array.length > 0) geometry.setAttribute('uv', new Float32BufferAttribute(uv.array, uv.stride))
-      if (uv2.array.length > 0) geometry.setAttribute('uv2', new Float32BufferAttribute(uv2.array, uv2.stride))
+      if (uv1.array.length > 0) geometry.setAttribute(UV1, new Float32BufferAttribute(uv1.array, uv1.stride))
 
       if (skinIndex.array.length > 0) {
         geometry.setAttribute('skinIndex', new Float32BufferAttribute(skinIndex.array, skinIndex.stride))
@@ -2496,14 +2497,14 @@ class ColladaLoader extends Loader {
             if (value > joint.limits.max || value < joint.limits.min) {
               console.warn(
                 'THREE.ColladaLoader: Joint ' +
-                  jointIndex +
-                  ' value ' +
-                  value +
-                  ' outside of limits (min: ' +
-                  joint.limits.min +
-                  ', max: ' +
-                  joint.limits.max +
-                  ').',
+                jointIndex +
+                ' value ' +
+                value +
+                ' outside of limits (min: ' +
+                joint.limits.min +
+                ', max: ' +
+                joint.limits.max +
+                ').',
               )
             } else if (joint.static) {
               console.warn('THREE.ColladaLoader: Joint ' + jointIndex + ' is static.')

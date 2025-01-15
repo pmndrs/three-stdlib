@@ -1,4 +1,4 @@
-const lottie = (() => {
+const lottie = /* @__PURE__ */ (() => {
   if (typeof navigator === 'undefined' || typeof document === 'undefined') return {}
 
   const svgNS = 'http://www.w3.org/2000/svg'

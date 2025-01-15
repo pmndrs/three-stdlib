@@ -7,6 +7,7 @@ import {
   LoaderUtils,
   Vector3,
 } from 'three'
+import { decodeText } from '../_polyfill/LoaderUtils'
 
 /**
  * Description: A THREE loader for STL ASCII files, as created by Solidworks and other CAD programs.
@@ -305,7 +306,7 @@ class STLLoader extends Loader {
 
     function ensureString(buffer) {
       if (typeof buffer !== 'string') {
-        return LoaderUtils.decodeText(new Uint8Array(buffer))
+        return decodeText(new Uint8Array(buffer))
       }
 
       return buffer

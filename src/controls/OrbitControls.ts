@@ -1,5 +1,4 @@
 import {
-  EventDispatcher,
   Matrix4,
   MOUSE,
   OrthographicCamera,
@@ -12,9 +11,11 @@ import {
   Ray,
   Plane,
 } from 'three'
+import { EventDispatcher } from './EventDispatcher'
+import { StandardControlsEventMap } from './StandardControlsEventMap'
 
-const _ray = new Ray()
-const _plane = new Plane()
+const _ray = /* @__PURE__ */ new Ray()
+const _plane = /* @__PURE__ */ new Plane()
 const TILT_LIMIT = Math.cos(70 * (Math.PI / 180))
 
 // This set of controls performs orbiting, dollying (zooming), and panning.
@@ -26,7 +27,7 @@ const TILT_LIMIT = Math.cos(70 * (Math.PI / 180))
 
 const moduloWrapAround = (offset: number, capacity: number) => ((offset % capacity) + capacity) % capacity
 
-class OrbitControls extends EventDispatcher {
+class OrbitControls extends EventDispatcher<StandardControlsEventMap> {
   object: PerspectiveCamera | OrthographicCamera
   domElement: HTMLElement | undefined
   // Set to false to disable this control
@@ -99,6 +100,8 @@ class OrbitControls extends EventDispatcher {
   setPolarAngle: (x: number) => void
   setAzimuthalAngle: (x: number) => void
   getDistance: () => number
+  // Not used in most scenarios, however they can be useful for specific use cases
+  getZoomScale: () => number
 
   listenToKeyEvents: (domElement: HTMLElement) => void
   stopListenToKeyEvents: () => void
@@ -107,6 +110,15 @@ class OrbitControls extends EventDispatcher {
   update: () => void
   connect: (domElement: HTMLElement) => void
   dispose: () => void
+
+  // Dolly in programmatically
+  dollyIn: (dollyScale?: number) => void
+  // Dolly out programmatically
+  dollyOut: (dollyScale?: number) => void
+  // Get the current scale
+  getScale: () => number
+  // Set the current scale (these are not used in most scenarios, however they can be useful for specific use cases)
+  setScale: (newScale: number) => void
 
   constructor(object: PerspectiveCamera | OrthographicCamera, domElement?: HTMLElement) {
     super()
@@ -274,10 +286,7 @@ class OrbitControls extends EventDispatcher {
 
         // adjust the camera position based on zoom only if we're not zooming to the cursor or if it's an ortho camera
         // we adjust zoom later in these cases
-        if (
-          (scope.zoomToCursor && performCursorZoom) ||
-          (scope.object as THREE.OrthographicCamera).isOrthographicCamera
-        ) {
+        if ((scope.zoomToCursor && performCursorZoom) || (scope.object as OrthographicCamera).isOrthographicCamera) {
           spherical.radius = clampDistance(spherical.radius)
         } else {
           spherical.radius = clampDistance(spherical.radius * scale)
@@ -317,7 +326,7 @@ class OrbitControls extends EventDispatcher {
             const radiusDelta = prevRadius - newRadius
             scope.object.position.addScaledVector(dollyDirection, radiusDelta)
             scope.object.updateMatrixWorld()
-          } else if ((scope.object as THREE.OrthographicCamera).isOrthographicCamera) {
+          } else if ((scope.object as OrthographicCamera).isOrthographicCamera) {
             // adjust the ortho camera position based on zoom changes
             const mouseBefore = new Vector3(mouse.x, mouse.y, 0)
             mouseBefore.unproject(scope.object)
@@ -399,11 +408,6 @@ class OrbitControls extends EventDispatcher {
 
     // https://github.com/mrdoob/three.js/issues/20575
     this.connect = (domElement: HTMLElement): void => {
-      if ((domElement as any) === document) {
-        console.error(
-          'THREE.OrbitControls: "document" should not be used as the target "domElement". Please use "renderer.domElement" instead.',
-        )
-      }
       scope.domElement = domElement
       // disables touch scroll
       // touch-action needs to be defined for pointer events to work on mobile
@@ -411,14 +415,18 @@ class OrbitControls extends EventDispatcher {
       scope.domElement.style.touchAction = 'none'
       scope.domElement.addEventListener('contextmenu', onContextMenu)
       scope.domElement.addEventListener('pointerdown', onPointerDown)
-      scope.domElement.addEventListener('pointercancel', onPointerCancel)
+      scope.domElement.addEventListener('pointercancel', onPointerUp)
       scope.domElement.addEventListener('wheel', onMouseWheel)
     }
 
     this.dispose = (): void => {
+      // Enabling touch scroll
+      if (scope.domElement) {
+        scope.domElement.style.touchAction = 'auto'
+      }
       scope.domElement?.removeEventListener('contextmenu', onContextMenu)
       scope.domElement?.removeEventListener('pointerdown', onPointerDown)
-      scope.domElement?.removeEventListener('pointercancel', onPointerCancel)
+      scope.domElement?.removeEventListener('pointercancel', onPointerUp)
       scope.domElement?.removeEventListener('wheel', onMouseWheel)
       scope.domElement?.ownerDocument.removeEventListener('pointermove', onPointerMove)
       scope.domElement?.ownerDocument.removeEventListener('pointerup', onPointerUp)
@@ -568,28 +576,24 @@ class OrbitControls extends EventDispatcher {
       }
     })()
 
-    function dollyOut(dollyScale: number) {
+    function setScale(newScale: number) {
       if (
         (scope.object instanceof PerspectiveCamera && scope.object.isPerspectiveCamera) ||
         (scope.object instanceof OrthographicCamera && scope.object.isOrthographicCamera)
       ) {
-        scale /= dollyScale
+        scale = newScale
       } else {
         console.warn('WARNING: OrbitControls.js encountered an unknown camera type - dolly/zoom disabled.')
         scope.enableZoom = false
       }
     }
 
+    function dollyOut(dollyScale: number) {
+      setScale(scale / dollyScale)
+    }
+
     function dollyIn(dollyScale: number) {
-      if (
-        (scope.object instanceof PerspectiveCamera && scope.object.isPerspectiveCamera) ||
-        (scope.object instanceof OrthographicCamera && scope.object.isOrthographicCamera)
-      ) {
-        scale *= dollyScale
-      } else {
-        console.warn('WARNING: OrbitControls.js encountered an unknown camera type - dolly/zoom disabled.')
-        scope.enableZoom = false
-      }
+      setScale(scale * dollyScale)
     }
 
     function updateMouseParameters(event: MouseEvent): void {
@@ -857,10 +861,6 @@ class OrbitControls extends EventDispatcher {
       state = STATE.NONE
     }
 
-    function onPointerCancel(event: PointerEvent) {
-      removePointer(event)
-    }
-
     function onMouseDown(event: MouseEvent) {
       let mouseAction
 
@@ -1085,6 +1085,31 @@ class OrbitControls extends EventDispatcher {
     function getSecondPointerPosition(event: PointerEvent) {
       const pointer = event.pointerId === pointers[0].pointerId ? pointers[1] : pointers[0]
       return pointerPositions[pointer.pointerId]
+    }
+
+    // Add dolly in/out methods for public API
+
+    this.dollyIn = (dollyScale = getZoomScale()) => {
+      dollyIn(dollyScale)
+      scope.update()
+    }
+
+    this.dollyOut = (dollyScale = getZoomScale()) => {
+      dollyOut(dollyScale)
+      scope.update()
+    }
+
+    this.getScale = () => {
+      return scale
+    }
+
+    this.setScale = (newScale) => {
+      setScale(newScale)
+      scope.update()
+    }
+
+    this.getZoomScale = () => {
+      return getZoomScale()
     }
 
     // connect events

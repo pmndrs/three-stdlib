@@ -1,13 +1,31 @@
-import { Euler, Camera, EventDispatcher, Vector3 } from 'three'
+import { Euler, Camera, Vector3 } from 'three'
+import { EventDispatcher } from './EventDispatcher'
 
-const _euler = new Euler(0, 0, 0, 'YXZ')
-const _vector = new Vector3()
+const _euler = /* @__PURE__ */ new Euler(0, 0, 0, 'YXZ')
+const _vector = /* @__PURE__ */ new Vector3()
 const _changeEvent = { type: 'change' }
 const _lockEvent = { type: 'lock' }
 const _unlockEvent = { type: 'unlock' }
 const _PI_2 = Math.PI / 2
 
-class PointerLockControls extends EventDispatcher {
+export interface PointerLockControlsEventMap {
+  /**
+   * Fires when the user moves the mouse.
+   */
+  change: {}
+
+  /**
+   * Fires when the pointer lock status is "locked" (in other words: the mouse is captured).
+   */
+  lock: {}
+
+  /**
+   * Fires when the pointer lock status is "unlocked" (in other words: the mouse is not captured anymore).
+   */
+  unlock: {}
+}
+
+class PointerLockControls extends EventDispatcher<PointerLockControlsEventMap> {
   public camera: Camera
   public domElement?: HTMLElement
   public isLocked: boolean
@@ -33,11 +51,9 @@ class PointerLockControls extends EventDispatcher {
 
   private onMouseMove = (event: MouseEvent): void => {
     if (!this.domElement || this.isLocked === false) return
-    const movementX = event.movementX || (event as any).mozMovementX || (event as any).webkitMovementX || 0
-    const movementY = event.movementY || (event as any).mozMovementY || (event as any).webkitMovementY || 0
     _euler.setFromQuaternion(this.camera.quaternion)
-    _euler.y -= movementX * 0.002 * this.pointerSpeed
-    _euler.x -= movementY * 0.002 * this.pointerSpeed
+    _euler.y -= event.movementX * 0.002 * this.pointerSpeed
+    _euler.x -= event.movementY * 0.002 * this.pointerSpeed
     _euler.x = Math.max(_PI_2 - this.maxPolarAngle, Math.min(_PI_2 - this.minPolarAngle, _euler.x))
     this.camera.quaternion.setFromEuler(_euler)
     // @ts-ignore

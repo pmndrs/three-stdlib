@@ -42,6 +42,8 @@ import {
 } from 'three'
 import { unzlibSync } from 'fflate'
 import { NURBSCurve } from '../curves/NURBSCurve'
+import { decodeText } from '../_polyfill/LoaderUtils'
+import { UV1 } from '../_polyfill/uv1'
 
 /**
  * Loader loads FBX file and generates Group representing FBX scene.
@@ -1273,13 +1275,8 @@ class GeometryParser {
     }
 
     buffers.uvs.forEach(function (uvBuffer, i) {
-      // subsequent uv buffers are called 'uv1', 'uv2', ...
-      let name = 'uv' + (i + 1).toString()
-
-      // the first uv buffer is just called 'uv'
-      if (i === 0) {
-        name = 'uv'
-      }
+      if (UV1 === 'uv2') i++
+      const name = i === 0 ? 'uv' : `uv${i}`
 
       geo.setAttribute(name, new Float32BufferAttribute(buffers.uvs[i], 2))
     })
@@ -3005,7 +3002,7 @@ class BinaryReader {
     const nullByte = a.indexOf(0)
     if (nullByte >= 0) a = a.slice(0, nullByte)
 
-    return LoaderUtils.decodeText(new Uint8Array(a))
+    return decodeText(new Uint8Array(a))
   }
 }
 
@@ -3116,8 +3113,8 @@ function getData(polygonVertexIndex, polygonIndex, vertexIndex, infoObject) {
   return slice(dataArray, infoObject.buffer, from, to)
 }
 
-const tempEuler = new Euler()
-const tempVec = new Vector3()
+const tempEuler = /* @__PURE__ */ new Euler()
+const tempVec = /* @__PURE__ */ new Vector3()
 
 // generate transformation from FBX transform data
 // ref: https://help.autodesk.com/view/FBX/2017/ENU/?guid=__files_GUID_10CDD63C_79C1_4F2D_BB28_AD2BE65A02ED_htm
@@ -3268,7 +3265,7 @@ function convertArrayBufferToString(buffer, from, to) {
   if (from === undefined) from = 0
   if (to === undefined) to = buffer.byteLength
 
-  return LoaderUtils.decodeText(new Uint8Array(buffer, from, to))
+  return decodeText(new Uint8Array(buffer, from, to))
 }
 
 function append(a, b) {

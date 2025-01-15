@@ -12,24 +12,27 @@ import {
 } from 'three'
 import { LineSegmentsGeometry } from '../lines/LineSegmentsGeometry'
 import { LineMaterial } from '../lines/LineMaterial'
+import { UV1 } from '../_polyfill/uv1'
 
-const _start = new Vector3()
-const _end = new Vector3()
+const _viewport = /* @__PURE__ */ new Vector4()
 
-const _start4 = new Vector4()
-const _end4 = new Vector4()
+const _start = /* @__PURE__ */ new Vector3()
+const _end = /* @__PURE__ */ new Vector3()
 
-const _ssOrigin = new Vector4()
-const _ssOrigin3 = new Vector3()
-const _mvMatrix = new Matrix4()
-const _line = new Line3()
-const _closestPoint = new Vector3()
+const _start4 = /* @__PURE__ */ new Vector4()
+const _end4 = /* @__PURE__ */ new Vector4()
 
-const _box = new Box3()
-const _sphere = new Sphere()
-const _clipToWorldVector = new Vector4()
+const _ssOrigin = /* @__PURE__ */ new Vector4()
+const _ssOrigin3 = /* @__PURE__ */ new Vector3()
+const _mvMatrix = /* @__PURE__ */ new Matrix4()
+const _line = /* @__PURE__ */ new Line3()
+const _closestPoint = /* @__PURE__ */ new Vector3()
 
-let _ray, _instanceStart, _instanceEnd, _lineWidth
+const _box = /* @__PURE__ */ new Box3()
+const _sphere = /* @__PURE__ */ new Sphere()
+const _clipToWorldVector = /* @__PURE__ */ new Vector4()
+
+let _ray, _lineWidth
 
 // Returns the margin required to expand by in world space given the distance from the camera,
 // line width, resolution, and camera projection
@@ -48,9 +51,17 @@ function getWorldSpaceHalfWidth(camera, distance, resolution) {
 }
 
 function raycastWorldUnits(lineSegments, intersects) {
-  for (let i = 0, l = _instanceStart.count; i < l; i++) {
-    _line.start.fromBufferAttribute(_instanceStart, i)
-    _line.end.fromBufferAttribute(_instanceEnd, i)
+  const matrixWorld = lineSegments.matrixWorld
+  const geometry = lineSegments.geometry
+  const instanceStart = geometry.attributes.instanceStart
+  const instanceEnd = geometry.attributes.instanceEnd
+  const segmentCount = Math.min(geometry.instanceCount, instanceStart.count)
+
+  for (let i = 0, l = segmentCount; i < l; i++) {
+    _line.start.fromBufferAttribute(instanceStart, i)
+    _line.end.fromBufferAttribute(instanceEnd, i)
+
+    _line.applyMatrix4(matrixWorld)
 
     const pointOnLine = new Vector3()
     const point = new Vector3()
@@ -67,7 +78,7 @@ function raycastWorldUnits(lineSegments, intersects) {
         face: null,
         faceIndex: i,
         uv: null,
-        uv2: null,
+        [UV1]: null,
       })
     }
   }
@@ -82,6 +93,7 @@ function raycastScreenSpace(lineSegments, camera, intersects) {
   const geometry = lineSegments.geometry
   const instanceStart = geometry.attributes.instanceStart
   const instanceEnd = geometry.attributes.instanceEnd
+  const segmentCount = Math.min(geometry.instanceCount, instanceStart.count)
 
   const near = -camera.near
 
@@ -107,7 +119,7 @@ function raycastScreenSpace(lineSegments, camera, intersects) {
 
   _mvMatrix.multiplyMatrices(camera.matrixWorldInverse, matrixWorld)
 
-  for (let i = 0, l = instanceStart.count; i < l; i++) {
+  for (let i = 0, l = segmentCount; i < l; i++) {
     _start4.fromBufferAttribute(instanceStart, i)
     _end4.fromBufferAttribute(instanceEnd, i)
 
@@ -187,7 +199,7 @@ function raycastScreenSpace(lineSegments, camera, intersects) {
         face: null,
         faceIndex: i,
         uv: null,
-        uv2: null,
+        [UV1]: null,
       })
     }
   }
@@ -247,9 +259,6 @@ class LineSegments2 extends Mesh {
 
     _lineWidth = material.linewidth + threshold
 
-    _instanceStart = geometry.attributes.instanceStart
-    _instanceEnd = geometry.attributes.instanceEnd
-
     // check if we intersect the sphere bounds
     if (geometry.boundingSphere === null) {
       geometry.computeBoundingSphere()
@@ -298,6 +307,15 @@ class LineSegments2 extends Mesh {
       raycastWorldUnits(this, intersects)
     } else {
       raycastScreenSpace(this, camera, intersects)
+    }
+  }
+
+  onBeforeRender(renderer) {
+    const uniforms = this.material.uniforms
+
+    if (uniforms && uniforms.resolution) {
+      renderer.getViewport(_viewport)
+      this.material.uniforms.resolution.value.set(_viewport.z, _viewport.w)
     }
   }
 }

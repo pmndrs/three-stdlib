@@ -1,7 +1,7 @@
 import { WebGLRenderer } from 'three'
 
-class ARButton {
-  static createButton(renderer: WebGLRenderer, sessionInit: XRSessionInit = {}): HTMLButtonElement | HTMLAnchorElement {
+const ARButton = {
+  createButton(renderer: WebGLRenderer, sessionInit: XRSessionInit = {}): HTMLButtonElement | HTMLAnchorElement {
     const button = document.createElement('button')
 
     function showStartAR(/*device*/): void {
@@ -156,7 +156,7 @@ class ARButton {
 
       return message
     }
-  }
+  },
 }
 
 export { ARButton }

@@ -40,6 +40,7 @@ import {
 } from 'three'
 
 import { IFFParser } from './lwo/IFFParser.js'
+import { UV1 } from '../_polyfill/uv1.ts'
 
 let _lwoTree
 
@@ -148,7 +149,7 @@ class LWOTreeParser {
 
     const materials = this.getMaterials(geometry.userData.matNames, layer.geometry.type)
 
-    this.duplicateUVs(geometry, materials)
+    if (UV1 === 'uv2') this.duplicateUVs(geometry, materials)
 
     if (layer.geometry.type === 'points') mesh = new Points(geometry, materials)
     else if (layer.geometry.type === 'lines') mesh = new LineSegments(geometry, materials)

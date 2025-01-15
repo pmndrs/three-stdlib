@@ -10,6 +10,7 @@ import {
   MeshPhongMaterial,
 } from 'three'
 import { unzipSync } from 'fflate'
+import { decodeText } from '../_polyfill/LoaderUtils'
 
 /**
  * Description: Early release of an AMF Loader following the pattern of the
@@ -90,7 +91,7 @@ class AMFLoader extends Loader {
         view = new DataView(zip[file].buffer)
       }
 
-      const fileText = LoaderUtils.decodeText(view)
+      const fileText = decodeText(view)
       const xmlData = new DOMParser().parseFromString(fileText, 'application/xml')
 
       if (xmlData.documentElement.nodeName.toLowerCase() !== 'amf') {

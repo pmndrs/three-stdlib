@@ -7,11 +7,11 @@
  *  dashSize: <float>,
  *  dashOffset: <float>,
  *  gapSize: <float>,
- *  resolution: <Vector2>, // to be set by renderer
  * }
  */
 
-import { ShaderMaterial, UniformsLib, UniformsUtils, Vector2, REVISION } from 'three'
+import { ShaderMaterial, UniformsLib, UniformsUtils, Vector2 } from 'three'
+import { version } from '../_polyfill/constants'
 
 class LineMaterial extends ShaderMaterial {
   constructor(parameters) {
@@ -438,7 +438,7 @@ class LineMaterial extends ShaderMaterial {
 					gl_FragColor = diffuseColor;
 
 					#include <tonemapping_fragment>
-					#include <${parseInt(REVISION.replace(/\D+/g, '')) >= 154 ? 'colorspace_fragment' : 'encodings_fragment'}>
+					#include <${version >= 154 ? 'colorspace_fragment' : 'encodings_fragment'}>
 					#include <fog_fragment>
 					#include <premultiplied_alpha_fragment>
 

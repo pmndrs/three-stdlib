@@ -28,8 +28,9 @@ jobs:
         run: yarn build
       - name: Check for SSR compat
         run: node dist/index.cjs && node dist/index.js
-      - name: Check NPM config
-        run: npx publint@latest dist
+      # TODO: upgrade Nodes
+      # - name: Check NPM config
+      #   run: npx publint@latest dist
   release:
     needs: test
     runs-on: ubuntu-latest
@@ -51,17 +52,9 @@ jobs:
       - name: Check build health
         run: yarn build
       - name: 🚀 Release
-        uses: cycjimmy/semantic-release-action@v2
+        uses: cycjimmy/semantic-release-action@v4
         with:
-          semantic_version: 17
-          extra_plugins: |
-            @semantic-release/git
-          branches: |
-            [
-              'main',
-              {name: 'beta', prerelease: true},
-              {name: 'alpha', prerelease: true}
-            ]
+          semantic_version: 24
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

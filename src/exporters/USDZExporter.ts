@@ -323,6 +323,19 @@ ${array.join('')}
         `${pad}color3f inputs:diffuseColor.connect = </Materials/Material_${material.id}/Texture_${material.map.id}_diffuse.outputs:rgb>`,
       )
 
+      // Include alpha input
+      if (material.transparent || material.alphaTest > 0.0) {
+        inputs.push(`${pad}float inputs:opacity.connect = </Materials/Material_${material.id}/Texture_${material.map.id}_diffuse.outputs:a>`);
+      }
+
+      // Check if alpha test is bigger than minimum of 0.01, if not and it is transparent still apply a 0.01 alpha clip in order to remove white blur in transparent place.
+      if (material.alphaTest > 0.01) {
+        inputs.push(`${pad}float inputs:opacityThreshold = ${material.alphaTest}`);
+      }
+      else if(material.transparent || material.alphaTest > 0.0) {
+        inputs.push(`${pad}float inputs:opacityThreshold = 0.01`);
+      }
+      
       samplers.push(this.buildTexture(material, material.map, 'diffuse', material.color))
     } else {
       inputs.push(`${pad}color3f inputs:diffuseColor = ${this.buildColor(material.color)}`)
@@ -412,6 +425,7 @@ ${samplers.join('\n')}
 
     this.textures[id] = texture
 
+    // Add the alpha output for when transparency is set or the alpha test is above 0
     return `
       def Shader "Transform2d_${mapType}" (
           sdrMetadata = {
@@ -436,6 +450,7 @@ ${samplers.join('\n')}
           float outputs:g
           float outputs:b
           float3 outputs:rgb
+          ${material.transparent || material.alphaTest > 0.0 ? 'float outputs:a' : ''}
       }`
   }
 

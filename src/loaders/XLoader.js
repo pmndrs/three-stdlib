@@ -19,8 +19,9 @@ import {
   Vector2,
   Vector3,
 } from 'three'
+import { decodeText } from '../_polyfill/LoaderUtils'
 
-var XLoader = (function () {
+var XLoader = /* @__PURE__ */ (function () {
   var classCallCheck = function (instance, Constructor) {
     if (!(instance instanceof Constructor)) {
       throw new TypeError('Cannot call a class as a function')
@@ -363,7 +364,7 @@ var XLoader = (function () {
         key: '_ensureString',
         value: function _ensureString(buf) {
           if (typeof buf !== 'string') {
-            return LoaderUtils.decodeText(new Uint8Array(buf))
+            return decodeText(new Uint8Array(buf))
           } else {
             return buf
           }
@@ -381,7 +382,7 @@ var XLoader = (function () {
       {
         key: '_parseBinary',
         value: function _parseBinary(data) {
-          return this._parseASCII(LoaderUtils.decodeText(new Uint8Array(data)))
+          return this._parseASCII(decodeText(new Uint8Array(data)))
         },
       },
       {
