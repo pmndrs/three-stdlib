@@ -1175,15 +1175,7 @@ const lottie = /* @__PURE__ */ (() => {
   })()
 
   const ImagePreloader = (function () {
-    var proxyImage = (function () {
-      var canvas = createTag('canvas')
-      canvas.width = 1
-      canvas.height = 1
-      var ctx = canvas.getContext('2d')
-      ctx.fillStyle = 'rgba(0,0,0,0)'
-      ctx.fillRect(0, 0, 1, 1)
-      return canvas
-    })()
+    var proxyImage
 
     function imageLoaded() {
       this.loadedAssets += 1
@@ -1364,6 +1356,15 @@ const lottie = /* @__PURE__ */ (() => {
     }
 
     function ImagePreloaderFactory() {
+      proxyImage = (function () {
+        var canvas = createTag('canvas')
+        canvas.width = 1
+        canvas.height = 1
+        var ctx = canvas.getContext('2d')
+        ctx.fillStyle = 'rgba(0,0,0,0)'
+        ctx.fillRect(0, 0, 1, 1)
+        return canvas
+      })()
       this._imageLoaded = imageLoaded.bind(this)
       this._footageLoaded = footageLoaded.bind(this)
       this.testImageLoaded = testImageLoaded.bind(this)
