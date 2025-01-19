@@ -23,9 +23,14 @@
   "main": "./index.cjs",
   "module": "./index.js",
   "exports": {
-    "types": "./index.d.ts",
-    "require": "./index.cjs",
-    "import": "./index.js"
+    "require": {
+      "types": "./index.d.cts",
+      "default": "./index.cjs"
+    },
+    "default": {
+      "types": "./index.d.ts",
+      "default": "./index.js"
+    }
   },
   "sideEffects": false,
   "devDependencies": {
@@ -35,6 +40,7 @@
     "json": "^11.0.0",
     "prettier": "^2.2.1",
     "rimraf": "^3.0.2",
+    "shelljs": "^0.8.5",
     "three": "^0.128.0",
     "typescript": "^4.7.4",
     "vite": "^4.3.8"
@@ -51,7 +57,7 @@
     "three": ">=0.128.0"
   },
   "scripts": {
-    "build": "rimraf dist && vite build && tsc --emitDeclarationOnly && copyfiles -u 1 \"src/**/*.d.ts\" dist && copyfiles package.json README.md LICENSE dist && json -I -f dist/package.json -e \"this.private=undefined;this.type=\\\"module\\\";\"",
+    "build": "rimraf dist && vite build && tsc --emitDeclarationOnly && copyfiles -u 1 \"src/**/*.d.ts\" dist && copyfiles package.json README.md LICENSE dist && json -I -f dist/package.json -e \"this.private=undefined;this.type=\\\"module\\\";\" && node patch-ts.js",
     "lint": "tsc --noEmit"
   }
 }
