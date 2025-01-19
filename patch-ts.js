@@ -7,7 +7,7 @@ for (const file of files) {
   const cts = file.replace('.d.ts', '.d.cts')
 
   // Add type qualifiers in annotations
-  shell.sed('-i', /(import|export )*\s+(?!type\b)/, '$1 type ', file)
+  shell.sed('-i', /(import|export)\s+(?!(type|enum|interface|class|function|const)\b)/, '$1 type ', file)
   // Remove .js extensions
   shell.sed('-i', /from '(\.[^.]+)\.js'/, "from '$1'", file)
 
