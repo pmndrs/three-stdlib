@@ -57,8 +57,7 @@
     "three": ">=0.128.0"
   },
   "scripts": {
-    "build": "rimraf dist && vite build && tsc --emitDeclarationOnly && copyfiles -u 1 \"src/**/*.d.ts\" dist && copyfiles package.json README.md LICENSE dist && json -I -f dist/package.json -e \"this.private=undefined;this.type=\\\"module\\\";\" && npm run patch-cts",
-    "patch-cts": "node -e \"require('shelljs').find('dist/**/*.d.ts').forEach(f=>{var f2=f.replace(/\\.ts$/,'.cts');require('fs').copyFileSync(f,f2);require('shelljs').sed('-i',/ from '(\\.[^']+)';$/,' from \\'\\$1.cts\\';',f2);require('shelljs').sed('-i',/^declare module '(\\.[^']+)'/,'declare module \\'\\$1.cts\\'',f2)})\"",
+    "build": "rimraf dist && vite build && tsc --emitDeclarationOnly && copyfiles -u 1 \"src/**/*.d.ts\" dist && copyfiles package.json README.md LICENSE dist && json -I -f dist/package.json -e \"this.private=undefined;this.type=\\\"module\\\";\" && node patch-ts.js",
     "lint": "tsc --noEmit"
   }
 }
