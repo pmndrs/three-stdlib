@@ -123,7 +123,7 @@ export const GodRaysGenerateShader = {
 		// Unrolling didnt do much on my hardware (ATI Mobility Radeon 3450),
 		// so ive just left the loop
 
-		"for ( float i = 0.0; i < TAPS_PER_PASS; i += 1.0 ) {",
+		for ( float i = 0.0; i < TAPS_PER_PASS; i += 1.0 ) {
 
 		// Accumulate samples, making sure we dont walk past the light source.
 
@@ -133,10 +133,10 @@ export const GodRaysGenerateShader = {
 		// sun is to the left, right or bottom of screen as these cases are
 		// not specifically handled.
 
-		"	col += ( i <= iters && uv.y < 1.0 ? texture2D( tInput, uv ).r : 0.0 );",
-		"	uv += stepv;",
+		col += ( i <= iters && uv.y < 1.0 ? texture2D( tInput, uv ).r : 0.0 );
+		uv += stepv;
 
-		"}",
+		}
 		*/
 
     // Unrolling loop manually makes it work in ANGLE
