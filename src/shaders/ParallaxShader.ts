@@ -56,7 +56,7 @@ export const ParallaxShader = {
     		float initialHeight = texture2D( bumpMap, vUv ).r;
 
     // No Offset Limitting: messy, floating output at grazing angles.
-    //"vec2 texCoordOffset = parallaxScale * V.xy / V.z * initialHeight;",
+    //vec2 texCoordOffset = parallaxScale * V.xy / V.z * initialHeight;
 
     // Offset Limiting
     		vec2 texCoordOffset = parallaxScale * V.xy * initialHeight;

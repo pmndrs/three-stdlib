@@ -55,7 +55,7 @@ export const FXAAShader = {
     //    contributors may be used to endorse or promote products derived
     //    from this software without specific prior written permission.
     //
-    "// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AS IS AND ANY",
+    // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AS IS AND ANY
     // EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
     // IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
     // PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
@@ -129,7 +129,7 @@ export const FXAAShader = {
     /*--------------------------------------------------------------------------*/
     #ifndef FXAA_EARLY_EXIT
         //
-    "    // Controls algorithms early exit path.",
+        // Controls algorithms early exit path.
         // On PS3 turning this ON adds 2 cycles to the shader.
         // On 360 turning this OFF adds 10ths of a millisecond to the shader.
         // Turning this off on console will result in a more blurry image.
@@ -146,9 +146,9 @@ export const FXAAShader = {
         // Only valid for PC OpenGL currently.
         // Probably will not work when FXAA_GREEN_AS_LUMA = 1.
         //
-    "    // 1 = Use discard on pixels which dont need AA.",
+        // 1 = Use discard on pixels which dont need AA.
         //     For APIs which enable concurrent TEX+ROP from same surface.
-    "    // 0 = Return unchanged color on pixels which dont need AA.",
+        // 0 = Return unchanged color on pixels which dont need AA.
         //
         #define FXAA_DISCARD 0
     #endif
