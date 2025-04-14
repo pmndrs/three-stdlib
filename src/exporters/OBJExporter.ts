@@ -168,7 +168,7 @@ class OBJExporter {
     const geometry = line.geometry
     const type = line.type
 
-    if (geometry.isBufferGeometry) {
+    if (!geometry.isBufferGeometry) {
       throw new Error('THREE.OBJExporter: Geometry is not of type THREE.BufferGeometry.')
     }
 
