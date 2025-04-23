@@ -12,7 +12,6 @@ import {
   NearestFilter,
   NoBlending,
   RedFormat,
-  LuminanceFormat,
   DepthStencilFormat,
   UnsignedInt248Type,
   RepeatWrapping,
@@ -185,8 +184,6 @@ const SSAOPass = /* @__PURE__ */ (() => {
     }
 
     render(renderer, writeBuffer /*, readBuffer, deltaTime, maskActive */) {
-      if (renderer.capabilities.isWebGL2 === false) this.noiseTexture.format = LuminanceFormat
-
       // render beauty
 
       renderer.setRenderTarget(this.beautyRenderTarget)

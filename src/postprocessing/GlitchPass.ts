@@ -4,7 +4,6 @@ import {
   FloatType,
   MathUtils,
   RedFormat,
-  LuminanceFormat,
   ShaderMaterial,
   UniformsUtils,
   WebGLRenderTarget,
@@ -45,8 +44,6 @@ class GlitchPass extends Pass {
     readBuffer: WebGLRenderTarget,
     /*, deltaTime, maskActive */
   ): void {
-    if (renderer.capabilities.isWebGL2 === false) this.uniforms['tDisp'].value.format = LuminanceFormat
-
     this.uniforms['tDiffuse'].value = readBuffer.texture
     this.uniforms['seed'].value = Math.random() //default seeding
     this.uniforms['byp'].value = 0
