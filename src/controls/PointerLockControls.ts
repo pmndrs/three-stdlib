@@ -6,6 +6,7 @@ const _vector = /* @__PURE__ */ new Vector3()
 const _changeEvent = { type: 'change' }
 const _lockEvent = { type: 'lock' }
 const _unlockEvent = { type: 'unlock' }
+const _MOUSE_SENSITIVITY = 0.002
 const _PI_2 = Math.PI / 2
 
 export interface PointerLockControlsEventMap {
@@ -52,8 +53,8 @@ class PointerLockControls extends EventDispatcher<PointerLockControlsEventMap> {
   private onMouseMove = (event: MouseEvent): void => {
     if (!this.domElement || this.isLocked === false) return
     _euler.setFromQuaternion(this.camera.quaternion)
-    _euler.y -= event.movementX * 0.002 * this.pointerSpeed
-    _euler.x -= event.movementY * 0.002 * this.pointerSpeed
+    _euler.y -= event.movementX * _MOUSE_SENSITIVITY * this.pointerSpeed
+    _euler.x -= event.movementY * _MOUSE_SENSITIVITY * this.pointerSpeed
     _euler.x = Math.max(_PI_2 - this.maxPolarAngle, Math.min(_PI_2 - this.minPolarAngle, _euler.x))
     this.camera.quaternion.setFromEuler(_euler)
     // @ts-ignore
