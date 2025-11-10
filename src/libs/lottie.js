@@ -1,7 +1,7 @@
 const lottie = /* @__PURE__ */ (() => {
   if (
-    typeof navigator === 'undefined' ||
-    typeof document === 'undefined' ||
+    typeof navigator === 'undefined' || navigator.product === 'ReactNative' ||
+    typeof document === 'undefined' || typeof document.getElementsByTagName !== 'function' || typeof document.createElement !== 'function' ||
     typeof CanvasRenderingContext2D === 'undefined'
   )
     return {}
