@@ -100,6 +100,7 @@ class OrbitControls extends EventDispatcher<StandardControlsEventMap> {
   setPolarAngle: (x: number) => void
   setAzimuthalAngle: (x: number) => void
   getDistance: () => number
+  setDistance: (x: number) => void
   // Not used in most scenarios, however they can be useful for specific use cases
   getZoomScale: () => number
 
@@ -180,6 +181,21 @@ class OrbitControls extends EventDispatcher<StandardControlsEventMap> {
     }
 
     this.getDistance = (): number => scope.object.position.distanceTo(scope.target)
+
+    this.setDistance = (value: number): void => {
+      const clamped = Math.max(scope.minDistance, Math.min(scope.maxDistance, value))
+      const current = scope.object.position.distanceTo(scope.target)
+      if (current === 0) return
+      if ((scope.object as OrthographicCamera).isOrthographicCamera) {
+        // z position has no effect on a parallel projection, so adjust zoom instead
+        const orthoCamera = scope.object as OrthographicCamera
+        orthoCamera.zoom = Math.max(scope.minZoom, Math.min(scope.maxZoom, (orthoCamera.zoom * current) / clamped))
+        orthoCamera.updateProjectionMatrix()
+      } else {
+        scope.object.position.sub(scope.target).setLength(clamped).add(scope.target)
+      }
+      scope.update()
+    }
 
     this.listenToKeyEvents = (domElement: HTMLElement): void => {
       domElement.addEventListener('keydown', onKeyDown)
