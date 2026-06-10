@@ -97,6 +97,13 @@ class STLLoader extends Loader {
   parse(data) {
     function isBinary(data) {
       const reader = new DataView(data)
+
+      // A binary STL is at minimum an 80-byte header followed by a 4-byte
+      // uint32 face count (84 bytes total). Anything shorter cannot be
+      // binary; treat it as ASCII to avoid an out-of-bounds DataView read
+      // on short but legal ASCII solids (e.g. "solid s\nendsolid s\n").
+      if (reader.byteLength < 84) return false
+
       const face_size = (32 / 8) * 3 + (32 / 8) * 3 * 3 + 16 / 8
       const n_faces = reader.getUint32(80, true)
       const expect = 80 + 32 / 8 + n_faces * face_size
