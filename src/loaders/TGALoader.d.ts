@@ -10,5 +10,11 @@ export class TGALoader extends DataTextureLoader {
     onError?: (event: ErrorEvent) => void,
   ): DataTexture
   loadAsync(url: string, onProgress?: (event: ProgressEvent) => void): Promise<DataTexture>
-  parse(data: ArrayBuffer): DataTexture
+  parse(data: ArrayBuffer): {
+    data: Uint8Array
+    width: number
+    height: number
+    flipY: boolean
+    generateMipmaps: boolean
+  }
 }
