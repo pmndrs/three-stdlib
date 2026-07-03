@@ -174,7 +174,7 @@ class FlyControls extends EventDispatcher<FlyControlsEventMap> {
 
   private pointerdown = (event: MouseEvent): void => {
     if (this.dragToLook) {
-      this.mouseStatus++
+      this.mouseStatus = 1
     } else {
       switch (event.button) {
         case 0:
@@ -204,7 +204,7 @@ class FlyControls extends EventDispatcher<FlyControlsEventMap> {
 
   private pointerup = (event: MouseEvent): void => {
     if (this.dragToLook) {
-      this.mouseStatus--
+      this.mouseStatus = 0
 
       this.moveState.yawLeft = this.moveState.pitchDown = 0
     } else {
