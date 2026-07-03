@@ -777,6 +777,7 @@ class OrbitControls extends EventDispatcher<StandardControlsEventMap> {
         rotateEnd.set(event.pageX, event.pageY)
       } else {
         const position = getSecondPointerPosition(event)
+        if (!position) return
         const x = 0.5 * (event.pageX + position.x)
         const y = 0.5 * (event.pageY + position.y)
         rotateEnd.set(x, y)
@@ -798,6 +799,7 @@ class OrbitControls extends EventDispatcher<StandardControlsEventMap> {
         panEnd.set(event.pageX, event.pageY)
       } else {
         const position = getSecondPointerPosition(event)
+        if (!position) return
         const x = 0.5 * (event.pageX + position.x)
         const y = 0.5 * (event.pageY + position.y)
         panEnd.set(x, y)
@@ -810,6 +812,7 @@ class OrbitControls extends EventDispatcher<StandardControlsEventMap> {
 
     function handleTouchMoveDolly(event: PointerEvent) {
       const position = getSecondPointerPosition(event)
+      if (!position) return
       const dx = event.pageX - position.x
       const dy = event.pageY - position.y
       const distance = Math.sqrt(dx * dx + dy * dy)
