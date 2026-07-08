@@ -279,6 +279,8 @@ class GPUComputationRenderer {
           const renderTarget = renderTargets[j]
           renderTarget.dispose()
         }
+
+        variable.material.dispose()
       }
     }
 
