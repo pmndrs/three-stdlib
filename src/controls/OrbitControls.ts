@@ -52,6 +52,14 @@ class OrbitControls extends EventDispatcher<StandardControlsEventMap> {
   // If damping is enabled, you must call controls.update() in your animation loop
   enableDamping = false
   dampingFactor = 0.05
+  /**
+   * The static friction force applied to the movement.
+   * This is a constant force that opposes movement, independent of speed.
+   *
+   * @type {number}
+   * @default 0
+   */
+  staticMovingFriction = 0
   // This option actually enables dollying in and out; left as "zoom" for backwards compatibility.
   // Set to false to disable zooming
   enableZoom = true
@@ -323,6 +331,33 @@ class OrbitControls extends EventDispatcher<StandardControlsEventMap> {
           sphericalDelta.phi *= 1 - scope.dampingFactor
 
           panOffset.multiplyScalar(1 - scope.dampingFactor)
+
+          if (scope.staticMovingFriction > 0) {
+            const thetaSign = Math.sign(sphericalDelta.theta)
+            if (thetaSign !== 0) {
+              sphericalDelta.theta -= thetaSign * scope.staticMovingFriction
+              if (Math.sign(sphericalDelta.theta) !== thetaSign) {
+                sphericalDelta.theta = 0
+              }
+            }
+
+            const phiSign = Math.sign(sphericalDelta.phi)
+            if (phiSign !== 0) {
+              sphericalDelta.phi -= phiSign * scope.staticMovingFriction
+              if (Math.sign(sphericalDelta.phi) !== phiSign) {
+                sphericalDelta.phi = 0
+              }
+            }
+
+            const panLen = panOffset.length()
+            if (panLen > 0) {
+              if (panLen > scope.staticMovingFriction) {
+                panOffset.multiplyScalar((panLen - scope.staticMovingFriction) / panLen)
+              } else {
+                panOffset.set(0, 0, 0)
+              }
+            }
+          }
         } else {
           sphericalDelta.set(0, 0, 0)
 

@@ -19,13 +19,13 @@
   "homepage": "https://github.com/pmndrs/three-stdlib",
   "repository": "https://github.com/pmndrs/three-stdlib",
   "license": "MIT",
-  "types": "./index.d.ts",
-  "main": "./index.cjs",
-  "module": "./index.js",
+  "types": "./dist/index.d.ts",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
   "exports": {
-    "types": "./index.d.ts",
-    "require": "./index.cjs",
-    "import": "./index.js"
+    "types": "./dist/index.d.ts",
+    "require": "./dist/index.cjs",
+    "import": "./dist/index.js"
   },
   "sideEffects": false,
   "devDependencies": {
