@@ -1,4 +1,4 @@
-import { Clock, LinearFilter, RGBAFormat, NoBlending, Vector2, WebGLRenderer, WebGLRenderTarget } from 'three'
+import { Timer, LinearFilter, RGBAFormat, NoBlending, Vector2, WebGLRenderer, WebGLRenderTarget } from 'three'
 import { CopyShader } from '../shaders/CopyShader'
 import { ShaderPass } from './ShaderPass'
 import { MaskPass, ClearMaskPass } from './MaskPass'
@@ -16,7 +16,7 @@ class EffectComposer<TRenderTarget extends WebGLRenderTarget = WebGLRenderTarget
   public renderToScreen: boolean
   public passes: Pass[] = []
   public copyPass: Pass
-  public clock: Clock
+  public timer: Timer
 
   constructor(renderer: WebGLRenderer, renderTarget?: TRenderTarget) {
     this.renderer = renderer
@@ -68,7 +68,7 @@ class EffectComposer<TRenderTarget extends WebGLRenderTarget = WebGLRenderTarget
     // @ts-ignore
     this.copyPass.material.blending = NoBlending
 
-    this.clock = new Clock()
+    this.timer = new Timer()
   }
 
   public swapBuffers(): void {
@@ -108,8 +108,10 @@ class EffectComposer<TRenderTarget extends WebGLRenderTarget = WebGLRenderTarget
   public render(deltaTime?: number): void {
     // deltaTime value is in seconds
 
+    this.timer.update()
+
     if (deltaTime === undefined) {
-      deltaTime = this.clock.getDelta()
+      deltaTime = this.timer.getDelta()
     }
 
     const currentRenderTarget = this.renderer.getRenderTarget()
