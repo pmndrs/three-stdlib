@@ -33,8 +33,15 @@ import { version } from '../_polyfill/constants'
 
 async function readAsDataURL(blob) {
   const buffer = await blob.arrayBuffer()
-  const data = btoa(String.fromCharCode(...new Uint8Array(buffer)))
-  return `data:${blob.type || ''};base64,${data}`
+  const bytes = new Uint8Array(buffer)
+
+  // Spread of a large byte array into fromCharCode overflows the call stack, so encode in chunks
+  let data = ''
+  for (let i = 0; i < bytes.length; i += 0x8000) {
+    data += String.fromCharCode(...bytes.subarray(i, i + 0x8000))
+  }
+
+  return `data:${blob.type || ''};base64,${btoa(data)}`
 }
 
 let _renderer
